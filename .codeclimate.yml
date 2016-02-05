@@ -1,4 +1,3 @@
----
 engines:
   duplication:
     enabled: true
@@ -13,7 +12,7 @@ engines:
     enabled: true
 ratings:
   paths:
-  - "**.php"
+  - "src/**"
 exclude_paths:
- - tests/
- - vendor/
+ - tests/**/*
+ - vendor/**/*
