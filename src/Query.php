@@ -18,7 +18,7 @@ class Query
     private $args=[];
 
     /** If no fields are defined, this field is used */
-    public $default_field='*';
+    public $defaultField='*';
 
     /** Backtics are added around all fields. Set this to blank string to avoid */
     public $escapeChar='`';
@@ -103,11 +103,11 @@ class Query
         $result=[];
 
         // If no fields were defined, use default_field
-        if (!$this->args['fields']) {
-            if ($this->default_field instanceof DB_dsql) {
-                return $this->consume($this->default_field);
+        if (!isset($this->args['fields']) || !($this->args['fields'])) {
+            if ($this->defaultField instanceof DB_dsql) {
+                return $this->consume($this->defaultField);
             }
-            return (string)$this->default_field;
+            return (string)$this->defaultField;
         }
 
         foreach ($this->args['fields'] as $row) {

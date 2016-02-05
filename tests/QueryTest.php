@@ -35,6 +35,9 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('`first_name` `name`', $this->q()->field(['name'=>'first_name'])->render_field());
         $this->assertEquals('`employee`.`first_name` `name`', $this->q()->field(['name'=>'first_name'],'employee')->render_field());
 
+        $this->assertEquals('*', $this->q()->render_field());
+        $this->assertEquals('id', $this->q(['defaultField'=>'id'])->render_field());
+
     }
 
 }
