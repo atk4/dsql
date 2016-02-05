@@ -121,11 +121,13 @@ class Query
             // Will parameterize the value and backtick if necessary.
             $field=$this->consume($field);
 
-            // TODO: not sure what this does
+            // TODO: Commented until I figure out what this does
+            /*
             if (!$field) {
                 $field=$table;
                 $table=null;
             }
+            */
 
             if (!is_null($table)) {
                 // table cannot be expression, so only backtick
@@ -156,7 +158,7 @@ class Query
             return null;
         }
 
-        /** TEMPORARILY removed, ATK feature **/
+        /** TODO: TEMPORARILY removed, ATK feature, implement with traits **/
         /*
         if (is_object($dsql) && $dsql instanceof Field) {
             $dsql=$dsql->getExpr();
