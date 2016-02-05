@@ -150,7 +150,7 @@ class Query
      *
      * @return string Quoted expression
      */
-    function consume($dsql, $tick = true)
+    function consume($dsql)
     {
         if ($dsql===null) {
             return null;
@@ -163,7 +163,7 @@ class Query
         }
         */
         if (!is_object($dsql) || !$dsql instanceof Query) {
-            return $tick?$this->escape($dsql):$dsql;
+            return $this->escape($dsql);
         }
         $dsql->params = &$this->params;
         $ret = $dsql->_render();
