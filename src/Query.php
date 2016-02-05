@@ -21,7 +21,7 @@ class Query
     public $default_field='*';
 
     /** Backtics are added around all fields. Set this to blank string to avoid */
-    public $bt='`';
+    public $escapeChar='`';
 
     /**
      * Specifying options to constructors will override default
@@ -129,12 +129,12 @@ class Query
 
             if (!is_null($table)) {
                 // table cannot be expression, so only backtick
-                $field=$this->bt($table).'.'.$field;
+                $field=$this->escape($table).'.'.$field;
             }
 
             if ($alias && $alias!==null) {
                 // alias cannot be expression, so only backtick
-                $field.=' '.$this->bt($alias);
+                $field.=' '.$this->escape($alias);
             }
             $result[]=$field;
         }
@@ -163,7 +163,7 @@ class Query
         }
         */
         if (!is_object($dsql) || !$dsql instanceof Query) {
-            return $tick?$this->bt($dsql):$dsql;
+            return $tick?$this->escape($dsql):$dsql;
         }
         $dsql->params = &$this->params;
         $ret = $dsql->_render();
@@ -176,35 +176,35 @@ class Query
     }
 
     /**
-     * Adds backtics around argument. This will allow you to use reserved
+     * Escapes argument by adding backtics around it. This will allow you to use reserved
      * SQL words as table or field names such as "table"
      *
      * @param string $s any string
      *
      * @return string Quoted string
      */
-    function bt($s)
+    function escape($s)
     {
         // Supports array
         if (is_array($s)) {
             $out=[];
             foreach ($s as $ss) {
-                $out[]=$this->bt($ss);
+                $out[]=$this->escape($ss);
             }
             return $out;
         }
 
-        if (!$this->bt
+        if (!$this->escapeChar
             || is_object($s)
             || $s==='*'
             || strpos($s, '.')!==false
             || strpos($s, '(')!==false
-            || strpos($s, $this->bt)!==false
+            || strpos($s, $this->escapeChar)!==false
         ) {
             return $s;
         }
 
-        return $this->bt.$s.$this->bt;
+        return $this->escapeChar.$s.$this->escapeChar;
     }
 
     public function table($table)
