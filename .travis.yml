@@ -6,5 +6,8 @@ php:
 before_script:
     - composer install
 
+after_script:
+    - vendor/bin/test-reporter
+
 notifications:
     slack: agiletoolkit:bjrKuPBf1h4cYiNxPBQ1kF6c
