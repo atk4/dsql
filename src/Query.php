@@ -7,7 +7,7 @@ class Query
     /**
      * Define templates for the basic queries
      */
-    public $sql_templates=[
+    public $templates=[
         'select'=>"select [field] [from] [table]"
     ];
 
@@ -183,28 +183,28 @@ class Query
      *
      * @return string Quoted string
      */
-    function escape($s)
+    function escape($identifier)
     {
         // Supports array
-        if (is_array($s)) {
+        if (is_array($identifier)) {
             $out=[];
-            foreach ($s as $ss) {
+            foreach ($identifier as $ss) {
                 $out[]=$this->escape($ss);
             }
             return $out;
         }
 
         if (!$this->escapeChar
-            || is_object($s)
-            || $s==='*'
-            || strpos($s, '.')!==false
-            || strpos($s, '(')!==false
-            || strpos($s, $this->escapeChar)!==false
+            || is_object($identifier)
+            || $identifier==='*'
+            || strpos($identifier, '.')!==false
+            || strpos($identifier, '(')!==false
+            || strpos($identifier, $this->escapeChar)!==false
         ) {
-            return $s;
+            return $identifier;
         }
 
-        return $this->escapeChar.$s.$this->escapeChar;
+        return $this->escapeChar.$identifier.$this->escapeChar;
     }
 
     public function table($table)
