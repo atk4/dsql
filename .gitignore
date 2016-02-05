@@ -1,2 +1,3 @@
-doc/html
-doc/doctree
+docs/html
+docs/doctrees
+/vendor
