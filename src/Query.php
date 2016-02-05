@@ -5,10 +5,10 @@ namespace atk4\dsql;
 class Query
 {
     public function table($table){
-        return true;
+        return (boolean)$table;
     }
 
     public function field($field){
-        return true;
+        return (boolean)$field;
     }
 }
