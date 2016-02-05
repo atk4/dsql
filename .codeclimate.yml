@@ -8,6 +8,9 @@ engines:
     enabled: true
   phpmd:
     enabled: true
+    checks:
+      Controversial/CamelCaseMethodName:
+        enabled: false
   radon:
     enabled: true
 ratings:
