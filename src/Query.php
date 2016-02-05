@@ -97,7 +97,7 @@ class Query
      *
      * @return string Parsed template chunk
      */
-    function render_field()
+    function _render_field()
     {
         // will be joined for output
         $result=[];
@@ -105,7 +105,7 @@ class Query
         // If no fields were defined, use default_field
         if (!isset($this->args['fields']) || !($this->args['fields'])) {
             if ($this->defaultField instanceof DB_dsql) {
-                return $this->consume($this->defaultField);
+                return $this->_consume($this->defaultField);
             }
             return (string)$this->defaultField;
         }
@@ -119,7 +119,7 @@ class Query
             }
 
             // Will parameterize the value and backtick if necessary.
-            $field=$this->consume($field);
+            $field=$this->_consume($field);
 
             // TODO: Commented until I figure out what this does
             /*
@@ -131,12 +131,12 @@ class Query
 
             if (!is_null($table)) {
                 // table cannot be expression, so only backtick
-                $field=$this->escape($table).'.'.$field;
+                $field=$this->_escape($table).'.'.$field;
             }
 
             if ($alias && $alias!==null) {
                 // alias cannot be expression, so only backtick
-                $field.=' '.$this->escape($alias);
+                $field.=' '.$this->_escape($alias);
             }
             $result[]=$field;
         }
@@ -152,28 +152,28 @@ class Query
      *
      * @return string Quoted expression
      */
-    function consume($dsql)
+    function _consume($sql_code)
     {
-        if ($dsql===null) {
+        if ($sql_code===null) {
             return null;
         }
 
         /** TODO: TEMPORARILY removed, ATK feature, implement with traits **/
         /*
-        if (is_object($dsql) && $dsql instanceof Field) {
-            $dsql=$dsql->getExpr();
+        if (is_object($sql_code) && $sql_code instanceof Field) {
+            $sql_code=$sql_code->getExpr();
         }
         */
-        if (!is_object($dsql) || !$dsql instanceof Query) {
-            return $this->escape($dsql);
+        if (!is_object($sql_code) || !$sql_code instanceof Query) {
+            return $this->_escape($sql_code);
         }
-        $dsql->params = &$this->params;
-        $ret = $dsql->_render();
-        if ($dsql->mode==='select') {
+        $sql_code->params = &$this->params;
+        $ret = $sql_code->_render();
+        if ($sql_code->mode==='select') {
             $ret='('.$ret.')';
         }
-        unset($dsql->params);
-        $dsql->params=[];
+        unset($sql_code->params);
+        $sql_code->params=[];
         return $ret;
     }
 
@@ -185,28 +185,28 @@ class Query
      *
      * @return string Quoted string
      */
-    function escape($identifier)
+    function _escape($sql_code)
     {
         // Supports array
-        if (is_array($identifier)) {
+        if (is_array($sql_code)) {
             $out=[];
-            foreach ($identifier as $ss) {
-                $out[]=$this->escape($ss);
+            foreach ($sql_code as $ss) {
+                $out[]=$this->_escape($ss);
             }
             return $out;
         }
 
         if (!$this->escapeChar
-            || is_object($identifier)
-            || $identifier==='*'
-            || strpos($identifier, '.')!==false
-            || strpos($identifier, '(')!==false
-            || strpos($identifier, $this->escapeChar)!==false
+            || is_object($sql_code)
+            || $sql_code==='*'
+            || strpos($sql_code, '.')!==false
+            || strpos($sql_code, '(')!==false
+            || strpos($sql_code, $this->escapeChar)!==false
         ) {
-            return $identifier;
+            return $sql_code;
         }
 
-        return $this->escapeChar.$identifier.$this->escapeChar;
+        return $this->escapeChar.$sql_code.$this->escapeChar;
     }
 
     public function table($table)
