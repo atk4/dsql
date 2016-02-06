@@ -2,26 +2,33 @@
 
 namespace atk4\dsql;
 
+/**
+ * @todo Class description goes here
+ */
 class Query
 {
     /**
      * Define templates for the basic queries
      */
-    public $templates=[
-        'select'=>"select [field] [from] [table]"
+    public $templates = [
+        'select' => "select [field] [from] [table]"
     ];
 
     /**
      * Hash containing configuration accumulated by calling methods
      * such as field(), table(), etc
      */
-    private $args=[];
+    private $args = [];
 
-    /** If no fields are defined, this field is used */
-    public $defaultField='*';
+    /**
+     * If no fields are defined, this field is used
+     */
+    public $defaultField = '*';
 
-    /** Backtics are added around all fields. Set this to blank string to avoid */
-    public $escapeChar='`';
+    /**
+     * Backticks are added around all fields. Set this to blank string to avoid
+     */
+    public $escapeChar = '`';
 
     /**
      * Specifying options to constructors will override default
@@ -43,30 +50,30 @@ class Query
      *  $q->field('name');
      *
      * Second argument specifies table for regular fields
-     *  $q->field('name','user');
-     *  $q->field('name','user')->field('line1','address');
+     *  $q->field('name', 'user');
+     *  $q->field('name', 'user')->field('line1', 'address');
      *
      * Array as a first argument will specify mulitple fields, same as calling field() multiple times
-     *  $q->field(['name','surname']);
+     *  $q->field(['name', 'surname']);
      *
-     * Associative array will assume that "key" holds the alias. Value may be object.
-     *  $q->field(['alias'=>'name','alias2'=>surname']);
-     *  $q->field(['alias'=>$q->expr(..), 'alias2'=>$q->dsql()->.. ]);
+     * Associative array will assume that "key" holds the alias. Value may be object
+     *  $q->field(['alias' => 'name', 'alias2' => 'surname']);
+     *  $q->field(['alias' => $q->expr(..), 'alias2' => $q->dsql()->.. ]);
      *
      * You may use array with aliases together with table specifier.
-     *  $q->field(['alias'=>'name','alias2'=>surname'],'user');
+     *  $q->field(['alias' => 'name', 'alias2' => 'surname'], 'user');
      *
-     * You can specify $q->expr() for calculated fields. Alias is mandatory.
-     *  $q->field( $q->expr('2+2'),'alias');                // must always use alias
+     * You can specify $q->expr() for calculated fields. In such case field alias is mandatory
+     *  $q->field( $q->expr('2+2'), 'alias');   // must always use alias
      *
-     * You can use $q->dsql() for subqueries. Alias is mandatory.
+     * You can use $q->dsql() for subqueries. In such case field alias is mandatory
      *  $q->field( $q->dsql()->table('x')... , 'alias');    // must always use alias
      *
      * @param string|array $field Specifies field to select
      * @param string       $table Specify if not using primary table
      * @param string       $alias Specify alias for this field
      *
-     * @return DB_dsql $this
+     * @return Query $this
      */
     function field($field, $table = null, $alias = null)
     {
@@ -100,9 +107,9 @@ class Query
     function _render_field()
     {
         // will be joined for output
-        $result=[];
+        $result = [];
 
-        // If no fields were defined, use default_field
+        // If no fields were defined, use defaultField
         if (!isset($this->args['fields']) || !($this->args['fields'])) {
             if ($this->defaultField instanceof DB_dsql) {
                 return $this->_consume($this->defaultField);
@@ -111,34 +118,34 @@ class Query
         }
 
         foreach ($this->args['fields'] as $row) {
-            list($field,$table,$alias)=$row;
+            list($field,$table,$alias) = $row;
 
             // Do not use alias, if it's same as field
-            if ($alias===$field) {
-                $alias=null;
+            if ($alias === $field) {
+                $alias = null;
             }
 
             // Will parameterize the value and backtick if necessary.
-            $field=$this->_consume($field);
+            $field = $this->_consume($field);
 
             // TODO: Commented until I figure out what this does
             /*
             if (!$field) {
-                $field=$table;
-                $table=null;
+                $field = $table;
+                $table = null;
             }
             */
 
             if (!is_null($table)) {
-                // table cannot be expression, so only backtick
-                $field=$this->_escape($table).'.'.$field;
+                // table name cannot be expression, so only backtick
+                $field = $this->_escape($table) . '.' . $field;
             }
 
-            if ($alias && $alias!==null) {
-                // alias cannot be expression, so only backtick
-                $field.=' '.$this->_escape($alias);
+            if ($alias && $alias !== null) {
+                // field alias cannot be expression, so only backtick
+                $field .= ' ' . $this->_escape($alias);
             }
-            $result[]=$field;
+            $result[] = $field;
         }
         return join(',', $result);
     }
@@ -154,14 +161,14 @@ class Query
      */
     function _consume($sql_code)
     {
-        if ($sql_code===null) {
+        if ($sql_code === null) {
             return null;
         }
 
         /** TODO: TEMPORARILY removed, ATK feature, implement with traits **/
         /*
         if (is_object($sql_code) && $sql_code instanceof Field) {
-            $sql_code=$sql_code->getExpr();
+            $sql_code = $sql_code->getExpr();
         }
         */
         if (!is_object($sql_code) || !$sql_code instanceof Query) {
@@ -169,19 +176,21 @@ class Query
         }
         $sql_code->params = &$this->params;
         $ret = $sql_code->_render();
-        if ($sql_code->mode==='select') {
-            $ret='('.$ret.')';
+        if ($sql_code->mode === 'select') {
+            $ret = '(' . $ret . ')';
         }
         unset($sql_code->params);
-        $sql_code->params=[];
+        $sql_code->params = [];
+        
         return $ret;
     }
 
     /**
-     * Escapes argument by adding backtics around it. This will allow you to use reserved
-     * SQL words as table or field names such as "table"
+     * Escapes argument by adding backticks around it.
+     * This will allow you to use reserved SQL words as table or field names
+     * such as "table"
      *
-     * @param string $s any string
+     * @param string $sql_code Any string
      *
      * @return string Quoted string
      */
@@ -189,33 +198,39 @@ class Query
     {
         // Supports array
         if (is_array($sql_code)) {
-            $out=[];
-            foreach ($sql_code as $ss) {
-                $out[]=$this->_escape($ss);
+            $out = [];
+            foreach ($sql_code as $s) {
+                $out[] = $this->_escape($s);
             }
             return $out;
         }
 
         if (!$this->escapeChar
             || is_object($sql_code)
-            || $sql_code==='*'
-            || strpos($sql_code, '.')!==false
-            || strpos($sql_code, '(')!==false
-            || strpos($sql_code, $this->escapeChar)!==false
+            || $sql_code === '*'
+            || strpos($sql_code, '.') !== false
+            || strpos($sql_code, '(') !== false
+            || strpos($sql_code, $this->escapeChar) !== false
         ) {
             return $sql_code;
         }
 
-        return $this->escapeChar.$sql_code.$this->escapeChar;
+        return $this->escapeChar . $sql_code . $this->escapeChar;
     }
 
+    /**
+     * @todo Method description
+     */
     public function table($table)
     {
         return (boolean)$table;
     }
 
-
-    public function render(){
+    /**
+     * @todo Method description
+     */
+    public function render()
+    {
 
     }
 }
