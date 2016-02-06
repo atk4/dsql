@@ -112,7 +112,7 @@ class Query
 
         // If no fields were defined, use defaultField
         if (!isset($this->args['fields']) || !($this->args['fields'])) {
-            if ($this->defaultField instanceof DB_dsql) {
+            if ($this->defaultField instanceof Query) {
                 return $this->_consume($this->defaultField);
             }
             return (string)$this->defaultField;
@@ -137,12 +137,12 @@ class Query
             }
             */
 
-            if (!is_null($table)) {
+            if ($table) {
                 // table name cannot be expression, so only backtick
                 $field = $this->_escape($table) . '.' . $field;
             }
 
-            if ($alias && $alias !== null) {
+            if ($alias) {
                 // field alias cannot be expression, so only backtick
                 $field .= ' ' . $this->_escape($alias);
             }
@@ -188,24 +188,21 @@ class Query
 
     /**
      * Escapes argument by adding backticks around it.
-     * This will allow you to use reserved SQL words as table or field names
-     * such as "table"
+     * This will allow you to use reserved SQL words as table or field
+     * names such as "table"
      *
-     * @param string $sql_code Any string
+     * @param string|array $sql_code Any string or array of strings
      *
-     * @return string Quoted string
+     * @return string|array Quoted string or array of strings
      */
     protected function _escape($sql_code)
     {
         // Supports array
         if (is_array($sql_code)) {
-            $out = [];
-            foreach ($sql_code as $s) {
-                $out[] = $this->_escape($s);
-            }
-            return $out;
+            return array_map([$this, '_escape'], $sql_code);
         }
 
+        // Don't escape objects, asterix, expressions and already escaped strings
         if (!$this->escapeChar
             || is_object($sql_code)
             || $sql_code === '*'
