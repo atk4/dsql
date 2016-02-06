@@ -11,7 +11,7 @@ class Query
      * Define templates for the basic queries
      */
     public $templates = [
-        'select' => "select [field] [from] [table]"
+        'select' => 'select [field] [from] [table]',
     ];
 
     /**
@@ -32,7 +32,7 @@ class Query
 
     /**
      * Specifying options to constructors will override default
-     * attribute values in this class
+     * attribute values of this class
      *
      * @param array $options will initialize class properties
      */
@@ -53,10 +53,11 @@ class Query
      *  $q->field('name', 'user');
      *  $q->field('name', 'user')->field('line1', 'address');
      *
-     * Array as a first argument will specify mulitple fields, same as calling field() multiple times
+     * Array as a first argument will specify multiple fields, same as calling field() multiple times
      *  $q->field(['name', 'surname']);
      *
-     * Associative array will assume that "key" holds the alias. Value may be object
+     * Associative array will assume that "key" holds the field alias.
+     * Value may be field name, expression or Query object itself
      *  $q->field(['alias' => 'name', 'alias2' => 'surname']);
      *  $q->field(['alias' => $q->expr(..), 'alias2' => $q->dsql()->.. ]);
      *
