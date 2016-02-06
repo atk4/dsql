@@ -105,7 +105,7 @@ class Query
      *
      * @return string Parsed template chunk
      */
-    protected function _render_field()
+    function _render_field()
     {
         // will be joined for output
         $result = [];
@@ -160,7 +160,7 @@ class Query
      *
      * @return string Quoted expression
      */
-    protected function _consume($sql_code)
+    function _consume($sql_code)
     {
         if ($sql_code === null) {
             return null;
@@ -195,7 +195,7 @@ class Query
      *
      * @return string|array Quoted string or array of strings
      */
-    protected function _escape($sql_code)
+    function _escape($sql_code)
     {
         // Supports array
         if (is_array($sql_code)) {
