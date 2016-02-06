@@ -34,9 +34,11 @@ Do not hesitate to contribute to DSQL. We have made it safe and simple for you t
  - Go to [http://github.com/atk4/dsql](http://github.com/atk4/dsql) and create Pull Request
  - In the description of your pull request, use screenshots of new functionality or examples of new code.
  - Go to #dsql on our Slack and ask others to review your PR.
- - Allow others to review. Never Merge your own pull requests. 
+ - Allow others to review. Never Merge your own pull requests.
+ - If you notice that anything is missing in your pull-request, go back to your code/branch, commit and push. Changes will automatically appear in your pull request.
+ - Clean up your repository. Follow this guide: [http://railsware.com/blog/2014/08/11/git-housekeeping-tutorial-clean-up-outdated-branches-in-local-and-remote-repositories/](http://railsware.com/blog/2014/08/11/git-housekeeping-tutorial-clean-up-outdated-branches-in-local-and-remote-repositories/)
 
-## If you do not have access to atk4/dsql
+## If you do not have access to commit into atk4/dsql
 
  - Fork atk4/dsql repository.
  - Follow same instructions as above, but use your own repository name
