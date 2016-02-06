@@ -28,9 +28,13 @@ Do not hesitate to contribute to DSQL. We have made it safe and simple for you t
  - commit your code. Name your commits consistently. See [https://github.com/atk4/dsql/commits/develop](https://github.com/atk4/dsql/commits/develop)
  - use multiple comments if necessary. I recommend you to use "Github Desktop", where you can even perform partial file commits.
  - once commits are done run `git feature publish fix-psr-compatibility`. 
- - Go to [http://github.com/atk4/dsql](http://github.com/atk4/dsql) and create Pull Request
- - Go to #dsql on our Slack and ask others to review your PR.
  
+## Create Pull Request
+
+ - Go to [http://github.com/atk4/dsql](http://github.com/atk4/dsql) and create Pull Request
+ - In the description of your pull request, use screenshots of new functionality or examples of new code.
+ - Go to #dsql on our Slack and ask others to review your PR.
+ - Allow others to review. Never Merge your own pull requests. 
 
 ## If you do not have access to atk4/dsql
 
