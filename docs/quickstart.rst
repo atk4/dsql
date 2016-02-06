@@ -28,7 +28,9 @@ We will start by looking at the Query building.
 
 .. code-block:: php
 
-    $query = new atk4/dsql/Query();
+    use atk4\dsql;
+
+    $query = new dsql\Query();
 
 Once you have a query object, you can add parameters by calling some of
 it's methods:

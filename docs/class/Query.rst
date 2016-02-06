@@ -1,9 +1,10 @@
+===========
 Query Class
 ===========
 
 .. php:class:: Query
 
-  Query class
+Query class represents your SQL query-in-making.
 
   .. php:method:: table($year)
 
@@ -44,13 +45,74 @@ you may use expression as a table::
 
 Refer to :ref:`expr` for more information on how to create them.
 
-  .. php:method:: field($fields)
+  .. php:method:: field($fields, $table = null, $alias = null)
 
-      Specify which fields to use in SELECT query.
+      Adds additional field that you would like to query. If never called,
+      will default do `defaultField`.
 
-      :param string|array $fields: Specify list of fields to fetch
+      This method has several call options. $field can be array of fields
+      and can also be an expression. If you specify expression in $field
+      then alias is mandatory.
+
+      :param string|array|object $fields: Specify list of fields to fetch
+      :param string $table: Optionally secify a table to query from
+      :param string $alias: Optionally secify alias for resulting query
       :returns: $this
 
-  .. php:const:: ATOM
+Basic Examples::
 
-      Y-m-d\TH:i:sP
+    $query = new dsql/Query();
+    $query->table('user');
+
+    $query->field('first_name');
+        // SELECT `first_name` from `user`
+
+    $query->field('first_name,last_name');
+        // SELECT `first_name`,`last_name` from `user`
+
+    $query->field('first_name','emplayee')
+        // SELECT `emplayee`.`first_name` from `user`
+
+    $query->field(first_name',null,'name')
+        // SELECT `first_name` `name` from `user`
+
+    $query->field(['name'=>'first_name'])
+        // SELECT `first_name` `name` from `user`
+
+    $query->field(['name'=>'first_name'],'employee');
+        // SELECT `employee`.`first_name` `name` from `user`
+
+See also field() usage with :ref:`expr`.
+
+
+Internal Methods
+================
+
+You probably won't have to use those methods, unless you're working with
+DSQL internally.
+
+  .. php:method:: _consume($sql_code)
+
+      Internal method.
+
+      Makes $sql_code part of $this query. Argument may be either
+      a string (which will be escaped) or another Query. If
+      specified query implements a "select", then it's automatically
+      placed inside brackets.
+
+      $query->consume('first_name');  // `first_name`
+      $query->consume($other_query);  // will merge parameters and return string
+
+  .. php:method:: _escape($sql_code)
+
+      Internal method.
+
+      Surrounds $sql code with $escapeChar. If escapeChar is null
+      will do nothing.
+
+      Will also do nothing if it finds "*", "." or "(" character in $sql_code
+
+      $query->_escape('first_name');  // `first_name`
+      $query->_escape('first.name');  // first.name
+      $query->_escape('(2+2)');       // (2+2)
+      $query->_escape('*');           // *

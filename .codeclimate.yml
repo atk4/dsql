@@ -8,11 +8,17 @@ engines:
     enabled: true
   phpmd:
     enabled: true
+    checks:
+      Controversial/CamelCaseMethodName:
+        enabled: false
+      CyclomaticComplexity:
+        reportLevel: 13
   radon:
     enabled: true
 ratings:
   paths:
   - "src/**"
 exclude_paths:
+ - docs/**/*
  - tests/**/*
  - vendor/**/*
