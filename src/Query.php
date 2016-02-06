@@ -2,7 +2,7 @@
 
 namespace atk4\dsql;
 
-class Query
+class Query implements Expression
 {
     /**
      * Define templates for the basic queries
@@ -10,6 +10,11 @@ class Query
     public $templates=[
         'select'=>"select [field] [from] [table]"
     ];
+
+    /**
+     * Current template
+     */
+    public $expression = null;
 
     /**
      * Hash containing configuration accumulated by calling methods
@@ -34,6 +39,46 @@ class Query
         foreach ($options as $key => $val) {
             $this->$key = $val;
         }
+    }
+
+    /**
+     * Query can be used as a part of other query.
+     * @return Query $this
+     */
+    function getDSQLExpression()
+    {
+        return $this;
+    }
+
+    /**
+     * Returns SQL representation of $this Query
+     */
+    function _render()
+    {
+        if (is_null($this->expression)) {
+            $this->_setTemplate('select');
+        }
+
+        // Will find [blah] tags inside current expression and will auto-fill
+        $res= preg_replace_callback(
+            '/\[([a-z0-9_]*)\]/',
+            function ($matches) {
+                $fx='render_'.$matches[1];
+
+                if (isset($this->args['custom'][$matches[1]])) {
+                    // setCustom may set argument to be auto-filled
+                    return $this->_consume($this->args['custom'][$matches[1]]);
+                } elseif (method_exists($this,$fx)) {
+                    // call the method that will produce necessary output
+                    return $this->$fx();
+                } else {
+                    throw new Exception('DSQL Expression could not render ['.$matches[0].']');
+                    //return $matches[0];
+                }
+            },
+                $this->template
+            );
+        return $res;
     }
 
     /**
@@ -152,7 +197,7 @@ class Query
      *
      * @return string Quoted expression
      */
-    function _consume($sql_code)
+    function _consume($sql_code, $do_not_escape = null)
     {
         if ($sql_code===null) {
             return null;
@@ -165,7 +210,11 @@ class Query
         }
         */
         if (!is_object($sql_code) || !$sql_code instanceof Query) {
-            return $this->_escape($sql_code);
+            if($do_not_escape){
+                return $sql_code;
+            }else{
+                return $this->_escape($sql_code);
+            }
         }
         $sql_code->params = &$this->params;
         $ret = $sql_code->_render();
