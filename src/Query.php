@@ -76,7 +76,7 @@ class Query
      *
      * @return Query $this
      */
-    function field($field, $table = null, $alias = null)
+    public function field($field, $table = null, $alias = null)
     {
         // field is passed as string, may contain commas
         if (is_string($field) && strpos($field, ',') !== false) {
@@ -105,7 +105,7 @@ class Query
      *
      * @return string Parsed template chunk
      */
-    function _render_field()
+    protected function _render_field()
     {
         // will be joined for output
         $result = [];
@@ -160,7 +160,7 @@ class Query
      *
      * @return string Quoted expression
      */
-    function _consume($sql_code)
+    protected function _consume($sql_code)
     {
         if ($sql_code === null) {
             return null;
@@ -195,7 +195,7 @@ class Query
      *
      * @return string Quoted string
      */
-    function _escape($sql_code)
+    protected function _escape($sql_code)
     {
         // Supports array
         if (is_array($sql_code)) {
