@@ -18,14 +18,22 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::__construct
+     */
+    public function testConstruct()
+    {
+        // passing arguments in constructor
+        $this->assertEquals('#', $this->q(['escapeChar' => '#'])->escapeChar);
+    }
+
+    /**
      * @covers ::_escape
      */
     public function testEscape()
     {
         // escaping expressions
-
         $this->assertEquals('`first_name`',     PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['first_name']));
-        $this->assertEquals('*first_name*',     PHPUnitUtil::callProtectedMethod($this->q(['escapeChar'=>'*']), '_escape', ['first_name']));
+        $this->assertEquals('*first_name*',     PHPUnitUtil::callProtectedMethod($this->q(['escapeChar' => '*']), '_escape', ['first_name']));
 
         // should not escape expressions
         $this->assertEquals('*',                PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['*']));
