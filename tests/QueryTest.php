@@ -1,47 +1,71 @@
 <?php
-
+namespace atk4\dsql\tests;
 use atk4\dsql\Query;
 
-class QueryTest extends PHPUnit_Framework_TestCase
-{
 
-    function q($args = []){
+
+/**
+ * @coversDefaultClass \atk4\dsql\Query
+ */
+class QueryTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * Name of class which we're testing with all these tests
+     */
+    public function q($args = [])
+    {
         return new Query($args);
     }
 
-    function testTable()
+    /**
+     * @covers ::_escape
+     */
+    public function testEscape()
     {
-        $q = new Query();
-        $res = $q->table('employee');
-        $this->assertEquals(true, $res);
+        // escaping expressions
+
+        $this->assertEquals('`first_name`',     PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['first_name']));
+        $this->assertEquals('*first_name*',     PHPUnitUtil::callProtectedMethod($this->q(['escapeChar'=>'*']), '_escape', ['first_name']));
+
+        // should not escape expressions
+        $this->assertEquals('*',                PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['*']));
+        $this->assertEquals('(2+2) age',        PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['(2+2) age']));
+        $this->assertEquals('first_name.table', PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['first_name.table']));
+        $this->assertEquals('first#name',       PHPUnitUtil::callProtectedMethod($this->q(['escapeChar'=>'#']), '_escape', ['first#name']));
+        //$this->assertEquals(true,               is_object(PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ["bleh"])));
+
+        // escaping array - escapes each of its elements
+        $this->assertEquals(
+            ['`first_name`', '*', '`last_name`'],
+            PHPUnitUtil::callProtectedMethod($this->q(), '_escape', [ ['first_name', '*', 'last_name'] ])
+        );
     }
 
-    function testEscaping()
+    /**
+     * @covers ::field
+     */
+    public function testFieldBasic()
     {
-        // escaping exclusions
-        $this->assertEquals('`first_name`', $this->q()->_escape('first_name'));
-        $this->assertEquals('*first_name*', $this->q(['escapeChar'=>'*'])->_escape('first_name'));
-        $this->assertEquals('first_name.table', $this->q()->_escape('first_name.table'));
-        $this->assertEquals('(2+2) age', $this->q()->_escape('(2+2) age'));
-        $this->assertEquals('*', $this->q()->_escape('*'));
-
+        $this->assertEquals('`first_name`',             PHPUnitUtil::callProtectedMethod($this->q()->field('first_name'), '_render_field'));
+        $this->assertEquals('`first_name`,`last_name`', PHPUnitUtil::callProtectedMethod($this->q()->field('first_name,last_name'), '_render_field'));
+        $this->assertEquals('`employee`.`first_name`',  PHPUnitUtil::callProtectedMethod($this->q()->field('first_name', 'employee'), '_render_field'));
+        $this->assertEquals('`first_name` `name`',      PHPUnitUtil::callProtectedMethod($this->q()->field('first_name', null, 'name'), '_render_field'));
+        $this->assertEquals('`first_name` `name`',      PHPUnitUtil::callProtectedMethod($this->q()->field(['name' => 'first_name']), '_render_field'));
+        $this->assertEquals(
+            '`employee`.`first_name` `name`',
+            PHPUnitUtil::callProtectedMethod($this->q()->field(['name'=>'first_name'],'employee'), '_render_field')
+        );
+        $this->assertEquals('*',                        PHPUnitUtil::callProtectedMethod($this->q(), '_render_field'));
+        $this->assertEquals('id',                       PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => 'id']), '_render_field'));
+        $this->assertEquals('*',                        PHPUnitUtil::callProtectedMethod($this->q()->field('*'), '_render_field'));
+        $this->assertEquals('first_name.employee',      PHPUnitUtil::callProtectedMethod($this->q()->field('first_name.employee'), '_render_field'));
     }
 
-    function testFieldBasic()
+    /**
+     * @covers ::table
+     */
+    public function testTable()
     {
-        // excludes expressions
-        $this->assertEquals('`first_name`', $this->q()->field('first_name')->_render_field());
-        $this->assertEquals('`first_name`,`last_name`', $this->q()->field('first_name,last_name')->_render_field());
-        $this->assertEquals('`emplayee`.`first_name`', $this->q()->field('first_name','emplayee')->_render_field());
-        $this->assertEquals('`first_name` `name`', $this->q()->field('first_name',null,'name')->_render_field());
-        $this->assertEquals('`first_name` `name`', $this->q()->field(['name'=>'first_name'])->_render_field());
-        $this->assertEquals('`employee`.`first_name` `name`', $this->q()->field(['name'=>'first_name'],'employee')->_render_field());
-
-        $this->assertEquals('*', $this->q()->_render_field());
-        $this->assertEquals('id', $this->q(['defaultField'=>'id'])->_render_field());
-        $this->assertEquals('*', $this->q()->field('*')->_render_field());
-        $this->assertEquals('first_name.employee', $this->q()->field('first_name.employee')->_render_field());
-
+        $this->assertEquals(true, $this->q()->table('employee'));
     }
-
 }

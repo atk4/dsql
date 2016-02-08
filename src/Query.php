@@ -18,7 +18,7 @@ class Query
      * Hash containing configuration accumulated by calling methods
      * such as field(), table(), etc
      */
-    private $args = [];
+    protected $args = [];
 
     /**
      * If no fields are defined, this field is used
@@ -36,7 +36,7 @@ class Query
      *
      * @param array $options will initialize class properties
      */
-    function __construct($options = array())
+    public function __construct($options = array())
     {
         foreach ($options as $key => $val) {
             $this->$key = $val;
@@ -97,6 +97,7 @@ class Query
             return $this;
         }
         $this->args['fields'][] = [$field, $table, $alias];
+        
         return $this;
     }
 
@@ -105,7 +106,7 @@ class Query
      *
      * @return string Parsed template chunk
      */
-    function _render_field()
+    protected function _render_field()
     {
         // will be joined for output
         $result = [];
@@ -148,6 +149,7 @@ class Query
             }
             $result[] = $field;
         }
+        
         return join(',', $result);
     }
 
@@ -160,7 +162,7 @@ class Query
      *
      * @return string Quoted expression
      */
-    function _consume($sql_code)
+    protected function _consume($sql_code)
     {
         if ($sql_code === null) {
             return null;
@@ -193,9 +195,9 @@ class Query
      *
      * @param string|array $sql_code Any string or array of strings
      *
-     * @return string|array Quoted string or array of strings
+     * @return string|array|object Quoted string or array of strings
      */
-    function _escape($sql_code)
+    protected function _escape($sql_code)
     {
         // Supports array
         if (is_array($sql_code)) {
