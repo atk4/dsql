@@ -52,43 +52,46 @@ Do not hesitate to contribute to DSQL. We have made it safe and simple for you t
  - It's important that both tests are successful
  - Once your branch is public, you should be able to run Analyze on CodeClimate: [https://codeclimate.com/github/atk4/dsql/branches](https://codeclimate.com/github/atk4/dsql/branches) specifically on your branch.
 
-## For Windows and UI lovers :)
+___
+
+
+## For UI lovers :)
 
 ### Tool for the job - SmartGit
 
-If you’re working on Windows and preffer using UI, then you can do like this:
+If you’re working on Windows / Mac or Linux and preffer using UI, then you can do like this:
 
- - Install SmartGit. It has impressive functionality and it’s free for non-commercial use. You can install it from here [Download SmartGit](http://www.syntevo.com/smartgit/download)
- - Open SmartGit and create new repository by cloning it from github - menu /Repository/Clone.
- - - Remote Git or SVN repository to clone = https://github.com/atk4/dsql
- - - Set master password
- - - Include Submodules and Fetch all Heads and Tags
- - - Set local directory where you want this repository to reside.
- - - Click finish and after some seconds atk4/dsql repository will be cloned to your local disk.
- - Configure Git-Flow like this:
+1. Install SmartGit. It has impressive functionality and it’s free for non-commercial use. You can install it from here [Download SmartGit](http://www.syntevo.com/smartgit/download)
+2. Open SmartGit and create new repository by cloning it from github - menu /Repository/Clone.
+  - Remote Git or SVN repository to clone = https://github.com/atk4/dsql
+  - Set master password
+  - Include Submodules and Fetch all Heads and Tags
+  - Set local directory where you want this repository to reside.
+  - Click finish and after some seconds atk4/dsql repository will be cloned to your local disk.
+  Configure Git-Flow like this:
 ![alt text](docs/images/smgit_configure_git-flow.png "Configure Git-Flow")
- - Now you should see all feature branches grouped in Features folder like this:
+3. Now you should see all feature branches grouped in Features folder:
 ![alt text](docs/images/smgit_configure_branches.png "Configure branches")
- - Create new feature branch for your changes.
- - - Click Git-Flow icon in toolbar and choose Start Feature.
- - - Name your new feature, for example, fix-psr-compatibility
+4. Create new feature branch for your changes.
+  - Click Git-Flow icon in toolbar and choose Start Feature.
+  - Name your new feature, for example, fix-psr-compatibility
 Keep in mind that you don’t have to add feature/ prefix because it’s added automatically. Avoid using spaces and strange symbols in name of your branch.
- - - Click Start and your new branch will be created and made active one.
- - Make your changes in your local repository by using your favorite PHP editor.
- - Don’t forget to update PHPUnit tests and Documentation!
+  - Click Start and your new branch will be created and made active one.
+5. Make your changes in your local repository by using your favorite PHP editor.
+6. Don’t forget to update PHPUnit tests and Documentation!
 
 ### Commiting your changes
 
- - When you finish particular part of your planned changes, then you should commit them. Don’t forget to add short description of your changes.
- - Select your repository (dsql) and click Commit in top toolbar.
- - You’ll see all files you have changed in a list. By double clicking on file new window will open where you can see all changes you have made.
+1. When you finish particular part of your planned changes, then you should commit them. Don’t forget to add short description of your changes.
+2. Select your repository (dsql) and click Commit in top toolbar.
+3. You’ll see all files you have changed in a list. By double clicking on file new window will open where you can see all changes you have made.
 ![alt text](docs/images/smgit_file_compare.png "File compare")
- - If everything is OK, then enter description of commit in Commit Message textbox and click Commit.
- - You can make unlimited amount of commits in your branch, but keep in mind that feature branch is meant only for particular task and there shouldn’t be 100 commits otherwise it’ll be harder to merge it into main repository branch later.
+4. If everything is OK, then enter description of commit in Commit Message textbox and click Commit.
+5. You can make unlimited amount of commits in your branch, but keep in mind that feature branch is meant only for particular task and there shouldn’t be 100 commits otherwise it’ll be harder to merge it into main repository branch later.
 
 ### Pushing you feature branch to github
 
- - When you’re ready to push your feature branch to githib, then click Push in top toolbar, choose "Current branch ‘name-of-your-branch’" and click Push.
+ When you’re ready to push your feature branch to githib, then click Push in top toolbar, choose "Current branch ‘name-of-your-branch’" and click Push.
 ![alt text](docs/images/smgit_push.png "Push")
 
 ### Finishing feature – DON'T DO THAT YOURSELF !
