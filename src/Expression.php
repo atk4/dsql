@@ -18,15 +18,14 @@ class Expression {
     public $template = null;
 
     /**
-     * Backtics are added around all fields. Set this to blank string to avoid
-     * @var string
+     * Backticks are added around all fields. Set this to blank string to avoid
      */
-    public $escapeChar='`';
+    public $escapeChar = '`';
 
     /**
      * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc
      */
-    public $param_base='a';
+    public $param_base=':a';
 
     /**
      * Will be populated with actual values by _param()
@@ -69,7 +68,7 @@ class Expression {
      *
      * @return string Quoted expression
      */
-    function _consume($sql_code, $escape_mode = 'param')
+    protected function _consume($sql_code, $escape_mode = 'param')
     {
         if ($sql_code===null) {
             return null;
@@ -116,7 +115,7 @@ class Expression {
      *
      * @return string Quoted string
      */
-    function _escape($sql_code)
+    protected function _escape($sql_code)
     {
         // Supports array
         if (is_array($sql_code)) {
@@ -149,9 +148,9 @@ class Expression {
      *
      * @return string Safe and escapeed string
      */
-    function _param($value)
+    protected function _param($value)
     {
-        $name=':'.$this->param_base;
+        $name=$this->param_base;
         $this->param_base++;
         $this->params[$name]=$value;
         return $name;

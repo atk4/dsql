@@ -1,8 +1,9 @@
 <?php
 
+namespace atk4\dsql\tests;
 use atk4\dsql\Expression;
 
-class ExpressionTest extends PHPUnit_Framework_TestCase
+class ExpressionTest extends \PHPUnit_Framework_TestCase
 {
 
     function e($template = null, $args = null){
@@ -17,7 +18,7 @@ class ExpressionTest extends PHPUnit_Framework_TestCase
 
         $e = $this->e('hello, [who]', ['who'=>'world']);
         $this->assertEquals('hello, :a', $e->render());
-        $this->assertEquals('world', $e->param['a']);
+        $this->assertEquals('world', $e->params[':a']);
 
         $this->assertEquals('hello, world', $this->e('hello, [who]', ['who'=>$this->e('world')])->render());
         $this->assertEquals('hello, world', $this->e('[what], [who]', ['what'=>$this->e('hello'), 'who'=>$this->e('world')])->render());
@@ -31,6 +32,29 @@ class ExpressionTest extends PHPUnit_Framework_TestCase
                 )
             ]
         )->render());
+    }
+
+    /**
+     * @covers ::_escape
+     */
+    public function testEscape()
+    {
+        // escaping expressions
+        $this->assertEquals('`first_name`',     PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', ['first_name']));
+        $this->assertEquals('*first_name*',     PHPUnitUtil::callProtectedMethod($this->e(['','escapeChar' => '*']), '_escape', ['first_name']));
+
+        // should not escape expressions
+        $this->assertEquals('*',                PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', ['*']));
+        $this->assertEquals('(2+2) age',        PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', ['(2+2) age']));
+        $this->assertEquals('first_name.table', PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', ['first_name.table']));
+        $this->assertEquals('first#name',       PHPUnitUtil::callProtectedMethod($this->e(['','escapeChar'=>'#']), '_escape', ['first#name']));
+        //$this->assertEquals(true,               is_object(PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ["bleh"])));
+
+        // escaping array - escapes each of its elements
+        $this->assertEquals(
+            ['`first_name`', '*', '`last_name`'],
+            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', [ ['first_name', '*', 'last_name'] ])
+        );
     }
 
     /**
