@@ -3,6 +3,9 @@
 namespace atk4\dsql\tests;
 use atk4\dsql\Expression;
 
+/**
+ * @coversDefaultClass \atk4\dsql\Expression
+ */
 class ExpressionTest extends \PHPUnit_Framework_TestCase
 {
 
