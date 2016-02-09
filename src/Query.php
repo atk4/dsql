@@ -2,7 +2,7 @@
 
 namespace atk4\dsql;
 
-class Query implements Expression
+class Query extends Expression
 {
     /**
      * Define templates for the basic queries
@@ -12,11 +12,6 @@ class Query implements Expression
     ];
 
     /**
-     * Current template
-     */
-    public $expression = null;
-
-    /**
      * Hash containing configuration accumulated by calling methods
      * such as field(), table(), etc
      */
@@ -24,9 +19,6 @@ class Query implements Expression
 
     /** If no fields are defined, this field is used */
     public $defaultField='*';
-
-    /** Backtics are added around all fields. Set this to blank string to avoid */
-    public $escapeChar='`';
 
     /**
      * Specifying options to constructors will override default
@@ -188,75 +180,6 @@ class Query implements Expression
         return join(',', $result);
     }
 
-    /**
-     * Recursively renders sub-query or expression, combining parameters.
-     * If the argument is more likely to be a field, use tick=true
-     *
-     * @param object|string $dsql Expression
-     * @param boolean       $tick Preferred quoted style
-     *
-     * @return string Quoted expression
-     */
-    function _consume($sql_code, $do_not_escape = null)
-    {
-        if ($sql_code===null) {
-            return null;
-        }
-
-        /** TODO: TEMPORARILY removed, ATK feature, implement with traits **/
-        /*
-        if (is_object($sql_code) && $sql_code instanceof Field) {
-            $sql_code=$sql_code->getExpr();
-        }
-        */
-        if (!is_object($sql_code) || !$sql_code instanceof Query) {
-            if($do_not_escape){
-                return $sql_code;
-            }else{
-                return $this->_escape($sql_code);
-            }
-        }
-        $sql_code->params = &$this->params;
-        $ret = $sql_code->_render();
-        if ($sql_code->mode==='select') {
-            $ret='('.$ret.')';
-        }
-        unset($sql_code->params);
-        $sql_code->params=[];
-        return $ret;
-    }
-
-    /**
-     * Escapes argument by adding backtics around it. This will allow you to use reserved
-     * SQL words as table or field names such as "table"
-     *
-     * @param string $s any string
-     *
-     * @return string Quoted string
-     */
-    function _escape($sql_code)
-    {
-        // Supports array
-        if (is_array($sql_code)) {
-            $out=[];
-            foreach ($sql_code as $ss) {
-                $out[]=$this->_escape($ss);
-            }
-            return $out;
-        }
-
-        if (!$this->escapeChar
-            || is_object($sql_code)
-            || $sql_code==='*'
-            || strpos($sql_code, '.')!==false
-            || strpos($sql_code, '(')!==false
-            || strpos($sql_code, $this->escapeChar)!==false
-        ) {
-            return $sql_code;
-        }
-
-        return $this->escapeChar.$sql_code.$this->escapeChar;
-    }
 
     public function table($table)
     {
@@ -264,7 +187,4 @@ class Query implements Expression
     }
 
 
-    public function render(){
-
-    }
 }
