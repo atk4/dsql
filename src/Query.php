@@ -5,7 +5,7 @@ namespace atk4\dsql;
 /**
  * @todo Class description goes here
  */
-class Query
+class Query extends Expression
 {
     /**
      * Define templates for the basic queries
@@ -24,11 +24,6 @@ class Query
      * If no fields are defined, this field is used
      */
     public $defaultField = '*';
-
-    /**
-     * Backticks are added around all fields. Set this to blank string to avoid
-     */
-    public $escapeChar = '`';
 
     /**
      * Specifying options to constructors will override default
@@ -97,7 +92,7 @@ class Query
             return $this;
         }
         $this->args['fields'][] = [$field, $table, $alias];
-        
+
         return $this;
     }
 
@@ -128,7 +123,7 @@ class Query
             }
 
             // Will parameterize the value and backtick if necessary.
-            $field = $this->_consume($field);
+            $field = $this->_consume($field,'escape');
 
             // TODO: Commented until I figure out what this does
             /*
@@ -149,73 +144,8 @@ class Query
             }
             $result[] = $field;
         }
-        
+
         return join(',', $result);
-    }
-
-    /**
-     * Recursively renders sub-query or expression, combining parameters.
-     * If the argument is more likely to be a field, use tick=true
-     *
-     * @param object|string $dsql Expression
-     * @param boolean       $tick Preferred quoted style
-     *
-     * @return string Quoted expression
-     */
-    protected function _consume($sql_code)
-    {
-        if ($sql_code === null) {
-            return null;
-        }
-
-        /** TODO: TEMPORARILY removed, ATK feature, implement with traits **/
-        /*
-        if (is_object($sql_code) && $sql_code instanceof Field) {
-            $sql_code = $sql_code->getExpr();
-        }
-        */
-        if (!is_object($sql_code) || !$sql_code instanceof Query) {
-            return $this->_escape($sql_code);
-        }
-        $sql_code->params = &$this->params;
-        $ret = $sql_code->_render();
-        if ($sql_code->mode === 'select') {
-            $ret = '(' . $ret . ')';
-        }
-        unset($sql_code->params);
-        $sql_code->params = [];
-        
-        return $ret;
-    }
-
-    /**
-     * Escapes argument by adding backticks around it.
-     * This will allow you to use reserved SQL words as table or field
-     * names such as "table"
-     *
-     * @param string|array $sql_code Any string or array of strings
-     *
-     * @return string|array|object Quoted string or array of strings
-     */
-    protected function _escape($sql_code)
-    {
-        // Supports array
-        if (is_array($sql_code)) {
-            return array_map([$this, '_escape'], $sql_code);
-        }
-
-        // Don't escape objects, asterix, expressions and already escaped strings
-        if (!$this->escapeChar
-            || is_object($sql_code)
-            || $sql_code === '*'
-            || strpos($sql_code, '.') !== false
-            || strpos($sql_code, '(') !== false
-            || strpos($sql_code, $this->escapeChar) !== false
-        ) {
-            return $sql_code;
-        }
-
-        return $this->escapeChar . $sql_code . $this->escapeChar;
     }
 
     /**
@@ -226,11 +156,4 @@ class Query
         return (boolean)$table;
     }
 
-    /**
-     * @todo Method description
-     */
-    public function render()
-    {
-
-    }
 }

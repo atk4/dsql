@@ -13,6 +13,7 @@ Contents:
 
     overview
     quickstart
+    expressions
     reference
 
 

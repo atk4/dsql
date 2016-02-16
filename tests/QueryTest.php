@@ -26,28 +26,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('#', $this->q(['escapeChar' => '#'])->escapeChar);
     }
 
-    /**
-     * @covers ::_escape
-     */
-    public function testEscape()
-    {
-        // escaping expressions
-        $this->assertEquals('`first_name`',     PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['first_name']));
-        $this->assertEquals('*first_name*',     PHPUnitUtil::callProtectedMethod($this->q(['escapeChar' => '*']), '_escape', ['first_name']));
-
-        // should not escape expressions
-        $this->assertEquals('*',                PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['*']));
-        $this->assertEquals('(2+2) age',        PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['(2+2) age']));
-        $this->assertEquals('first_name.table', PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['first_name.table']));
-        $this->assertEquals('first#name',       PHPUnitUtil::callProtectedMethod($this->q(['escapeChar'=>'#']), '_escape', ['first#name']));
-        //$this->assertEquals(true,               is_object(PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ["bleh"])));
-
-        // escaping array - escapes each of its elements
-        $this->assertEquals(
-            ['`first_name`', '*', '`last_name`'],
-            PHPUnitUtil::callProtectedMethod($this->q(), '_escape', [ ['first_name', '*', 'last_name'] ])
-        );
-    }
 
     /**
      * @covers ::field
