@@ -100,7 +100,7 @@ class Expression {
 
         // Queries should be wrapped in most cases
         if ($sql_code instanceof Query) {
-            $ret='('.$ret.')';
+            $ret = '(' . $ret . ')';
         }
         unset($sql_code->params);
         $sql_code->params=[];
@@ -108,35 +108,32 @@ class Expression {
     }
 
     /**
-     * Escapes argument by adding backtics around it. This will allow you to use reserved
-     * SQL words as table or field names such as "table"
+     * Escapes argument by adding backticks around it.
+     * This will allow you to use reserved SQL words as table or field
+     * names such as "table
      *
-     * @param string $s any string
+     * @param string|array $sql_code Any string or array of strings
      *
-     * @return string Quoted string
+     * @return string|array Escaped string or array of strings
      */
     protected function _escape($sql_code)
     {
         // Supports array
         if (is_array($sql_code)) {
-            $out=[];
-            foreach ($sql_code as $ss) {
-                $out[]=$this->_escape($ss);
-            }
-            return $out;
+            return array_map([$this, '_escape'], $sql_code);
         }
 
         if (!$this->escapeChar
             || is_object($sql_code)
-            || $sql_code==='*'
-            || strpos($sql_code, '.')!==false
-            || strpos($sql_code, '(')!==false
-            || strpos($sql_code, $this->escapeChar)!==false
+            || $sql_code === '*'
+            || strpos($sql_code, '.') !== false
+            || strpos($sql_code, '(') !== false
+            || strpos($sql_code, $this->escapeChar) !== false
         ) {
             return $sql_code;
         }
 
-        return $this->escapeChar.$sql_code.$this->escapeChar;
+        return $this->escapeChar . $sql_code . $this->escapeChar;
     }
 
     /**
