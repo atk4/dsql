@@ -216,4 +216,44 @@ class Expression implements \ArrayAccess {
         return $res;
     }
 
+    /**
+     * Return formatted debug output.
+     *
+     * @param string $r Rendered material
+     *
+     * @return string SQL syntax of query
+     */
+    public function getDebugQuery()
+    {
+        $d = $this->render();
+
+        $pp = array();
+        $d = preg_replace('/`([^`]*)`/', '`<font color="black">\1</font>`', $d);
+        foreach (array_reverse($this->params) as $key => $val) {
+            if (is_string($val)) {
+                $d = preg_replace('/'.$key.'([^_]|$)/', '"<font color="green">'.
+                    htmlspecialchars(addslashes($val)).'</font>"\1', $d);
+            } elseif (is_null($val)) {
+                $d = preg_replace(
+                    '/'.$key.'([^_]|$)/',
+                    '<font color="black">NULL</font>\1',
+                    $d
+                );
+            } elseif (is_numeric($val)) {
+                $d = preg_replace(
+                    '/'.$key.'([^_]|$)/',
+                    '<font color="red">'.$val.'</font>\1',
+                    $d
+                );
+            } else {
+                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\1', $d);
+            }
+
+            $pp[] = $key;
+        }
+
+        return $d." <font color='gray'>[".
+            implode(', ', $pp).']</font>';
+    }
+
 }
