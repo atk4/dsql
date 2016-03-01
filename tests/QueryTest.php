@@ -168,7 +168,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::dump
+     * @covers ::getDebugQuery
      */
     public function testgetDebugQurey()
     {
