@@ -37,6 +37,32 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         )->render());
     }
 
+    function testNestedParams()
+    {
+
+        $q = new Expression("[] and []", [
+            new Expression('++[]', [1]),
+            new Expression('--[]', [2]),
+        ]);
+
+        $this->assertEquals(
+            '++1 and --2 [:b, :a]',
+            strip_tags($q->getDebugQuery())
+        );
+
+        $qq = new Expression("=== [foo] ===",['foo'=>$q]);
+
+        $this->assertEquals(
+            '=== ++1 and --2 === [:b, :a]',
+            strip_tags($qq->getDebugQuery())
+        );
+
+        $this->assertEquals(
+            '++1 and --2 [:b, :a]',
+            strip_tags($q->getDebugQuery())
+        );
+    }
+
     /**
      * @covers ::_escape
      */
