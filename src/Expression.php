@@ -7,7 +7,7 @@ namespace atk4\dsql;
  * query. Implement getDSQLExpression method that would return a valid
  * Query object (or string);
  */
-class Expression {
+class Expression implements \ArrayAccess {
 
     /**
      * Creates new expression. Optionally specify a string - a piece
@@ -64,6 +64,27 @@ class Expression {
             $this->$key = $val;
         }
     }
+
+    public function offsetSet($offset, $value) {
+        if (is_null($offset)) {
+            $this->args['custom'][] = $value;
+        } else {
+            $this->args['custom'][$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->args['custom'][$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->args['custom'][$offset]);
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->args['custom'][$offset]) ? $this->args['custom'][$offset] : null;
+    }
+
 
     /**
      * Recursively renders sub-query or expression, combining parameters.
