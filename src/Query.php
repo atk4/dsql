@@ -15,6 +15,14 @@ class Query extends Expression
     ];
 
     /**
+     * Query will use one of the predefined "templates". The mode
+     * will contain name of template used.
+     *
+     * @var [type]
+     */
+    public $mode = null;
+
+    /**
      * Hash containing configuration accumulated by calling methods
      * such as field(), table(), etc
      */
@@ -148,12 +156,129 @@ class Query extends Expression
         return join(',', $result);
     }
 
+    protected $main_table = null;
+
     /**
      * @todo Method description
      */
-    public function table($table)
+    public function table($table, $alias = null)
     {
-        return (boolean)$table;
+        if (is_array($table)) {
+            // array_map([$this, 'table'], $table); ??
+
+            foreach ($table as $alias => $t) {
+                if (is_numeric($alias)) {
+                    $alias = null;
+                }
+                $this->table($t, $alias);
+            }
+            return $this;
+        }
+
+        // This can be expression, but then we can only set the table once
+        if ($table instanceof Expression) {
+
+            if (isset($this->args['table'])){
+                throw new Exception('You cannot use table([expression]). table() was called before.');
+            }
+
+
+            $this->main_table = false;
+            $this->args['table'] = $table;
+            return $this;
+        }
+
+        if (!isset($this->args['table'])) {
+            $this->args['table'] = array();
+        }
+
+        if ($this->args['table'] instanceof Expression){
+            throw new Exception('You cannot use table(). You have already used table([expression]) previously.');
+        }
+
+        // main_table will be set only if table() is called once. It's used
+        // wher joining with other tables
+        if ($this->main_table === null) {
+            $this->main_table = $alias ? $alias : $table;
+
+            // on multiple calls, main_table will be false and we won't
+            // be able to join easily anymore.
+        } elseif ($this->main_table) {
+            $this->main_table = false;   // query from multiple tables
+        }
+
+        $this->args['table'][] = array($table, $alias);
+
+        return $this;
     }
 
+    /**
+     * Renders part of the template: [table]
+     * Do not call directly.
+     *
+     * @return string Parsed template chunk
+     */
+    protected function _render_table()
+    {
+        $ret = array();
+        if (!isset($this->args['table'])){
+            return '';
+        }
+
+        if ($this->args['table'] instanceof Expression) {
+
+            // This will wrap into () if Query is used here
+            return $this->_consume($this->args['table']);
+        }
+
+        foreach ($this->args['table'] as $row) {
+            list($table, $alias) = $row;
+
+            $table = $this->_escape($table);
+
+            if ($alias !== null) {
+                $table .= ' '.$this->_escape($alias);
+            }
+
+            $ret[] = $table;
+        }
+
+        return implode(',', $ret);
+    }
+
+    /**
+     * [render description]
+     * @return [type] [description]
+     */
+    public function render()
+    {
+        if (!$this->template) {
+            $this->selectTemplate('select');
+        }
+        return parent::render();
+
+    }
+
+    protected function _render_from()
+    {
+        return isset($this->main_table)?'from':'';
+    }
+
+    /**
+     * Switch template for this query. Determines what would be done
+     * on execute.
+     *
+     * By default it is in SELECT mode
+     *
+     * @param string $mode A key for $this->sql_templates
+     *
+     * @return DB_dsql $this
+     */
+    public function selectTemplate($mode)
+    {
+        $this->mode = $mode;
+        $this->template = $this->templates[$mode];
+
+        return $this;
+    }
 }
