@@ -78,7 +78,7 @@ you do not have to define "use" block:
 
     $query -> where('time', '>', $query->expr('NOW()'));
 
-You can specify some of the expressio properties through first argument
+You can specify some of the expression properties through first argument
 of the constructor:
 
 .. code-block:: php
@@ -153,7 +153,7 @@ Properties
 
 .. php:attr:: escapeChar
 
-    Field and table names are escaped using escapeChar which is by default is: *`*
+    Field and table names are escaped using escapeChar which by default is: *`*
 
 .. php:attr:: paramBase
 

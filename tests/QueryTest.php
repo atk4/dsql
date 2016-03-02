@@ -170,7 +170,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers ::getDebugQuery
      */
-    public function testgetDebugQurey()
+    public function testgetDebugQuery()
     {
 
         $query = new Query();
