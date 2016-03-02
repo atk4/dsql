@@ -7,7 +7,7 @@ namespace atk4\dsql;
  * query. Implement getDSQLExpression method that would return a valid
  * Query object (or string);
  */
-class Expression {
+class Expression implements \ArrayAccess {
 
     /**
      * Creates new expression. Optionally specify a string - a piece
@@ -15,17 +15,23 @@ class Expression {
      *
      * See below for call patterns
      */
-    public $template = null;
+    protected $template = null;
 
     /**
      * Backticks are added around all fields. Set this to blank string to avoid
      */
-    public $escapeChar = '`';
+    protected $escapeChar = '`';
 
     /**
      * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc
      */
-    public $param_base=':a';
+    protected $paramBase=':a';
+
+    /**
+     * Used for Linking
+     * @var [type]
+     */
+    public $_paramBase=null;
 
     /**
      * Will be populated with actual values by _param()
@@ -58,6 +64,27 @@ class Expression {
             $this->$key = $val;
         }
     }
+
+    public function offsetSet($offset, $value) {
+        if (is_null($offset)) {
+            $this->args['custom'][] = $value;
+        } else {
+            $this->args['custom'][$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->args['custom'][$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->args['custom'][$offset]);
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->args['custom'][$offset]) ? $this->args['custom'][$offset] : null;
+    }
+
 
     /**
      * Recursively renders sub-query or expression, combining parameters.
@@ -96,6 +123,7 @@ class Expression {
 
          //|| !$sql_code instanceof Expression) {
         $sql_code->params = &$this->params;
+        $sql_code->_paramBase = &$this->_paramBase;
         $ret = $sql_code->render();
 
         // Queries should be wrapped in most cases
@@ -147,8 +175,8 @@ class Expression {
      */
     protected function _param($value)
     {
-        $name=$this->param_base;
-        $this->param_base++;
+        $name=$this->_paramBase;
+        $this->_paramBase++;
         $this->params[$name]=$value;
         return $name;
     }
@@ -157,9 +185,13 @@ class Expression {
     public function render()
     {
         $nameless_count = 0;
+        if(!isset($this->_paramBase)){
+            $this->_paramBase = $this->paramBase;
+        }
+
         $res= preg_replace_callback(
             '/\[([a-z0-9_]*)\]/',
-            function ($matches) use ($nameless_count) {
+            function ($matches) use (&$nameless_count) {
 
                 // Allow template to contain []
                 $identifier = $matches[1];
@@ -180,7 +212,48 @@ class Expression {
             },
                 $this->template
             );
+        unset($this->_paramBase);
         return $res;
+    }
+
+    /**
+     * Return formatted debug output.
+     *
+     * @param string $r Rendered material
+     *
+     * @return string SQL syntax of query
+     */
+    public function getDebugQuery()
+    {
+        $d = $this->render();
+
+        $pp = array();
+        $d = preg_replace('/`([^`]*)`/', '`<font color="black">\1</font>`', $d);
+        foreach (array_reverse($this->params) as $key => $val) {
+            if (is_string($val)) {
+                $d = preg_replace('/'.$key.'([^_]|$)/', '"<font color="green">'.
+                    htmlspecialchars(addslashes($val)).'</font>"\1', $d);
+            } elseif (is_null($val)) {
+                $d = preg_replace(
+                    '/'.$key.'([^_]|$)/',
+                    '<font color="black">NULL</font>\1',
+                    $d
+                );
+            } elseif (is_numeric($val)) {
+                $d = preg_replace(
+                    '/'.$key.'([^_]|$)/',
+                    '<font color="red">'.$val.'</font>\1',
+                    $d
+                );
+            } else {
+                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\1', $d);
+            }
+
+            $pp[] = $key;
+        }
+
+        return $d." <font color='gray'>[".
+            implode(', ', $pp).']</font>';
     }
 
 }

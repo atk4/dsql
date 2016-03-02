@@ -35,7 +35,53 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
                 )
             ]
         )->render());
+
+        $this->assertEquals('hello, world', $this->e(
+            ['template'=>'hello, [who]'],
+            ['who'=>$this->e('world')]
+        )->render());
+
     }
+
+    function testNestedParams()
+    {
+
+        $q = new Expression("[] and []", [
+            new Expression('++[]', [1]),
+            new Expression('--[]', [2]),
+        ]);
+
+        $this->assertEquals(
+            '++1 and --2 [:b, :a]',
+            strip_tags($q->getDebugQuery())
+        );
+
+        $qq = new Expression("=== [foo] ===",['foo'=>$q]);
+
+        $this->assertEquals(
+            '=== ++1 and --2 === [:b, :a]',
+            strip_tags($qq->getDebugQuery())
+        );
+
+        $this->assertEquals(
+            '++1 and --2 [:b, :a]',
+            strip_tags($q->getDebugQuery())
+        );
+    }
+
+
+    function testConstructorException1()
+    {
+        $this->setExpectedException('atk4\dsql\Exception');
+        $e = new Expression(false);
+    }
+
+    function testConstructorException2()
+    {
+        $this->setExpectedException('atk4\dsql\Exception');
+        $e = new Expression("hello, []", "hello");
+    }
+
 
     /**
      * @covers ::_escape

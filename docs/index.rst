@@ -14,7 +14,7 @@ Contents:
     overview
     quickstart
     expressions
-    reference
+    queries
 
 
 
