@@ -39,7 +39,7 @@ the escaping.
 There are 2 types of escaping:
 
  * escape. Used for field and table names. Surrounds name with *`*.
- * param. Will convert value into param and repalce with *:a*
+ * param. Will convert value into param and replace with *:a*
 
 By calling `$res = Expression::_consume($sql, 'param')` the query code
 makes sure that nested expressions are properly interlinked and that
@@ -151,7 +151,7 @@ qurey:
 
     select `date`,`debit`,`credit` from (
         (select `date`,`amount` `debit` from `sales`) union
-        (select `date`,`amount` `debit` from `purchases`)
+        (select `date`,`amount` `credit` from `purchases`)
     ) derrivedTable
 
 Modifying your Query
@@ -174,7 +174,7 @@ There are many possible scenarios how to specify a table::
         // SELECT * from `user` `u`
 
     $query->table('user')->table('salary');
-        // specify multiple tables. Don't forget to link with "where"
+        // specify multiple tables. Don't forget to link them by using "where"
         // SELECT * from `user`, `salary`
 
     $query->table(['user','salary']);
@@ -251,8 +251,8 @@ DSQL internally.
       specified query implements a "select", then it's automatically
       placed inside brackets.
 
-      $query->consume('first_name');  // `first_name`
-      $query->consume($other_query);  // will merge parameters and return string
+      $query->_consume('first_name');  // `first_name`
+      $query->_consume($other_query);  // will merge parameters and return string
 
   .. php:method:: _escape($sql_code)
 
