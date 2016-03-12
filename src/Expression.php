@@ -91,16 +91,12 @@ class Expression implements \ArrayAccess {
      * If the argument is more likely to be a field, use tick=true
      *
      * @param object|string $dsql Expression
-     * @param 'param'|'consume'|'none' $escape_mode Fall-back escaping mode
+     * @param 'param'|'escape'|'none' $escape_mode Fall-back escaping mode
      *
      * @return string Quoted expression
      */
     protected function _consume($sql_code, $escape_mode = 'param')
     {
-        if ($sql_code===null) {
-            return null;
-        }
-
         if (!is_object($sql_code)) {
             switch($escape_mode){
                 case'param':
@@ -175,6 +171,9 @@ class Expression implements \ArrayAccess {
      */
     protected function _param($value)
     {
+        if (is_array($value)) {
+            return array_map([$this, '_param'], $value);
+        }
         $name=$this->_paramBase;
         $this->_paramBase++;
         $this->params[$name]=$value;
@@ -213,7 +212,7 @@ class Expression implements \ArrayAccess {
                 $this->template
             );
         unset($this->_paramBase);
-        return $res;
+        return trim($res);
     }
 
     /**
