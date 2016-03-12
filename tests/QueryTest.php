@@ -277,8 +277,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'update `employee` set `name`=`name`+1',
-            ($q=new Query())
-            ->field('name')->table('employee')->set('name',$q->expr('`name`+1'))
+            (new Query())
+            ->field('name')->table('employee')->set('name',new Expression('`name`+1'))
             ->selectTemplate('update')
             ->render()
         );
