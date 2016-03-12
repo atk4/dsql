@@ -11,7 +11,8 @@ class Query extends Expression
      * Define templates for the basic queries
      */
     public $templates = [
-        'select' => 'select [field] [from] [table]',
+        'select' => 'select [field] [from] [table][where][having]',
+        'delete' => 'delete [from] [table][where][having]',
     ];
 
     /**
@@ -242,6 +243,276 @@ class Query extends Expression
         return isset($this->main_table)?'from':'';
     }
     /// }}}
+
+    // {{{ where() and having() specification and rendering
+    /**
+     * Adds condition to your query.
+     *
+     * Examples:
+     *  $q->where('id',1);
+     *
+     * By default condition implies equality. You can specify a different comparison
+     * operator by eithre including it along with the field or using 3-argument
+     * format:
+     *  $q->where('id>','1');
+     *  $q->where('id','>',1);
+     *
+     * You may use Expression as any part of the query.
+     *  $q->where($q->expr('a=b'));
+     *  $q->where('date>',$q->expr('now()'));
+     *  $q->where($q->expr('length(password)'),'>',5);
+     *
+     * If you specify Query as an argument, it will be automatically
+     * surrounded by brackets:
+     *  $q->where('user_id',$q->dsql()->table('users')->field('id'));
+     *
+     * You can specify OR conditions by passing single argument - array:
+     *  $q->where([
+     *      ['a','is',null],
+     *      ['b','is',null]
+     *  ]);
+     *
+     * If entry of the OR condition is not an array, then it's assumed to
+     * be an expression;
+     *
+     *  $q->where([
+     *      ['age',20],
+     *      'age is null'
+     *  ]);
+     *
+     * The above use of OR conditions rely on orExpr() functionality. See
+     * that method for morer information, but in short it makes use of
+     * Expression_OR class 
+     *
+     * To specify OR conditions
+     *  $q->where($q->orExpr()->where('a',1)->where('b',1));
+     *
+     * @param mixed  $field Field, array for OR or Expression
+     * @param string $cond  Condition such as '=', '>' or 'is not'
+     * @param string $value Value. Will be quoted unless you pass expression
+     * @param string $kind  Do not use directly. Use having()
+     *
+     * @return DB_dsql $this
+     */
+    public function where($field, $cond = null, $value = null, $kind = 'where')
+    {
+
+        // Number of passed arguments will be used to determine if arguments were specified or not
+        $num_args = func_num_args();
+
+        // Array as first argument means we have to replace it with orExpr()
+        if (is_array($field)) {
+            // or conditions
+            $or = $this->orExpr();
+            foreach ($field as $row) {
+                call_user_func_array([$or,'where'],$row);
+            }
+            $field = $or;
+        }
+
+        if ($num_args === 1) {
+            $this->args[$kind][] = [$this->expr($field)];
+            return $this; 
+        }
+
+        // first argument is string containing more than just a field name and no more than 2
+        // arguments means that we either have a string expression or embedded condition.
+        if (is_string($field) && !preg_match('/^[.a-zA-Z0-9_]*$/', $field) && $num_args === 2) {
+            // field contains non-alphanumeric values. Look for condition
+            preg_match(
+                '/^([^ <>!=]*)([><!=]*|( *(not|is|in|like))*) *$/',
+                $field,
+                $matches
+            );
+
+            // matches[2] will contain the condition, but $cond will contain the value
+            $value = $cond;
+            $cond = $matches[2];
+
+            // if we couldn't clearly identify the condinulltion, we might be dealing with
+            // a more complex expression. If expression is followed by another argument
+            // we need to add equation sign  where('now()',123).
+            if (!$cond) {
+                $matches[1] = $this->expr($field);
+
+                if ($num_args == 2) {
+                    $cond = '=';
+                } else {
+                    $cond = null;
+                }
+            } else {
+                $num_args++;
+            }
+
+            $field = $matches[1];
+        }
+
+
+        switch($num_args){
+            case 2: $this->args[$kind][] = [$field, $cond]; break;
+            case 3: $this->args[$kind][] = [$field, $cond, $value]; break;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Same syntax as where().
+     *
+     * @param mixed  $field Field, array for OR or Expression
+     * @param string $cond  Condition such as '=', '>' or 'is not'
+     * @param string $value Value. Will be quoted unless you pass expression
+     *
+     * @return DB_dsql $this
+     */
+    public function having($field, $cond = null, $value = null)
+    {
+        return $this->where($field, $cond, $value, 'having');
+    }
+
+    /**
+     * Subroutine which renders either [where] or [having].
+     *
+     * @param string $kind 'where' or 'having'
+     *
+     * @return array Parsed chunks of query
+     */
+    public function __render_where($kind)
+    {
+        $ret = [];
+
+        // where() might have been called multiple times. Collect all conditions,
+        // then join with them AND keyword
+        foreach ($this->args[$kind] as $row) {
+
+            if(count($row) === 3) {
+                list($field, $cond, $value) = $row;
+            }elseif(count($row) === 2) {
+                list($field, $cond) = $row;
+            }elseif(count($row) === 1) {
+                list($field) = $row;
+            }
+
+            if (is_object($field)) {
+                // if first argument is object/expression, consume it, converting
+                // it to the string
+                $field = $this->_consume($field);
+            } else {
+                // otherwise, perform some escaping
+                $field = join('.',$this->_escape(explode('.', $field)));
+            }
+
+            if (count($row) == 1) {
+                // Only a single parameter was passed, so we simply include all
+                $ret[] = $field;
+                continue;
+            }
+
+            // below are only cases when 2 or 3 arguments are passed
+
+            // if no condition defined - set default condition
+            if (count($row) == 2) {
+                $value = $cond;
+                if (is_array($value)) {
+                    $cond = 'in';
+                } elseif (is_object($value) && $value->mode === 'select') {
+                    $cond = 'in';
+                } else {
+                    $cond = '=';
+                }
+            } else {
+                $cond = trim(strtolower($cond));
+            }
+
+            // below we can be sure that all 3 arguments has been passed
+
+            if ($value === null) {
+                // special conditions if value is null
+                if ($cond === '=') {
+                    $cond = 'is';
+                } elseif (in_array($cond, array('!=', '<>', 'not'))) {
+                    $cond = 'is not';
+                }
+            }
+
+            // value should be array for such conditions
+            if (($cond === 'in' || $cond === 'not in') && is_string($value)) {
+                $value = explode(',', $value);
+            }
+
+            // if value is array, then use IN or NOT IN as condition
+            if (is_array($value)) {
+                $value = '('.join(',',$this->_param($value)).')';
+                $cond = in_array($cond, array('!=', '<>', 'not', 'not in')) ? 'not in' : 'in';
+                $ret[] = $this->_consume($field,'escape').' '.$cond.' '.$value;
+                continue;
+            }
+
+            // if value is object, then it should be DSQL itself
+            // otherwise just escape value
+            $value = $this->_consume($value,'param');
+            $ret[] = $field.' '.$cond.' '.$value;
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Renders [where].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_where()
+    {
+        if (!isset($this->args['where'])) {
+            return;
+        }
+
+        return ' where '.join(' and ', $this->__render_where('where'));
+    }
+
+    /**
+     * Renders [orwhere].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_orwhere()
+    {
+        if (!isset($this->args['where'])) {
+            return;
+        }
+
+        return join(' or ', $this->__render_where('where'));
+    }
+
+    /**
+     * Renders [andwhere].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function render_andwhere()
+    {
+        if (!isset($this->args['where'])) {
+            return;
+        }
+
+        return join(' and ', $this->__render_where('where'));
+    }
+
+    /**
+     * Renders [having].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_having()
+    {
+        if (!isset($this->args['having'])) {
+            return;
+        }
+
+        return ' having '.join(' and ', $this->_render_where('having'));
+    }
+    // }}}
 
     // {{{ Miscelanious
     /**

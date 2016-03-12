@@ -189,4 +189,66 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
 
     }
+
+    /**
+     * @covers ::where
+     */
+    public function testBasicWhere()
+    {
+        $this->assertEquals('where `id` = :a',       $this->q(['template'=>'[where]'])->where('id',1)->render());
+        $this->assertEquals('where `user`.`id` = :a', $this->q(['template'=>'[where]'])->where('user.id',1)->render());
+        $this->assertEquals('where `db`.`user`.`id` = :a',$this->q(['template'=>'[where]'])->where('db.user.id',1)->render());
+        $this->assertEquals('where `id` > :a',       $this->q(['template'=>'[where]'])->where('id','>',1)->render());
+        $this->assertEquals('where `id` in (:a,:b)',$this->q(['template'=>'[where]'])->where('id','in',[1,2])->render());
+        $this->assertEquals('where `id` is :a',    $this->q(['template'=>'[where]'])->where('id','is',null)->render());
+        $this->assertEquals('where `id` is not :a',      $this->q(['template'=>'[where]'])->where('id!=',null)->render());
+        $this->assertEquals('where `id` is not :a',      $this->q(['template'=>'[where]'])->where('id<>',null)->render());
+        $this->assertEquals('where now()',           $this->q(['template'=>'[where]'])->where('now()')->render());
+        $this->assertEquals('where now() = :a',      $this->q(['template'=>'[where]'])->where('now()',1)->render());
+        $this->assertEquals('where now = :a',        $this->q(['template'=>'[where]'])->where(new Expression('now'),1)->render());
+        $this->assertEquals('where `a` = :a and `b` = :b',$this->q(['template'=>'[where]'])->where('a',1)->where('b',2)->render());
+    }
+
+    public function testBasicWhere2()
+    {
+        $this->assertEquals('where now() = :a',      $this->q(['template'=>'[where]'])->where('now()',1)->render());
+
+    }
+
+    /**
+     * Combined execution of where() clauses
+     */
+    public function testCombinedWhere()
+    {
+        $this->assertEquals(
+            'select `name` from `employee` where `a` = :a',
+            (new Query())
+            ->field('name')->table('employee')->where('a',1)
+            ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee` where `employee`.`a` = :a',
+            (new Query())
+            ->field('name')->table('employee')->where('employee.a',1)
+            ->render()
+        );
+
+        /*
+        $this->assertEquals(
+            'select `name` from `db`.`employee` where `db`.`employee`.`a` = :a',
+            (new Query())
+            ->field('name')->table('db.employee')->where('db.employee.a',1)
+            ->render()
+        );
+         */
+
+        $this->assertEquals(
+            'delete from `employee` where `employee`.`a` = :a',
+            (new Query())
+            ->selectTemplate('delete')
+            ->field('name')->table('employee')->where('employee.a',1)
+            ->render()
+        );
+    }
 }
