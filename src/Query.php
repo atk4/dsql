@@ -1,9 +1,9 @@
-<?php
+<?php // vim:ts=4:sw=4:et:fdm=marker
 
 namespace atk4\dsql;
 
 /**
- * @todo Class description goes here
+ * Perform query operation on SQL server (such as select, insert, delete, etc)
  */
 class Query extends Expression
 {
@@ -33,19 +33,8 @@ class Query extends Expression
      */
     public $defaultField = '*';
 
-    /**
-     * Specifying options to constructors will override default
-     * attribute values of this class
-     *
-     * @param array $options will initialize class properties
-     */
-    public function __construct($options = array())
-    {
-        foreach ($options as $key => $val) {
-            $this->$key = $val;
-        }
-    }
 
+    // {{{ Field specification and rendering 
     /**
      * Adds new column to resulting select by querying $field.
      *
@@ -155,7 +144,9 @@ class Query extends Expression
 
         return join(',', $result);
     }
+    // }}}
 
+    // {{{ Table specification and rendering
     protected $main_table = null;
 
     /**
@@ -246,8 +237,28 @@ class Query extends Expression
         return implode(',', $ret);
     }
 
+    protected function _render_from()
+    {
+        return isset($this->main_table)?'from':'';
+    }
+    /// }}}
+
+    // {{{ Miscelanious
     /**
-     * [render description]
+     * Specifying options to constructors will override default
+     * attribute values of this class
+     *
+     * @param array $options will initialize class properties
+     */
+    public function __construct($options = array())
+    {
+        foreach ($options as $key => $val) {
+            $this->$key = $val;
+        }
+    }
+
+    /**
+     * When rendering a query, if the template is not set explicitly will use "select" mode
      * @return [type] [description]
      */
     public function render()
@@ -257,11 +268,6 @@ class Query extends Expression
         }
         return parent::render();
 
-    }
-
-    protected function _render_from()
-    {
-        return isset($this->main_table)?'from':'';
     }
 
     /**
@@ -281,4 +287,5 @@ class Query extends Expression
 
         return $this;
     }
+    /// }}}
 }
