@@ -287,18 +287,22 @@ class Query extends Expression
      * To specify OR conditions
      *  $q->where($q->orExpr()->where('a',1)->where('b',1));
      *
-     * @param mixed  $field Field, array for OR or Expression
-     * @param string $cond  Condition such as '=', '>' or 'is not'
-     * @param string $value Value. Will be quoted unless you pass expression
-     * @param string $kind  Do not use directly. Use having()
+     * @param mixed  $field     Field, array for OR or Expression
+     * @param string $cond      Condition such as '=', '>' or 'is not'
+     * @param string $value     Value. Will be quoted unless you pass expression
+     * @param string $kind      Do not use directly. Use having()
+     * @param string $num_args  When $kind is passed, we can't determine number of
+     *                          actual arguments, so this argumen must be specified.
      *
      * @return DB_dsql $this
      */
-    public function where($field, $cond = null, $value = null, $kind = 'where')
+    public function where($field, $cond = null, $value = null, $kind = 'where', $num_args = null)
     {
 
         // Number of passed arguments will be used to determine if arguments were specified or not
-        $num_args = func_num_args();
+        if(is_null($num_args)) {
+            $num_args = func_num_args();
+        }
 
         // Array as first argument means we have to replace it with orExpr()
         if (is_array($field)) {
@@ -367,7 +371,8 @@ class Query extends Expression
      */
     public function having($field, $cond = null, $value = null)
     {
-        return $this->where($field, $cond, $value, 'having');
+        $num_args = func_num_args();
+        return $this->where($field, $cond, $value, 'having', $num_args);
     }
 
     /**
@@ -510,7 +515,7 @@ class Query extends Expression
             return;
         }
 
-        return ' having '.join(' and ', $this->_render_where('having'));
+        return ' having '.join(' and ', $this->__render_where('having'));
     }
     // }}}
 

@@ -195,24 +195,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testBasicWhere()
     {
-        $this->assertEquals('where `id` = :a',       $this->q(['template'=>'[where]'])->where('id',1)->render());
-        $this->assertEquals('where `user`.`id` = :a', $this->q(['template'=>'[where]'])->where('user.id',1)->render());
+        $this->assertEquals('where `id` = :a',            $this->q(['template'=>'[where]'])->where('id',1)->render());
+        $this->assertEquals('where `user`.`id` = :a',     $this->q(['template'=>'[where]'])->where('user.id',1)->render());
         $this->assertEquals('where `db`.`user`.`id` = :a',$this->q(['template'=>'[where]'])->where('db.user.id',1)->render());
-        $this->assertEquals('where `id` > :a',       $this->q(['template'=>'[where]'])->where('id','>',1)->render());
-        $this->assertEquals('where `id` in (:a,:b)',$this->q(['template'=>'[where]'])->where('id','in',[1,2])->render());
-        $this->assertEquals('where `id` is :a',    $this->q(['template'=>'[where]'])->where('id','is',null)->render());
-        $this->assertEquals('where `id` is not :a',      $this->q(['template'=>'[where]'])->where('id!=',null)->render());
-        $this->assertEquals('where `id` is not :a',      $this->q(['template'=>'[where]'])->where('id<>',null)->render());
-        $this->assertEquals('where now()',           $this->q(['template'=>'[where]'])->where('now()')->render());
-        $this->assertEquals('where now() = :a',      $this->q(['template'=>'[where]'])->where('now()',1)->render());
-        $this->assertEquals('where now = :a',        $this->q(['template'=>'[where]'])->where(new Expression('now'),1)->render());
+        $this->assertEquals('where `id` > :a',            $this->q(['template'=>'[where]'])->where('id','>',1)->render());
+        $this->assertEquals('where `id` in (:a,:b)',      $this->q(['template'=>'[where]'])->where('id','in',[1,2])->render());
+        $this->assertEquals('where `id` is :a',           $this->q(['template'=>'[where]'])->where('id','is',null)->render());
+        $this->assertEquals('where `id` is not :a',       $this->q(['template'=>'[where]'])->where('id!=',null)->render());
+        $this->assertEquals('where `id` is not :a',       $this->q(['template'=>'[where]'])->where('id<>',null)->render());
+        $this->assertEquals('where now()',                $this->q(['template'=>'[where]'])->where('now()')->render());
+        $this->assertEquals('where now() = :a',           $this->q(['template'=>'[where]'])->where('now()',1)->render());
+        $this->assertEquals('where now = :a',             $this->q(['template'=>'[where]'])->where(new Expression('now'),1)->render());
         $this->assertEquals('where `a` = :a and `b` = :b',$this->q(['template'=>'[where]'])->where('a',1)->where('b',2)->render());
     }
 
-    public function testBasicWhere2()
+    /**
+     * @covers ::having
+     */
+    public function testBasicHaving()
     {
-        $this->assertEquals('where now() = :a',      $this->q(['template'=>'[where]'])->where('now()',1)->render());
-
+        $this->assertEquals('having `id` = :a',            $this->q(['template'=>'[having]'])->having('id',1)->render());
+        $this->assertEquals('having `id` > :a',            $this->q(['template'=>'[having]'])->having('id','>',1)->render());
+        $this->assertEquals('where `id` = :a having `id` > :b',
+            $this->q(['template'=>'[where][having]'])->where('id',1)->having('id>',1)->render());
     }
 
     /**
