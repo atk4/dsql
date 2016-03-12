@@ -526,19 +526,6 @@ class Query extends Expression
 
     // {{{ Miscelanious
     /**
-     * Specifying options to constructors will override default
-     * attribute values of this class
-     *
-     * @param array $options will initialize class properties
-     */
-    public function __construct($options = array())
-    {
-        foreach ($options as $key => $val) {
-            $this->$key = $val;
-        }
-    }
-
-    /**
      * When rendering a query, if the template is not set explicitly will use "select" mode
      * @return [type] [description]
      */

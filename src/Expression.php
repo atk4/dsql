@@ -40,7 +40,13 @@ class Expression implements \ArrayAccess {
     public $params=[];
 
 
-    function __construct($template = null, $arguments = null)
+    /**
+     * Specifying options to constructors will override default
+     * attribute values of this class
+     *
+     * @param array $options will initialize class properties
+     */
+    function __construct($template = [], $arguments = null)
     {
 ;
         if(is_string($template)){
