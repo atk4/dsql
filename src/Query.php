@@ -309,12 +309,16 @@ class Query extends Expression
             // or conditions
             $or = $this->orExpr();
             foreach ($field as $row) {
-                call_user_func_array([$or,'where'],$row);
+                if (is_array($row)) {
+                    call_user_func_array([$or,'where'],$row);
+                }else{
+                    $or->where($row);
+                }
             }
             $field = $or;
         }
 
-        if ($num_args === 1) {
+        if ($num_args === 1 && is_string($field)) {
             $this->args[$kind][] = [$this->expr($field)];
             return $this; 
         }
@@ -567,6 +571,16 @@ class Query extends Expression
     public function expr($expr, $options = [])
     {
         return new Expression($expr, $options);
+    }
+
+    public function orExpr()
+    {
+        return new Query(['template'=>'[orwhere]']);
+    }
+
+    public function andExpr()
+    {
+        return new Query(['template'=>'[andwhere]']);
     }
     /// }}}
 }
