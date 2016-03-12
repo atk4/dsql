@@ -76,7 +76,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            'select now()  ',
+            'select now()',
             (new Query())
             ->field(new Expression('now()'))
             ->render()
