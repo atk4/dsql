@@ -13,6 +13,8 @@ class Query extends Expression
     public $templates = [
         'select' => 'select [field] [from] [table][where][having]',
         'delete' => 'delete [from] [table][where][having]',
+        'insert' => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
+        'update' => 'update [table_noalias] set [set] [where]',
     ];
 
     /**
@@ -236,6 +238,25 @@ class Query extends Expression
         }
 
         return implode(',', $ret);
+    }
+
+    protected function _render_table_noalias()
+    {
+        $ret = array();
+
+        if ($this->args['table'] instanceof Expression) {
+            throw new Exception('Table cannot be expression for UPDATE / INSERT queries');
+        }
+
+        foreach ($this->args['table'] as $row) {
+            list($table, $alias) = $row;
+
+            $table = $this->_escape($table);
+
+            $ret[] = $table;
+        }
+
+        return implode(', ', $ret);
     }
 
     protected function _render_from()
@@ -519,6 +540,92 @@ class Query extends Expression
     }
     // }}}
 
+    // {{{ Set field implementation
+    /**
+     * Sets field value for INSERT or UPDATE statements.
+     *
+     * @param string $field Name of the field
+     * @param mixed  $value Value of the field
+     *
+     * @return DB_dsql $this
+     */
+    public function set($field, $value = null)
+    {
+        if ($value === false) {
+            throw $this->exception('Value "false" is not supported by SQL')
+                ->addMoreInfo('field', $field);
+        }
+
+        if (is_array($field)) {
+            foreach ($field as $key => $value) {
+                $this->set($key, $value);
+            }
+
+            return $this;
+        }
+
+        $this->args['set'][$field] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Renders [set] for UPDATE query.
+     *
+     * @return string rendered SQL chunk
+     */
+    protected function _render_set()
+    {
+        $result = array();
+        if ($this->args['set']) {
+            foreach ($this->args['set'] as $field => $value) {
+                $field = $this->_consume($field,'escape');
+                $value = $this->_consume($value,'param');
+
+                $result[] = $field.'='.$value;
+            }
+        }
+
+        return implode(', ', $result);
+    }
+    /**
+     * Renders [set_fields] for INSERT.
+     *
+     * @return string rendered SQL chunk
+     */
+    protected function _render_set_fields()
+    {
+        $result = array();
+        if ($this->args['set']) {
+            foreach ($this->args['set'] as $field => $value) {
+                $field = $this->_consume($field,'escape');
+
+                $result[] = $field;
+            }
+        }
+
+        return implode(',', $result);
+    }
+    /**
+     * Renders [set_values] for INSERT.
+     *
+     * @return string rendered SQL chunk
+     */
+    protected function _render_set_values()
+    {
+        $result = array();
+        if ($this->args['set']) {
+            foreach ($this->args['set'] as $field => $value) {
+                $value = $this->_consume($value,'param');
+
+                $result[] = $value;
+            }
+        }
+
+        return implode(',', $result);
+    }
+    /// }}}
+ 
     // {{{ Miscelanious
     /**
      * Specifying options to constructors will override default
