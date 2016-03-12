@@ -357,6 +357,7 @@ class Query extends Expression
 
 
         switch($num_args){
+            case 1: $this->args[$kind][] = [$field]; break;
             case 2: $this->args[$kind][] = [$field, $cond]; break;
             case 3: $this->args[$kind][] = [$field, $cond, $value]; break;
         }
@@ -386,7 +387,7 @@ class Query extends Expression
      *
      * @return array Parsed chunks of query
      */
-    public function __render_where($kind)
+    protected function __render_where($kind)
     {
         $ret = [];
 
@@ -471,7 +472,7 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function _render_where()
+    protected function _render_where()
     {
         if (!isset($this->args['where'])) {
             return;
@@ -485,7 +486,7 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function _render_orwhere()
+    protected function _render_orwhere()
     {
         if (!isset($this->args['where'])) {
             return;
@@ -499,7 +500,7 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function render_andwhere()
+    protected function _render_andwhere()
     {
         if (!isset($this->args['where'])) {
             return;
@@ -513,7 +514,7 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function _render_having()
+    protected function _render_having()
     {
         if (!isset($this->args['having'])) {
             return;
