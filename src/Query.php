@@ -287,5 +287,10 @@ class Query extends Expression
 
         return $this;
     }
+
+    public function expr($expr, $options = [])
+    {
+        return new Expression($expr, $options);
+    }
     /// }}}
 }
