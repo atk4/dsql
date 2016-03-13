@@ -300,46 +300,39 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testInsertDeleteUpdate()
+    public function testNestedOrAnd()
     {
-        $this->assertEquals(
-            'delete from `employee` where `name` = :a',
-            (new Query())
-            ->field('name')->table('employee')->where('name',1)
-            ->selectTemplate('delete')
-            ->render()
+
+        $q = new Query();
+        $q->table('employee')->field('name');
+        $q->where(
+            $q
+                ->orExpr()
+                ->where('a',1)
+                ->where('b',1)
         );
 
         $this->assertEquals(
-            'update `employee` set `name`=:a',
-            (new Query())
-            ->field('name')->table('employee')->set('name',1)
-            ->selectTemplate('update')
-            ->render()
+            'select `name` from `employee` where (`a` = :a or `b` = :b)',
+            $q->render()
+        );
+
+        $q = new Query();
+        $q->table('employee')->field('name');
+        $q->where(
+            $q
+                ->orExpr()
+                ->where('a',1)
+                ->where('b',1)
+                ->where($q->andExpr()
+                    ->where('true')
+                    ->where('false')
+                )
         );
 
         $this->assertEquals(
-            'update `employee` set `name`=`name`+1',
-            ($q=new Query())
-            ->field('name')->table('employee')->set('name',$q->expr('`name`+1'))
-            ->selectTemplate('update')
-            ->render()
-        );
-
-        $this->assertEquals(
-            'insert into `employee` (`name`) values (:a)',
-            (new Query())
-            ->field('name')->table('employee')->set('name',1)
-            ->selectTemplate('insert')
-            ->render()
-        );
-
-        $this->assertEquals(
-            'insert into `employee` (`name`) values (now())',
-            (new Query())
-            ->field('name')->table('employee')->set('name',new Expression('now()'))
-            ->selectTemplate('insert')
-            ->render()
+            'select `name` from `employee` where (`a` = :a or `b` = :b or (true and false))',
+            $q->render()
         );
     }
 }

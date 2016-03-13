@@ -8,17 +8,30 @@ engines:
     enabled: true
   phpmd:
     enabled: true
+    #config:
+    #  file_extensions: "php"
+    #  rulesets: "unusedcode,codesize,naming,optional_relative_path_to_custom_ruleset.xml"
     checks:
+      CyclomaticComplexity:
+        enabled: true
+        reportLevel: 13
+      # Disable some rules
       Controversial/CamelCaseMethodName:
         enabled: false
-      CyclomaticComplexity:
-        reportLevel: 13
+      Controversial/CamelCasePropertyName:
+        enabled: false
+      Controversial/CamelCaseVariableName:
+        enabled: false
+      Naming\ShortVariable:
+        enabled: false
+      #CleanCode\ElseExpression:
+      #  enabled: false
   radon:
     enabled: true
 ratings:
   paths:
-  - "src/**"
+  - src/**
 exclude_paths:
- - docs/**/*
- - tests/**/*
- - vendor/**/*
+- docs/**/*
+- tests/**/*
+- vendor/**/*
