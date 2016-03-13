@@ -257,6 +257,24 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testOrWhere()
+    {
+        $this->assertEquals(
+            'select `name` from `employee` where (`a` = :a or `b` = :b)',
+            (new Query())
+            ->field('name')->table('employee')->where([['a',1],['b',1]])
+            ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee` where (`a` = :a or a=b)',
+            (new Query())
+            ->field('name')->table('employee')->where([['a',1],'a=b'])
+            ->render()
+        );
+    }
+
+
     public function testInsertDeleteUpdate()
     {
         $this->assertEquals(
