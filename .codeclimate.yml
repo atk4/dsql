@@ -12,6 +12,7 @@ engines:
       Controversial/CamelCaseMethodName:
         enabled: false
       CyclomaticComplexity:
+        enabled: true
         reportLevel: 13
   radon:
     enabled: true
