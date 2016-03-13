@@ -643,7 +643,6 @@ class Query extends Expression
     }
 
     /**
-<<<<<<< HEAD
      * Renders [set_values] for INSERT.
      *
      * @return string rendered SQL chunk
@@ -727,16 +726,6 @@ class Query extends Expression
     public function andExpr()
     {
         return new Query(['template' => '[andwhere]']);
-    }
-
-    public function orExpr()
-    {
-        return new Query(['template'=>'[orwhere]']);
-    }
-
-    public function andExpr()
-    {
-        return new Query(['template'=>'[andwhere]']);
     }
     /// }}}
 }
