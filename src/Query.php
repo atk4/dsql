@@ -8,7 +8,9 @@ namespace atk4\dsql;
 class Query extends Expression
 {
     /**
-     * Define templates for the basic queries
+     * Define templates for the basic queries.
+     *
+     * @var array
      */
     public $templates = [
         'select' => 'select [field] [from] [table][where][having]',
@@ -21,23 +23,35 @@ class Query extends Expression
      * Query will use one of the predefined "templates". The mode
      * will contain name of template used.
      *
-     * @var [type]
+     * @var string
      */
     public $mode = null;
 
     /**
      * Hash containing configuration accumulated by calling methods
-     * such as field(), table(), etc
+     * such as field(), table(), etc.
+     *
+     * @var array
      */
     protected $args = [];
 
     /**
      * If no fields are defined, this field is used
+     *
+     * @var string
      */
     public $defaultField = '*';
 
+    /**
+     * Name of database table to use in query.
+     * Will be used only if we query from one table.
+     *
+     * @var null|false|string
+     */
+    protected $main_table = null;
 
-    // {{{ Field specification and rendering 
+
+    // {{{ Field specification and rendering
     /**
      * Adds new column to resulting select by querying $field.
      *
@@ -65,11 +79,11 @@ class Query extends Expression
      * You can use $q->dsql() for subqueries. In such case field alias is mandatory
      *  $q->field( $q->dsql()->table('x')... , 'alias');    // must always use alias
      *
-     * @param string|array $field Specifies field to select
-     * @param string       $table Specify if not using primary table
-     * @param string       $alias Specify alias for this field
+     * @param mixed  $field Specifies field to select
+     * @param string $table Specify if not using primary table
+     * @param string $alias Specify alias for this field
      *
-     * @return Query $this
+     * @return $this
      */
     public function field($field, $table = null, $alias = null)
     {
@@ -97,7 +111,7 @@ class Query extends Expression
     }
 
     /**
-     * Returns template component for [field]
+     * Returns template component for [field].
      *
      * @return string Parsed template chunk
      */
@@ -115,7 +129,7 @@ class Query extends Expression
         }
 
         foreach ($this->args['fields'] as $row) {
-            list($field,$table,$alias) = $row;
+            list($field, $table, $alias) = $row;
 
             // Do not use alias, if it's same as field
             if ($alias === $field) {
@@ -145,15 +159,18 @@ class Query extends Expression
             $result[] = $field;
         }
 
-        return join(',', $result);
+        return implode(',', $result);
     }
     // }}}
 
     // {{{ Table specification and rendering
-    protected $main_table = null;
-
     /**
      * @todo Method description
+     *
+     * @param mixed  $table
+     * @param string $alias
+     *
+     * @return $this
      */
     public function table($table, $alias = null)
     {
@@ -176,7 +193,6 @@ class Query extends Expression
                 throw new Exception('You cannot use table([expression]). table() was called before.');
             }
 
-
             $this->main_table = false;
             $this->args['table'] = $table;
             return $this;
@@ -191,9 +207,9 @@ class Query extends Expression
         }
 
         // main_table will be set only if table() is called once. It's used
-        // wher joining with other tables
+        // when joining with other tables
         if ($this->main_table === null) {
-            $this->main_table = $alias ? $alias : $table;
+            $this->main_table = $alias ?: $table;
 
             // on multiple calls, main_table will be false and we won't
             // be able to join easily anymore.
@@ -231,7 +247,7 @@ class Query extends Expression
             $table = $this->_escape($table);
 
             if ($alias !== null) {
-                $table .= ' '.$this->_escape($alias);
+                $table .= ' ' . $this->_escape($alias);
             }
 
             $ret[] = $table;
@@ -240,6 +256,12 @@ class Query extends Expression
         return implode(',', $ret);
     }
 
+    /**
+     * Renders part of the template: [table_noalias]
+     * Do not call directly.
+     *
+     * @return string Parsed template chunk
+     */
     protected function _render_table_noalias()
     {
         $ret = array();
@@ -259,9 +281,15 @@ class Query extends Expression
         return implode(', ', $ret);
     }
 
+    /**
+     * Renders part of the template: [from]
+     * Do not call directly.
+     *
+     * @return string Parsed template chunk
+     */
     protected function _render_from()
     {
-        return isset($this->main_table)?'from':'';
+        return isset($this->main_table) ? 'from' : '';
     }
     /// }}}
 
@@ -303,7 +331,7 @@ class Query extends Expression
      *
      * The above use of OR conditions rely on orExpr() functionality. See
      * that method for morer information, but in short it makes use of
-     * Expression_OR class 
+     * Expression_OR class
      *
      * To specify OR conditions
      *  $q->where($q->orExpr()->where('a',1)->where('b',1));
@@ -315,11 +343,10 @@ class Query extends Expression
      * @param string $num_args  When $kind is passed, we can't determine number of
      *                          actual arguments, so this argumen must be specified.
      *
-     * @return DB_dsql $this
+     * @return $this
      */
     public function where($field, $cond = null, $value = null, $kind = 'where', $num_args = null)
     {
-
         // Number of passed arguments will be used to determine if arguments were specified or not
         if(is_null($num_args)) {
             $num_args = func_num_args();
@@ -330,14 +357,18 @@ class Query extends Expression
             // or conditions
             $or = $this->orExpr();
             foreach ($field as $row) {
-                call_user_func_array([$or,'where'],$row);
+                if (is_array($row)) {
+                    call_user_func_array([$or, 'where'], $row);
+                }else{
+                    $or->where($row);
+                }
             }
             $field = $or;
         }
 
-        if ($num_args === 1) {
+        if ($num_args === 1 && is_string($field)) {
             $this->args[$kind][] = [$this->expr($field)];
-            return $this; 
+            return $this;
         }
 
         // first argument is string containing more than just a field name and no more than 2
@@ -374,6 +405,7 @@ class Query extends Expression
 
 
         switch($num_args){
+            case 1: $this->args[$kind][] = [$field]; break;
             case 2: $this->args[$kind][] = [$field, $cond]; break;
             case 3: $this->args[$kind][] = [$field, $cond, $value]; break;
         }
@@ -388,11 +420,12 @@ class Query extends Expression
      * @param string $cond  Condition such as '=', '>' or 'is not'
      * @param string $value Value. Will be quoted unless you pass expression
      *
-     * @return DB_dsql $this
+     * @return $this
      */
     public function having($field, $cond = null, $value = null)
     {
         $num_args = func_num_args();
+
         return $this->where($field, $cond, $value, 'having', $num_args);
     }
 
@@ -403,7 +436,7 @@ class Query extends Expression
      *
      * @return array Parsed chunks of query
      */
-    public function __render_where($kind)
+    protected function __render_where($kind)
     {
         $ret = [];
 
@@ -425,7 +458,7 @@ class Query extends Expression
                 $field = $this->_consume($field);
             } else {
                 // otherwise, perform some escaping
-                $field = join('.',$this->_escape(explode('.', $field)));
+                $field = implode('.', $this->_escape(explode('.', $field)));
             }
 
             if (count($row) == 1) {
@@ -468,7 +501,7 @@ class Query extends Expression
 
             // if value is array, then use IN or NOT IN as condition
             if (is_array($value)) {
-                $value = '('.join(',',$this->_param($value)).')';
+                $value = '('.implode(',', $this->_param($value)).')';
                 $cond = in_array($cond, array('!=', '<>', 'not', 'not in')) ? 'not in' : 'in';
                 $ret[] = $this->_consume($field,'escape').' '.$cond.' '.$value;
                 continue;
@@ -488,13 +521,13 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function _render_where()
+    protected function _render_where()
     {
         if (!isset($this->args['where'])) {
             return;
         }
 
-        return ' where '.join(' and ', $this->__render_where('where'));
+        return ' where '.implode(' and ', $this->__render_where('where'));
     }
 
     /**
@@ -502,13 +535,13 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function _render_orwhere()
+    protected function _render_orwhere()
     {
         if (!isset($this->args['where'])) {
             return;
         }
 
-        return join(' or ', $this->__render_where('where'));
+        return implode(' or ', $this->__render_where('where'));
     }
 
     /**
@@ -516,13 +549,13 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function render_andwhere()
+    protected function _render_andwhere()
     {
         if (!isset($this->args['where'])) {
             return;
         }
 
-        return join(' and ', $this->__render_where('where'));
+        return implode(' and ', $this->__render_where('where'));
     }
 
     /**
@@ -530,13 +563,13 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function _render_having()
+    protected function _render_having()
     {
         if (!isset($this->args['having'])) {
             return;
         }
 
-        return ' having '.join(' and ', $this->__render_where('having'));
+        return ' having '.implode(' and ', $this->__render_where('having'));
     }
     // }}}
 
@@ -544,10 +577,10 @@ class Query extends Expression
     /**
      * Sets field value for INSERT or UPDATE statements.
      *
-     * @param string $field Name of the field
+     * @param string|array $field Name of the field
      * @param mixed  $value Value of the field
      *
-     * @return DB_dsql $this
+     * @return $this
      */
     public function set($field, $value = null)
     {
@@ -579,8 +612,8 @@ class Query extends Expression
         $result = array();
         if ($this->args['set']) {
             foreach ($this->args['set'] as $field => $value) {
-                $field = $this->_consume($field,'escape');
-                $value = $this->_consume($value,'param');
+                $field = $this->_consume($field, 'escape');
+                $value = $this->_consume($value, 'param');
 
                 $result[] = $field.'='.$value;
             }
@@ -588,6 +621,7 @@ class Query extends Expression
 
         return implode(', ', $result);
     }
+
     /**
      * Renders [set_fields] for INSERT.
      *
@@ -598,7 +632,7 @@ class Query extends Expression
         $result = array();
         if ($this->args['set']) {
             foreach ($this->args['set'] as $field => $value) {
-                $field = $this->_consume($field,'escape');
+                $field = $this->_consume($field, 'escape');
 
                 $result[] = $field;
             }
@@ -606,6 +640,7 @@ class Query extends Expression
 
         return implode(',', $result);
     }
+
     /**
      * Renders [set_values] for INSERT.
      *
@@ -616,7 +651,7 @@ class Query extends Expression
         $result = array();
         if ($this->args['set']) {
             foreach ($this->args['set'] as $field => $value) {
-                $value = $this->_consume($value,'param');
+                $value = $this->_consume($value, 'param');
 
                 $result[] = $value;
             }
@@ -625,32 +660,20 @@ class Query extends Expression
         return implode(',', $result);
     }
     /// }}}
- 
+
     // {{{ Miscelanious
     /**
-     * Specifying options to constructors will override default
-     * attribute values of this class
+     * Renders query template. If the template is not explicitly set will use "select" mode.
      *
-     * @param array $options will initialize class properties
-     */
-    public function __construct($options = array())
-    {
-        foreach ($options as $key => $val) {
-            $this->$key = $val;
-        }
-    }
-
-    /**
-     * When rendering a query, if the template is not set explicitly will use "select" mode
-     * @return [type] [description]
+     * @return string
      */
     public function render()
     {
         if (!$this->template) {
             $this->selectTemplate('select');
         }
-        return parent::render();
 
+        return parent::render();
     }
 
     /**
@@ -661,7 +684,7 @@ class Query extends Expression
      *
      * @param string $mode A key for $this->sql_templates
      *
-     * @return DB_dsql $this
+     * @return $this
      */
     public function selectTemplate($mode)
     {
@@ -671,9 +694,37 @@ class Query extends Expression
         return $this;
     }
 
-    public function expr($expr, $options = [])
+    /**
+     * Returns new Expression object.
+     *
+     * @param string|array $template
+     * @param array        $options
+     *
+     * @return Expression
+     */
+    public function expr($template, $options = [])
     {
-        return new Expression($expr, $options);
+        return new Expression($template, $options);
+    }
+
+    /**
+     * Returns new Query object of [or] expression.
+     *
+     * @return Query
+     */
+    public function orExpr()
+    {
+        return new Query(['template' => '[orwhere]']);
+    }
+
+    /**
+     * Returns new Query object of [and] expression.
+     *
+     * @return Query
+     */
+    public function andExpr()
+    {
+        return new Query(['template' => '[andwhere]']);
     }
     /// }}}
 }
