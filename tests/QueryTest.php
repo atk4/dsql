@@ -300,5 +300,46 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testInsertDeleteUpdate()
+    {
+        $this->assertEquals(
+            'delete from `employee` where `name` = :a',
+            (new Query())
+            ->field('name')->table('employee')->where('name',1)
+            ->selectTemplate('delete')
+            ->render()
+        );
 
+        $this->assertEquals(
+            'update `employee` set `name`=:a',
+            (new Query())
+            ->field('name')->table('employee')->set('name',1)
+            ->selectTemplate('update')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'update `employee` set `name`=`name`+1',
+            ($q=new Query())
+            ->field('name')->table('employee')->set('name',$q->expr('`name`+1'))
+            ->selectTemplate('update')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'insert into `employee` (`name`) values (:a)',
+            (new Query())
+            ->field('name')->table('employee')->set('name',1)
+            ->selectTemplate('insert')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'insert into `employee` (`name`) values (now())',
+            (new Query())
+            ->field('name')->table('employee')->set('name',new Expression('now()'))
+            ->selectTemplate('insert')
+            ->render()
+        );
+    }
 }

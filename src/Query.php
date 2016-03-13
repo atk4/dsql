@@ -633,6 +633,7 @@ class Query extends Expression
         if ($this->args['set']) {
             foreach ($this->args['set'] as $field => $value) {
                 $field = $this->_consume($field, 'escape');
+                $field = $this->_consume($field,'escape');
 
                 $result[] = $field;
             }
