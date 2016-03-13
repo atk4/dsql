@@ -309,12 +309,16 @@ class Query extends Expression
             // or conditions
             $or = $this->orExpr();
             foreach ($field as $row) {
-                call_user_func_array([$or,'where'],$row);
+                if (is_array($row)) {
+                    call_user_func_array([$or,'where'],$row);
+                }else{
+                    $or->where($row);
+                }
             }
             $field = $or;
         }
 
-        if ($num_args === 1) {
+        if ($num_args === 1 && is_string($field)) {
             $this->args[$kind][] = [$this->expr($field)];
             return $this; 
         }
@@ -353,6 +357,7 @@ class Query extends Expression
 
 
         switch($num_args){
+            case 1: $this->args[$kind][] = [$field]; break;
             case 2: $this->args[$kind][] = [$field, $cond]; break;
             case 3: $this->args[$kind][] = [$field, $cond, $value]; break;
         }
@@ -382,7 +387,7 @@ class Query extends Expression
      *
      * @return array Parsed chunks of query
      */
-    public function __render_where($kind)
+    protected function __render_where($kind)
     {
         $ret = [];
 
@@ -467,7 +472,7 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function _render_where()
+    protected function _render_where()
     {
         if (!isset($this->args['where'])) {
             return;
@@ -481,7 +486,7 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function _render_orwhere()
+    protected function _render_orwhere()
     {
         if (!isset($this->args['where'])) {
             return;
@@ -495,7 +500,7 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function render_andwhere()
+    protected function _render_andwhere()
     {
         if (!isset($this->args['where'])) {
             return;
@@ -509,7 +514,7 @@ class Query extends Expression
      *
      * @return string rendered SQL chunk
      */
-    public function _render_having()
+    protected function _render_having()
     {
         if (!isset($this->args['having'])) {
             return;
@@ -520,19 +525,6 @@ class Query extends Expression
     // }}}
 
     // {{{ Miscelanious
-    /**
-     * Specifying options to constructors will override default
-     * attribute values of this class
-     *
-     * @param array $options will initialize class properties
-     */
-    public function __construct($options = array())
-    {
-        foreach ($options as $key => $val) {
-            $this->$key = $val;
-        }
-    }
-
     /**
      * When rendering a query, if the template is not set explicitly will use "select" mode
      * @return [type] [description]
@@ -567,6 +559,16 @@ class Query extends Expression
     public function expr($expr, $options = [])
     {
         return new Expression($expr, $options);
+    }
+
+    public function orExpr()
+    {
+        return new Query(['template'=>'[orwhere]']);
+    }
+
+    public function andExpr()
+    {
+        return new Query(['template'=>'[andwhere]']);
     }
     /// }}}
 }

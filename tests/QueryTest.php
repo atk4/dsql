@@ -256,4 +256,57 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->render()
         );
     }
+
+    public function testOrWhere()
+    {
+        $this->assertEquals(
+            'select `name` from `employee` where (`a` = :a or `b` = :b)',
+            (new Query())
+            ->field('name')->table('employee')->where([['a',1],['b',1]])
+            ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee` where (`a` = :a or a=b)',
+            (new Query())
+            ->field('name')->table('employee')->where([['a',1],'a=b'])
+            ->render()
+        );
+    }
+
+    public function testNestedOrAnd()
+    {
+
+        $q = new Query();
+        $q->table('employee')->field('name');
+        $q->where(
+            $q
+                ->orExpr()
+                ->where('a',1)
+                ->where('b',1)
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee` where (`a` = :a or `b` = :b)',
+            $q->render()
+        );
+
+        $q = new Query();
+        $q->table('employee')->field('name');
+        $q->where(
+            $q
+                ->orExpr()
+                ->where('a',1)
+                ->where('b',1)
+                ->where($q->andExpr()
+                    ->where('true')
+                    ->where('false')
+                )
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee` where (`a` = :a or `b` = :b or (true and false))',
+            $q->render()
+        );
+    }
 }
