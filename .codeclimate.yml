@@ -9,11 +9,16 @@ engines:
   phpmd:
     enabled: true
     checks:
-      Controversial/CamelCaseMethodName:
-        enabled: false
       CyclomaticComplexity:
         enabled: true
         reportLevel: 13
+      # Disable some checks
+      Controversial/CamelCaseMethodName:
+        enabled: false
+      Controversial/CamelCasePropertyName:
+        enabled: false
+      Controversial/CamelCaseVariableName:
+        enabled: false
   radon:
     enabled: true
 ratings:
