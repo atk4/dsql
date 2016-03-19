@@ -104,6 +104,8 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+highlight_language = 'php'
+
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
@@ -274,3 +276,9 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+
+from sphinx.highlighting import lexers
+from pygments.lexers.web import PhpLexer
+lexers['php'] = PhpLexer(startinline=True)
+lexers['php-annotations'] = PhpLexer(startinline=True)
+primary_domain = "php"    # It seems to help sphinx in some kind (don't know why)

@@ -1,6 +1,6 @@
 .. _expr:
 
-.. php:class:: Query
+.. php:class:: Expressions
 
 ===========
 Expressions
