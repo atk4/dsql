@@ -3,18 +3,13 @@
 namespace atk4\dsql;
 
 /**
- * Implement this interface in your class if it can be used as a part of a
- * query. Implement getDSQLExpression method that would return a valid
- * Query object (or string);
+ * Creates new expression. Optionally specify a string - a piece
+ * of SQL code that will become expression template and arguments.
+ *
+ * See below for call patterns
  */
 class Expression implements \ArrayAccess {
 
-    /**
-     * Creates new expression. Optionally specify a string - a piece
-     * of SQL code that will become expression template and arguments.
-     *
-     * See below for call patterns
-     */
     protected $template = null;
 
     /**
