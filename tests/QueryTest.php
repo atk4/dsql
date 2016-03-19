@@ -48,6 +48,18 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('first_name.employee',      PHPUnitUtil::callProtectedMethod($this->q()->field('first_name.employee'), '_render_field'));
     }
 
+    public function testFieldExpression()
+    {
+        $this->assertEquals('`name`',        $this->q(['template'=>'[field]'])->field('name')->render());
+        $this->assertEquals('`first name`',  $this->q(['template'=>'[field]'])->field('first name')->render());
+        $this->assertEquals('first.name',    $this->q(['template'=>'[field]'])->field('first.name')->render());
+        $this->assertEquals('now()',         $this->q(['template'=>'[field]'])->field('now()')->render());
+        $this->assertEquals('now()',         $this->q(['template'=>'[field]'])->field(new Expression('now()'))->render());
+        $this->assertEquals('now() `time`',         $this->q(['template'=>'[field]'])->field('now()',null,'time')->render());
+        $this->assertEquals('now() `time`',         $this->q(['template'=>'[field]'])->field(new Expression('now()'),null,'time')->render());
+
+    }
+
     /**
      * @covers ::table
      */
@@ -55,12 +67,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $q = $this->q();
         $this->assertEquals($q, $q->table('employee'));
+
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testTableFailure1()
+    {
+        (new Query())->table('employee,jobs','u');
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testTableFailure2()
+    {
+        (new Query())->table(['employee','jobs'],'u');
     }
 
     /**
      * @covers ::render
      */
-    public function testBasicRender()
+    public function testTableRender()
     {
         $this->assertEquals(
             'select `name` from `employee`',
@@ -68,10 +97,32 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->field('name')->table('employee')
             ->render()
         );
+
         $this->assertEquals(
             'select `employee`.`name` from `employee`,`jobs`',
             (new Query())
             ->field('name','employee')->table('employee')->table('jobs')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs`',
+            (new Query())
+            ->field('name')->table('employee,jobs')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs`',
+            (new Query())
+            ->field('name')->table(['employee','jobs'])
+            ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs` `j`',
+            (new Query())
+            ->field('name')->table(['employee','j'=>'jobs'])
             ->render()
         );
 
