@@ -8,7 +8,7 @@ namespace atk4\dsql;
  *
  * See below for call patterns
  */
-class Expression implements \ArrayAccess
+class Expression implements \ArrayAccess,\IteratorAggregate
 {
     protected $template = null;
 
@@ -108,7 +108,6 @@ class Expression implements \ArrayAccess
         return isset($this->args['custom'][$offset]) ? $this->args['custom'][$offset] : null;
     }
 
-<<<<<<< HEAD
     /**
      * Use this instead of "new Expression()" if you want to automatically bind
      * expression to the same connection as the parent.
@@ -130,8 +129,6 @@ class Expression implements \ArrayAccess
         return new Query($options);
     }
 
-=======
->>>>>>> feature/add-insert-update-delete-basics
     /**
      * Recursively renders sub-query or expression, combining parameters.
      * If the argument is more likely to be a field, use tick=true.
@@ -305,4 +302,67 @@ class Expression implements \ArrayAccess
 
         return $d." <font color='gray'>[" . implode(', ', $pp) . ']</font>';
     }
+
+    function execute($connection = null)
+    {
+        if ($connection == null) {
+            $connection = $this->connection;
+        }
+
+        // If it's a PDO connection, we're cool
+        if ($connection instanceof \PDO) {
+            // We support PDO
+            $query = $this->render();
+            $statement = $connection->prepare($query);
+            foreach ($this->params as $key=>$val) {
+
+                if (is_int($val)) {
+                    $type = \PDO::PARAM_INT;
+                } elseif (is_bool($val)) {
+                    $type = \PDO::PARAM_BOOL;
+                } elseif (is_null($val)) {
+                    $type = \PDO::PARAM_NULL;
+                } elseif (is_string($val)) {
+                    $type = \PDO::PARAM_STR;
+                } else {
+                    throw new Exception('Incorrect param type');
+                }
+
+                if (!$statement->bindValue($key,$val,$type)) {
+                    throw new Exception('Unable to bind parameter');
+                }
+            }
+
+            $statement->setFetchMode(\PDO::FETCH_ASSOC);
+            $statement->execute();
+            return $statement;
+            
+        } else {
+            return $connection->execute($this);
+        }
+    }
+
+    function getIterator()
+    {
+        return $this->execute();
+    }
+
+    // {{{ Result Querying
+    function get()
+    {
+        return $this->execute()->fetchAll();
+    }
+
+    function getOne()
+    {
+        $data = $this->getRow();
+        $one = array_shift($data);
+        return $one;
+    }
+
+    function getRow()
+    {
+        return $this->execute()->fetch();
+    }
+    // }}}
 }
