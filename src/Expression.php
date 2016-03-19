@@ -36,6 +36,11 @@ class Expression implements \ArrayAccess {
 
 
     /**
+     * When you are willing to execute the query, connection needs to be specified
+     */
+    public $connection = null;
+
+    /**
      * Specifying options to constructors will override default
      * attribute values of this class
      *
@@ -86,6 +91,26 @@ class Expression implements \ArrayAccess {
         return isset($this->args['custom'][$offset]) ? $this->args['custom'][$offset] : null;
     }
 
+    /**
+     * Use this instead of "new Expression()" if you want to automatically bind
+     * expression to the same connection as the parent.
+     */
+    public function expr($expr, $options = [])
+    {
+        $options['connection'] = $this->connection;
+        $class = get_class($this);
+        return new Expression($expr, $options);
+    }
+
+    /**
+     * Use this instead of "new Query()" if you want to automatically bind
+     * expression to the same connection as the parent.
+     */
+    public function dsql($options = [])
+    {
+        $options['connection'] = $this->connection;
+        return new Query($options);
+    }
 
     /**
      * Recursively renders sub-query or expression, combining parameters.
