@@ -2,6 +2,7 @@
     <testsuites>
         <testsuite name="dsql">
             <directory>tests</directory>
+            <exclude>tests/db</exclude>
         </testsuite>
     </testsuites>
     <logging>
