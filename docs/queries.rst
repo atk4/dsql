@@ -1,11 +1,13 @@
+
 .. php:class:: Query
 
-=========
-Basic Queries
-=========
+==============================
+Introduction to Query Building
+==============================
 
-Query class represents your SQL query-in-making. Query class extends expression,
-therefore inheriting their ability to render(), getDebugQuery() and more.
+Query class represents your SQL query in-the-making. Once you create object of the Query
+class, call some of the methods listed below to modify your query. To actually execute
+your query and start retrieving data, see :ref:`fetching` section.
 
 You should use Query to build a specific statements that are understood by
 your SQL database, such as SELECT or INSERT.
@@ -16,9 +18,7 @@ Once you create a query you can execute modifier methods such as `field()` or
 Once the query is defined, you can either use it inside another query or
 expression or you can execute it in exchange for result set.
 
-Quick Example:
-
-.. code-block:: php
+Quick Example::
 
     use dsql;
 
@@ -164,7 +164,12 @@ Modifying your Query
       :param mixed $table: table such as "employees"
       :returns: $this
 
-There are many possible scenarios how to specify a table::
+This method can be invoked using different combinations of arguments. Follow
+the principle of specifying the table first, and then
+optionally provide an alias. You can specify multiple tables at the same
+time by using comma or array (although you won't be able to use the
+alias there). Using keys in your array will also
+specify the aliases::
 
     $query->table('user');
         // SELECT * from `user`
@@ -185,8 +190,8 @@ There are many possible scenarios how to specify a table::
         // specify aliases for multiple tables
         // SELECT * from `user` `u`, `salary` `s`
 
-All tables and aliases will always be surrounded by backticks. Additionally
-you may use expression as a table::
+Inside your query tables and aliases will always be surrounded by backticks.
+If you want to use a more complex expression, use :php:class:`Expression`::
 
     $query->table($query->expr(
         '(SELECT id FROM user UNION select id from document) tbl'
@@ -194,15 +199,26 @@ you may use expression as a table::
         // SELECT * FROM (SELECT id FROM user UNION
         //  SELECT id FROM document ) tbl
 
-Refer to :ref:`expr` for more information on how to create them.
+Finally, you can also specify a different query instead of table, by simply
+passing another :php:class:`Query` object::
+
+    $sub_q = new Query();
+    $sub_q -> table('emplyeee');
+    $sub_q -> where('name','John');
+
+    $q = new Query();
+    $t -> field('surname');
+    $t -> table($sub_q);
+
+Method table() can be executed several times on the same query object.
 
   .. php:method:: field($fields, $table = null, $alias = null)
 
       Adds additional field that you would like to query. If never called,
-      will default do `defaultField`.
+      will default do `defaultField`, which normally is `*`.
 
       This method has several call options. $field can be array of fields
-      and can also be an expression. If you specify expression in $field
+      and can also can be an expression. If you specify expression in $field
       then alias is mandatory.
 
       :param string|array|object $fields: Specify list of fields to fetch
@@ -233,7 +249,73 @@ Basic Examples::
     $query->field(['name'=>'first_name'],'employee');
         // SELECT `employee`.`first_name` `name` from `user`
 
-See also field() usage with :ref:`expr`.
+If the first argument to field contains non-alphanumeric values such as spaces
+or brackets, then field() will assume that you're passing an expression::
+
+    $query->field('now()');
+
+    $query->field('now()', 'time_now');
+
+You may also pass array as first argument, keys will be used as alias (if they are
+specified)::
+
+    $query->field(['time_now'=>'now()', 'time_created']);
+
+Obviously you can call field() multiple times.
+
+  .. php:method:: where($field, $operation, $value)
+
+
+      Specify a table to be used in a query.
+
+      :param mixed $field: field such as "name"
+      :param mixed $operation: comparison operation such as ">" (optional)
+      :param mixed $value: value or expression
+      :returns: $this
+
+This method can be invoked with different arguments, as long as you specify
+them in the correct order.
+
+Pass string (field), Expression (or even Query) as first argument. If you
+are using string, you may end it with operation, such as "age>"  or "parent_id is not"
+DSQL will recognize <,>,=,!=,<>,is,is not. 
+
+If you havent specified parameter as a part of field, specify it through a second
+parameter - $operation. If unspecified, will default to '='.
+
+Last argument is value. You can specify number, string, array or even null.
+This argument will always be parameterised. If you specify array, it's
+elements will be parametrised.
+
+Starting with the basic examples::
+
+    $q->where('id',1);
+
+    $q->where('id>', 1);
+    $q->where('id', '>', 1); //  same as above
+
+    $q->where('id', 'is', null); 
+    $q->where('id', null);   // same as above
+
+    $q->where('now()',1);    // will not use backticks.
+    $q->where(new Expression('now()'),1);  // same as above
+
+    $q->where('id',[1,2]);   // renders as id in (1,2)
+
+You may call where() multiple times, and conditions are always additive (uses AND)
+The easiest way to supply OR condition is if you specify multiple condition
+through array::
+
+    $q->where([['name','like','%john%'], ['surname','like','%john%']);
+
+You can also mix and match with expressions and strings::
+
+    $q->where([['name','like','%john%'], 'surname is null');
+
+    $q->where([['name','like','%john%'], new Expression('surname is null')]);
+
+.. todo::
+    strict mode
 
 
 Internal Methods

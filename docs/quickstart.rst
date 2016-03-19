@@ -6,8 +6,6 @@ This page provides a quick introduction to DSQL and introductory examples.
 If you have not already installed, Guzzle, head over to the :ref:`installation`
 page.
 
-.. _installation:
-
 Basic Principles
 ===================
 

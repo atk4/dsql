@@ -51,6 +51,9 @@ class Query extends Expression
     protected $main_table = null;
 
 
+    // TODO: I want to get rid of $table argument, because it's either
+    // can embedded into a field directly or not necessary for expression,
+
     // {{{ Field specification and rendering
     /**
      * Adds new column to resulting select by querying $field.
@@ -175,7 +178,10 @@ class Query extends Expression
     public function table($table, $alias = null)
     {
         if (is_array($table)) {
-            // array_map([$this, 'table'], $table); ??
+
+            if ($alias !== null) {
+                throw new Exception('Do not use alias with multiple tables');
+            }
 
             foreach ($table as $alias => $t) {
                 if (is_numeric($alias)) {
@@ -196,6 +202,14 @@ class Query extends Expression
             $this->main_table = false;
             $this->args['table'] = $table;
             return $this;
+        }
+
+        // comma-separating tables
+        if (is_string($table) && strpos($table,',') !== false) {
+            if ($alias !== null) {
+                throw new Exception('Do not use alias with multiple tables');
+            }
+            return $this->table(explode(',',$table));
         }
 
         if (!isset($this->args['table'])) {
