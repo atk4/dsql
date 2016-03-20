@@ -22,9 +22,9 @@ engines:
         enabled: false
       Controversial/CamelCaseVariableName:
         enabled: false
-      Naming\ShortVariable:
+      Naming/ShortVariable:
         enabled: false
-      #CleanCode\ElseExpression:
+      #CleanCode/ElseExpression:
       #  enabled: false
   radon:
     enabled: true
