@@ -12,7 +12,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
     public function e()
     {
-        $reflection = new ReflectionClass("Expression");
+        $reflection = new \ReflectionClass("Expression");
         $instance = $reflection->newInstanceWithoutConstructor();
         return call_user_func_array(array($instance, '__construct'), func_get_args());
     }
