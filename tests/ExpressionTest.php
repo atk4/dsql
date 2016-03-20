@@ -12,9 +12,19 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
     public function e()
     {
-        $reflection = new \ReflectionClass("atk4\dsql\Expression");
-        $instance = $reflection->newInstanceWithoutConstructor();
-        return call_user_func_array(array($instance, '__construct'), func_get_args());
+        $args = func_get_args();
+        switch (count($args)) {
+            case 1:
+                return new Expression($args[0]);
+            case 2:
+                return new Expression($args[0], $args[1]);
+        }
+        return new Expression();
+
+        // Didn't work this way :(
+        //$reflection = new \ReflectionClass("atk4\dsql\Expression");
+        //$instance = $reflection->newInstanceWithoutConstructor();
+        //return call_user_func_array(array($instance, '__construct'), func_get_args());
     }
 
 
