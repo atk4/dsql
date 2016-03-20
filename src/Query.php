@@ -28,14 +28,6 @@ class Query extends Expression
     public $mode = null;
 
     /**
-     * Hash containing configuration accumulated by calling methods
-     * such as field(), table(), etc.
-     *
-     * @var array
-     */
-    protected $args = [];
-
-    /**
      * If no fields are defined, this field is used
      *
      * @var string

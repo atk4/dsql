@@ -10,46 +10,80 @@ use atk4\dsql\Expression;
 class ExpressionTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function e($template = null, $args = null)
+    public function e($template = [], $args = null)
     {
         return new Expression($template, $args);
     }
 
 
+    /**
+     * @covers ::__construct
+     */
     public function testConstructor()
     {
+        // Testing parameter edge cases - no parameters, null, empty strings and arrays etc.
+        $this->assertEquals(
+            '',
+            (new Expression)->render()
+        );
         $this->assertEquals(
             '',
             $this->e('')->render()
         );
+
+
+
+
+
+        // Testing simple template patterns
         $this->assertEquals(
             'now()',
             $this->e('now()')->render()
         );
 
-        $e = $this->e('hello, [who]', ['who'=>'world']);
+        // Testing template with parameter
+        $e = $this->e('hello, [who]', ['who' => 'world']);
         $this->assertEquals('hello, :a', $e->render());
         $this->assertEquals('world', $e->params[':a']);
 
-        $this->assertEquals('hello, world', $this->e('hello, [who]', ['who'=>$this->e('world')])->render());
-        $this->assertEquals('hello, world', $this->e('[what], [who]', ['what'=>$this->e('hello'), 'who'=>$this->e('world')])->render());
-        $this->assertEquals('testing "hello, world"', $this->e(
-            'testing "[]"',
-            [
-                $this->e(
-                    '[what], [who]',
-                    [
-                        'what'=>$this->e('hello'),
-                        'who'=>$this->e('world')
-                    ]
-                )
-            ]
-        )->render());
+        // ...
+        $this->assertEquals(
+            'hello, world',
+            $this->e('hello, [who]', ['who' => $this->e('world')])->render()
+        );
+        $this->assertEquals(
+            'hello, world',
+            $this->e(
+                '[what], [who]',
+                [
+                    'what' => $this->e('hello'),
+                    'who'  => $this->e('world')
+                ]
+            )->render()
+        );
+        $this->assertEquals(
+            'testing "hello, world"',
+            $this->e(
+                'testing "[]"',
+                [
+                    $this->e(
+                        '[what], [who]',
+                        [
+                            'what' => $this->e('hello'),
+                            'who'  => $this->e('world')
+                        ]
+                    )
+                ]
+            )->render()
+        );
 
-        $this->assertEquals('hello, world', $this->e(
-            ['template'=>'hello, [who]'],
-            ['who'=>$this->e('world')]
-        )->render());
+        $this->assertEquals(
+            'hello, world',
+            $this->e(
+                ['template' => 'hello, [who]'],
+                ['who' => $this->e('world')]
+            )->render()
+        );
 
     }
 
@@ -79,19 +113,23 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-
+    /**
+     * @covers ::__construct
+     */
     public function testConstructorException1()
     {
         $this->setExpectedException('atk4\dsql\Exception');
         $e = new Expression(false);
     }
 
+    /**
+     * @covers ::__construct
+     */
     public function testConstructorException2()
     {
         $this->setExpectedException('atk4\dsql\Exception');
         $e = new Expression("hello, []", "hello");
     }
-
 
     /**
      * @covers ::_escape
@@ -140,7 +178,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test for vendors that rely on JavaScript expressions, instead of parameters.
      */
-
     public function testJsonExpression()
     {
         $e = new JsonExpression('hello, [who]', ['who'=>'world']);

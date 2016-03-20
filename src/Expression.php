@@ -10,7 +10,23 @@ namespace atk4\dsql;
  */
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
+    /**
+     * Template string.
+     *
+     * @var string
+     */
     protected $template = null;
+
+    /**
+     * Hash containing configuration accumulated by calling methods
+     * such as Query::field(), Query::table(), etc.
+     *
+     * $args['custom'] is used in this Expression class to store hash
+     * of custom template replacements.
+     *
+     * @var array
+     */
+    protected $args = [];
 
     /**
      * Backticks are added around all fields. Set this to blank string to avoid.
@@ -42,6 +58,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     /**
      * When you are willing to execute the query, connection needs to be specified
+     *
+     * @var PDO
      */
     public $connection = null;
 
@@ -59,13 +77,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         } elseif (is_array($template)) {
             $options = $template;
         } else {
-            throw new Exception('$template must be a string in Expression::__construct()');
+            throw new Exception('$template must be a string or array in '.__METHOD__);
         }
 
         // new Expression('unix_timestamp([])', [$date]);
-        if ($arguments) {
+        if ($arguments !== null) {
             if (!is_array($arguments)) {
-                throw new Exception('$arguments must be an array in Expression::__construct()');
+                throw new Exception('$arguments must be an array in '.__METHOD__);
             }
             $this->args['custom'] = $arguments;
         }
@@ -119,7 +137,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     public function expr($expr, $options = [])
     {
         $options['connection'] = $this->connection;
-        $class = get_class($this);
         return new Expression($expr, $options);
     }
 
@@ -231,7 +248,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * ???
+     * Render expression and return it as string.
      *
      * @return string Rendered query
      */
