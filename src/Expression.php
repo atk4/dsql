@@ -8,7 +8,7 @@ namespace atk4\dsql;
  *
  * See below for call patterns
  */
-class Expression implements \ArrayAccess,\IteratorAggregate
+class Expression implements \ArrayAccess, \IteratorAggregate
 {
     protected $template = null;
 
@@ -52,7 +52,7 @@ class Expression implements \ArrayAccess,\IteratorAggregate
      * @param string|array $template
      * @param array        $arguments
      */
-    function __construct($template = [], $arguments = null)
+    public function __construct($template = [], $arguments = null)
     {
         if (is_string($template)) {
             $options = ['template' => $template];
@@ -79,7 +79,8 @@ class Expression implements \ArrayAccess,\IteratorAggregate
     /**
      * ???
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         if (is_null($offset)) {
             $this->args['custom'][] = $value;
         } else {
@@ -90,21 +91,24 @@ class Expression implements \ArrayAccess,\IteratorAggregate
     /**
      * ???
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->args['custom'][$offset]);
     }
 
     /**
      * ???
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->args['custom'][$offset]);
     }
 
     /**
      * ???
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return isset($this->args['custom'][$offset]) ? $this->args['custom'][$offset] : null;
     }
 
@@ -141,12 +145,12 @@ class Expression implements \ArrayAccess,\IteratorAggregate
     protected function _consume($sql_code, $escape_mode = 'param')
     {
         if (!is_object($sql_code)) {
-            switch($escape_mode){
-                case'param':
+            switch ($escape_mode) {
+                case 'param':
                     return $this->_param($sql_code);
-                case'escape':
+                case 'escape':
                     return $this->_escape($sql_code);
-                case'none':
+                case 'none':
                     return $sql_code;
             }
         }
@@ -303,7 +307,7 @@ class Expression implements \ArrayAccess,\IteratorAggregate
         return $d." <font color='gray'>[" . implode(', ', $pp) . ']</font>';
     }
 
-    function execute($connection = null)
+    public function execute($connection = null)
     {
         if ($connection == null) {
             $connection = $this->connection;
@@ -314,7 +318,7 @@ class Expression implements \ArrayAccess,\IteratorAggregate
             // We support PDO
             $query = $this->render();
             $statement = $connection->prepare($query);
-            foreach ($this->params as $key=>$val) {
+            foreach ($this->params as $key => $val) {
 
                 if (is_int($val)) {
                     $type = \PDO::PARAM_INT;
@@ -328,7 +332,7 @@ class Expression implements \ArrayAccess,\IteratorAggregate
                     throw new Exception('Incorrect param type');
                 }
 
-                if (!$statement->bindValue($key,$val,$type)) {
+                if (!$statement->bindValue($key, $val, $type)) {
                     throw new Exception('Unable to bind parameter');
                 }
             }
@@ -342,25 +346,25 @@ class Expression implements \ArrayAccess,\IteratorAggregate
         }
     }
 
-    function getIterator()
+    public function getIterator()
     {
         return $this->execute();
     }
 
     // {{{ Result Querying
-    function get()
+    public function get()
     {
         return $this->execute()->fetchAll();
     }
 
-    function getOne()
+    public function getOne()
     {
         $data = $this->getRow();
         $one = array_shift($data);
         return $one;
     }
 
-    function getRow()
+    public function getRow()
     {
         return $this->execute()->fetch();
     }

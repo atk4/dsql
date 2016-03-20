@@ -140,7 +140,7 @@ class Query extends Expression
             }
 
             // Will parameterize the value and backtick if necessary.
-            $field = $this->_consume($field,'escape');
+            $field = $this->_consume($field, 'escape');
 
             // TODO: Commented until I figure out what this does
             /*
@@ -195,7 +195,7 @@ class Query extends Expression
         // This can be expression, but then we can only set the table once
         if ($table instanceof Expression) {
 
-            if (isset($this->args['table'])){
+            if (isset($this->args['table'])) {
                 throw new Exception('You cannot use table([expression]). table() was called before.');
             }
 
@@ -205,18 +205,18 @@ class Query extends Expression
         }
 
         // comma-separating tables
-        if (is_string($table) && strpos($table,',') !== false) {
+        if (is_string($table) && strpos($table, ',') !== false) {
             if ($alias !== null) {
                 throw new Exception('Do not use alias with multiple tables');
             }
-            return $this->table(explode(',',$table));
+            return $this->table(explode(',', $table));
         }
 
         if (!isset($this->args['table'])) {
             $this->args['table'] = array();
         }
 
-        if ($this->args['table'] instanceof Expression){
+        if ($this->args['table'] instanceof Expression) {
             throw new Exception('You cannot use table(). You have already used table([expression]) previously.');
         }
 
@@ -245,7 +245,7 @@ class Query extends Expression
     protected function _render_table()
     {
         $ret = array();
-        if (!isset($this->args['table'])){
+        if (!isset($this->args['table'])) {
             return '';
         }
 
@@ -362,7 +362,7 @@ class Query extends Expression
     public function where($field, $cond = null, $value = null, $kind = 'where', $num_args = null)
     {
         // Number of passed arguments will be used to determine if arguments were specified or not
-        if(is_null($num_args)) {
+        if (is_null($num_args)) {
             $num_args = func_num_args();
         }
 
@@ -373,7 +373,7 @@ class Query extends Expression
             foreach ($field as $row) {
                 if (is_array($row)) {
                     call_user_func_array([$or, 'where'], $row);
-                }else{
+                } else {
                     $or->where($row);
                 }
             }
@@ -418,10 +418,16 @@ class Query extends Expression
         }
 
 
-        switch($num_args){
-            case 1: $this->args[$kind][] = [$field]; break;
-            case 2: $this->args[$kind][] = [$field, $cond]; break;
-            case 3: $this->args[$kind][] = [$field, $cond, $value]; break;
+        switch ($num_args) {
+            case 1:
+                $this->args[$kind][] = [$field];
+                break;
+            case 2:
+                $this->args[$kind][] = [$field, $cond];
+                break;
+            case 3:
+                $this->args[$kind][] = [$field, $cond, $value];
+                break;
         }
 
         return $this;
@@ -458,11 +464,11 @@ class Query extends Expression
         // then join with them AND keyword
         foreach ($this->args[$kind] as $row) {
 
-            if(count($row) === 3) {
+            if (count($row) === 3) {
                 list($field, $cond, $value) = $row;
-            }elseif(count($row) === 2) {
+            } elseif (count($row) === 2) {
                 list($field, $cond) = $row;
-            }elseif(count($row) === 1) {
+            } elseif (count($row) === 1) {
                 list($field) = $row;
             }
 
@@ -517,13 +523,13 @@ class Query extends Expression
             if (is_array($value)) {
                 $value = '('.implode(',', $this->_param($value)).')';
                 $cond = in_array($cond, array('!=', '<>', 'not', 'not in')) ? 'not in' : 'in';
-                $ret[] = $this->_consume($field,'escape').' '.$cond.' '.$value;
+                $ret[] = $this->_consume($field, 'escape').' '.$cond.' '.$value;
                 continue;
             }
 
             // if value is object, then it should be DSQL itself
             // otherwise just escape value
-            $value = $this->_consume($value,'param');
+            $value = $this->_consume($value, 'param');
             $ret[] = $field.' '.$cond.' '.$value;
         }
 
@@ -647,7 +653,7 @@ class Query extends Expression
         if ($this->args['set']) {
             foreach ($this->args['set'] as $field => $value) {
                 $field = $this->_consume($field, 'escape');
-                $field = $this->_consume($field,'escape');
+                $field = $this->_consume($field, 'escape');
 
                 $result[] = $field;
             }
