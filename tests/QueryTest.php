@@ -48,6 +48,19 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('first_name.employee',      PHPUnitUtil::callProtectedMethod($this->q()->field('first_name.employee'), '_render_field'));
     }
 
+    public function testFieldExpression()
+    {
+        $this->assertEquals('`name`',        $this->q(['template'=>'[field]'])->field('name')->render());
+        $this->assertEquals('`first name`',  $this->q(['template'=>'[field]'])->field('first name')->render());
+        $this->assertEquals('first.name',    $this->q(['template'=>'[field]'])->field('first.name')->render());
+        $this->assertEquals('now()',         $this->q(['template'=>'[field]'])->field('now()')->render());
+        $this->assertEquals('now()',         $this->q(['template'=>'[field]'])->field(new Expression('now()'))->render());
+        // Next two require review of $field() second argument logic
+        //$this->assertEquals('now() `time`',         $this->q(['template'=>'[field]'])->field('now()',null,'time')->render());
+        //$this->assertEquals('now() `time`',         $this->q(['template'=>'[field]'])->field(new Expression('now()'),null,'time')->render());
+
+    }
+
     /**
      * @covers ::table
      */
@@ -55,12 +68,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $q = $this->q();
         $this->assertEquals($q, $q->table('employee'));
+
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testTableFailure1()
+    {
+        (new Query())->table('employee,jobs','u');
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testTableFailure2()
+    {
+        (new Query())->table(['employee','jobs'],'u');
     }
 
     /**
      * @covers ::render
      */
-    public function testBasicRender()
+    public function testTableRender()
     {
         $this->assertEquals(
             'select `name` from `employee`',
@@ -68,10 +98,32 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->field('name')->table('employee')
             ->render()
         );
+
         $this->assertEquals(
             'select `employee`.`name` from `employee`,`jobs`',
             (new Query())
             ->field('name','employee')->table('employee')->table('jobs')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs`',
+            (new Query())
+            ->field('name')->table('employee,jobs')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs`',
+            (new Query())
+            ->field('name')->table(['employee','jobs'])
+            ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs` `j`',
+            (new Query())
+            ->field('name')->table(['employee','j'=>'jobs'])
             ->render()
         );
 
@@ -270,6 +322,50 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'select `name` from `employee` where (`a` = :a or a=b)',
             (new Query())
             ->field('name')->table('employee')->where([['a',1],'a=b'])
+            ->render()
+        );
+    }
+
+
+    public function testInsertDeleteUpdate()
+    {
+        $this->assertEquals(
+            'delete from `employee` where `name` = :a',
+            (new Query())
+            ->field('name')->table('employee')->where('name',1)
+            ->selectTemplate('delete')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'update `employee` set `name`=:a',
+            (new Query())
+            ->field('name')->table('employee')->set('name',1)
+            ->selectTemplate('update')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'update `employee` set `name`=`name`+1',
+            (new Query())
+            ->field('name')->table('employee')->set('name',new Expression('`name`+1'))
+            ->selectTemplate('update')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'insert into `employee` (`name`) values (:a)',
+            (new Query())
+            ->field('name')->table('employee')->set('name',1)
+            ->selectTemplate('insert')
+            ->render()
+        );
+
+        $this->assertEquals(
+            'insert into `employee` (`name`) values (now())',
+            (new Query())
+            ->field('name')->table('employee')->set('name',new Expression('now()'))
+            ->selectTemplate('insert')
             ->render()
         );
     }

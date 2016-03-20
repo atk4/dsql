@@ -1,4 +1,4 @@
-<?php
+<?php // vim:ts=4:sw=4:et:fdm=marker
 
 namespace atk4\dsql;
 
@@ -7,59 +7,66 @@ namespace atk4\dsql;
  * query. Implement getDSQLExpression method that would return a valid
  * Query object (or string);
  */
-class Expression implements \ArrayAccess {
-
+class Expression implements \ArrayAccess
+{
     /**
      * Creates new expression. Optionally specify a string - a piece
      * of SQL code that will become expression template and arguments.
      *
-     * See below for call patterns
+     * See below for call patterns.
+     *
+     * @var string
      */
     protected $template = null;
 
     /**
-     * Backticks are added around all fields. Set this to blank string to avoid
+     * Backticks are added around all fields. Set this to blank string to avoid.
+     *
+     * @var string
      */
     protected $escapeChar = '`';
 
     /**
-     * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc
+     * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc.
+     *
+     * @var string
      */
-    protected $paramBase=':a';
+    protected $paramBase = ':a';
 
     /**
      * Used for Linking
-     * @var [type]
+     *
+     * @var string
      */
-    public $_paramBase=null;
+    public $_paramBase = null;
 
     /**
      * Will be populated with actual values by _param()
-     * @var [type]
+     *
+     * @var array
      */
-    public $params=[];
-
+    public $params = [];
 
     /**
      * Specifying options to constructors will override default
      * attribute values of this class
      *
-     * @param array $options will initialize class properties
+     * @param string|array $template
+     * @param array        $arguments
      */
     function __construct($template = [], $arguments = null)
     {
-;
-        if(is_string($template)){
+        if (is_string($template)) {
             $options = ['template' => $template];
-        }elseif(is_array($template)){
+        } elseif (is_array($template)) {
             $options = $template;
-        }else{
+        } else {
             throw new Exception('$template must be a string in Expression::__construct()');
         }
 
         // new Expression('unix_timestamp([])', [$date]);
-        if($arguments){
-            if(!is_array($arguments)){
+        if ($arguments) {
+            if (!is_array($arguments)) {
                 throw new Exception('$arguments must be an array in Expression::__construct()');
             }
             $this->args['custom'] = $arguments;
@@ -71,6 +78,9 @@ class Expression implements \ArrayAccess {
         }
     }
 
+    /**
+     * ???
+     */
     public function offsetSet($offset, $value) {
         if (is_null($offset)) {
             $this->args['custom'][] = $value;
@@ -79,25 +89,33 @@ class Expression implements \ArrayAccess {
         }
     }
 
+    /**
+     * ???
+     */
     public function offsetExists($offset) {
         return isset($this->args['custom'][$offset]);
     }
 
+    /**
+     * ???
+     */
     public function offsetUnset($offset) {
         unset($this->args['custom'][$offset]);
     }
 
+    /**
+     * ???
+     */
     public function offsetGet($offset) {
         return isset($this->args['custom'][$offset]) ? $this->args['custom'][$offset] : null;
     }
 
-
     /**
      * Recursively renders sub-query or expression, combining parameters.
-     * If the argument is more likely to be a field, use tick=true
+     * If the argument is more likely to be a field, use tick=true.
      *
-     * @param object|string $dsql Expression
-     * @param 'param'|'escape'|'none' $escape_mode Fall-back escaping mode
+     * @param string|array|object $sql_code    Expression
+     * @param string              $escape_mode Fall-back escaping mode - param|escape|none
      *
      * @return string Quoted expression
      */
@@ -115,11 +133,11 @@ class Expression implements \ArrayAccess {
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
-        if ($sql_code instanceof Expressionable){
-            $sql_code = $sql_code -> getDSQLExpression();
+        if ($sql_code instanceof Expressionable) {
+            $sql_code = $sql_code->getDSQLExpression();
         }
 
-        if (!$sql_code instanceof Expression){
+        if (!$sql_code instanceof Expression) {
             throw new Exception('Foreign objects may not be passed into DSQL');
         }
 
@@ -133,14 +151,15 @@ class Expression implements \ArrayAccess {
             $ret = '(' . $ret . ')';
         }
         unset($sql_code->params);
-        $sql_code->params=[];
+        $sql_code->params = [];
+
         return $ret;
     }
 
     /**
      * Escapes argument by adding backticks around it.
      * This will allow you to use reserved SQL words as table or field
-     * names such as "table
+     * names such as "table".
      *
      * @param string|array $sql_code Any string or array of strings
      *
@@ -171,26 +190,32 @@ class Expression implements \ArrayAccess {
      * query rendering. Consider using `_consume()` instead, which will
      * also handle nested expressions properly.
      *
-     * @param string $val String literal containing input data
+     * @param string|array $value String literal containing input data
      *
-     * @return string Safe and escapeed string
+     * @return string|array Safe and escaped string
      */
     protected function _param($value)
     {
         if (is_array($value)) {
             return array_map([$this, '_param'], $value);
         }
-        $name=$this->_paramBase;
+
+        $name = $this->_paramBase;
         $this->_paramBase++;
-        $this->params[$name]=$value;
+        $this->params[$name] = $value;
+
         return $name;
     }
 
-
+    /**
+     * ???
+     *
+     * @return string Rendered query
+     */
     public function render()
     {
         $nameless_count = 0;
-        if(!isset($this->_paramBase)){
+        if (!isset($this->_paramBase)) {
             $this->_paramBase = $this->paramBase;
         }
 
@@ -200,31 +225,30 @@ class Expression implements \ArrayAccess {
 
                 // Allow template to contain []
                 $identifier = $matches[1];
-                if($identifier === ""){
+                if ($identifier === "") {
                     $identifier = $nameless_count++;
                 }
 
                 // [foo] will attempt to call $this->_render_foo()
-                $fx='_render_'.$matches[1];
+                $fx = '_render_'.$matches[1];
 
                 if (isset($this->args['custom'][$identifier])) {
                     return $this->_consume($this->args['custom'][$identifier]);
-                } elseif (method_exists($this,$fx)) {
+                } elseif (method_exists($this, $fx)) {
                     return $this->$fx();
                 } else {
                     throw new Exception('Expression could not render ['.$identifier.']');
                 }
             },
-                $this->template
-            );
+            $this->template
+        );
         unset($this->_paramBase);
+
         return trim($res);
     }
 
     /**
      * Return formatted debug output.
-     *
-     * @param string $r Rendered material
      *
      * @return string SQL syntax of query
      */
@@ -257,8 +281,6 @@ class Expression implements \ArrayAccess {
             $pp[] = $key;
         }
 
-        return $d." <font color='gray'>[".
-            implode(', ', $pp).']</font>';
+        return $d." <font color='gray'>[" . implode(', ', $pp) . ']</font>';
     }
-
 }
