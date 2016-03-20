@@ -3,20 +3,13 @@
 namespace atk4\dsql;
 
 /**
- * Implement this interface in your class if it can be used as a part of a
- * query. Implement getDSQLExpression method that would return a valid
- * Query object (or string);
+ * Creates new expression. Optionally specify a string - a piece
+ * of SQL code that will become expression template and arguments.
+ *
+ * See below for call patterns
  */
-class Expression implements \ArrayAccess
+class Expression implements \ArrayAccess,\IteratorAggregate
 {
-    /**
-     * Creates new expression. Optionally specify a string - a piece
-     * of SQL code that will become expression template and arguments.
-     *
-     * See below for call patterns.
-     *
-     * @var string
-     */
     protected $template = null;
 
     /**
@@ -46,6 +39,11 @@ class Expression implements \ArrayAccess
      * @var array
      */
     public $params = [];
+
+    /**
+     * When you are willing to execute the query, connection needs to be specified
+     */
+    public $connection = null;
 
     /**
      * Specifying options to constructors will override default
@@ -108,6 +106,27 @@ class Expression implements \ArrayAccess
      */
     public function offsetGet($offset) {
         return isset($this->args['custom'][$offset]) ? $this->args['custom'][$offset] : null;
+    }
+
+    /**
+     * Use this instead of "new Expression()" if you want to automatically bind
+     * expression to the same connection as the parent.
+     */
+    public function expr($expr, $options = [])
+    {
+        $options['connection'] = $this->connection;
+        $class = get_class($this);
+        return new Expression($expr, $options);
+    }
+
+    /**
+     * Use this instead of "new Query()" if you want to automatically bind
+     * expression to the same connection as the parent.
+     */
+    public function dsql($options = [])
+    {
+        $options['connection'] = $this->connection;
+        return new Query($options);
     }
 
     /**
@@ -283,4 +302,67 @@ class Expression implements \ArrayAccess
 
         return $d." <font color='gray'>[" . implode(', ', $pp) . ']</font>';
     }
+
+    function execute($connection = null)
+    {
+        if ($connection == null) {
+            $connection = $this->connection;
+        }
+
+        // If it's a PDO connection, we're cool
+        if ($connection instanceof \PDO) {
+            // We support PDO
+            $query = $this->render();
+            $statement = $connection->prepare($query);
+            foreach ($this->params as $key=>$val) {
+
+                if (is_int($val)) {
+                    $type = \PDO::PARAM_INT;
+                } elseif (is_bool($val)) {
+                    $type = \PDO::PARAM_BOOL;
+                } elseif (is_null($val)) {
+                    $type = \PDO::PARAM_NULL;
+                } elseif (is_string($val)) {
+                    $type = \PDO::PARAM_STR;
+                } else {
+                    throw new Exception('Incorrect param type');
+                }
+
+                if (!$statement->bindValue($key,$val,$type)) {
+                    throw new Exception('Unable to bind parameter');
+                }
+            }
+
+            $statement->setFetchMode(\PDO::FETCH_ASSOC);
+            $statement->execute();
+            return $statement;
+            
+        } else {
+            return $connection->execute($this);
+        }
+    }
+
+    function getIterator()
+    {
+        return $this->execute();
+    }
+
+    // {{{ Result Querying
+    function get()
+    {
+        return $this->execute()->fetchAll();
+    }
+
+    function getOne()
+    {
+        $data = $this->getRow();
+        $one = array_shift($data);
+        return $one;
+    }
+
+    function getRow()
+    {
+        return $this->execute()->fetch();
+    }
+    // }}}
 }

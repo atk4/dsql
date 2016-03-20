@@ -45,6 +45,8 @@ By calling `$res = Expression::_consume($sql, 'param')` the query code
 makes sure that nested expressions are properly interlinked and that
 any strings are converted into parameters.
 
+.. _query-modes:
+
 Query Modes
 ===========
 

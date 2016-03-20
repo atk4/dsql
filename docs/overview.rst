@@ -2,12 +2,85 @@
 Overview
 ========
 
+Purpose and design goals of DSQL
+================================
+When writing PHP software you have to rely on data storage engines such as SQL.
+Recently more NoSQL vendors have also picked up SQL language (or some subset)
+making SQL even more demanded.
+
+If you have used SQL with PHP you would have used PDO in the past, but
+designing all your SQL queries leaves a lot of space for error and inflexibility.
+
+If you have to modify your SQL query depending on your application logic,
+you also are forced working with query-"string".
+
+DSQL represents your query as an object, allowing you to extensibly extend
+various parts of your query with great efficiency and safety. DSQL takes care
+of escaping parameters of your query, adding quotations and handling nested
+expressions.
+
+Goals of DSQL
+-------------
+
+- Provide Object-oriented library for designing SQL queries of any complexity.
+- Offer simple and readable syntax
+- Offer great integration for higher-level ORM libraries
+- Support PDO out of the box
+- Allow developers to extend DSQL into supporting non-relational SQL databases
+
+
+DSQL by example
+===============
+The simplest way to explain DSQL is by example::
+
+ 
+    use atk4\dsql;
+
+    $query = new dsql\Query(['connection' => $pdo]);
+
+    $query
+        ->table('employees')
+        ->where('birth_date','1961-05-02')
+        ->field('count(*)')
+        ;
+
+    $count = $query->getOne();
+
+The above code will execute the following query:
+
+.. code-block:: sql
+
+    select count(*) from `salary` where `birth_date` = :a
+        :a = "1961-05-02"
+
+DSQL can also execute queries with multiple sub-queries, joins, expressions
+grouping, ordering, unions as well as queries on result-set.
+
+ - See :ref:`quickstart` if you would like to learn more about basics.
+ - https://github.com/atk4/dsql-example project contains various working
+   examples of using DSQL with a real data-set.
+
+DSQL in ORM
+===========
+Frankly, not many developers are keen to write queries today and prefer
+use of ORM (Object Relational Mapper). DSQL is designed in such a way
+so that a higher-level ORM library could use it in it's foundation.
+
+Agile ORM is a Functional-ORM library for PHP, that combines database
+mapping with query-building to create one of the most powerful and
+flexible database manipalation libraries available today.
+
+.. warning:: 
+    Before start using DSQL, look into Agile ORM. It may be a more approprite
+    library tool for your application that retains full power of DSQL.
+
+    If you want to learn more about Agile ORM you need to understand how
+    DSQL functions, so continue reading.
+
 Requirements
 ============
 
 #. PHP 5.3
-#. One of the supported SQL Vendors
-#. RECOMMENDED: Use along with Agile ORM
 
 .. _installation:
 
@@ -36,31 +109,20 @@ You can specify DSQL as a project or module dependency in composer.json:
       }
     }
 
-After installing, you need to require Composer's autoloader in your PHP file:
-
-.. code-block:: php
+After installing, you need to require Composer's autoloader in your PHP file::
 
     require 'vendor/autoload.php';
 
 You can find out more on how to install Composer, configure autoloading, and
-other best-practices for defining dependencies at `getcomposer.org <http://getcomposer.org>`_.
+other best-practices for defining dependencies at
+`getcomposer.org <http://getcomposer.org>`_.
 
 
-Testing your installation
-=========================
+Getting Started
+===============
 
-If you are looking to perform a quick-test, use the following code:
-
-.. code-block:: php
-
-    $dsql = new atk4\dsql\DSQL\MySQL();
-    echo $dsql
-        ->table('user')
-        ->where('foo',123)
-        ->field('hello')
-        ->getDebugQuery();
-
-Continue to :ref:`quickstart` for further examples.
+Continue reading :ref:`quickstart` where you will learn about basics of
+DSQL and how to use it to it's full potential.
 
 Contributing
 ============
@@ -82,7 +144,6 @@ Review and Approval
 1. All code must be submitted through pull requests on Github
 2. Any of the project managers may Merge your pull request, but it must not be
    the same person who initiated the pull request.
-3.
 
 
 Running the tests
@@ -100,18 +161,23 @@ DSQL is unit tested with PHPUnit. Run the tests using the Makefile:
 
 .. code-block:: bash
 
-    make test
+    make tests
 
-.. note::
+There are also vendor-specific test-scripts which will require you to
+set database. To run them:
 
-    In order to execute tests against a specific database verdor, you may need to
-    set environment variable, e.g. DSN="mysql://root:root@127.0.0.1/employees"
+.. code-block:: bash
 
+    phpunit --config phpunit-sqlite.xml
+    
+    phpunit --config phpunit-mysql.xml
+
+Look inside the .xml files for further information and connection details.
 
 License
 =======
 
-Licensed using the `MIT license <http://opensource.org/licenses/MIT>`_.
+Licensed using the `MIT license <http://opensource.org/licenses/MIT>`_:
 
     Copyright (c) 2015 Michael Dowling <https://github.com/mtdowling>
 

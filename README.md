@@ -1,9 +1,15 @@
 # dsql
 
-DSQL is a lightweight interface to dynamically creating SQL queries in PHP.
+DSQL is a lightweight interface to dynamically creating SQL queries in PHP. Goals of DSQL are:
+
+ - provide consistent API for use in higher level ORM implementation
+ - offer consise and easy-to-understand syntax
+ - integrate with PDO out of the box
+ - support Big Data extensions for NoSQL databases such as Clusterpoint, DocumentDB and more
+
 
 ```
-$query = new dsql\Query();
+$query = new atk4\dsql\Query();
 $query  ->table('employees')
         ->where('birth_date','1961-05-02')
         ->field('count(*)')

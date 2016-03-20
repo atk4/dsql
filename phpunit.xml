@@ -1,10 +1,11 @@
 <phpunit bootstrap="vendor/autoload.php">
-  <testsuites>
-    <testsuite name="dsql">
-      <directory>tests</directory>
-    </testsuite>
-  </testsuites>
-  <logging>
-   <log type="coverage-clover" target="build/logs/clover.xml"/>
- </logging>
+    <testsuites>
+        <testsuite name="dsql">
+            <directory>tests</directory>
+            <exclude>tests/db</exclude>
+        </testsuite>
+    </testsuites>
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
 </phpunit>

@@ -709,18 +709,6 @@ class Query extends Expression
         return $this;
     }
 
-    /**
-     * Returns new Expression object.
-     *
-     * @param string|array $template
-     * @param array        $options
-     *
-     * @return Expression
-     */
-    public function expr($template, $options = [])
-    {
-        return new Expression($template, $options);
-    }
 
     /**
      * Returns new Query object of [or] expression.
