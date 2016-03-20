@@ -18,6 +18,8 @@ engines:
       # Disable some rules
       Controversial/CamelCaseMethodName:
         enabled: false
+      Controversial/CamelCaseParameterName:
+        enabled: false
       Controversial/CamelCasePropertyName:
         enabled: false
       Controversial/CamelCaseVariableName:
