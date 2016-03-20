@@ -10,9 +10,11 @@ use atk4\dsql\Expression;
 class ExpressionTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function e($template = [], $args = null)
+    public function e()
     {
-        return new Expression($template, $args);
+        $reflection = new ReflectionClass(__CLASS__);
+        $instance = $reflection->newInstanceWithoutConstructor();
+        return call_user_func_array(array($instance, '__construct'), func_get_args());
     }
 
 
