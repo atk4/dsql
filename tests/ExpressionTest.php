@@ -90,6 +90,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Testing different ways how to pass template to constructor.
      *
      * @covers ::__construct
+     * @covers ::_escape
      */
     public function testConstructor_2()
     {

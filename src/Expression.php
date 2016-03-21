@@ -234,6 +234,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // in some cases we should not escape
         if (!$this->escapeChar
             || is_object($value)
+            || is_numeric($value)
             || $value === '*'
             || strpos($value, '.') !== false
             || strpos($value, '(') !== false
