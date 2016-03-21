@@ -67,30 +67,30 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * Specifying options to constructors will override default
      * attribute values of this class.
      *
-     * @param string|array $template
+     * If $properties is passed as string, then it's treated as template.
+     *
+     * @param string|array $properties
      * @param array        $arguments
      */
-    public function __construct($template = [], $arguments = null)
+    public function __construct($properties = [], $arguments = null)
     {
         // save template
-        if (is_string($template)) {
-            $options = ['template' => $template];
-        } elseif (is_array($template)) {
-            $options = $template;
-        } else {
-            throw new Exception('$template must be a string or array in '.__METHOD__);
+        if (is_string($properties)) {
+            $properties = ['template' => $properties];
+        } elseif (!is_array($properties)) {
+            throw new Exception('1st parameter must be a string or array in '.__METHOD__);
         }
 
         // save arguments
         if ($arguments !== null) {
             if (!is_array($arguments)) {
-                throw new Exception('$arguments must be an array in '.__METHOD__);
+                throw new Exception('2nd parameter must be an array in '.__METHOD__);
             }
             $this->args['custom'] = $arguments;
         }
 
         // deal with remaining options
-        foreach ($options as $key => $val) {
+        foreach ($properties as $key => $val) {
             $this->$key = $val;
         }
     }
@@ -148,17 +148,18 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Use this instead of "new Expression()" if you want to automatically bind
-     * expression to the same connection as the parent.
+     * new expression to the same connection as the parent.
      *
-     * @param array|string $expr
-     * @param array $options
+     * @param array|string $properties
+     * @param array $arguments
      *
      * @return Expression
      */
-    public function expr($expr, $options = [])
+    public function expr($properties = [], $arguments = null)
     {
-        $options['connection'] = $this->connection;
-        return new Expression($expr, $options);
+        $properties['connection'] = $this->connection;
+
+        return new Expression($properties, $arguments);
     }
 
     /**
