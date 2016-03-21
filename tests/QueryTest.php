@@ -9,26 +9,33 @@ use atk4\dsql\Expression;
  */
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * Name of class which we're testing with all these tests
-     */
-    public function q($args = [])
+    public function q()
     {
-        return new Query($args);
+        $args = func_get_args();
+        switch (count($args)) {
+            case 1:
+                return new Query($args[0]);
+            case 2:
+                return new Query($args[0], $args[1]);
+        }
+        return new Query();
     }
 
+
+
     /**
+     * Test constructor
+     *
      * @covers ::__construct
      */
     public function testConstruct()
     {
-        // passing arguments in constructor
+        // passing properties in constructor
         $this->assertEquals(
             '#q#',
             PHPUnitUtil::callProtectedMethod($this->q(['escapeChar' => '#']), '_escape', ['q'])
         );
     }
-
 
     /**
      * @covers ::field
@@ -126,7 +133,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testTableFailure1()
     {
-        (new Query())->table('employee,jobs', 'u');
+        $this->q()->table('employee,jobs', 'u');
     }
 
     /**
@@ -134,7 +141,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testTableFailure2()
     {
-        (new Query())->table(['employee','jobs'], 'u');
+        $this->q()->table(['employee','jobs'], 'u');
     }
 
     /**
@@ -144,55 +151,55 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             'select `name` from `employee`',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')
                 ->render()
         );
 
         $this->assertEquals(
             'select `employee`.`name` from `employee`,`jobs`',
-            (new Query())
+            $this->q()
                 ->field('name', 'employee')->table('employee')->table('jobs')
                 ->render()
         );
 
         $this->assertEquals(
             'select `name` from `employee`,`jobs`',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee,jobs')
                 ->render()
         );
 
         $this->assertEquals(
             'select `name` from `employee`,`jobs`',
-            (new Query())
+            $this->q()
                 ->field('name')->table(['employee','jobs'])
                 ->render()
         );
 
         $this->assertEquals(
             'select `name` from `employee`,`jobs` `j`',
-            (new Query())
+            $this->q()
                 ->field('name')->table(['employee','j'=>'jobs'])
                 ->render()
         );
 
         $this->assertEquals(
             'select now()',
-            (new Query())
+            $this->q()
                 ->field(new Expression('now()'))
                 ->render()
         );
 
         $this->assertEquals(
             'select `name` from `employee` `e`',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee', 'e')
                 ->render()
         );
         $this->assertEquals(
             'select * from `employee` `e`',
-            (new Query())
+            $this->q()
                 ->table('employee', 'e')
                 ->render()
         );
@@ -203,16 +210,16 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testBasicRenderSubquery()
     {
-        $q = (new Query())->table('employee');
+        $q = $this->q()->table('employee');
 
         $this->assertEquals(
             'select `name` from (select * from `employee`)',
-            (new Query())
+            $this->q()
                 ->field('name')->table($q)
                 ->render()
         );
 
-        $query = new Query();
+        $query = $this->q();
         $query->table('user');
 
         $age = new Expression("coalesce([age], [default_age])");
@@ -231,7 +238,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testUnionQuery()
     {
-        $q1 = (new Query())
+        $q1 = $this->q()
             ->table('sales')
             ->field('date')
             ->field('amount', null, 'debit');
@@ -241,7 +248,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $q1->render()
         );
 
-        $q2 = (new Query())
+        $q2 = $this->q()
             ->table('purchases')
             ->field('date')
             ->field('amount', null, 'credit');
@@ -258,7 +265,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $u->render()
         );
 
-        $q = (new Query())
+        $q = $this->q()
             ->field('date,debit,credit')
             ->table($u);
 
@@ -273,7 +280,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testgetDebugQuery()
     {
-        $query = new Query();
+        $query = $this->q();
         $query->table('user');
 
         $age = new Expression("coalesce([age], [default_age])");
@@ -369,14 +376,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             'select `name` from `employee` where `a` = :a',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')->where('a', 1)
                 ->render()
         );
 
         $this->assertEquals(
             'select `name` from `employee` where `employee`.`a` = :a',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')->where('employee.a', 1)
                 ->render()
         );
@@ -384,7 +391,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         /*
         $this->assertEquals(
             'select `name` from `db`.`employee` where `db`.`employee`.`a` = :a',
-            (new Query())
+            $this->q()
                 ->field('name')->table('db.employee')->where('db.employee.a',1)
                 ->render()
         );
@@ -392,7 +399,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'delete from `employee` where `employee`.`a` = :a',
-            (new Query())
+            $this->q()
                 ->selectTemplate('delete')
                 ->field('name')->table('employee')->where('employee.a', 1)
                 ->render()
@@ -403,14 +410,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or `b` = :b)',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')->where([['a',1],['b',1]])
                 ->render()
         );
 
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or a=b)',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')->where([['a',1],'a=b'])
                 ->render()
         );
@@ -421,7 +428,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             'delete from `employee` where `name` = :a',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')->where('name', 1)
                 ->selectTemplate('delete')
                 ->render()
@@ -429,7 +436,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'update `employee` set `name`=:a',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')->set('name', 1)
                 ->selectTemplate('update')
                 ->render()
@@ -437,7 +444,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'update `employee` set `name`=`name`+1',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')->set('name', new Expression('`name`+1'))
                 ->selectTemplate('update')
                 ->render()
@@ -445,7 +452,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'insert into `employee` (`name`) values (:a)',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')->set('name', 1)
                 ->selectTemplate('insert')
                 ->render()
@@ -453,7 +460,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'insert into `employee` (`name`) values (now())',
-            (new Query())
+            $this->q()
                 ->field('name')->table('employee')->set('name', new Expression('now()'))
                 ->selectTemplate('insert')
                 ->render()
@@ -463,7 +470,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testNestedOrAnd()
     {
 
-        $q = new Query();
+        $q = $this->q();
         $q->table('employee')->field('name');
         $q->where(
             $q
@@ -477,7 +484,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $q->render()
         );
 
-        $q = new Query();
+        $q = $this->q();
         $q->table('employee')->field('name');
         $q->where(
             $q

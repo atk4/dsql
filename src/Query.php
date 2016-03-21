@@ -20,8 +20,8 @@ class Query extends Expression
     ];
 
     /**
-     * Query will use one of the predefined "templates". The mode
-     * will contain name of template used.
+     * Query will use one of the predefined "templates". The mode will contain
+     * name of template used. Basically it's array key from $templates property.
      *
      * @var string
      */
@@ -694,7 +694,7 @@ class Query extends Expression
      *
      * By default it is in SELECT mode
      *
-     * @param string $mode A key for $this->sql_templates
+     * @param string $mode A key for $this->templates
      *
      * @return $this
      */
@@ -729,7 +729,7 @@ class Query extends Expression
      */
     public function orExpr()
     {
-        return new Query(['template' => '[orwhere]']);
+        return $this->dsql(['template' => '[orwhere]']);
     }
 
     /**
@@ -739,7 +739,7 @@ class Query extends Expression
      */
     public function andExpr()
     {
-        return new Query(['template' => '[andwhere]']);
+        return $this->dsql(['template' => '[andwhere]']);
     }
     /// }}}
 }
