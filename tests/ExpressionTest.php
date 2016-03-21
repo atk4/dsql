@@ -283,7 +283,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             true,
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [new stdClass()]) instanceof stdClass
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [new \stdClass()]) instanceof \stdClass
         );
 
         // escaping array - escapes each of its elements
