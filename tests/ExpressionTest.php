@@ -20,49 +20,110 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
                 return new Expression($args[0], $args[1]);
         }
         return new Expression();
-
-        // Didn't work this way :(
-        //$reflection = new \ReflectionClass("atk4\dsql\Expression");
-        //$instance = $reflection->newInstanceWithoutConstructor();
-        //return call_user_func_array(array($instance, '__construct'), func_get_args());
     }
 
 
+
     /**
+     * Test constructor exception - no parameters.
+     *
      * @covers ::__construct
      */
-    public function testConstructor()
+    public function testConstructorException_1st_1()
     {
-        // Testing parameter edge cases - no parameters, null, empty strings and arrays etc.
-        $this->assertEquals(
-            '',
-            (new Expression)->render()
-        );
+        $this->setExpectedException('atk4\dsql\Exception');
+        $this->e();
+    }
+
+    /**
+     * Test constructor exception - wrong 1st parameter.
+     *
+     * @covers ::__construct
+     */
+    public function testConstructorException_1st_2()
+    {
+        $this->setExpectedException('atk4\dsql\Exception');
+        $this->e(false);
+    }
+
+    /**
+     * Test constructor exception - wrong 2nd parameter.
+     *
+     * @covers ::__construct
+     */
+    public function testConstructorException_2nd_1()
+    {
+        $this->setExpectedException('atk4\dsql\Exception');
+        $this->e("hello, []", false);
+    }
+
+    /**
+     * Test constructor exception - wrong 2nd parameter.
+     *
+     * @covers ::__construct
+     */
+    public function testConstructorException_2nd_2()
+    {
+        $this->setExpectedException('atk4\dsql\Exception');
+        $this->e("hello, []", "hello");
+    }
+
+    /**
+     * Testing parameter edge cases - empty strings and arrays etc.
+     *
+     * @covers ::__construct
+     */
+    public function testConstructor_1()
+    {
         $this->assertEquals(
             '',
             $this->e('')->render()
         );
+        $this->assertEquals(
+            '',
+            $this->e([])->render()
+        );
+    }
 
-
-
-
-
-        // Testing simple template patterns
+    /**
+     * Testing simple template patterns without arguments.
+     *
+     * @covers ::__construct
+     */
+    public function testConstructor_2()
+    {
         $this->assertEquals(
             'now()',
             $this->e('now()')->render()
         );
+    }
 
-        // Testing template with parameter
+    /**
+     * Testing template with simple arguments.
+     *
+     * @covers ::__construct
+     */
+    public function testConstructor_3()
+    {
         $e = $this->e('hello, [who]', ['who' => 'world']);
         $this->assertEquals('hello, :a', $e->render());
         $this->assertEquals('world', $e->params[':a']);
+    }
 
-        // ...
+    /**
+     * Testing template with complex arguments.
+     *
+     * @covers ::__construct
+     */
+    public function testConstructor_4()
+    {
+        // argument = Expression
         $this->assertEquals(
             'hello, world',
             $this->e('hello, [who]', ['who' => $this->e('world')])->render()
         );
+
+        // multiple arguments = Expression
         $this->assertEquals(
             'hello, world',
             $this->e(
@@ -73,6 +134,8 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
                 ]
             )->render()
         );
+
+        // numeric argument = Expression
         $this->assertEquals(
             'testing "hello, world"',
             $this->e(
@@ -89,6 +152,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             )->render()
         );
 
+        // pass template as array
         $this->assertEquals(
             'hello, world',
             $this->e(
@@ -99,51 +163,42 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Test nested parameters
+     *
+     * @covers ::__construct
+     * @covers ::_param
+     * @covers ::getDebugQuery
+     */
     public function testNestedParams()
     {
-
-        $q = new Expression("[] and []", [
-            new Expression('++[]', [1]),
-            new Expression('--[]', [2]),
+        // ++1 and --2
+        $e1 = $this->e("[] and []", [
+            $this->e('++[]', [1]),
+            $this->e('--[]', [2]),
         ]);
 
         $this->assertEquals(
             '++1 and --2 [:b, :a]',
-            strip_tags($q->getDebugQuery())
+            strip_tags($e1->getDebugQuery())
         );
 
-        $qq = new Expression("=== [foo] ===", ['foo'=>$q]);
+        $e2 = $this->e("=== [foo] ===", ['foo' => $e1]);
 
         $this->assertEquals(
             '=== ++1 and --2 === [:b, :a]',
-            strip_tags($qq->getDebugQuery())
+            strip_tags($e2->getDebugQuery())
         );
 
         $this->assertEquals(
             '++1 and --2 [:b, :a]',
-            strip_tags($q->getDebugQuery())
+            strip_tags($e1->getDebugQuery())
         );
     }
 
     /**
-     * @covers ::__construct
-     */
-    public function testConstructorException1()
-    {
-        $this->setExpectedException('atk4\dsql\Exception');
-        $e = new Expression(false);
-    }
-
-    /**
-     * @covers ::__construct
-     */
-    public function testConstructorException2()
-    {
-        $this->setExpectedException('atk4\dsql\Exception');
-        $e = new Expression("hello, []", "hello");
-    }
-
-    /**
+     * Fully covers _escape method
+     *
      * @covers ::_escape
      */
     public function testEscape()
@@ -155,13 +210,17 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             '*first_name*',
-            PHPUnitUtil::callProtectedMethod($this->e(['','escapeChar' => '*']), '_escape', ['first_name'])
+            PHPUnitUtil::callProtectedMethod($this->e(['escapeChar' => '*']), '_escape', ['first_name'])
         );
 
         // should not escape expressions
         $this->assertEquals(
             '*',
             PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', ['*'])
+        );
+        $this->assertEquals(
+            '123',
+            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', [123])
         );
         $this->assertEquals(
             '(2+2) age',
@@ -173,12 +232,12 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             'first#name',
-            PHPUnitUtil::callProtectedMethod($this->e(['','escapeChar'=>'#']), '_escape', ['first#name'])
+            PHPUnitUtil::callProtectedMethod($this->e(['escapeChar'=>'#']), '_escape', ['first#name'])
         );
-        //$this->assertEquals(
-        //    true,
-        //    is_object(PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ["bleh"]))
-        //);
+        $this->assertEquals(
+            true,
+            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', [new Date]) instanceof Date
+        );
 
         // escaping array - escapes each of its elements
         $this->assertEquals(
@@ -188,11 +247,53 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test ArrayAccess implementation
+     *
+     * @covers ::offsetSet
+     * @covers ::offsetExists
+     * @covers ::offsetUnset
+     * @covers ::offsetGet
+     */
+    public function testArrayAccess()
+    {
+        $e = $this->e('', ['parrot' => 'red', 'blue']);
+
+        // offsetGet
+        $this->assertEquals('red', $e['parrot']);
+        $this->assertEquals('blue', $e[0]);
+
+        // offsetSet
+        $e['cat'] = 'black';
+        $this->assertEquals('black', $e['cat']);
+        $e['cat'] = 'white';
+        $this->assertEquals('white', $e['cat']);
+        
+        // offsetExists, offsetUnset
+        $this->assertEquals(true, isset($e['cat']));
+        unset($e['cat']);
+        $this->assertEquals(false, isset($e['cat']));
+
+    }
+
+    /**
+     * Test IteratorAggregate implementation
+     *
+     * @covers ::getIterator
+     */
+    public function testIteratorAggregate()
+    {
+        // todo - can not test this without actual DB connection and executing expression
+        null;
+    }
+
+    /**
      * Test for vendors that rely on JavaScript expressions, instead of parameters.
+     *
+     * @covers ::_param
      */
     public function testJsonExpression()
     {
-        $e = new JsonExpression('hello, [who]', ['who'=>'world']);
+        $e = new JsonExpression('hello, [who]', ['who' => 'world']);
         
         $this->assertEquals(
             'hello, "world"',
@@ -206,6 +307,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 }
 
 
+// @codingStandardsIgnoreStart
 class JsonExpression extends Expression
 {
     public function _param($value)
@@ -213,3 +315,4 @@ class JsonExpression extends Expression
         return json_encode($value);
     }
 }
+// @codingStandardsIgnoreEnd
