@@ -210,7 +210,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $ret = '(' . $ret . ')';
         }
         
-        /* useless ? */unset($sql_code->params);
+        // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
+        // if we unset() first, we’re safe.
+        unset($sql_code->params);
         $sql_code->params = [];
 
         return $ret;
@@ -235,7 +237,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // in some cases we should not escape
         if (!$this->escapeChar
             || is_object($value)
-            || is_numeric($value)
             || $value === '*'
             || strpos($value, '.') !== false
             || strpos($value, '(') !== false

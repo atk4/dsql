@@ -220,6 +220,30 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests where one expression with parameter is used within several other expressions.
+     *
+     * @covers ::__construct
+     * @covers ::render
+     */
+    public function test()
+    {
+        $e1 = $this->e('Hello [who]', ['who' => 'world']);
+        
+        $e2 = $this->e('[greeting]! How are you.', ['greeting' => $e1]);
+        $e3 = $this->e('It is me again. [greeting]', ['greeting' => $e1]);
+
+        $s2 = $e2->render(); // Hello world! How are you.
+        $s3 = $e3->render(); // It is me again. Hello world
+        
+        $e4 = $this->e('[] and good night', [$e1]);
+        $s4 = $e4->render(); // Hello world and good night
+
+        $this->assertEquals('Hello world! How are you.', $s2);
+        $this->assertEquals('It is me again. Hello world', $s3);
+        $this->assertEquals('Hello world and good night', $s4);
+    }
+
+    /**
      * Fully covers _escape method
      *
      * @covers ::_escape
@@ -235,15 +259,15 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             '*first_name*',
             PHPUnitUtil::callProtectedMethod($this->e(['escapeChar' => '*']), '_escape', ['first_name'])
         );
+        $this->assertEquals(
+            '`123`',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [123])
+        );
 
         // should not escape expressions
         $this->assertEquals(
             '*',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['*'])
-        );
-        $this->assertEquals(
-            '123',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [123])
         );
         $this->assertEquals(
             '(2+2) age',
