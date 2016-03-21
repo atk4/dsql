@@ -42,7 +42,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::field
      * @covers ::_render_field
-     * @covers Expression::_escape
+     * @covers ::__render_one_field
      */
     public function testFieldBasic()
     {
@@ -85,7 +85,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::field
      * @covers ::_render_field
-     * @covers Expression::_escape
+     * @covers ::__render_one_field
      */
     public function testFieldDefaultField()
     {
@@ -122,6 +122,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Testing field - basic cases
      *
      * @covers ::field
+     * @covers ::_render_field
+     * @covers ::__render_one_field
      */
     public function testFieldExpression()
     {
@@ -327,14 +329,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testgetDebugQuery()
     {
-        $query = $this->q();
-        $query->table('user');
-
         $age = new Expression("coalesce([age], [default_age])");
         $age['age'] = new Expression("year(now()) - year(birth_date)");
         $age['default_age'] = 18;
 
-        $query -> field($age, 'calculated_age');
+        $query = $this->q()->table('user')->field($age, 'calculated_age');
 
         $this->assertEquals(
             'select coalesce(year(now()) - year(birth_date), 18) `calculated_age` from `user` [:a]',
@@ -418,6 +417,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Combined execution of where() clauses
+     *
+     * @covers ::where
+     * @covers ::selectTemplate
      */
     public function testCombinedWhere()
     {
