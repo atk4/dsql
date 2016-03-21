@@ -716,9 +716,10 @@ class Query extends Expression
      */
     public function dsql($properties = [])
     {
-        $properties['connection'] = $this->connection;
+        $q = new Query($properties);
+        $q->connection = $this->connection;
         
-        return new Query($properties);
+        return $q;
     }
 
     /**

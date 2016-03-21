@@ -286,8 +286,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'select coalesce(year(now()) - year(birth_date), 18) `calculated_age` from `user` [:a]',
             strip_tags($query->getDebugQuery())
         );
-
-
     }
 
     /**

@@ -163,9 +163,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function expr($properties = [], $arguments = null)
     {
-        $properties['connection'] = $this->connection;
+        $e = new Expression($properties, $arguments);
+        $e->connection = $this->connection;
 
-        return new Expression($properties, $arguments);
+        return $e;
     }
 
     /**
