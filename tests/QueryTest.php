@@ -38,6 +38,17 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * field() should return $this Query for chaining
+     *
+     * @covers ::field
+     */
+    public function testFieldReturnValue()
+    {
+        $q = $this->q();
+        $this->assertEquals($q, $q->field('first_name'));
+    }
+
+    /**
      * Testing field - basic cases
      *
      * @covers ::field
@@ -148,19 +159,32 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         //);
     }
 
-
-
-
-
-
-
-
-
+    /**
+     * There shouldn't be alias when passing multiple tables
+     *
+     * @expectedException Exception
+     */
+    public function testTableException1()
+    {
+        $this->q()->table('employee,jobs', 'u');
+    }
 
     /**
+     * There shouldn't be alias when passing multiple tables
+     *
+     * @expectedException Exception
+     */
+    public function testTableException2()
+    {
+        $this->q()->table(['employee','jobs'], 'u');
+    }
+
+    /**
+     * table() should return $this Query for chaining
+     *
      * @covers ::table
      */
-    public function testTable()
+    public function testTableReturnValue()
     {
         $q = $this->q();
         $this->assertEquals($q, $q->table('employee'));
@@ -168,61 +192,12 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
-     */
-    public function testTableFailure1()
-    {
-        $this->q()->table('employee,jobs', 'u');
-    }
-
-    /**
-     * @expectedException Exception
-     */
-    public function testTableFailure2()
-    {
-        $this->q()->table(['employee','jobs'], 'u');
-    }
-
-    /**
-     * @covers ::render
+     * @covers ::table
+     * @covers ::_render_table
      */
     public function testTableRender()
     {
-        $this->assertEquals(
-            'select `name` from `employee`',
-            $this->q()
-                ->field('name')->table('employee')
-                ->render()
-        );
-
-        $this->assertEquals(
-            'select `employee`.`name` from `employee`,`jobs`',
-            $this->q()
-                ->field('name', 'employee')->table('employee')->table('jobs')
-                ->render()
-        );
-
-        $this->assertEquals(
-            'select `name` from `employee`,`jobs`',
-            $this->q()
-                ->field('name')->table('employee,jobs')
-                ->render()
-        );
-
-        $this->assertEquals(
-            'select `name` from `employee`,`jobs`',
-            $this->q()
-                ->field('name')->table(['employee','jobs'])
-                ->render()
-        );
-
-        $this->assertEquals(
-            'select `name` from `employee`,`jobs` `j`',
-            $this->q()
-                ->field('name')->table(['employee','j'=>'jobs'])
-                ->render()
-        );
-
+        // no table defined
         $this->assertEquals(
             'select now()',
             $this->q()
@@ -230,6 +205,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->render()
         );
 
+        // one table
+        $this->assertEquals(
+            'select `name` from `employee`',
+            $this->q()
+                ->field('name')->table('employee')
+                ->render()
+        );
         $this->assertEquals(
             'select `name` from `employee` `e`',
             $this->q()
@@ -242,13 +224,61 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->table('employee', 'e')
                 ->render()
         );
+
+        // multiple tables
+        $this->assertEquals(
+            'select `employee`.`name` from `employee`,`jobs`',
+            $this->q()
+                ->field('name', 'employee')->table('employee')->table('jobs')
+                ->render()
+        );
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs`',
+            $this->q()
+                ->field('name')->table('employee,jobs')
+                ->render()
+        );
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs`',
+            $this->q()
+                ->field('name')->table('  employee ,   jobs  ')
+                ->render()
+        );
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs`',
+            $this->q()
+                ->field('name')->table(['employee', 'jobs'])
+                ->render()
+        );
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs`',
+            $this->q()
+                ->field('name')->table(['employee  ', '  jobs'])
+                ->render()
+        );
+
+        // multiple tables with aliases
+        $this->assertEquals(
+            'select `name` from `employee`,`jobs` `j`',
+            $this->q()
+                ->field('name')->table(['employee', 'j'=>'jobs'])
+                ->render()
+        );
+        $this->assertEquals(
+            'select `name` from `employee` `e`,`jobs` `j`',
+            $this->q()
+                ->field('name')->table(['e'=>'employee', 'j'=>'jobs'])
+                ->render()
+        );
     }
 
     /**
-     * @covers ::render
+     * @covers ::table
+     * @covers ::_render_table
      */
-    public function testBasicRenderSubquery()
+    public function testTableRender2()
     {
+        // pass table as expression or query
         $q = $this->q()->table('employee');
 
         $this->assertEquals(
@@ -258,18 +288,45 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->render()
         );
 
-        $query = $this->q();
-        $query->table('user');
+        /**
+         * @todo Add more tests with multiple tables & subqueries
+         * Currently that's restricted, but I believe it should be allowed to create query like this
+         * SELECT `e`.`name`, `c`.`name`
+         * FROM
+         *  (select * from `employee`) `e`,
+         *  (select * from `customer`) `c`
+         * In such case table alias should better be mandatory.
+         */
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * @covers ::render
+     */
+    public function testBasicRenderSubquery()
+    {
+        $q = $this->q();
+        $q->table('user');
 
         $age = new Expression("coalesce([age], [default_age])");
         $age['age'] = new Expression("year(now()) - year(birth_date)");
         $age['default_age'] = 18;
 
-        $query->field($age, 'calculated_age');
+        $q->field($age, 'calculated_age');
 
         $this->assertEquals(
             'select coalesce(year(now()) - year(birth_date), :a) `calculated_age` from `user`',
-            $query->render()
+            $q->render()
         );
 
 
@@ -323,16 +380,28 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $age['age'] = new Expression("year(now()) - year(birth_date)");
         $age['default_age'] = 18;
 
-        $query = $this->q()->table('user')->field($age, 'calculated_age');
+        $q = $this->q()->table('user')->field($age, 'calculated_age');
 
         $this->assertEquals(
             'select coalesce(year(now()) - year(birth_date), 18) `calculated_age` from `user` [:a]',
-            strip_tags($query->getDebugQuery())
+            strip_tags($q->getDebugQuery())
         );
     }
 
     /**
+     * where() should return $this Query for chaining
+     *
      * @covers ::where
+     */
+    public function testWhereReturnValue()
+    {
+        $q = $this->q();
+        $this->assertEquals($q, $q->where('id', 1));
+    }
+
+    /**
+     * @covers ::where
+     * @covers ::_render_where
      */
     public function testBasicWhere()
     {
@@ -387,7 +456,19 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * having() should return $this Query for chaining
+     *
+     * @covers ::field
+     */
+    public function testHavingReturnValue()
+    {
+        $q = $this->q();
+        $this->assertEquals($q, $q->having('id', 1));
+    }
+
+    /**
      * @covers ::having
+     * @covers ::_render_having
      */
     public function testBasicHaving()
     {
@@ -409,6 +490,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Combined execution of where() clauses
      *
      * @covers ::where
+     * @covers ::_render_where
      * @covers ::selectTemplate
      */
     public function testCombinedWhere()

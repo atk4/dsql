@@ -113,7 +113,7 @@ class Query extends Expression
     protected function _render_field()
     {
         // will be joined for output
-        $result = [];
+        $ret = [];
 
         // If no fields were defined, use defaultField
         if (!isset($this->args['fields']) || empty($this->args['fields'])) {
@@ -152,10 +152,10 @@ class Query extends Expression
                 $field .= ' ' . $this->_escape($alias);
             }
 
-            $result[] = $field;
+            $ret[] = $field;
         }
 
-        return implode(',', $result);
+        return implode(',', $ret);
     }
     // }}}
 
@@ -170,6 +170,12 @@ class Query extends Expression
      */
     public function table($table, $alias = null)
     {
+        // comma-separated table names
+        if (is_string($table) && strpos($table, ',') !== false) {
+            $table = explode(',', $table);
+        }
+
+        // array of tables - recursively process each
         if (is_array($table)) {
 
             if ($alias !== null) {
@@ -182,36 +188,36 @@ class Query extends Expression
                 }
                 $this->table($t, $alias);
             }
+
             return $this;
         }
 
-        // This can be expression, but then we can only set the table once
+        // table can be expression, but then we can only set the table once
+        // @todo WHY such restriction ?
         if ($table instanceof Expression) {
 
             if (isset($this->args['table'])) {
-                throw new Exception('You cannot use table([expression]). table() was called before. In '.__METHOD__);
+                throw new Exception('You cannot use table(expression). table() was called before. In '.__METHOD__);
             }
 
             $this->main_table = false;
             $this->args['table'] = $table;
+
             return $this;
         }
 
-        // comma-separating tables
-        if (is_string($table) && strpos($table, ',') !== false) {
-            if ($alias !== null) {
-                throw new Exception('Do not use alias with multiple tables in '.__METHOD__);
-            }
-            return $this->table(explode(',', $table));
-        }
-
+        // initialize args[table] array
         if (!isset($this->args['table'])) {
             $this->args['table'] = array();
         }
 
+        // @todo WHY such restriction ?
         if ($this->args['table'] instanceof Expression) {
-            throw new Exception('You cannot use table(). You have already used table([expression]) previously. In '.__METHOD__);
+            throw new Exception('You cannot use table(). You have already used table(expression) previously. In '.__METHOD__);
         }
+
+        // trim table name just in case developer called it like 'employees,    jobs'
+        $table = trim($table);
 
         // main_table will be set only if table() is called once. It's used
         // when joining with other tables
@@ -237,7 +243,9 @@ class Query extends Expression
      */
     protected function _render_table()
     {
-        $ret = array();
+        // will be joined for output
+        $ret = [];
+
         if (!isset($this->args['table'])) {
             return '';
         }
@@ -271,7 +279,8 @@ class Query extends Expression
      */
     protected function _render_table_noalias()
     {
-        $ret = array();
+        // will be joined for output
+        $ret = [];
 
         if ($this->args['table'] instanceof Expression) {
             throw new Exception('Table cannot be expression for UPDATE / INSERT queries in '.__METHOD__);
@@ -451,6 +460,7 @@ class Query extends Expression
      */
     protected function __render_where($kind)
     {
+        // will be joined for output
         $ret = [];
 
         // where() might have been called multiple times. Collect all conditions,
@@ -621,17 +631,19 @@ class Query extends Expression
      */
     protected function _render_set()
     {
-        $result = array();
+        // will be joined for output
+        $ret = [];
+
         if ($this->args['set']) {
             foreach ($this->args['set'] as $field => $value) {
                 $field = $this->_consume($field, 'escape');
                 $value = $this->_consume($value, 'param');
 
-                $result[] = $field.'='.$value;
+                $ret[] = $field.'='.$value;
             }
         }
 
-        return implode(', ', $result);
+        return implode(', ', $ret);
     }
 
     /**
@@ -641,17 +653,19 @@ class Query extends Expression
      */
     protected function _render_set_fields()
     {
-        $result = array();
+        // will be joined for output
+        $ret = [];
+
         if ($this->args['set']) {
             foreach ($this->args['set'] as $field => $value) {
                 $field = $this->_consume($field, 'escape');
                 $field = $this->_consume($field, 'escape');
 
-                $result[] = $field;
+                $ret[] = $field;
             }
         }
 
-        return implode(',', $result);
+        return implode(',', $ret);
     }
 
     /**
@@ -661,16 +675,18 @@ class Query extends Expression
      */
     protected function _render_set_values()
     {
-        $result = array();
+        // will be joined for output
+        $ret = [];
+
         if ($this->args['set']) {
             foreach ($this->args['set'] as $field => $value) {
                 $value = $this->_consume($value, 'param');
 
-                $result[] = $value;
+                $ret[] = $value;
             }
         }
 
-        return implode(',', $result);
+        return implode(',', $ret);
     }
     /// }}}
 
