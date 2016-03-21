@@ -111,13 +111,13 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
         // pass as array without key and custom escapeChar
         $this->assertEquals(
-            '*firstName*',
-            $this->e(['firstName', 'escapeChar' => '*'])->render()
+            '*first*Name',
+            $this->e(['[]Name', 'escapeChar' => '*'], ['first'])->render()
         );
         // pass as array with template key and custom escapeChar
         $this->assertEquals(
-            '*firstName*',
-            $this->e(['template' => 'firstName', 'escapeChar' => '*'])->render()
+            '*last*Name',
+            $this->e(['template' => '[]Name', 'escapeChar' => '*'], ['last'])->render()
         );
     }
 
@@ -225,22 +225,22 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * @covers ::__construct
      * @covers ::render
      */
-    public function test()
+    public function testNestedExpressions()
     {
         $e1 = $this->e('Hello [who]', ['who' => 'world']);
         
         $e2 = $this->e('[greeting]! How are you.', ['greeting' => $e1]);
         $e3 = $this->e('It is me again. [greeting]', ['greeting' => $e1]);
 
-        $s2 = $e2->render(); // Hello world! How are you.
-        $s3 = $e3->render(); // It is me again. Hello world
+        $s2 = $e2->render(); // Hello :a! How are you.
+        $s3 = $e3->render(); // It is me again. Hello :a
         
         $e4 = $this->e('[] and good night', [$e1]);
-        $s4 = $e4->render(); // Hello world and good night
+        $s4 = $e4->render(); // Hello :a and good night
 
-        $this->assertEquals('Hello world! How are you.', $s2);
-        $this->assertEquals('It is me again. Hello world', $s3);
-        $this->assertEquals('Hello world and good night', $s4);
+        $this->assertEquals('Hello :a! How are you.', $s2);
+        $this->assertEquals('It is me again. Hello :a', $s3);
+        $this->assertEquals('Hello :a and good night', $s4);
     }
 
     /**
