@@ -21,14 +21,14 @@ class Query extends Expression
 
     /**
      * Query will use one of the predefined "templates". The mode will contain
-     * name of template used. Basically it's array key from $templates property.
+     * name of template used. Basically it's array key of $templates property.
      *
      * @var string
      */
     public $mode = null;
 
     /**
-     * If no fields are defined, this field is used
+     * If no fields are defined, this field is used.
      *
      * @var string
      */
@@ -43,12 +43,12 @@ class Query extends Expression
     protected $main_table = null;
 
 
-    // TODO: I want to get rid of $table argument, because it's either
-    // can embedded into a field directly or not necessary for expression,
-
     // {{{ Field specification and rendering
     /**
      * Adds new column to resulting select by querying $field.
+     *
+     * @todo I want to get rid of $table argument, because it's either
+     *  can embedded into a field directly or not necessary for expression.
      *
      * Examples:
      *  $q->field('name');
@@ -116,13 +116,82 @@ class Query extends Expression
         $result = [];
 
         // If no fields were defined, use defaultField
-        if (!isset($this->args['fields']) || !($this->args['fields'])) {
-            if ($this->defaultField instanceof Query) {
-                return $this->_consume($this->defaultField);
-            }
-            return (string)$this->defaultField;
+        if (!isset($this->args['fields']) || empty($this->args['fields'])) {
+            return $this->__render_one_field($this->defaultField);
         }
 
+        // process each defined field
+        foreach ($this->args['fields'] as $row) {
+            list($field, $table, $alias) = $row;
+
+            $result[] = $this->__render_one_field($field, $table, $alias);
+        }
+
+        return implode(',', $result);
+    }
+
+    /**
+     * Returns one rendered field
+     *
+     * @param mixed  $field Specifies field to select
+     * @param string $table Specify if not using primary table
+     * @param string $alias Specify alias for this field
+     *
+     * @return string Parsed template chunk
+     */
+    protected function __render_one_field($field, $table = null, $alias = null)
+    {
+        // Do not use alias, if it's same as field
+        if ($alias === $field) {
+            $alias = null;
+        }
+
+        // Will parameterize the value and backtick if necessary
+        $field = $this->_consume($field, 'escape');
+
+        // TODO: Commented until I figure out what this does
+        /*
+        if (!$field) {
+            $field = $table;
+            $table = null;
+        }
+        */
+
+        if ($table) {
+            // table name cannot be expression, so only backtick
+            $field = $this->_escape($table) . '.' . $field;
+        }
+
+        if ($alias) {
+            // field alias cannot be expression, so only backtick
+            $field .= ' ' . $this->_escape($alias);
+        }
+
+        return $field;
+    }
+
+    /**
+     * Returns template component for [field].
+     *
+     * @return string Parsed template chunk
+     */
+    /*
+    protected function _render_field()
+    {
+        // will be joined for output
+        $result = [];
+
+        // If no fields were defined, use defaultField
+        if (!isset($this->args['fields']) || empty($this->args['fields'])) {
+            // useless
+            //if ($this->defaultField instanceof Query) {
+            //    return $this->_consume($this->defaultField);
+            //}
+            //return (string)$this->defaultField;
+            return $this->_consume($this->defaultField, 'escape');
+        }
+
+        // process each defined field
         foreach ($this->args['fields'] as $row) {
             list($field, $table, $alias) = $row;
 
@@ -131,16 +200,14 @@ class Query extends Expression
                 $alias = null;
             }
 
-            // Will parameterize the value and backtick if necessary.
+            // Will parameterize the value and backtick if necessary
             $field = $this->_consume($field, 'escape');
 
             // TODO: Commented until I figure out what this does
-            /*
-            if (!$field) {
-                $field = $table;
-                $table = null;
-            }
-            */
+            //if (!$field) {
+            //    $field = $table;
+            //    $table = null;
+            //}
 
             if ($table) {
                 // table name cannot be expression, so only backtick
@@ -151,11 +218,13 @@ class Query extends Expression
                 // field alias cannot be expression, so only backtick
                 $field .= ' ' . $this->_escape($alias);
             }
+
             $result[] = $field;
         }
 
         return implode(',', $result);
     }
+    */
     // }}}
 
     // {{{ Table specification and rendering

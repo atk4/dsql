@@ -38,7 +38,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Testing field - basic cases
+     *
      * @covers ::field
+     * @covers ::_render_field
+     * @covers Expression::_escape
      */
     public function testFieldBasic()
     {
@@ -68,55 +72,98 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             '*',
-            PHPUnitUtil::callProtectedMethod($this->q(), '_render_field')
-        );
-        $this->assertEquals(
-            'id',
-            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => 'id']), '_render_field')
-        );
-        $this->assertEquals(
-            '*',
             PHPUnitUtil::callProtectedMethod($this->q()->field('*'), '_render_field')
         );
         $this->assertEquals(
-            'first_name.employee',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name.employee'), '_render_field')
+            'employee.first_name',
+            PHPUnitUtil::callProtectedMethod($this->q()->field('employee.first_name'), '_render_field')
         );
     }
 
+    /**
+     * Testing field - defaultField
+     *
+     * @covers ::field
+     * @covers ::_render_field
+     * @covers Expression::_escape
+     */
+    public function testFieldDefaultField()
+    {
+        // default defaultField
+        $this->assertEquals(
+            '*',
+            PHPUnitUtil::callProtectedMethod($this->q(), '_render_field')
+        );
+        // defaultField as string (field name) - backticked
+        $this->assertEquals(
+            '`id`',
+            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => 'id']), '_render_field')
+        );
+        // defaultField as string (field name, but include dot symbol) - not backticked
+        $this->assertEquals(
+            'employee.first_name',
+            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => 'employee.first_name']), '_render_field')
+        );
+        // defaultField as Expression object - no backticks
+        $e = new Expression('now()');
+        $this->assertEquals(
+            'now()',
+            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => $e]), '_render_field')
+        );
+        // defaultField as Query object - no backticks
+        $q = $this->q()->table('foo')->field('bar');
+        $this->assertEquals(
+            '(select `bar` from `foo`)',
+            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => $q]), '_render_field')
+        );
+    }
+
+    /**
+     * Testing field - basic cases
+     *
+     * @covers ::field
+     */
     public function testFieldExpression()
     {
         $this->assertEquals(
             '`name`',
-            $this->q(['template'=>'[field]'])->field('name')->render()
+            $this->q('[field]')->field('name')->render()
         );
         $this->assertEquals(
             '`first name`',
-            $this->q(['template'=>'[field]'])->field('first name')->render()
+            $this->q('[field]')->field('first name')->render()
         );
         $this->assertEquals(
             'first.name',
-            $this->q(['template'=>'[field]'])->field('first.name')->render()
+            $this->q('[field]')->field('first.name')->render()
         );
         $this->assertEquals(
             'now()',
-            $this->q(['template'=>'[field]'])->field('now()')->render()
+            $this->q('[field]')->field('now()')->render()
         );
         $this->assertEquals(
             'now()',
-            $this->q(['template'=>'[field]'])->field(new Expression('now()'))->render()
+            $this->q('[field]')->field(new Expression('now()'))->render()
         );
         // Next two require review of $field() second argument logic
         //$this->assertEquals(
         //    'now() `time`',
-        //    $this->q(['template'=>'[field]'])->field('now()',null,'time')->render()
+        //    $this->q('[field]')->field('now()',null,'time')->render()
         //);
         //$this->assertEquals(
         //    'now() `time`',
-        //    $this->q(['template'=>'[field]'])->field(new Expression('now()'),null,'time')->render()
+        //    $this->q('[field]')->field(new Expression('now()'),null,'time')->render()
         //);
-
     }
+
+
+
+
+
+
+
+
+
 
     /**
      * @covers ::table
