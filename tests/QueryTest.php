@@ -42,7 +42,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::field
      * @covers ::_render_field
-     * @covers ::__render_one_field
      */
     public function testFieldBasic()
     {
@@ -85,7 +84,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::field
      * @covers ::_render_field
-     * @covers ::__render_one_field
      */
     public function testFieldDefaultField()
     {
@@ -94,27 +92,20 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             '*',
             PHPUnitUtil::callProtectedMethod($this->q(), '_render_field')
         );
-        // defaultField as string (field name) - backticked
+        // defaultField as custom string - not escaped
         $this->assertEquals(
-            '`id`',
+            'id',
             PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => 'id']), '_render_field')
         );
-        // defaultField as string (field name, but include dot symbol) - not backticked
+        // defaultField as custom string with dot - not escaped
         $this->assertEquals(
-            'employee.first_name',
-            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => 'employee.first_name']), '_render_field')
+            'all.values',
+            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => 'all.values']), '_render_field')
         );
-        // defaultField as Expression object - no backticks
-        $e = new Expression('now()');
+        // defaultField as Expression object - not escaped
         $this->assertEquals(
-            'now()',
-            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => $e]), '_render_field')
-        );
-        // defaultField as Query object - no backticks
-        $q = $this->q()->table('foo')->field('bar');
-        $this->assertEquals(
-            '(select `bar` from `foo`)',
-            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => $q]), '_render_field')
+            'values()',
+            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => new Expression('values()')]), '_render_field')
         );
     }
 
@@ -123,7 +114,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::field
      * @covers ::_render_field
-     * @covers ::__render_one_field
      */
     public function testFieldExpression()
     {

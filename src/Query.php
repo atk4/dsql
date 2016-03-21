@@ -30,7 +30,7 @@ class Query extends Expression
     /**
      * If no fields are defined, this field is used.
      *
-     * @var string
+     * @var string|Expression
      */
     public $defaultField = '*';
 
@@ -117,78 +117,10 @@ class Query extends Expression
 
         // If no fields were defined, use defaultField
         if (!isset($this->args['fields']) || empty($this->args['fields'])) {
-            return $this->__render_one_field($this->defaultField);
-        }
-
-        // process each defined field
-        foreach ($this->args['fields'] as $row) {
-            list($field, $table, $alias) = $row;
-
-            $result[] = $this->__render_one_field($field, $table, $alias);
-        }
-
-        return implode(',', $result);
-    }
-
-    /**
-     * Returns one rendered field
-     *
-     * @param mixed  $field Specifies field to select
-     * @param string $table Specify if not using primary table
-     * @param string $alias Specify alias for this field
-     *
-     * @return string Parsed template chunk
-     */
-    protected function __render_one_field($field, $table = null, $alias = null)
-    {
-        // Do not use alias, if it's same as field
-        if ($alias === $field) {
-            $alias = null;
-        }
-
-        // Will parameterize the value and backtick if necessary
-        $field = $this->_consume($field, 'escape');
-
-        // TODO: Commented until I figure out what this does
-        /*
-        if (!$field) {
-            $field = $table;
-            $table = null;
-        }
-        */
-
-        if ($table) {
-            // table name cannot be expression, so only backtick
-            $field = $this->_escape($table) . '.' . $field;
-        }
-
-        if ($alias) {
-            // field alias cannot be expression, so only backtick
-            $field .= ' ' . $this->_escape($alias);
-        }
-
-        return $field;
-    }
-
-    /**
-     * Returns template component for [field].
-     *
-     * @return string Parsed template chunk
-     */
-    /*
-    protected function _render_field()
-    {
-        // will be joined for output
-        $result = [];
-
-        // If no fields were defined, use defaultField
-        if (!isset($this->args['fields']) || empty($this->args['fields'])) {
-            // useless
-            //if ($this->defaultField instanceof Query) {
-            //    return $this->_consume($this->defaultField);
-            //}
-            //return (string)$this->defaultField;
-            return $this->_consume($this->defaultField, 'escape');
+            if ($this->defaultField instanceof Expression) {
+                return $this->_consume($this->defaultField);
+            }
+            return (string)$this->defaultField;
         }
 
         // process each defined field
@@ -203,11 +135,12 @@ class Query extends Expression
             // Will parameterize the value and backtick if necessary
             $field = $this->_consume($field, 'escape');
 
-            // TODO: Commented until I figure out what this does
-            //if (!$field) {
-            //    $field = $table;
-            //    $table = null;
-            //}
+            /* TODO: Commented until I figure out what this does
+            if (!$field) {
+                $field = $table;
+                $table = null;
+            }
+            */
 
             if ($table) {
                 // table name cannot be expression, so only backtick
@@ -224,7 +157,6 @@ class Query extends Expression
 
         return implode(',', $result);
     }
-    */
     // }}}
 
     // {{{ Table specification and rendering
