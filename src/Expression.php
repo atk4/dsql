@@ -149,21 +149,16 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Use this instead of "new Expression()" if you want to automatically bind
      * expression to the same connection as the parent.
+     *
+     * @param array|string $expr
+     * @param array $options
+     *
+     * @return Expression
      */
     public function expr($expr, $options = [])
     {
         $options['connection'] = $this->connection;
         return new Expression($expr, $options);
-    }
-
-    /**
-     * Use this instead of "new Query()" if you want to automatically bind
-     * expression to the same connection as the parent.
-     */
-    public function dsql($options = [])
-    {
-        $options['connection'] = $this->connection;
-        return new Query($options);
     }
 
     /**

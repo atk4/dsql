@@ -707,6 +707,19 @@ class Query extends Expression
         return $this;
     }
 
+    /**
+     * Use this instead of "new Query()" if you want to automatically bind
+     * query to the same connection as the parent.
+     *
+     * @param array $options
+     *
+     * @return Query
+     */
+    public function dsql($options = [])
+    {
+        $options['connection'] = $this->connection;
+        return new Query($options);
+    }
 
     /**
      * Returns new Query object of [or] expression.
