@@ -70,7 +70,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * @param string|array $template
      * @param array        $arguments
      */
-    public function __construct($template = null, $arguments = null)
+    public function __construct($template = [], $arguments = null)
     {
         // save template
         if (is_string($template)) {

@@ -25,14 +25,14 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * Test constructor exception - no parameters.
+     * Test constructor exception - wrong 1st parameter.
      *
      * @covers ::__construct
      */
     public function testConstructorException_1st_1()
     {
         $this->setExpectedException('atk4\dsql\Exception');
-        $this->e();
+        $this->e(null);
     }
 
     /**
@@ -206,7 +206,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         // escaping expressions
         $this->assertEquals(
             '`first_name`',
-            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', ['first_name'])
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['first_name'])
         );
         $this->assertEquals(
             '*first_name*',
@@ -216,19 +216,19 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         // should not escape expressions
         $this->assertEquals(
             '*',
-            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', ['*'])
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['*'])
         );
         $this->assertEquals(
             '123',
-            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', [123])
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [123])
         );
         $this->assertEquals(
             '(2+2) age',
-            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', ['(2+2) age'])
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['(2+2) age'])
         );
         $this->assertEquals(
             'first_name.table',
-            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', ['first_name.table'])
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['first_name.table'])
         );
         $this->assertEquals(
             'first#name',
@@ -236,13 +236,13 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             true,
-            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', [new Date]) instanceof Date
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [new Date]) instanceof Date
         );
 
         // escaping array - escapes each of its elements
         $this->assertEquals(
             ['`first_name`', '*', '`last_name`'],
-            PHPUnitUtil::callProtectedMethod($this->e(''), '_escape', [ ['first_name', '*', 'last_name'] ])
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [ ['first_name', '*', 'last_name'] ])
         );
     }
 
