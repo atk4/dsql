@@ -87,6 +87,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Testing simple template patterns without arguments.
+     * Testing different ways how to pass template to constructor.
      *
      * @covers ::__construct
      */
@@ -106,6 +107,16 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'now()',
             $this->e(['template' => 'now()'])->render()
+        );
+        // pass as array without key and custom escapeChar
+        $this->assertEquals(
+            '*firstName*',
+            $this->e(['firstName', 'escapeChar' => '*'])->render()
+        );
+        // pass as array with template key and custom escapeChar
+        $this->assertEquals(
+            '*firstName*',
+            $this->e(['template' => 'firstName', 'escapeChar' => '*'])->render()
         );
     }
 

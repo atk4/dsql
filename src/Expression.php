@@ -172,8 +172,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * Recursively renders sub-query or expression, combining parameters.
      * If the argument is more likely to be a field, use tick=true.
      *
-     * @param string|array|object $sql_code    Expression
-     * @param string              $escape_mode Fall-back escaping mode - param|escape|none
+     * @param mixed   $sql_code    Expression
+     * @param string  $escape_mode Fall-back escaping mode - param|escape|none
      *
      * @return string Quoted expression
      */
@@ -220,30 +220,30 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * This will allow you to use reserved SQL words as table or field
      * names such as "table".
      *
-     * @param mixed $sql_code Any string or array of strings
+     * @param mixed $value Any string or array of strings
      *
      * @return string|array Escaped string or array of strings
      */
-    protected function _escape($sql_code)
+    protected function _escape($value)
     {
         // Supports array
-        if (is_array($sql_code)) {
-            return array_map([$this, '_escape'], $sql_code);
+        if (is_array($value)) {
+            return array_map(__METHOD__, $value);
         }
 
         // in some cases we should not escape
         if (!$this->escapeChar
-            || is_object($sql_code)
-            || $sql_code === '*'
-            || strpos($sql_code, '.') !== false
-            || strpos($sql_code, '(') !== false
-            || strpos($sql_code, $this->escapeChar) !== false
+            || is_object($value)
+            || $value === '*'
+            || strpos($value, '.') !== false
+            || strpos($value, '(') !== false
+            || strpos($value, $this->escapeChar) !== false
         ) {
-            return $sql_code;
+            return $value;
         }
 
         // in all other cases we should escape
-        return $this->escapeChar . $sql_code . $this->escapeChar;
+        return $this->escapeChar . $value . $this->escapeChar;
     }
 
     /**
@@ -258,7 +258,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     protected function _param($value)
     {
         if (is_array($value)) {
-            return array_map([$this, '_param'], $value);
+            return array_map(__METHOD__, $value);
         }
 
         $name = $this->_paramBase;
