@@ -150,10 +150,11 @@ Properties
 
     Template which is used when rendering. You can set this with either
     `new Expression("show tables")` or `new Expression(["show tables"])`
+    or `new Expression(["template" => "show tables"])`.
 
 .. php:attr:: escapeChar
 
-    Field and table names are escaped using escapeChar which by default is: *`*
+    Field and table names are escaped using escapeChar which by default is: *`*.
 
 .. php:attr:: paramBase
 

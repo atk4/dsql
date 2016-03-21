@@ -172,7 +172,7 @@ class Query extends Expression
         if (is_array($table)) {
 
             if ($alias !== null) {
-                throw new Exception('Do not use alias with multiple tables');
+                throw new Exception('Do not use alias with multiple tables in '.__METHOD__);
             }
 
             foreach ($table as $alias => $t) {
@@ -188,7 +188,7 @@ class Query extends Expression
         if ($table instanceof Expression) {
 
             if (isset($this->args['table'])) {
-                throw new Exception('You cannot use table([expression]). table() was called before.');
+                throw new Exception('You cannot use table([expression]). table() was called before. In '.__METHOD__);
             }
 
             $this->main_table = false;
@@ -199,7 +199,7 @@ class Query extends Expression
         // comma-separating tables
         if (is_string($table) && strpos($table, ',') !== false) {
             if ($alias !== null) {
-                throw new Exception('Do not use alias with multiple tables');
+                throw new Exception('Do not use alias with multiple tables in '.__METHOD__);
             }
             return $this->table(explode(',', $table));
         }
@@ -209,7 +209,7 @@ class Query extends Expression
         }
 
         if ($this->args['table'] instanceof Expression) {
-            throw new Exception('You cannot use table(). You have already used table([expression]) previously.');
+            throw new Exception('You cannot use table(). You have already used table([expression]) previously. In '.__METHOD__);
         }
 
         // main_table will be set only if table() is called once. It's used
@@ -273,7 +273,7 @@ class Query extends Expression
         $ret = array();
 
         if ($this->args['table'] instanceof Expression) {
-            throw new Exception('Table cannot be expression for UPDATE / INSERT queries');
+            throw new Exception('Table cannot be expression for UPDATE / INSERT queries in '.__METHOD__);
         }
 
         foreach ($this->args['table'] as $row) {
@@ -597,8 +597,7 @@ class Query extends Expression
     public function set($field, $value = null)
     {
         if ($value === false) {
-            throw $this->exception('Value "false" is not supported by SQL')
-                ->addMoreInfo('field', $field);
+            throw new Exception('Value "false" is not supported by SQL for field '.$field.' in '.__METHOD__);
         }
 
         if (is_array($field)) {

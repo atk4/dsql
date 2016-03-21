@@ -80,6 +80,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         } elseif (!is_array($properties)) {
             throw new Exception('1st parameter must be a string or array in '.__METHOD__);
         }
+        
+        // supports passing template as property value without key 'template'
+        if (isset($properties[0])) {
+            $properties['template'] = $properties[0];
+            unset($properties[0]);
+        }
 
         // save arguments
         if ($arguments !== null) {
@@ -89,7 +95,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $this->args['custom'] = $arguments;
         }
 
-        // deal with remaining options
+        // deal with remaining properties
         foreach ($properties as $key => $val) {
             $this->$key = $val;
         }
@@ -190,7 +196,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (!$sql_code instanceof Expression) {
-            throw new Exception('Foreign objects may not be passed into DSQL');
+            throw new Exception('Foreign objects may not be passed into DSQL in '.__METHOD__);
         }
 
          //|| !$sql_code instanceof Expression) {
@@ -292,7 +298,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (method_exists($this, $fx)) {
                     return $this->$fx();
                 } else {
-                    throw new Exception('Expression could not render ['.$identifier.']');
+                    throw new Exception('Expression could not render ['.$identifier.'] in '.__METHOD__);
                 }
             },
             $this->template
@@ -368,11 +374,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (is_string($val)) {
                     $type = \PDO::PARAM_STR;
                 } else {
-                    throw new Exception('Incorrect param type');
+                    throw new Exception('Incorrect param type in '.__METHOD__);
                 }
 
                 if (!$statement->bindValue($key, $val, $type)) {
-                    throw new Exception('Unable to bind parameter');
+                    throw new Exception('Unable to bind parameter in '.__METHOD__);
                 }
             }
 

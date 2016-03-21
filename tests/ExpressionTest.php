@@ -92,9 +92,20 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructor_2()
     {
+        // pass as string
         $this->assertEquals(
             'now()',
             $this->e('now()')->render()
+        );
+        // pass as array without key
+        $this->assertEquals(
+            'now()',
+            $this->e(['now()'])->render()
+        );
+        // pass as array with template key
+        $this->assertEquals(
+            'now()',
+            $this->e(['template' => 'now()'])->render()
         );
     }
 
@@ -273,6 +284,11 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         unset($e['cat']);
         $this->assertEquals(false, isset($e['cat']));
 
+        // real-life example
+        $age = $this->e('coalesce([age], [default_age])');
+        $age['age'] = $this->e('year(now()) - year(birth_date)');
+        $age['default_age'] = 18;
+        $this->assertEquals('coalesce(year(now()) - year(birth_date), :a)', $age->render());
     }
 
     /**
