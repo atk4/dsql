@@ -318,21 +318,21 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         $d = $this->render();
 
         $pp = array();
-        $d = preg_replace('/`([^`]*)`/', '`<font color="black">\1</font>`', $d);
+        $d = preg_replace('/`([^`]*)`/', '`<span style="color:black">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', '"<font color="green">'.
-                    htmlspecialchars(addslashes($val)).'</font>"\1', $d);
+                $d = preg_replace('/'.$key.'([^_]|$)/', '"<span style="color:green">'.
+                    htmlspecialchars(addslashes($val)).'</span>"\1', $d);
             } elseif (is_null($val)) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
-                    '<font color="black">NULL</font>\1',
+                    '<span style="color:black">NULL</span>\1',
                     $d
                 );
             } elseif (is_numeric($val)) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
-                    '<font color="red">'.$val.'</font>\1',
+                    '<span style="color:red">'.$val.'</span>\1',
                     $d
                 );
             } else {
@@ -342,7 +342,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $pp[] = $key;
         }
 
-        return $d." <font color='gray'>[" . implode(', ', $pp) . ']</font>';
+        return $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
     }
 
     /**
