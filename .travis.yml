@@ -10,4 +10,7 @@ after_script:
     - vendor/bin/test-reporter
 
 notifications:
-    slack: agiletoolkit:bjrKuPBf1h4cYiNxPBQ1kF6c
+    slack:
+        rooms:
+            - agiletoolkit:bjrKuPBf1h4cYiNxPBQ1kF6c#dsql
+        on_success: change

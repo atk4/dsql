@@ -1,0 +1,13 @@
+<phpunit bootstrap="vendor/autoload.php">
+    <testsuites>
+        <testsuite name="dsql">
+            <directory>tests/db</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <var name="DB_DSN" value="sqlite::memory:" />
+        <var name="DB_USER" value="travis" />
+        <var name="DB_PASSWD" value="" />
+        <var name="DB_DBNAME" value="dsql_test" />
+    </php>
+</phpunit>

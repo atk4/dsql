@@ -13,7 +13,8 @@ Contents:
 
     overview
     quickstart
-    reference
+    expressions
+    queries
 
 
 

@@ -1,2 +1,5 @@
+.PHONY: docs tests
 docs:
-	cd doc && make html
+	cd docs && make html
+tests:
+	phpunit
