@@ -148,15 +148,19 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'now()',
             $this->q('[field]')->field(new Expression('now()'))->render()
         );
-        // Next two require review of $field() second argument logic
-        //$this->assertEquals(
-        //    'now() `time`',
-        //    $this->q('[field]')->field('now()',null,'time')->render()
-        //);
-        //$this->assertEquals(
-        //    'now() `time`',
-        //    $this->q('[field]')->field(new Expression('now()'),null,'time')->render()
-        //);
+        // Usage of field aliases
+        $this->assertEquals(
+            'now() `time`',
+            $this->q('[field]')->field('now()', null, 'time')->render()
+        );
+        $this->assertEquals(
+            'now() `time`',
+            $this->q('[field]')->field(new Expression('now()'), 'time')->render()
+        );
+        $this->assertEquals(
+            'now() `time`',
+            $this->q('[field]')->field(new Expression('now()'), null, 'time')->render()
+        );
     }
 
     /**
@@ -307,7 +311,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->table('foo', 'a')
             ->table('bar', 'a');
         $this->assertEquals(
-            'select * from `foo` `a`, `bar` `a`', // <-- testing this !!! table aliases should be unique.
+            'select * from `foo` `a`,`bar` `a`', // <-- aliases should be unique and THIS SHOULD THROW EXCEPTION
             $q->render()
         );
 

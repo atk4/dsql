@@ -85,7 +85,7 @@ class Query extends Expression
         // field is passed as string, may contain commas
         if (is_string($field) && strpos($field, ',') !== false) {
             $field = explode(',', $field);
-        } elseif (is_object($field)) {
+        } elseif (is_object($field) && $alias === null) {
             $alias = $table;
             $table = null;
         }
