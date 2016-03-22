@@ -201,6 +201,7 @@ class Query extends Expression
             }
 
             $this->main_table = false;
+            // @todo Imants: Only saves table (expression) and doesn't save table/expression alias!?!
             $this->args['table'] = $table;
 
             return $this;

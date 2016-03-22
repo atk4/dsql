@@ -153,11 +153,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'now() `time`',
             $this->q('[field]')->field('now()', null, 'time')->render()
         );
-        $this->assertEquals(
+        $this->assertEquals( // alias can be passed as 2nd argument
             'now() `time`',
             $this->q('[field]')->field(new Expression('now()'), 'time')->render()
         );
-        $this->assertEquals(
+        $this->assertEquals( // alias can be passed as 3nd argument
             'now() `time`',
             $this->q('[field]')->field(new Expression('now()'), null, 'time')->render()
         );
@@ -198,6 +198,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers ::table
      * @covers ::_render_table
+     * @covers ::_render_table_noalias
      */
     public function testTableRender1()
     {
@@ -272,6 +273,21 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'select `name` from `employee` `e`,`jobs` `j`',
             $this->q()
                 ->field('name')->table(['e'=>'employee', 'j'=>'jobs'])
+                ->render()
+        );
+        // testing _render_table_noalias, shouldn't render table alias 'emp'
+        $this->assertEquals(
+            'insert into `employee` (`name`) values (:a)',
+            $this->q()
+                ->field('name')->table('employee', 'emp')->set('name', 1)
+                ->selectTemplate('insert')
+                ->render()
+        );
+        $this->assertEquals(
+            'update `employee` set `name`=:a',
+            $this->q()
+                ->field('name')->table('employee', 'emp')->set('name', 1)
+                ->selectTemplate('update')
                 ->render()
         );
     }
