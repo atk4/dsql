@@ -309,7 +309,7 @@ class Query extends Expression
         return isset($this->main_table) ? 'from' : '';
         /**
          * @todo Imants: maybe we can change this to
-         *      return !empty($this->args['table']) ? 'from' : ''
+         *  return !empty($this->args['table']) ? 'from' : ''
          * and get rid of main_table.
          */
     }
@@ -395,7 +395,7 @@ class Query extends Expression
 
         // first argument is string containing more than just a field name and no more than 2
         // arguments means that we either have a string expression or embedded condition.
-        if (is_string($field) && !preg_match('/^[.a-zA-Z0-9_]*$/', $field) && $num_args === 2) {
+        if ($num_args === 2 && is_string($field) && !preg_match('/^[.a-zA-Z0-9_]*$/', $field)) {
             // field contains non-alphanumeric values. Look for condition
             preg_match(
                 '/^([^ <>!=]*)([><!=]*|( *(not|is|in|like))*) *$/',
@@ -407,12 +407,13 @@ class Query extends Expression
             $value = $cond;
             $cond = $matches[2];
 
-            // if we couldn't clearly identify the condinulltion, we might be dealing with
+            // if we couldn't clearly identify the condition, we might be dealing with
             // a more complex expression. If expression is followed by another argument
             // we need to add equation sign  where('now()',123).
             if (!$cond) {
                 $matches[1] = $this->expr($field);
 
+                // @todo Imants it's useless to check again $num_args===2 here. It'll always be true.
                 if ($num_args == 2) {
                     $cond = '=';
                 } else {
@@ -470,7 +471,7 @@ class Query extends Expression
         $ret = [];
 
         // where() might have been called multiple times. Collect all conditions,
-        // then join with them AND keyword
+        // then join them with AND keyword
         foreach ($this->args[$kind] as $row) {
 
             if (count($row) === 3) {
@@ -503,7 +504,7 @@ class Query extends Expression
                 $value = $cond;
                 if (is_array($value)) {
                     $cond = 'in';
-                } elseif (is_object($value) && $value->mode === 'select') {
+                } elseif ($value instanceof Query && $value->mode === 'select') {
                     $cond = 'in';
                 } else {
                     $cond = '=';
@@ -514,8 +515,8 @@ class Query extends Expression
 
             // below we can be sure that all 3 arguments has been passed
 
+            // special conditions (IS | IS NOT) if value is null
             if ($value === null) {
-                // special conditions if value is null
                 if ($cond === '=') {
                     $cond = 'is';
                 } elseif (in_array($cond, array('!=', '<>', 'not'))) {
@@ -525,10 +526,10 @@ class Query extends Expression
 
             // value should be array for such conditions
             if (($cond === 'in' || $cond === 'not in') && is_string($value)) {
-                $value = explode(',', $value);
+                $value = array_map('trim', explode(',', $value));
             }
 
-            // if value is array, then use IN or NOT IN as condition
+            // special conditions (IN | NOT IN) if value is array
             if (is_array($value)) {
                 $value = '('.implode(',', $this->_param($value)).')';
                 $cond = in_array($cond, array('!=', '<>', 'not', 'not in')) ? 'not in' : 'in';
@@ -536,7 +537,7 @@ class Query extends Expression
                 continue;
             }
 
-            // if value is object, then it should be DSQL itself
+            // if value is object, then it should be Expression or Query itself
             // otherwise just escape value
             $value = $this->_consume($value, 'param');
             $ret[] = $field.' '.$cond.' '.$value;
@@ -552,6 +553,11 @@ class Query extends Expression
      */
     protected function _render_where()
     {
+        /**
+         * @todo Imants: To not duplicate code maybe replace this with
+         * $s = $this->_render_andwhere();
+         * return $s ? ' where '.$s : null;
+         */
         if (!isset($this->args['where'])) {
             return;
         }
@@ -625,7 +631,11 @@ class Query extends Expression
             return $this;
         }
 
-        $this->args['set'][$field] = $value;
+        if (is_string($field)) {
+            $this->args['set'][$field] = $value;
+        } else {
+            throw new Exception('Field name should be string in '.__METHOD__);
+        }
 
         return $this;
     }
@@ -664,7 +674,6 @@ class Query extends Expression
 
         if ($this->args['set']) {
             foreach ($this->args['set'] as $field => $value) {
-                $field = $this->_consume($field, 'escape');
                 $field = $this->_consume($field, 'escape');
 
                 $ret[] = $field;

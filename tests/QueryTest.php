@@ -38,6 +38,17 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * dsql() should return new Query object and inherit connection from it.
+     *
+     * @covers ::dsql
+     */
+    public function testDsql()
+    {
+        $q = $this->q(['connection' => new PDO]);
+        $this->assertEquals(true, $q->dsql() instanceof PDO);
+    }
+
+    /**
      * field() should return $this Query for chaining
      *
      * @covers ::field
@@ -166,6 +177,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * There shouldn't be alias when passing multiple tables
      *
+     * @covers ::table
      * @expectedException Exception
      */
     public function testTableException1()
@@ -176,6 +188,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * There shouldn't be alias when passing multiple tables
      *
+     * @covers ::table
      * @expectedException Exception
      */
     public function testTableException2()
@@ -401,7 +414,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
 
         // $q1 union $q2
-        $u = (new Expression("[] union []", [$q1, $q2]));
+        $u = new Expression("[] union []", [$q1, $q2]);
         $this->assertEquals(
             '(select `date`,`amount` `debit`,0 `credit` from `sales`) union (select `date`,0 `debit`,`amount` `credit` from `purchases`)',
             $u->render()
@@ -412,28 +425,17 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->field('date,debit,credit')
             ->table($u, 'derrivedTable')
             ;
+        /**
+         * @see https://github.com/atk4/dsql/issues/33
+         * @see https://github.com/atk4/dsql/issues/34
+         */
+        /*
         $this->assertEquals(
             'select `date`,`debit`,`credit` from ((select `date`,`amount` `debit`,0 `credit` from `sales`) union (select `date`,0 `debit`,`amount` `credit` from `purchases`)) `derrivedTable`',
             $q->render()
         );
+        */
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * where() should return $this Query for chaining
@@ -444,62 +446,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $q = $this->q();
         $this->assertEquals($q, $q->where('id', 1));
-    }
-
-    /**
-     * @covers ::where
-     * @covers ::_render_where
-     */
-    public function testBasicWhere()
-    {
-        $this->assertEquals(
-            'where `id` = :a',
-            $this->q(['template'=>'[where]'])->where('id', 1)->render()
-        );
-        $this->assertEquals(
-            'where `user`.`id` = :a',
-            $this->q(['template'=>'[where]'])->where('user.id', 1)->render()
-        );
-        $this->assertEquals(
-            'where `db`.`user`.`id` = :a',
-            $this->q(['template'=>'[where]'])->where('db.user.id', 1)->render()
-        );
-        $this->assertEquals(
-            'where `id` > :a',
-            $this->q(['template'=>'[where]'])->where('id', '>', 1)->render()
-        );
-        $this->assertEquals(
-            'where `id` in (:a,:b)',
-            $this->q(['template'=>'[where]'])->where('id', 'in', [1, 2])->render()
-        );
-        $this->assertEquals(
-            'where `id` is :a',
-            $this->q(['template'=>'[where]'])->where('id', 'is', null)->render()
-        );
-        $this->assertEquals(
-            'where `id` is not :a',
-            $this->q(['template'=>'[where]'])->where('id!=', null)->render()
-        );
-        $this->assertEquals(
-            'where `id` is not :a',
-            $this->q(['template'=>'[where]'])->where('id<>', null)->render()
-        );
-        $this->assertEquals(
-            'where now()',
-            $this->q(['template'=>'[where]'])->where('now()')->render()
-        );
-        $this->assertEquals(
-            'where now() = :a',
-            $this->q(['template'=>'[where]'])->where('now()', 1)->render()
-        );
-        $this->assertEquals(
-            'where now = :a',
-            $this->q(['template'=>'[where]'])->where(new Expression('now'), 1)->render()
-        );
-        $this->assertEquals(
-            'where `a` = :a and `b` = :b',
-            $this->q(['template'=>'[where]'])->where('a', 1)->where('b', 2)->render()
-        );
     }
 
     /**
@@ -514,6 +460,208 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Basic where() tests
+     *
+     * @covers ::where
+     * @covers ::_render_where
+     */
+    public function testWhereBasic()
+    {
+        // one parameter as a string - treat as expression
+        $this->assertEquals(
+            'where now()',
+            $this->q('[where]')->where('now()')->render()
+        );
+        $this->assertEquals(
+            'where foo >=    bar',
+            $this->q('[where]')->where('foo >=    bar')->render()
+        );
+        
+        // two parameters - field, value
+        $this->assertEquals(
+            'where `id` = :a',
+            $this->q('[where]')->where('id', 1)->render()
+        );
+        $this->assertEquals(
+            'where `user`.`id` = :a',
+            $this->q('[where]')->where('user.id', 1)->render()
+        );
+        $this->assertEquals(
+            'where `db`.`user`.`id` = :a',
+            $this->q('[where]')->where('db.user.id', 1)->render()
+        );
+        $this->assertEquals(
+            'where `id` is :a',
+            $this->q('[where]')->where('id', null)->render()
+        );
+
+        // three parameters - field, condition, value
+        $this->assertEquals(
+            'where `id` > :a',
+            $this->q('[where]')->where('id', '>', 1)->render()
+        );
+        $this->assertEquals(
+            'where `id` < :a',
+            $this->q('[where]')->where('id', '<', 1)->render()
+        );
+        $this->assertEquals(
+            'where `id` = :a',
+            $this->q('[where]')->where('id', '=', 1)->render()
+        );
+        
+        // two parameters - more_than_just_a_field, value
+        $this->assertEquals(
+            'where `id` = :a',
+            $this->q('[where]')->where('id=', 1)->render()
+        );
+        $this->assertEquals(
+            'where `id` <> :a',
+            $this->q('[where]')->where('id!=', 1)->render()
+        );
+        $this->assertEquals(
+            'where `id` <> :a',
+            $this->q('[where]')->where('id<>', 1)->render()
+        );
+
+        // field name with special symbols - not escape
+        $this->assertEquals(
+            'where now() = :a',
+            $this->q('[where]')->where('now()', 1)->render()
+        );
+
+        // field name as expression
+        $this->assertEquals(
+            'where now = :a',
+            $this->q('[where]')->where(new Expression('now'), 1)->render()
+        );
+
+        // more than one where condition - join with AND keyword
+        $this->assertEquals(
+            'where `a` = :a and `b` is :b',
+            $this->q('[where]')->where('a', 1)->where('b', null)->render()
+        );
+    }
+
+    /**
+     * Testing where() with special values - null, array, like
+     *
+     * @covers ::where
+     * @covers ::_render_where
+     */
+    public function testWhereSpecialValues()
+    {
+        // in | not in
+        $this->assertEquals(
+            'where `id` in (:a,:b)',
+            $this->q('[where]')->where('id', 'in', [1, 2])->render()
+        );
+        $this->assertEquals(
+            'where `id` not in (:a,:b)',
+            $this->q('[where]')->where('id', 'not in', [1, 2])->render()
+        );
+        $this->assertEquals(
+            'where `id` not in (:a,:b)',
+            $this->q('[where]')->where('id', 'not', [1, 2])->render()
+        );
+        $this->assertEquals(
+            'where `id` in (:a,:b)',
+            $this->q('[where]')->where('id', '=', [1, 2])->render()
+        );
+        $this->assertEquals(
+            'where `id` not in (:a,:b)',
+            $this->q('[where]')->where('id', '<>', [1, 2])->render()
+        );
+        $this->assertEquals(
+            'where `id` not in (:a,:b)',
+            $this->q('[where]')->where('id', '!=', [1, 2])->render()
+        );
+        // pass array as CSV
+        $this->assertEquals(
+            'where `id` in (:a,:b)',
+            $this->q('[where]')->where('id', 'in', '1,2')->render()
+        );
+        $this->assertEquals(
+            'where `id` not in (:a,:b)',
+            $this->q('[where]')->where('id', 'not in', '1,    2')->render()
+        );
+        $this->assertEquals(
+            'where `id` not in (:a,:b)',
+            $this->q('[where]')->where('id', 'not', '1,2')->render()
+        );
+        
+        // is | is not
+        $this->assertEquals(
+            'where `id` is :a',
+            $this->q('[where]')->where('id', 'is', null)->render()
+        );
+        $this->assertEquals(
+            'where `id` is not :a',
+            $this->q('[where]')->where('id', 'is not', null)->render()
+        );
+        $this->assertEquals(
+            'where `id` is not :a',
+            $this->q('[where]')->where('id', 'not', null)->render()
+        );
+        $this->assertEquals(
+            'where `id` is :a',
+            $this->q('[where]')->where('id', '=', null)->render()
+        );
+        $this->assertEquals(
+            'where `id` is not :a',
+            $this->q('[where]')->where('id', '<>', null)->render()
+        );
+        $this->assertEquals(
+            'where `id` is not :a',
+            $this->q('[where]')->where('id', '!=', null)->render()
+        );
+        
+        // like | not like
+        $this->assertEquals(
+            'where `name` like :a',
+            $this->q('[where]')->where('name', 'like', 'foo')->render()
+        );
+        $this->assertEquals(
+            'where `name` not like :a',
+            $this->q('[where]')->where('name', 'not like', 'foo')->render()
+        );
+        $this->assertEquals(
+            'where `name` not like :a',
+            $this->q('[where]')->where('name', 'not', 'foo')->render()
+        );
+        
+        // two parameters - more_than_just_a_field, value
+        // is | is not
+        $this->assertEquals(
+            'where `id` is :a',
+            $this->q('[where]')->where('id=', null)->render()
+        );
+        $this->assertEquals(
+            'where `id` is not :a',
+            $this->q('[where]')->where('id!=', null)->render()
+        );
+        $this->assertEquals(
+            'where `id` is not :a',
+            $this->q('[where]')->where('id<>', null)->render()
+        );
+
+        // in | not in
+        $this->assertEquals(
+            'where `id` in (:a,:b)',
+            $this->q('[where]')->where('id=', [1, 2])->render()
+        );
+        $this->assertEquals(
+            'where `id` not in (:a,:b)',
+            $this->q('[where]')->where('id!=', [1, 2])->render()
+        );
+        $this->assertEquals(
+            'where `id` not in (:a,:b)',
+            $this->q('[where]')->where('id<>', [1, 2])->render()
+        );
+    }
+
+    /**
+     * Having basically is the same as where, so we can relax and trouhly test where() instead.
+     *
      * @covers ::having
      * @covers ::_render_having
      */
@@ -521,15 +669,15 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             'having `id` = :a',
-            $this->q(['template'=>'[having]'])->having('id', 1)->render()
+            $this->q('[having]')->having('id', 1)->render()
         );
         $this->assertEquals(
             'having `id` > :a',
-            $this->q(['template'=>'[having]'])->having('id', '>', 1)->render()
+            $this->q('[having]')->having('id', '>', 1)->render()
         );
         $this->assertEquals(
             'where `id` = :a having `id` > :b',
-            $this->q(['template'=>'[where][having]'])->where('id', 1)->having('id>', 1)->render()
+            $this->q('[where][having]')->where('id', 1)->having('id>', 1)->render()
         );
     }
 
@@ -574,26 +722,44 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Test where() when $field is passed as array. Should create OR conditions.
+     *
+     * @covers ::where
+     * @covers ::orExpr
+     * @covers ::_render_where
+     * @covers ::_render_orwhere
+     */
     public function testOrWhere()
     {
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or `b` = :b)',
             $this->q()
-                ->field('name')->table('employee')->where([['a',1],['b',1]])
+                ->field('name')->table('employee')->where([['a', 1],['b', 1]])
                 ->render()
         );
 
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or a=b)',
             $this->q()
-                ->field('name')->table('employee')->where([['a',1],'a=b'])
+                ->field('name')->table('employee')->where([['a', 1],'a=b'])
                 ->render()
         );
     }
 
-
+    /**
+     * Test insert, update and delete templates.
+     *
+     * @covers ::setTemplate
+     * @covers ::where
+     * @covers ::set
+     * @covers ::_render_set
+     * @covers ::_render_set_fields
+     * @covers ::_render_set_values
+     */
     public function testInsertDeleteUpdate()
     {
+        // delete template
         $this->assertEquals(
             'delete from `employee` where `name` = :a',
             $this->q()
@@ -602,6 +768,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->render()
         );
 
+        // update template
         $this->assertEquals(
             'update `employee` set `name`=:a',
             $this->q()
@@ -618,6 +785,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->render()
         );
 
+        // insert template
         $this->assertEquals(
             'insert into `employee` (`name`) values (:a)',
             $this->q()
@@ -626,18 +794,73 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->render()
         );
 
+        // set multiple fields
         $this->assertEquals(
-            'insert into `employee` (`name`) values (now())',
+            'insert into `employee` (`time`,`name`) values (now(),:a)',
             $this->q()
-                ->field('name')->table('employee')->set('name', new Expression('now()'))
+                ->field('time')->field('name')->table('employee')
+                ->set('time', new Expression('now()'))
+                ->set('name', 'unknown')
+                ->selectTemplate('insert')
+                ->render()
+        );
+        
+        // set as array
+        $this->assertEquals(
+            'insert into `employee` (`time`,`name`) values (now(),:a)',
+            $this->q()
+                ->field('time')->field('name')->table('employee')
+                ->set(['time' => new Expression('now()'), 'name' => 'unknown'])
                 ->selectTemplate('insert')
                 ->render()
         );
     }
 
+    /**
+     * set() should return $this Query for chaining
+     *
+     * @covers ::set
+     */
+    public function testSetReturnValue()
+    {
+        $q = $this->q();
+        $this->assertEquals($q, $q->set('id', 1));
+    }
+
+    /**
+     * Value [false] is not supported by SQL
+     *
+     * @covers ::set
+     * @expectedException Exception
+     */
+    public function testSetException1()
+    {
+        $this->q()->set('name', false);
+    }
+
+    /**
+     * Field name should be array or string.
+     *
+     * @covers ::set
+     * @expectedException Exception
+     */
+    public function testSetException2()
+    {
+        $this->q()->set((new Expression('foo')), 1);
+    }
+
+    /**
+     * Test nested OR and AND expressions.
+     *
+     * @covers ::where
+     * @covers ::orExpr
+     * @covers ::andExpr
+     * @covers ::_render_orwhere
+     * @covers ::_render_andwhere
+     */
     public function testNestedOrAnd()
     {
-
+        // test 1
         $q = $this->q();
         $q->table('employee')->field('name');
         $q->where(
@@ -646,12 +869,12 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->where('a', 1)
                 ->where('b', 1)
         );
-
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or `b` = :b)',
             $q->render()
         );
 
+        // test 2
         $q = $this->q();
         $q->table('employee')->field('name');
         $q->where(
@@ -665,7 +888,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                         ->where('false')
                 )
         );
-
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or `b` = :b or (true and false))',
             $q->render()

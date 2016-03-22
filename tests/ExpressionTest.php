@@ -244,6 +244,17 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * expr() should return new Expression object and inherit connection from it.
+     *
+     * @covers ::expr
+     */
+    public function testExpr()
+    {
+        $q = $this->e(['connection' => new PDO]);
+        $this->assertEquals(true, $e->expr() instanceof PDO);
+    }
+
+    /**
      * Fully covers _escape method
      *
      * @covers ::_escape
