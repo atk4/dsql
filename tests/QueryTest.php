@@ -750,7 +750,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Test insert, update and delete templates.
      *
-     * @covers ::setTemplate
+     * @covers ::selectTemplate
      * @covers ::where
      * @covers ::set
      * @covers ::_render_set
