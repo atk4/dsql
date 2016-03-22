@@ -45,9 +45,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testDsql()
     {
         $q = $this->q(['connection' => new \stdClass()]);
-        var_dump($q);
-        var_dump($q->dsql());
-        $this->assertEquals(true, $q->dsql() instanceof \stdClass);
+        $this->assertEquals(true, $q->dsql()->connection instanceof \stdClass);
     }
 
     /**

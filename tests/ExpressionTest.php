@@ -251,7 +251,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     public function testExpr()
     {
         $e = $this->e(['connection' => new \stdClass()]);
-        $this->assertEquals(true, $e->expr() instanceof \stdClass);
+        $this->assertEquals(true, $e->expr()->connection instanceof \stdClass);
     }
 
     /**
