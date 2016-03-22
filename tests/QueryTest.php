@@ -45,6 +45,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testDsql()
     {
         $q = $this->q(['connection' => new \stdClass()]);
+        var_dump($q);
+        var_dump($q->dsql());
         $this->assertEquals(true, $q->dsql() instanceof \stdClass);
     }
 
@@ -623,10 +625,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'where `name` not like :a',
             $this->q('[where]')->where('name', 'not like', 'foo')->render()
-        );
-        $this->assertEquals(
-            'where `name` not like :a',
-            $this->q('[where]')->where('name', 'not', 'foo')->render()
         );
         
         // two parameters - more_than_just_a_field, value
