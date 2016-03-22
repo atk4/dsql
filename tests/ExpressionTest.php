@@ -250,8 +250,8 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpr()
     {
-        $q = $this->e(['connection' => new PDO]);
-        $this->assertEquals(true, $e->expr() instanceof PDO);
+        $q = $this->e(['connection' => new \PDO]);
+        $this->assertEquals(true, $e->expr() instanceof \PDO);
     }
 
     /**

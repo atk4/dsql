@@ -44,8 +44,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testDsql()
     {
-        $q = $this->q(['connection' => new PDO]);
-        $this->assertEquals(true, $q->dsql() instanceof PDO);
+        $q = $this->q(['connection' => new \PDO]);
+        $this->assertEquals(true, $q->dsql() instanceof \PDO);
     }
 
     /**
