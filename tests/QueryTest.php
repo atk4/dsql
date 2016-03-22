@@ -195,7 +195,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * @covers ::table
      * @covers ::_render_table
      */
-    public function testTableRender()
+    public function testTableRender1()
     {
         // no table defined
         $this->assertEquals(
@@ -297,76 +297,35 @@ class QueryTest extends \PHPUnit_Framework_TestCase
          *  (select * from `customer`) `c`
          * In such case table alias should better be mandatory.
          */
+
+        /**
+         * @todo Add some tests with non-unique table aliases.
+         *  They will currently generate: SELECT * FROM `foo` `a`, `bar` `a` which is wrong!
+         * We have to check uniquness of table aliases and in such cases throw appropriate exception.
+         */
+        $q = $this->q()
+            ->table('foo', 'a')
+            ->table('bar', 'a');
+        $this->assertEquals(
+            'select * from `foo` `a`, `bar` `a`', // <-- testing this !!! table aliases should be unique.
+            $q->render()
+        );
+
     }
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * @covers ::render
      */
     public function testBasicRenderSubquery()
     {
-        $q = $this->q();
-        $q->table('user');
-
         $age = new Expression("coalesce([age], [default_age])");
         $age['age'] = new Expression("year(now()) - year(birth_date)");
         $age['default_age'] = 18;
 
-        $q->field($age, 'calculated_age');
+        $q = $this->q()->table('user')->field($age, 'calculated_age');
 
         $this->assertEquals(
             'select coalesce(year(now()) - year(birth_date), :a) `calculated_age` from `user`',
-            $q->render()
-        );
-
-
-    }
-
-    public function testUnionQuery()
-    {
-        $q1 = $this->q()
-            ->table('sales')
-            ->field('date')
-            ->field('amount', null, 'debit');
-
-        $this->assertEquals(
-            'select `date`,`amount` `debit` from `sales`',
-            $q1->render()
-        );
-
-        $q2 = $this->q()
-            ->table('purchases')
-            ->field('date')
-            ->field('amount', null, 'credit');
-
-        $this->assertEquals(
-            'select `date`,`amount` `credit` from `purchases`',
-            $q2->render()
-        );
-
-        $u = (new Expression("([] union []) derrivedTable", [$q1, $q2]));
-
-        $this->assertEquals(
-            '((select `date`,`amount` `debit` from `sales`) union (select `date`,`amount` `credit` from `purchases`)) derrivedTable',
-            $u->render()
-        );
-
-        $q = $this->q()
-            ->field('date,debit,credit')
-            ->table($u);
-
-        $this->assertEquals(
-            'select `date`,`debit`,`credit` from ((select `date`,`amount` `debit` from `sales`) union (select `date`,`amount` `credit` from `purchases`)) derrivedTable',
             $q->render()
         );
     }
@@ -387,6 +346,74 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             strip_tags($q->getDebugQuery())
         );
     }
+
+    /**
+     * @covers ::field
+     * @covers ::_render_field
+     * @covers ::table
+     * @covers ::_render_table
+     * @covers ::render
+     */
+    public function testUnionQuery()
+    {
+        // 1st query
+        $q1 = $this->q()
+            ->table('sales')
+            ->field('date')
+            ->field('amount', null, 'debit')
+            ->field($this->q()->expr('0'), null, 'credit') // simply 0
+            ;
+        $this->assertEquals(
+            'select `date`,`amount` `debit`,0 `credit` from `sales`',
+            $q1->render()
+        );
+
+        // 2nd query
+        $q2 = $this->q()
+            ->table('purchases')
+            ->field('date')
+            ->field($this->q()->expr('0'), null, 'debit') // simply 0
+            ->field('amount', null, 'credit')
+            ;
+        $this->assertEquals(
+            'select `date`,0 `debit`,`amount` `credit` from `purchases`',
+            $q2->render()
+        );
+
+        // $q1 union $q2
+        $u = (new Expression("[] union []", [$q1, $q2]));
+        $this->assertEquals(
+            '(select `date`,`amount` `debit`,0 `credit` from `sales`) union (select `date`,0 `debit`,`amount` `credit` from `purchases`)',
+            $u->render()
+        );
+
+        // SELECT date,debit,credit FROM ($q1 union $q2)
+        $q = $this->q()
+            ->field('date,debit,credit')
+            ->table($u, 'derrivedTable')
+            ;
+        $this->assertEquals(
+            'select `date`,`debit`,`credit` from ((select `date`,`amount` `debit`,0 `credit` from `sales`) union (select `date`,0 `debit`,`amount` `credit` from `purchases`)) `derrivedTable`',
+            $q->render()
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * where() should return $this Query for chaining

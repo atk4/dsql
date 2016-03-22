@@ -179,7 +179,7 @@ class Query extends Expression
         if (is_array($table)) {
 
             if ($alias !== null) {
-                throw new Exception('Do not use alias with multiple tables in '.__METHOD__);
+                throw new Exception('Do not use single alias with multiple tables in '.__METHOD__);
             }
 
             foreach ($table as $alias => $t) {
@@ -252,7 +252,7 @@ class Query extends Expression
 
         if ($this->args['table'] instanceof Expression) {
 
-            // This will wrap into () if Query is used here
+            // This will wrap into () if Query object is used here
             return $this->_consume($this->args['table']);
         }
 
@@ -306,6 +306,11 @@ class Query extends Expression
     protected function _render_from()
     {
         return isset($this->main_table) ? 'from' : '';
+        /**
+         * @todo Imants: maybe we can change this to
+         *      return !empty($this->args['table']) ? 'from' : ''
+         * and get rid of main_table.
+         */
     }
     /// }}}
 
