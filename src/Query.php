@@ -519,20 +519,20 @@ class Query extends Expression
             if ($value === null) {
                 if ($cond === '=') {
                     $cond = 'is';
-                } elseif (in_array($cond, array('!=', '<>', 'not'))) {
+                } elseif (in_array($cond, ['!=', '<>', 'not'])) {
                     $cond = 'is not';
                 }
             }
 
             // value should be array for such conditions
-            if (($cond === 'in' || $cond === 'not in') && is_string($value)) {
+            if (in_array($cond, ['in', 'not in', 'not']) && is_string($value)) {
                 $value = array_map('trim', explode(',', $value));
             }
 
             // special conditions (IN | NOT IN) if value is array
             if (is_array($value)) {
                 $value = '('.implode(',', $this->_param($value)).')';
-                $cond = in_array($cond, array('!=', '<>', 'not', 'not in')) ? 'not in' : 'in';
+                $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
                 $ret[] = $this->_consume($field, 'escape').' '.$cond.' '.$value;
                 continue;
             }

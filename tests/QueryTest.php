@@ -44,8 +44,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testDsql()
     {
-        $q = $this->q(['connection' => new \PDO]);
-        $this->assertEquals(true, $q->dsql() instanceof \PDO);
+        $q = $this->q(['connection' => new \stdClass()]);
+        $this->assertEquals(true, $q->dsql() instanceof \stdClass);
     }
 
     /**
@@ -515,7 +515,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $this->q('[where]')->where('id=', 1)->render()
         );
         $this->assertEquals(
-            'where `id` <> :a',
+            'where `id` != :a',
             $this->q('[where]')->where('id!=', 1)->render()
         );
         $this->assertEquals(
