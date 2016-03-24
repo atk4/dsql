@@ -39,4 +39,4 @@ yet functional database query interface.
 
 ## Documentation
 
-http://dsql.readthedocs.org/en/latest/
+http://dsql.readthedocs.org/
