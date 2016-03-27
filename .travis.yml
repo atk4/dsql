@@ -3,11 +3,19 @@ php:
     - '5.5'
     - '7.0'
 
+services:
+    - mysql
+
 before_script:
     - composer install
+    - mysql -e 'create database dsql_test;'
 
 after_script:
     - vendor/bin/test-reporter
+
+script:
+    - phpunit
+    - phpunit --configuration phpunit-mysql.xml
 
 notifications:
     slack:

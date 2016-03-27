@@ -11,6 +11,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     function __construct()
     {
         $this->pdo = new \PDO( $GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD'] );
+        $this->pdo->query('created database if not exists dsql_test');
         $this->pdo->query('create temporary table employee (id int, name text, surname text, retired bool)');
     }
     protected function getConnection()
@@ -28,6 +29,9 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             $q->table('employee');
         }
         return $q;
+    }
+    private function e($template=null,$args=null){
+        return $this->q()->expr($template,$args);
     }
     public function testBasicQueries()
     {
@@ -70,6 +74,14 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(
             [['now'=>6]],
             $this->q()->field(new Expression('[]+[]',[3,3]),'now')->get()
+        );
+    }
+
+    public function testExpresison()
+    {
+        $this->assertEquals(
+            'foo',
+            $this->e('select []',['foo'])->getOne()
         );
     }
 }

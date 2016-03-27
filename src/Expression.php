@@ -8,9 +8,24 @@ namespace atk4\dsql;
  *
  * See below for call patterns
  */
-class Expression implements \ArrayAccess,\IteratorAggregate
+class Expression implements \ArrayAccess, \IteratorAggregate
 {
+    /**
+     * Template string.
+     *
+     * @var string
+     */
     protected $template = null;
+
+    /**
+     * Hash containing configuration accumulated by calling methods
+     * such as Query::field(), Query::table(), etc.
+     *
+     * $args['custom'] is used to store hash of custom template replacements.
+     *
+     * @var array
+     */
+    protected $args = ['custom' => []];
 
     /**
      * Backticks are added around all fields. Set this to blank string to avoid.
@@ -41,45 +56,60 @@ class Expression implements \ArrayAccess,\IteratorAggregate
     public $params = [];
 
     /**
-     * When you are willing to execute the query, connection needs to be specified
+     * When you are willing to execute the query, connection needs to be specified.
+     * By default this is PDO object.
+     *
+     * @var PDO
      */
     public $connection = null;
 
     /**
      * Specifying options to constructors will override default
-     * attribute values of this class
+     * attribute values of this class.
      *
-     * @param string|array $template
+     * If $properties is passed as string, then it's treated as template.
+     *
+     * @param string|array $properties
      * @param array        $arguments
      */
-    function __construct($template = [], $arguments = null)
+    public function __construct($properties = [], $arguments = null)
     {
-        if (is_string($template)) {
-            $options = ['template' => $template];
-        } elseif (is_array($template)) {
-            $options = $template;
-        } else {
-            throw new Exception('$template must be a string in Expression::__construct()');
+        // save template
+        if (is_string($properties)) {
+            $properties = ['template' => $properties];
+        } elseif (!is_array($properties)) {
+            throw new Exception('Incorect use of Expression constructor');
+        }
+        
+        // supports passing template as property value without key 'template'
+        if (isset($properties[0])) {
+            $properties['template'] = $properties[0];
+            unset($properties[0]);
         }
 
-        // new Expression('unix_timestamp([])', [$date]);
-        if ($arguments) {
+        // save arguments
+        if ($arguments !== null) {
             if (!is_array($arguments)) {
-                throw new Exception('$arguments must be an array in Expression::__construct()');
+                throw new Exception('Expression arguments must be an array');
             }
             $this->args['custom'] = $arguments;
         }
 
-        // Deal with remaining options
-        foreach ($options as $key => $val) {
+        // deal with remaining properties
+        foreach ($properties as $key => $val) {
             $this->$key = $val;
         }
     }
 
     /**
-     * ???
+     * Assigns a value to the specified offset.
+     *
+     * @param string The offset to assign the value to
+     * @param mixed  The value to set
+     * @abstracting ArrayAccess
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         if (is_null($offset)) {
             $this->args['custom'][] = $value;
         } else {
@@ -88,67 +118,78 @@ class Expression implements \ArrayAccess,\IteratorAggregate
     }
 
     /**
-     * ???
+     * Whether or not an offset exists.
+     *
+     * @param string An offset to check for
+     * @return boolean
+     * @abstracting ArrayAccess
      */
-    public function offsetExists($offset) {
-        return isset($this->args['custom'][$offset]);
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this->args['custom']);
     }
 
     /**
-     * ???
+     * Unsets an offset.
+     *
+     * @param string The offset to unset
+     * @abstracting ArrayAccess
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->args['custom'][$offset]);
     }
 
     /**
-     * ???
+     * Returns the value at specified offset.
+     *
+     * @param string The offset to retrieve
+     * @return mixed
+     * @abstracting ArrayAccess
      */
-    public function offsetGet($offset) {
-        return isset($this->args['custom'][$offset]) ? $this->args['custom'][$offset] : null;
+    public function offsetGet($offset)
+    {
+        return $this->args['custom'][$offset];
     }
 
     /**
      * Use this instead of "new Expression()" if you want to automatically bind
-     * expression to the same connection as the parent.
+     * new expression to the same connection as the parent.
+     *
+     * @param array|string $properties
+     * @param array $arguments
+     *
+     * @return Expression
      */
-    public function expr($expr, $options = [])
+    public function expr($properties = [], $arguments = null)
     {
-        $options['connection'] = $this->connection;
-        $class = get_class($this);
-        return new Expression($expr, $options);
-    }
+        $e = new Expression($properties, $arguments);
+        $e->connection = $this->connection;
 
-    /**
-     * Use this instead of "new Query()" if you want to automatically bind
-     * expression to the same connection as the parent.
-     */
-    public function dsql($options = [])
-    {
-        $options['connection'] = $this->connection;
-        return new Query($options);
+        return $e;
     }
 
     /**
      * Recursively renders sub-query or expression, combining parameters.
      * If the argument is more likely to be a field, use tick=true.
      *
-     * @param string|array|object $sql_code    Expression
-     * @param string              $escape_mode Fall-back escaping mode - param|escape|none
+     * @param mixed   $sql_code    Expression
+     * @param string  $escape_mode Fall-back escaping mode - param|escape|none
      *
      * @return string Quoted expression
      */
     protected function _consume($sql_code, $escape_mode = 'param')
     {
         if (!is_object($sql_code)) {
-            switch($escape_mode){
-                case'param':
+            switch ($escape_mode) {
+                case 'param':
                     return $this->_param($sql_code);
-                case'escape':
+                case 'escape':
                     return $this->_escape($sql_code);
-                case'none':
+                case 'none':
                     return $sql_code;
             }
+            throw new Exception(['$escape_mode value is incorrect','escape_mode'=>$escape_mode]);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
@@ -157,7 +198,7 @@ class Expression implements \ArrayAccess,\IteratorAggregate
         }
 
         if (!$sql_code instanceof Expression) {
-            throw new Exception('Foreign objects may not be passed into DSQL');
+            throw new Exception(['Only Expressions or Expressionable objects may be used in Expression','object'=>$sql_code]);
         }
 
          //|| !$sql_code instanceof Expression) {
@@ -165,10 +206,13 @@ class Expression implements \ArrayAccess,\IteratorAggregate
         $sql_code->_paramBase = &$this->_paramBase;
         $ret = $sql_code->render();
 
-        // Queries should be wrapped in most cases
+        // Queries should be wrapped in parentheses in most cases
         if ($sql_code instanceof Query) {
             $ret = '(' . $ret . ')';
         }
+        
+        // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
+        // if we unset() first, we’re safe.
         unset($sql_code->params);
         $sql_code->params = [];
 
@@ -180,28 +224,30 @@ class Expression implements \ArrayAccess,\IteratorAggregate
      * This will allow you to use reserved SQL words as table or field
      * names such as "table".
      *
-     * @param string|array $sql_code Any string or array of strings
+     * @param mixed $value Any string or array of strings
      *
      * @return string|array Escaped string or array of strings
      */
-    protected function _escape($sql_code)
+    protected function _escape($value)
     {
         // Supports array
-        if (is_array($sql_code)) {
-            return array_map([$this, '_escape'], $sql_code);
+        if (is_array($value)) {
+            return array_map(__METHOD__, $value);
         }
 
+        // in some cases we should not escape
         if (!$this->escapeChar
-            || is_object($sql_code)
-            || $sql_code === '*'
-            || strpos($sql_code, '.') !== false
-            || strpos($sql_code, '(') !== false
-            || strpos($sql_code, $this->escapeChar) !== false
+            || is_object($value)
+            || $value === '*'
+            || strpos($value, '.') !== false
+            || strpos($value, '(') !== false
+            || strpos($value, $this->escapeChar) !== false
         ) {
-            return $sql_code;
+            return $value;
         }
 
-        return $this->escapeChar . $sql_code . $this->escapeChar;
+        // in all other cases we should escape
+        return $this->escapeChar . $value . $this->escapeChar;
     }
 
     /**
@@ -216,7 +262,7 @@ class Expression implements \ArrayAccess,\IteratorAggregate
     protected function _param($value)
     {
         if (is_array($value)) {
-            return array_map([$this, '_param'], $value);
+            return array_map(__METHOD__, $value);
         }
 
         $name = $this->_paramBase;
@@ -227,7 +273,7 @@ class Expression implements \ArrayAccess,\IteratorAggregate
     }
 
     /**
-     * ???
+     * Render expression and return it as string.
      *
      * @return string Rendered query
      */
@@ -236,6 +282,10 @@ class Expression implements \ArrayAccess,\IteratorAggregate
         $nameless_count = 0;
         if (!isset($this->_paramBase)) {
             $this->_paramBase = $this->paramBase;
+        }
+
+        if ($this->template === null) {
+            throw new Exception('Template is not defined for Expression');
         }
 
         $res= preg_replace_callback(
@@ -251,13 +301,13 @@ class Expression implements \ArrayAccess,\IteratorAggregate
                 // [foo] will attempt to call $this->_render_foo()
                 $fx = '_render_'.$matches[1];
 
-                if (isset($this->args['custom'][$identifier])) {
+                if (array_key_exists($identifier,$this->args['custom'])) {
                     return $this->_consume($this->args['custom'][$identifier]);
                 } elseif (method_exists($this, $fx)) {
                     return $this->$fx();
-                } else {
-                    throw new Exception('Expression could not render ['.$identifier.']');
                 }
+
+                throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
             },
             $this->template
         );
@@ -276,21 +326,21 @@ class Expression implements \ArrayAccess,\IteratorAggregate
         $d = $this->render();
 
         $pp = array();
-        $d = preg_replace('/`([^`]*)`/', '`<font color="black">\1</font>`', $d);
+        $d = preg_replace('/`([^`]*)`/', '`<span style="color:black">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', '"<font color="green">'.
-                    htmlspecialchars(addslashes($val)).'</font>"\1', $d);
+                $d = preg_replace('/'.$key.'([^_]|$)/', '"<span style="color:green">'.
+                    htmlspecialchars(addslashes($val)).'</span>"\1', $d);
             } elseif (is_null($val)) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
-                    '<font color="black">NULL</font>\1',
+                    '<span style="color:black">NULL</span>\1',
                     $d
                 );
             } elseif (is_numeric($val)) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
-                    '<font color="red">'.$val.'</font>\1',
+                    '<span style="color:red">'.$val.'</span>\1',
                     $d
                 );
             } else {
@@ -300,12 +350,19 @@ class Expression implements \ArrayAccess,\IteratorAggregate
             $pp[] = $key;
         }
 
-        return $d." <font color='gray'>[" . implode(', ', $pp) . ']</font>';
+        return $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
     }
 
-    function execute($connection = null)
+    /**
+     * Execute expression
+     *
+     * @param PDO $connection
+     *
+     * @return PDOStatement
+     */
+    public function execute($connection = null)
     {
-        if ($connection == null) {
+        if ($connection === null) {
             $connection = $this->connection;
         }
 
@@ -314,7 +371,7 @@ class Expression implements \ArrayAccess,\IteratorAggregate
             // We support PDO
             $query = $this->render();
             $statement = $connection->prepare($query);
-            foreach ($this->params as $key=>$val) {
+            foreach ($this->params as $key => $val) {
 
                 if (is_int($val)) {
                     $type = \PDO::PARAM_INT;
@@ -325,11 +382,12 @@ class Expression implements \ArrayAccess,\IteratorAggregate
                 } elseif (is_string($val)) {
                     $type = \PDO::PARAM_STR;
                 } else {
-                    throw new Exception('Incorrect param type');
+                    throw new Exception('Incorrect param type in');
                 }
 
-                if (!$statement->bindValue($key,$val,$type)) {
-                    throw new Exception('Unable to bind parameter');
+                if (!$statement->bindValue($key, $val, $type)) {
+                    throw new Exception(['Unable to bind parameter','param'=>$key,
+                        'value'=>$val, 'type'=>$type ]);
                 }
             }
 
@@ -342,25 +400,31 @@ class Expression implements \ArrayAccess,\IteratorAggregate
         }
     }
 
-    function getIterator()
+    /**
+     * Returns ArrayIterator, for example PDOStatement
+     *
+     * @return PDOStatement
+     * @abstracting IteratorAggregate
+     */
+    public function getIterator()
     {
         return $this->execute();
     }
 
     // {{{ Result Querying
-    function get()
+    public function get()
     {
         return $this->execute()->fetchAll();
     }
 
-    function getOne()
+    public function getOne()
     {
         $data = $this->getRow();
         $one = array_shift($data);
         return $one;
     }
 
-    function getRow()
+    public function getRow()
     {
         return $this->execute()->fetch();
     }
