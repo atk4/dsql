@@ -28,8 +28,8 @@ engines:
         enabled: false
       Naming/ShortVariable:
         enabled: false
-      #CleanCode/ElseExpression:
-      #  enabled: false
+      CleanCode/ElseExpression:
+        enabled: false
   radon:
     enabled: true
 ratings:

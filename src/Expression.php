@@ -305,9 +305,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     return $this->_consume($this->args['custom'][$identifier]);
                 } elseif (method_exists($this, $fx)) {
                     return $this->$fx();
-                } else {
-                    throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
                 }
+
+                throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
             },
             $this->template
         );
