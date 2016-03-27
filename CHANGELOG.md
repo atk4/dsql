@@ -1,3 +1,7 @@
+## 1.0.0-alpha2
+
+Mainly clean up the code and added more tests.
+
 ## 1.0.0-alpha
 
 Massive release that delivers all the major functionality we will need
