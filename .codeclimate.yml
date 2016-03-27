@@ -15,6 +15,8 @@ engines:
       CyclomaticComplexity:
         enabled: true
         reportLevel: 13
+      ExcessiveClassComplexity:
+        maximum: 80
       # Disable some rules
       Controversial/CamelCaseMethodName:
         enabled: false
