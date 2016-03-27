@@ -348,8 +348,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Fully covers _consume method
-     *
      * @covers ::_consume
      */
     public function testConsume()
@@ -375,8 +373,26 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test ArrayAccess implementation
-     *
+     * @covers ::_consume
+     * @expectedException atk4\dsql\Exception
+     * @expectedExceptionMessage $escape_mode value is incorrect
+     */
+    public function testConsumeException1()
+    {
+        PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'blahblah']);
+    }
+
+    /**
+     * @covers ::_consume
+     * @expectedException atk4\dsql\Exception
+     * @expectedExceptionMessage Only Expressions or Expressionable objects may be used in Expression
+     */
+    public function testConsumeException2()
+    {
+        PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [new \StdClass()]);
+    }
+
+    /**
      * @covers ::offsetSet
      * @covers ::offsetExists
      * @covers ::offsetUnset

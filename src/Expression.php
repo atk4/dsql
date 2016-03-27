@@ -189,6 +189,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 case 'none':
                     return $sql_code;
             }
+            throw new Exception(['$escape_mode value is incorrect','escape_mode'=>$escape_mode]);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
@@ -197,7 +198,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (!$sql_code instanceof Expression) {
-            throw new Exception('Foreign objects may not be passed into DSQL in '.__METHOD__);
+            throw new Exception(['Only Expressions or Expressionable objects may be used in Expression','object'=>$sql_code]);
         }
 
          //|| !$sql_code instanceof Expression) {
