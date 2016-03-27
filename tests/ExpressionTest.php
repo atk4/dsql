@@ -3,6 +3,7 @@
 namespace atk4\dsql\tests;
 
 use atk4\dsql\Expression;
+use atk4\dsql\Expressionable;
 
 /**
  * @coversDefaultClass \atk4\dsql\Expression
@@ -305,6 +306,63 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Fully covers _param method
+     *
+     * @covers ::_param
+     */
+    public function testParam()
+    {
+        $e = new Expression('hello, [who]', ['who' => 'world']);
+        
+        $this->assertEquals(
+            'hello, :a',
+            $e->render()
+        );
+        $this->assertEquals(
+            [':a'=>'world'],
+            $e->params
+        );
+
+        $e = new Expression('hello, [who]', ['who' => 'world']);
+        
+        $this->assertEquals(
+            'hello, :a',
+            $e->render()
+        );
+        $this->assertEquals(
+            [':a'=>'world'],
+            $e->params
+        );
+    }
+
+    /**
+     * Fully covers _consume method
+     *
+     * @covers ::_consume
+     */
+    public function testConsume()
+    {
+        // few brief tests on _consume
+        $this->assertEquals(
+            '`123`',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'escape'])
+        );
+        $this->assertEquals(
+            ':x',
+            PHPUnitUtil::callProtectedMethod($this->e(['_paramBase'=>':x']), '_consume', [123, 'param'])
+        );
+        $this->assertEquals(
+            123,
+            PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'none'])
+        );
+
+        $this->assertEquals(
+            'hello, `myfield`',
+            $this->e('hello, []', [new MyField])->render()
+        );
+    }
+
+    /**
      * Test ArrayAccess implementation
      *
      * @covers ::offsetSet
@@ -325,11 +383,17 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('black', $e['cat']);
         $e['cat'] = 'white';
         $this->assertEquals('white', $e['cat']);
-        
+
         // offsetExists, offsetUnset
         $this->assertEquals(true, isset($e['cat']));
         unset($e['cat']);
         $this->assertEquals(false, isset($e['cat']));
+
+        // testing absence of specific key in asignment
+        $e = $this->e('[], []');
+        $e[]='Hello';
+        $e[]='World';
+        $this->assertEquals('"Hello", "World" [:b, :a]', strip_tags($e->getDebugQuery()));
 
         // real-life example
         $age = $this->e('coalesce([age], [default_age])');
@@ -352,7 +416,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test for vendors that rely on JavaScript expressions, instead of parameters.
      *
-     * @covers ::_param
+     * @coversNothing
      */
     public function testJsonExpression()
     {
@@ -376,6 +440,12 @@ class JsonExpression extends Expression
     public function _param($value)
     {
         return json_encode($value);
+    }
+}
+class MyField implements Expressionable {
+    function getDSQLExpression()
+    {
+        return new Expression('`myfield`');
     }
 }
 // @codingStandardsIgnoreEnd
