@@ -80,7 +80,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         } elseif (!is_array($properties)) {
             throw new Exception('Incorect use of Expression constructor');
         }
-        
+
         // supports passing template as property value without key 'template'
         if (isset($properties[0])) {
             $properties['template'] = $properties[0];
@@ -210,7 +210,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         if ($sql_code instanceof Query) {
             $ret = '(' . $ret . ')';
         }
-        
+
         // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
         // if we unset() first, we’re safe.
         unset($sql_code->params);
@@ -329,8 +329,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         $d = preg_replace('/`([^`]*)`/', '`<span style="color:black">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', '"<span style="color:green">'.
-                    htmlspecialchars(addslashes($val)).'</span>"\1', $d);
+                $d = preg_replace('/'.$key.'([^_]|$)/', '\'<span style="color:green">'.
+                    htmlspecialchars(addslashes($val)).'</span>\'\1', $d);
             } elseif (is_null($val)) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
@@ -394,7 +394,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $statement->setFetchMode(\PDO::FETCH_ASSOC);
             $statement->execute();
             return $statement;
-            
+
         } else {
             return $connection->execute($this);
         }

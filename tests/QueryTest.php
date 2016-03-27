@@ -409,7 +409,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q = $this->q()->table('user')->field($age, 'calculated_age');
 
         $this->assertEquals(
-            'select coalesce(year(now()) - year(birth_date), 18, "foo", NULL) `calculated_age` from `user` [:c, :b, :a]',
+            "select coalesce(year(now()) - year(birth_date), 18, 'foo', NULL) `calculated_age` from `user` [:c, :b, :a]",
             strip_tags($q->getDebugQuery())
         );
     }
@@ -511,7 +511,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where foo >=    bar',
             $this->q('[where]')->where('foo >=    bar')->render()
         );
-        
+
         // two parameters - field, value
         $this->assertEquals(
             'where `id` = :a',
@@ -543,7 +543,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where `id` = :a',
             $this->q('[where]')->where('id', '=', 1)->render()
         );
-        
+
         // two parameters - more_than_just_a_field, value
         $this->assertEquals(
             'where `id` = :a',
@@ -624,7 +624,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where `id` not in (:a,:b)',
             $this->q('[where]')->where('id', 'not', '1,2')->render()
         );
-        
+
         // is | is not
         $this->assertEquals(
             'where `id` is :a',
@@ -650,7 +650,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where `id` is not :a',
             $this->q('[where]')->where('id', '!=', null)->render()
         );
-        
+
         // like | not like
         $this->assertEquals(
             'where `name` like :a',
@@ -660,7 +660,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where `name` not like :a',
             $this->q('[where]')->where('name', 'not like', 'foo')->render()
         );
-        
+
         // two parameters - more_than_just_a_field, value
         // is | is not
         $this->assertEquals(
@@ -836,7 +836,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->selectTemplate('insert')
                 ->render()
         );
-        
+
         // set as array
         $this->assertEquals(
             'insert into `employee` (`time`,`name`) values (now(),:a)',
