@@ -52,7 +52,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test constructor exception - wrong 2nd parameter.
      *
-     * @covers ::__construct
      * @expectedException atk4\dsql\Exception
      * @expectedExceptionMessage Expression arguments must be an array
      */
@@ -64,7 +63,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test constructor exception - wrong 2nd parameter.
      *
-     * @covers ::__construct
      * @expectedException atk4\dsql\Exception
      * @expectedExceptionMessage Expression arguments must be an array
      */
@@ -76,7 +74,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test constructor exception - no arguments
      *
-     * @covers ::__construct
      * @expectedException atk4\dsql\Exception
      * @expectedExceptionMessage Template is not defined for Expression
      */
