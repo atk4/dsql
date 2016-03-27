@@ -8,6 +8,7 @@ services:
 
 before_script:
     - composer install
+    - mysql -e 'create database dsql_test;'
 
 after_script:
     - vendor/bin/test-reporter
@@ -15,7 +16,6 @@ after_script:
 script:
     - phpunit
     - phpunit --configuration phpunit-mysql.xml
-    - phpunit --configuration phpunit-sqlite.xml
 
 notifications:
     slack:
