@@ -25,7 +25,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @var array
      */
-    protected $args = [];
+    protected $args = ['custom' => []];
 
     /**
      * Backticks are added around all fields. Set this to blank string to avoid.
@@ -126,7 +126,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function offsetExists($offset)
     {
-        return isset($this->args['custom'][$offset]);
+        return array_key_exists($offset, $this->args['custom']);
     }
 
     /**
@@ -149,7 +149,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function offsetGet($offset)
     {
-        return isset($this->args['custom'][$offset]) ? $this->args['custom'][$offset] : null;
+        return $this->args['custom'][$offset];
     }
 
     /**
@@ -301,7 +301,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 // [foo] will attempt to call $this->_render_foo()
                 $fx = '_render_'.$matches[1];
 
-                if (isset($this->args['custom'][$identifier])) {
+                if (array_key_exists($identifier,$this->args['custom'])) {
                     return $this->_consume($this->args['custom'][$identifier]);
                 } elseif (method_exists($this, $fx)) {
                     return $this->$fx();

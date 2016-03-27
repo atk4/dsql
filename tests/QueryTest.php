@@ -374,14 +374,16 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testgetDebugQuery()
     {
-        $age = new Expression("coalesce([age], [default_age])");
+        $age = new Expression("coalesce([age], [default_age], [foo], [bar])");
         $age['age'] = new Expression("year(now()) - year(birth_date)");
         $age['default_age'] = 18;
+        $age['foo'] = 'foo';
+        $age['bar'] = null;
 
         $q = $this->q()->table('user')->field($age, 'calculated_age');
 
         $this->assertEquals(
-            'select coalesce(year(now()) - year(birth_date), 18) `calculated_age` from `user` [:a]',
+            'select coalesce(year(now()) - year(birth_date), 18, "foo", NULL) `calculated_age` from `user` [:c, :b, :a]',
             strip_tags($q->getDebugQuery())
         );
     }
