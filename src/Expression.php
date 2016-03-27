@@ -382,11 +382,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (is_string($val)) {
                     $type = \PDO::PARAM_STR;
                 } else {
-                    throw new Exception('Incorrect param type in '.__METHOD__);
+                    throw new Exception('Incorrect param type in');
                 }
 
                 if (!$statement->bindValue($key, $val, $type)) {
-                    throw new Exception('Unable to bind parameter in '.__METHOD__);
+                    throw new Exception(['Unable to bind parameter','param'=>$key,
+                        'value'=>$val, 'type'=>$type ]);
                 }
             }
 

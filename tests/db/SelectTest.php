@@ -30,6 +30,9 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         }
         return $q;
     }
+    private function e($template=null,$args=null){
+        return $this->q()->expr($template,$args);
+    }
     public function testBasicQueries()
     {
         $this->assertEquals(4, $this->getConnection()->getRowCount('employee'));
@@ -71,6 +74,14 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(
             [['now'=>6]],
             $this->q()->field(new Expression('[]+[]',[3,3]),'now')->get()
+        );
+    }
+
+    public function testExpresison()
+    {
+        $this->assertEquals(
+            'foo',
+            $this->e('select []',['foo'])->getOne()
         );
     }
 }

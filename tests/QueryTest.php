@@ -199,6 +199,32 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->q()->table(['employee','jobs'], 'u');
     }
+    /**
+     * can't use table with expression
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableExprException1()
+    {
+        $q = $this->q();
+        $q
+            ->table($q->expr('test'))
+            ->table('user');
+    }
+    /**
+     * can't use table with expression
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableExprException2()
+    {
+        $q = $this->q();
+        $q
+            ->table('user')
+            ->table($q->expr('test'));
+    }
 
     /**
      * table() should return $this Query for chaining
@@ -472,6 +498,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::where
      * @covers ::_render_where
+     * @covers ::__render_where
      */
     public function testWhereBasic()
     {
@@ -555,6 +582,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::where
      * @covers ::_render_where
+     * @covers ::__render_where
      */
     public function testWhereSpecialValues()
     {

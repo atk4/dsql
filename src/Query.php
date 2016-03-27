@@ -179,7 +179,7 @@ class Query extends Expression
         if (is_array($table)) {
 
             if ($alias !== null) {
-                throw new Exception('Do not use single alias with multiple tables in '.__METHOD__);
+                throw new Exception('You cannot use single alias with multiple tables');
             }
 
             foreach ($table as $alias => $t) {
@@ -197,7 +197,7 @@ class Query extends Expression
         if ($table instanceof Expression) {
 
             if (isset($this->args['table'])) {
-                throw new Exception('You cannot use table(expression). table() was called before. In '.__METHOD__);
+                throw new Exception('You cannot use table(expression). table() was called before');
             }
 
             $this->main_table = false;
@@ -214,7 +214,7 @@ class Query extends Expression
 
         // @todo WHY such restriction ?
         if ($this->args['table'] instanceof Expression) {
-            throw new Exception('You cannot use table(). You have already used table(expression) previously. In '.__METHOD__);
+            throw new Exception('You cannot use table(). You have already used table(expression) previously.');
         }
 
         // trim table name just in case developer called it like 'employees,    jobs'
@@ -413,12 +413,7 @@ class Query extends Expression
             if (!$cond) {
                 $matches[1] = $this->expr($field);
 
-                // @todo Imants it's useless to check again $num_args===2 here. It'll always be true.
-                if ($num_args == 2) {
-                    $cond = '=';
-                } else {
-                    $cond = null;
-                }
+                $cond = '=';
             } else {
                 $num_args++;
             }
