@@ -348,6 +348,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::render
+     * @covers atk4\dsql\Expression::_consume
+     * @covers atk4\dsql\Expression::render
      */
     public function testBasicRenderSubquery()
     {
@@ -364,7 +366,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::getDebugQuery
+     * @covers atk4\dsql\Expression::getDebugQuery
      */
     public function testgetDebugQuery()
     {
