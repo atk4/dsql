@@ -78,7 +78,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         if (is_string($properties)) {
             $properties = ['template' => $properties];
         } elseif (!is_array($properties)) {
-            throw new Exception('1st parameter must be a string or array in '.__METHOD__);
+            throw new Exception('Incorect use of Expression constructor');
         }
         
         // supports passing template as property value without key 'template'
@@ -90,7 +90,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // save arguments
         if ($arguments !== null) {
             if (!is_array($arguments)) {
-                throw new Exception('2nd parameter must be an array in '.__METHOD__);
+                throw new Exception('Expression arguments must be an array');
             }
             $this->args['custom'] = $arguments;
         }
@@ -281,6 +281,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         $nameless_count = 0;
         if (!isset($this->_paramBase)) {
             $this->_paramBase = $this->paramBase;
+        }
+
+        if ($this->template === null) {
+            throw new Exception('Template is not defined for Expression');
         }
 
         $res= preg_replace_callback(

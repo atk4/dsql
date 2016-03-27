@@ -29,10 +29,11 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Test constructor exception - wrong 1st parameter.
      *
      * @covers ::__construct
+     * @expectedException atk4\dsql\Exception
+     * @expectedExceptionMessage Incorect use of Expression constructor
      */
     public function testConstructorException_1st_1()
     {
-        $this->setExpectedException('atk4\dsql\Exception');
         $this->e(null);
     }
 
@@ -40,10 +41,11 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Test constructor exception - wrong 1st parameter.
      *
      * @covers ::__construct
+     * @expectedException atk4\dsql\Exception
+     * @expectedExceptionMessage Incorect use of Expression constructor
      */
     public function testConstructorException_1st_2()
     {
-        $this->setExpectedException('atk4\dsql\Exception');
         $this->e(false);
     }
 
@@ -51,10 +53,11 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Test constructor exception - wrong 2nd parameter.
      *
      * @covers ::__construct
+     * @expectedException atk4\dsql\Exception
+     * @expectedExceptionMessage Expression arguments must be an array
      */
     public function testConstructorException_2nd_1()
     {
-        $this->setExpectedException('atk4\dsql\Exception');
         $this->e("hello, []", false);
     }
 
@@ -62,11 +65,24 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Test constructor exception - wrong 2nd parameter.
      *
      * @covers ::__construct
+     * @expectedException atk4\dsql\Exception
+     * @expectedExceptionMessage Expression arguments must be an array
      */
     public function testConstructorException_2nd_2()
     {
-        $this->setExpectedException('atk4\dsql\Exception');
         $this->e("hello, []", "hello");
+    }
+
+    /**
+     * Test constructor exception - no arguments
+     *
+     * @covers ::__construct
+     * @expectedException atk4\dsql\Exception
+     * @expectedExceptionMessage Template is not defined for Expression
+     */
+    public function testConstructorException_0arg()
+    {
+        $this->e()->render();
     }
 
     /**
@@ -79,10 +95,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             '',
             $this->e('')->render()
-        );
-        $this->assertEquals(
-            '',
-            $this->e([])->render()
         );
     }
 
