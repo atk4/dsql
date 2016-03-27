@@ -15,7 +15,7 @@ class Exception extends \Exception
 
     function __construct(
         $message = "", 
-        int $code = 0, 
+        $code = 0, 
         Throwable $previous = null 
     ) {
         if (is_array($message)) {
