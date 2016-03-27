@@ -288,7 +288,7 @@ class Query extends Expression
         }
 
         foreach ($this->args['table'] as $row) {
-            list($table, $alias) = $row;
+            list($table, ) = $row;
 
             $table = $this->_escape($table);
 

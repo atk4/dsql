@@ -14,10 +14,11 @@ engines:
     checks:
       CyclomaticComplexity:
         enabled: true
-        reportLevel: 13
+        reportLevel: 20
       ExcessiveClassComplexity:
         maximum: 80
-      # Disable some rules
+      Design/NpathComplexity:
+        enabled: false
       Controversial/CamelCaseMethodName:
         enabled: false
       Controversial/CamelCaseParameterName:
@@ -30,6 +31,10 @@ engines:
         enabled: false
       CleanCode/ElseExpression:
         enabled: false
+
+    exclude_fingerprints:
+    - 9d462b7c90c564bf28007ee399340fad # table() NPath is too complex.
+      
   radon:
     enabled: true
 ratings:
