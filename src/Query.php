@@ -700,7 +700,7 @@ class Query extends Expression
     }
     /// }}}
 
-    // {{{ Limit 
+    // {{{ Limit
     /**
      * Limit how many rows will be returned.
      *
@@ -734,7 +734,7 @@ class Query extends Expression
     }
     // }}}
 
-    // {{{ Order 
+    // {{{ Order
     /**
      * Orders results by field or Expression. See documentation for full
      * list of possible arguments.
@@ -744,8 +744,8 @@ class Query extends Expression
      * $q->order('name desc, id asc')
      * $q->order('name',true);
      *
-     * @param string $order Order by
-     * @param string $desc  true to sort descending
+     * @param string|array $order Order by
+     * @param string|bool $desc  true to sort descending
      *
      * @return DB_dsql $this
      */
@@ -810,7 +810,7 @@ class Query extends Expression
         return ' order by '.implode(', ', array_reverse($x));
     }
     // }}}
-    
+
     // {{{ Miscelanious
     /**
      * Renders query template. If the template is not explicitly set will use "select" mode.
@@ -856,7 +856,7 @@ class Query extends Expression
     {
         $q = new Query($properties);
         $q->connection = $this->connection;
-        
+
         return $q;
     }
 
