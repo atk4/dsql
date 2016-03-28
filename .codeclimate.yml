@@ -17,8 +17,6 @@ engines:
       CyclomaticComplexity:
         enabled: true
         reportLevel: 20
-      ExcessiveClassComplexity:
-        maximum: 80
       Design/NpathComplexity:
         enabled: false
       Controversial/CamelCaseMethodName:
