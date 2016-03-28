@@ -11,6 +11,8 @@ engines:
     #config:
     #  file_extensions: "php"
     #  rulesets: "unusedcode,codesize,naming,optional_relative_path_to_custom_ruleset.xml"
+    exclude_fingerprints:
+      - 9d462b7c90c564bf28007ee399340fad # table() NPath is too complex.
     checks:
       CyclomaticComplexity:
         enabled: true
@@ -32,9 +34,6 @@ engines:
       CleanCode/ElseExpression:
         enabled: false
 
-    exclude_fingerprints:
-    - 9d462b7c90c564bf28007ee399340fad # table() NPath is too complex.
-      
   radon:
     enabled: true
 ratings:
