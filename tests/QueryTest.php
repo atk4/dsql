@@ -714,6 +714,54 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test Limits
+     *
+     * @covers ::limit
+     * @covers ::_render_limit
+     */
+    public function testLimit()
+    {
+        $this->assertEquals(
+            'limit 0, 100',
+            $this->q('[limit]')->limit(100)->render()
+        );
+        $this->assertEquals(
+            'limit 200, 100',
+            $this->q('[limit]')->limit(100,200)->render()
+        );
+    }
+
+    /**
+     * Test Order
+     *
+     * @covers ::order
+     * @covers ::_render_order
+     */
+    public function testOrder()
+    {
+        $this->assertEquals(
+            'order by `name`',
+            $this->q('[order]')->order('name')->render()
+        );
+        $this->assertEquals(
+            'order by `name`, `surname`',
+            $this->q('[order]')->order('name,surname')->render()
+        );
+        $this->assertEquals(
+            'order by `name` desc, `surname` desc',
+            $this->q('[order]')->order('name desc,surname desc')->render()
+        );
+        $this->assertEquals(
+            'order by `name` desc, `surname`',
+            $this->q('[order]')->order(['name desc','surname'])->render()
+        );
+        $this->assertEquals(
+            'order by `name` desc, `surname`',
+            $this->q('[order]')->order('surname')->order('name desc')->render()
+        );
+    }
+
+    /**
      * Combined execution of where() clauses
      *
      * @covers ::where
