@@ -115,7 +115,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testOtherQueries()
     {
-        // delete
+        // delete all data
         $this->q('employee')->delete();
         $this->assertEquals(
             0,
@@ -146,15 +146,24 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
 
         // replace
         $this->q('employee')
-            ->set(['id' => 1, 'name' => 'Peter'])
+            ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
             ->replace();
+
+        // In SQLite replace is just like insert, it just checks if there is duplicate key and if it is
+        // it deletes the row, and inserts the new one, otherwise it just inserts.
+        // So order of records after REPLACE in SQLite will be [Jane, Peter] not [Peter, Jane] as in MySQL,
+        // which in theory does the same thing, but returns [Peter, Jane] - in original order.
+        // That's why we add usort here.
+        $data = $this->q('employee')->field('id,name')->select()->fetchAll();
+        usort($data, function ($a, $b) {
+            return $a['id'] - $b['id'];
+        });
         $this->assertEquals(
             [['id'=>1, 'name'=>'Peter'], ['id'=>2, 'name'=>'Jane']],
-            $this->q('employee')->field('id,name')->select()->fetchAll()
+            $data
         );
 
         // delete
-        /**/var_dump($this->q('employee')->get());
         $this->q('employee')
             ->where('retired', 1)
             ->delete();
