@@ -1,16 +1,16 @@
 <?php
 namespace atk4\dsql\tests;
+
 use atk4\dsql\Query;
 use atk4\dsql\Expression;
-
-
 
 class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
 {
     protected $pdo;
-    function __construct()
+    
+    public function __construct()
     {
-        $this->pdo = new \PDO( $GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD'] );
+        $this->pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
         $this->pdo->query('create database if not exists dsql_test');
         $this->pdo->query('create temporary table employee (id int, name text, surname text, retired bool)');
     }
@@ -22,7 +22,8 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     {
         return $this->createFlatXMLDataSet(dirname(__FILE__).'/SelectTest.xml');
     }
-    private function q($table = null){
+    private function q($table = null)
+    {
         $q = new Query(['connection'=>$this->pdo]);
 
         if ($table !== null) {
@@ -30,8 +31,9 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         }
         return $q;
     }
-    private function e($template=null,$args=null){
-        return $this->q()->expr($template,$args);
+    private function e($template = null, $args = null)
+    {
+        return $this->q()->expr($template, $args);
     }
     public function testBasicQueries()
     {
@@ -44,7 +46,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
 
         $this->assertEquals(
             ['surname'=>'Taylor'],
-            $this->q('employee')->field('surname')->where('retired','1')->getRow()
+            $this->q('employee')->field('surname')->where('retired', '1')->getRow()
         );
 
         $this->assertEquals(
@@ -58,7 +60,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         $names = [];
-        foreach($this->q('employee')->where('retired',false) as $row){
+        foreach ($this->q('employee')->where('retired', false) as $row) {
             $names[] = $row['name'];
         }
         $this->assertEquals(
@@ -68,21 +70,20 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
 
         $this->assertEquals(
             [['now'=>4]],
-            $this->q()->field(new Expression('2+2'),'now')->get()
+            $this->q()->field(new Expression('2+2'), 'now')->get()
         );
 
         $this->assertEquals(
             [['now'=>6]],
-            $this->q()->field(new Expression('[]+[]',[3,3]),'now')->get()
+            $this->q()->field(new Expression('[]+[]', [3,3]), 'now')->get()
         );
     }
 
-    public function testExpresison()
+    public function testExpression()
     {
         $this->assertEquals(
             'foo',
-            $this->e('select []',['foo'])->getOne()
+            $this->e('select []', ['foo'])->getOne()
         );
     }
 }
-

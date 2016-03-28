@@ -13,10 +13,10 @@ class Exception extends \Exception
      */
     private $params = [];
 
-    function __construct(
-        $message = "", 
-        $code = 0, 
-        Throwable $previous = null 
+    public function __construct(
+        $message = "",
+        $code = 0,
+        Throwable $previous = null
     ) {
         if (is_array($message)) {
             // message contain additional parameters
@@ -30,7 +30,7 @@ class Exception extends \Exception
     /**
      * Follow the getter-style of PHP Exception
      */
-    function getParams()
+    public function getParams()
     {
         return $this->params;
     }

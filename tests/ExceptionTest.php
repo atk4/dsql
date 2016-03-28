@@ -32,7 +32,7 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
         try {
             $e = new Expression('hello, [world]');
             $e->render();
-        }catch(\atk4\dsql\Exception $e){
+        } catch (\atk4\dsql\Exception $e) {
             $this->assertEquals(
                 'Expression could not render tag',
                 $e->getMessage()
