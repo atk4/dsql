@@ -101,6 +101,8 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     public function testOtherQueries()
     {
         // truncate
+        /**/echo strip_tags($this->q('employee')->selectTemplate('truncate')->getDebugQuery());
+
         $this->q('employee')->truncate();
         $this->assertEquals(
             0,
@@ -139,6 +141,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         // delete
+        /**/echo strip_tags($this->q('employee')->where('retired', 1)->selectTemplate('delete')->getDebugQuery());
         $this->q('employee')
             ->where('retired', 1)
             ->delete();
