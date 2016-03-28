@@ -238,13 +238,13 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     public function testNestedExpressions()
     {
         $e1 = $this->e('Hello [who]', ['who' => 'world']);
-        
+
         $e2 = $this->e('[greeting]! How are you.', ['greeting' => $e1]);
         $e3 = $this->e('It is me again. [greeting]', ['greeting' => $e1]);
 
         $s2 = $e2->render(); // Hello :a! How are you.
         $s3 = $e3->render(); // It is me again. Hello :a
-        
+
         $e4 = $this->e('[] and good night', [$e1]);
         $s4 = $e4->render(); // Hello :a and good night
 
@@ -322,7 +322,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     public function testParam()
     {
         $e = new Expression('hello, [who]', ['who' => 'world']);
-        
+
         $this->assertEquals(
             'hello, :a',
             $e->render()
@@ -333,7 +333,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
 
         $e = new Expression('hello, [who]', ['who' => 'world']);
-        
+
         $this->assertEquals(
             'hello, :a',
             $e->render()
@@ -418,7 +418,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $e = $this->e('[], []');
         $e[]='Hello';
         $e[]='World';
-        $this->assertEquals('"Hello", "World" [:b, :a]', strip_tags($e->getDebugQuery()));
+        $this->assertEquals("'Hello', 'World' [:b, :a]", strip_tags($e->getDebugQuery()));
 
         // real-life example
         $age = $this->e('coalesce([age], [default_age])');
@@ -446,7 +446,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     public function testJsonExpression()
     {
         $e = new JsonExpression('hello, [who]', ['who' => 'world']);
-        
+
         $this->assertEquals(
             'hello, "world"',
             $e->render()

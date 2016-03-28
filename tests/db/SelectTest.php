@@ -11,7 +11,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     function __construct()
     {
         $this->pdo = new \PDO( $GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD'] );
-        $this->pdo->query('created database if not exists dsql_test');
+        $this->pdo->query('create database if not exists dsql_test');
         $this->pdo->query('create temporary table employee (id int, name text, surname text, retired bool)');
     }
     protected function getConnection()

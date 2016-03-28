@@ -22,3 +22,5 @@ notifications:
         rooms:
             - agiletoolkit:bjrKuPBf1h4cYiNxPBQ1kF6c#dsql
         on_success: change
+    email: false
+
