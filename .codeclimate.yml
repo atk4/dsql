@@ -15,8 +15,7 @@ engines:
       - 9d462b7c90c564bf28007ee399340fad # table() NPath is too complex.
     checks:
       CyclomaticComplexity:
-        enabled: true
-        reportLevel: 20
+        enabled: false
       Design/NpathComplexity:
         enabled: false
       Design/WeightedMethodCount:
