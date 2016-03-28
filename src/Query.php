@@ -13,11 +13,11 @@ class Query extends Expression
      * @var array
      */
     public $templates = [
-        'select' => 'select [field] [from] [table][where][having]',
-        'delete' => 'delete [from] [table][where][having]',
-        'insert' => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
-        'replace'=>'replace into [table_noalias] ([set_fields]) values ([set_values])',
-        'update' => 'update [table_noalias] set [set] [where]',
+        'select'   => 'select [field] [from] [table][where][having]',
+        'delete'   => 'delete [from] [table][where][having]',
+        'insert'   => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
+        'replace'  => 'replace into [table_noalias] ([set_fields]) values ([set_values])',
+        'update'   => 'update [table_noalias] set [set] [where]',
         'truncate' => 'truncate table [table_noalias]',
     ];
 
@@ -703,23 +703,62 @@ class Query extends Expression
     /// }}}
 
     // {{{ Query Modes
-    function insert()
+    /**
+     * Execute select statement
+     *
+     * @return PDOStatement
+     */
+    public function select()
+    {
+        return $this->selectTemplate('select')->execute();
+    }
+
+    /**
+     * Execute insert statement
+     *
+     * @return PDOStatement
+     */
+    public function insert()
     {
         return $this->selectTemplate('insert')->execute();
     }
-    function update()
+
+    /**
+     * Execute update statement
+     *
+     * @return PDOStatement
+     */
+    public function update()
     {
         return $this->selectTemplate('update')->execute();
     }
-    function replace()
+
+    /**
+     * Execute replace statement
+     *
+     * @return PDOStatement
+     */
+    public function replace()
     {
         return $this->selectTemplate('replace')->execute();
     }
-    function delete()
+
+    /**
+     * Execute delete statement
+     *
+     * @return PDOStatement
+     */
+    public function delete()
     {
         return $this->selectTemplate('delete')->execute();
     }
-    function truncate()
+
+    /**
+     * Execute truncate statement
+     *
+     * @return PDOStatement
+     */
+    public function truncate()
     {
         return $this->selectTemplate('truncate')->execute();
     }

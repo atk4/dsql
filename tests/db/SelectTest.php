@@ -12,7 +12,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $this->pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
         $this->pdo->query('create database if not exists dsql_test');
-        $this->pdo->query('create temporary table employee (id int, name text, surname text, retired bool)');
+        $this->pdo->query('create temporary table employee (id int not null auto_increment, name text, surname text, retired bool, primary key (id))');
     }
     protected function getConnection()
     {
@@ -84,6 +84,56 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(
             'foo',
             $this->e('select []', ['foo'])->getOne()
+        );
+    }
+
+    public function testOtherQueries()
+    {
+        // truncate
+        $this->q('employee')->truncate();
+        $this->assertEquals(
+            0,
+            $this->q('employee')->field(new Expression('count(*)'))->getOne()
+        );
+
+        // insert, auto_increment after truncate
+        $this->q('employee')
+            ->set(['name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+            ->insert();
+        $this->q('employee')
+            ->set(['id' => 2, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+            ->insert();
+        $this->assertEquals(
+            [['id'=>1, 'name'=>'John'], ['id'=>2, 'name'=>'Jane']],
+            $this->q('employee')->field('id,name')->select()->fetchAll()
+        );
+
+        // update
+        $this->q('employee')
+            ->where('name', 'John')
+            ->set('name', 'Johnny')
+            ->update();
+        $this->assertEquals(
+            [['id'=>1, 'name'=>'Johhny'], ['id'=>2, 'name'=>'Jane']],
+            $this->q('employee')->field('id,name')->select()->fetchAll()
+        );
+
+        // replace
+        $this->q('employee')
+            ->set(['id' => 1, 'name' => 'Peter'])
+            ->replace();
+        $this->assertEquals(
+            [['id'=>1, 'name'=>'Peter'], ['id'=>2, 'name'=>'Jane']],
+            $this->q('employee')->field('id,name')->select()->fetchAll()
+        );
+
+        // delete
+        $this->q('employee')
+            ->where('retired', 1)
+            ->delete();
+        $this->assertEquals(
+            [['id'=>2, 'name'=>'Jane']],
+            $this->q('employee')->field('id,name')->select()->fetchAll()
         );
     }
 }
