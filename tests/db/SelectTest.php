@@ -11,23 +11,31 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     public function __construct()
     {
         $this->pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
-        $this->pdo->query('create database if not exists dsql_test');
-        $this->pdo->query('create temporary table employee (id int not null auto_increment, name text, surname text, retired bool, primary key (id))');
+        //$this->pdo->query('create database if not exists dsql_test');
+        $this->pdo->query('create temporary table employee (id int not null, name text, surname text, retired bool, primary key (id))');
     }
+    /**
+     * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
+     */
     protected function getConnection()
     {
         return $this->createDefaultDBConnection($this->pdo, $GLOBALS['DB_DBNAME']);
     }
+    
+    /**
+     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
+     */
     protected function getDataSet()
     {
         return $this->createFlatXMLDataSet(dirname(__FILE__).'/SelectTest.xml');
     }
+    
     private function q($table = null)
     {
         $q = new Query(['connection'=>$this->pdo]);
 
         if ($table !== null) {
-            $q->table('employee');
+            $q->table($table);
         }
         return $q;
     }
@@ -35,6 +43,9 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     {
         return $this->q()->expr($template, $args);
     }
+    
+
+
     public function testBasicQueries()
     {
         $this->assertEquals(4, $this->getConnection()->getRowCount('employee'));
@@ -96,9 +107,9 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
-        // insert, auto_increment after truncate
+        // insert
         $this->q('employee')
-            ->set(['name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+            ->set(['id' => 1, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
             ->insert();
         $this->q('employee')
             ->set(['id' => 2, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
@@ -114,7 +125,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->set('name', 'Johnny')
             ->update();
         $this->assertEquals(
-            [['id'=>1, 'name'=>'Johhny'], ['id'=>2, 'name'=>'Jane']],
+            [['id'=>1, 'name'=>'Johnny'], ['id'=>2, 'name'=>'Jane']],
             $this->q('employee')->field('id,name')->select()->fetchAll()
         );
 
