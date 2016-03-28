@@ -19,6 +19,8 @@ engines:
         reportLevel: 20
       Design/NpathComplexity:
         enabled: false
+      Design/WeightedMethodCount:
+        enabled: false
       Controversial/CamelCaseMethodName:
         enabled: false
       Controversial/CamelCaseParameterName:
