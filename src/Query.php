@@ -16,7 +16,9 @@ class Query extends Expression
         'select' => 'select [field] [from] [table][where][having]',
         'delete' => 'delete [from] [table][where][having]',
         'insert' => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
+        'replace'=>'replace into [table_noalias] ([set_fields]) values ([set_values])',
         'update' => 'update [table_noalias] set [set] [where]',
+        'truncate' => 'truncate table [table_noalias]',
     ];
 
     /**
@@ -699,6 +701,29 @@ class Query extends Expression
         return implode(',', $ret);
     }
     /// }}}
+
+    // {{{ Query Modes
+    function insert()
+    {
+        return $this->selectTemplate('insert')->execute();
+    }
+    function update()
+    {
+        return $this->selectTemplate('update')->execute();
+    }
+    function replace()
+    {
+        return $this->selectTemplate('replace')->execute();
+    }
+    function delete()
+    {
+        return $this->selectTemplate('delete')->execute();
+    }
+    function truncate()
+    {
+        return $this->selectTemplate('truncate')->execute();
+    }
+    // }}}
 
     // {{{ Miscelanious
     /**
