@@ -20,9 +20,9 @@
         "codeclimate/php-test-reporter": "*"
     },
     "autoload": {
-        "psr-4": {"atk4\\dsql\\":"src"}
+        "psr-4": {"atk4\\dsql\\":"src/"}
     },
     "autoload-dev": {
-        "psr-4": {"atk4\\dsql\\tests\\":"tests"}
+        "psr-4": {"atk4\\dsql\\tests\\":"tests/"}
     }
 }
