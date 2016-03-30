@@ -13,7 +13,7 @@ class Query extends Expression
      * @var array
      */
     public $templates = [
-        'select'   => 'select [field] [from] [table][where][having]',
+        'select'   => 'select [field] [from] [table][where][having][order][limit]',
         'delete'   => 'delete [from] [table][where][having]',
         'insert'   => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
         'replace'  => 'replace into [table_noalias] ([set_fields]) values ([set_values])',
@@ -764,6 +764,117 @@ class Query extends Expression
     }
     // }}}
 
+    // {{{ Limit
+    /**
+     * Limit how many rows will be returned.
+     *
+     * @param int $cnt   Number of rows to return
+     * @param int $shift Offset, how many rows to skip
+     *
+     * @return DB_dsql $this
+     */
+    public function limit($cnt, $shift = null)
+    {
+        $this->args['limit'] = array(
+            'cnt' => $cnt,
+            'shift' => $shift,
+        );
+
+        return $this;
+    }
+    /**
+     * Renders [limit].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_limit()
+    {
+        if (isset($this->args['limit'])) {
+            return ' limit '.
+                (int) $this->args['limit']['shift'].
+                ', '.
+                (int) $this->args['limit']['cnt'];
+        }
+    }
+    // }}}
+
+    // {{{ Order
+    /**
+     * Orders results by field or Expression. See documentation for full
+     * list of possible arguments.
+     *
+     * $q->order('name');
+     * $q->order('name desc');
+     * $q->order('name desc, id asc')
+     * $q->order('name',true);
+     *
+     * @param string|array $order Order by
+     * @param string|bool $desc  true to sort descending
+     *
+     * @return DB_dsql $this
+     */
+    public function order($order, $desc = null)
+    {
+        // Case with comma-separated fields or first argument being an array
+        if (is_string($order) && strpos($order, ',') !== false) {
+            // Check for multiple
+            $order = explode(',', $order);
+        }
+        if (is_array($order)) {
+            if (!is_null($desc)) {
+                throw new Exception(
+                    'If first argument is array, second argument must not be used'
+                );
+            }
+            foreach (array_reverse($order) as $o) {
+                $this->order($o);
+            }
+
+            return $this;
+        }
+
+        // First argument may contain space, to divide field and keyword
+        if (is_null($desc) && is_string($order) && strpos($order, ' ') !== false) {
+            list($order, $desc) = array_map('trim', explode(' ', trim($order), 2));
+        }
+
+        if (is_string($order) && strpos($order, '.') !== false) {
+            $order = implode('.', $this->_escape(explode('.', $order)));
+        }
+
+        if (is_bool($desc)) {
+            $desc = $desc ? 'desc' : '';
+        } elseif (strtolower($desc) === 'asc') {
+            $desc = '';
+        } elseif ($desc && strtolower($desc) != 'desc') {
+            throw new Exception(['Incorrect ordering keyword', 'order by'=>$desc]);
+        }
+
+        $this->args['order'][] = array($order, $desc);
+
+        return $this;
+    }
+
+    /**
+     * Renders [order].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_order()
+    {
+        if (!isset($this->args['order'])) {
+            return'';
+        }
+        $x = array();
+        foreach ($this->args['order'] as $tmp) {
+            list($arg, $desc) = $tmp;
+            $x[] = $this->_consume($arg, 'escape').($desc ? (' '.$desc) : '');
+        }
+
+        return ' order by '.implode(', ', array_reverse($x));
+    }
+    // }}}
+
     // {{{ Miscelanious
     /**
      * Renders query template. If the template is not explicitly set will use "select" mode.
@@ -809,7 +920,7 @@ class Query extends Expression
     {
         $q = new Query($properties);
         $q->connection = $this->connection;
-        
+
         return $q;
     }
 
