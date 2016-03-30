@@ -98,25 +98,10 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
     }
 
-    /**
-     * WARNING: SQLite doesn't support TRUNCATE TABLE and can only use DELETE FROM instead
-     * so we disable this test while there is no solution how to run this test only on MySQL.
-     */
-    /*
-    public function testTruncate()
-    {
-        $this->q('employee')->truncate();
-        $this->assertEquals(
-            0,
-            $this->q('employee')->field(new Expression('count(*)'))->getOne()
-        );
-    }
-    */
-
     public function testOtherQueries()
     {
-        // delete all data
-        $this->q('employee')->delete();
+        // truncate table
+        $this->q('employee')->truncate();
         $this->assertEquals(
             0,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
