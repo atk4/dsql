@@ -301,7 +301,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 // [foo] will attempt to call $this->_render_foo()
                 $fx = '_render_'.$matches[1];
 
-                if (array_key_exists($identifier,$this->args['custom'])) {
+                if (array_key_exists($identifier, $this->args['custom'])) {
                     return $this->_consume($this->args['custom'][$identifier]);
                 } elseif (method_exists($this, $fx)) {
                     return $this->$fx();
