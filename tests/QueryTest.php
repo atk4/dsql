@@ -727,7 +727,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             'limit 200, 100',
-            $this->q('[limit]')->limit(100,200)->render()
+            $this->q('[limit]')->limit(100, 200)->render()
         );
     }
 

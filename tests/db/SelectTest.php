@@ -3,8 +3,8 @@ namespace atk4\dsql\tests;
 
 use atk4\dsql\Expression;
 use atk4\dsql\Query;
-use atk4\dsql\Query_MySQL;
-use atk4\dsql\Query_SQLite;
+use atk4\dsql\Query\MySQL as Query_MySQL;
+use atk4\dsql\Query\SQLite as Query_SQLite;
 
 class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
 {
