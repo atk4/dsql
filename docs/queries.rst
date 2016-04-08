@@ -1,9 +1,9 @@
 
 .. php:class:: Query
 
-==============================
-Introduction to Query Building
-==============================
+=======
+Queries
+=======
 
 Query class represents your SQL query in-the-making. Once you create object of the Query
 class, call some of the methods listed below to modify your query. To actually execute
@@ -159,6 +159,9 @@ qurey:
 Modifying your Query
 ====================
 
+Setting Table
+-------------
+
   .. php:method:: table($year)
 
       Specify a table to be used in a query.
@@ -214,6 +217,9 @@ passing another :php:class:`Query` object::
 
 Method table() can be executed several times on the same query object.
 
+Setting Fields
+--------------
+
   .. php:method:: field($fields, $table = null, $alias = null)
 
       Adds additional field that you would like to query. If never called,
@@ -264,6 +270,10 @@ specified)::
     $query->field(['time_now'=>'now()', 'time_created']);
 
 Obviously you can call field() multiple times.
+
+Setting where clauses
+---------------------
+
 
   .. php:method:: where($field, $operation, $value)
 
@@ -319,6 +329,34 @@ You can also mix and match with expressions and strings::
 .. todo::
     strict mode
 
+
+Grouping results by field
+-------------------------
+
+
+  .. php:method:: group($field)
+
+
+      Group results with same values in $field
+
+      :param mixed $field: field such as "name"
+
+The "group by" clause in SQL query accepts one or several fields. It acn also
+accept expressions. You can call `group()` with one or several comma-separated
+fields as a parameter or you can specify them in array. Additionally you can
+mix that with Expression or Expressionable objects.
+
+    $q->group('gender');
+
+    $q->group('gender,age');
+
+    $q->group(['gender', 'age']);
+
+    $q->group('gender')->group('age');
+
+    $q->group(new Expression('year(date)'));
+
+You may call group() multiple times.
 
 Internal Methods
 ================
