@@ -605,6 +605,51 @@ class Query extends Expression
     }
     // }}}
 
+    // {{{ group()
+    /**
+     * Implemens GROUP BY functionality. Simply pass either string field
+     * or expression.
+     *
+     * @param string|object $group Group by this
+     *
+     * @return DB_dsql $this
+     */
+    public function group($group)
+    {
+        // Case with comma-separated fields
+        if (is_string($group) && strpos($group, ',') !== false) {
+            $group = explode(',', $group);
+        }
+
+        if (is_array($group)) {
+            foreach($group as $g){
+                $this->args['group'][] = $g;
+            }
+            return $this;
+        }
+
+        $this->args['group'][] = $group;
+        return $this;
+    }
+
+    /**
+     * Renders [group].
+     *
+     * @return string rendered SQL chunk
+     */
+    protected function _render_group()
+    {
+        if (!isset($this->args['group'])) {
+            return '';
+        }
+
+
+        $g = implode(', ', array_map(function($a){ return $this->_consume($a, 'escape');}, $this->args['group']));
+
+        return ' group by '.$g;
+    }
+    // }}}
+
     // {{{ Set field implementation
     /**
      * Sets field value for INSERT or UPDATE statements.
