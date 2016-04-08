@@ -319,6 +319,32 @@ You can also mix and match with expressions and strings::
 .. todo::
     strict mode
 
+Joining with other tables
+-------------------------
+
+  .. php:method:: join($field)
+
+      Join results with additional table using "JOIN" statement in your query.
+
+      :param string $foreign_table: table to join (may include field and alias)
+      :param mixed  $master_field:  main field (and table) to join on or Expression
+      :param string $join_kind:     'left' (default), 'inner', etc - which type of join.
+
+When joinin with a different table, the results will be stacked by the SQL server
+so that fields from both tables are available.
+
+    $q->group('gender');
+
+    $q->group('gender,age');
+
+    $q->group(['gender', 'age']);
+
+    $q->group('gender')->group('age');
+
+    $q->group(new Expression('year(date)'));
+
+You may call group() multiple times.
+
 
 Internal Methods
 ================
