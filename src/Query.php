@@ -37,8 +37,10 @@ class Query extends Expression
     public $defaultField = '*';
 
     /**
-     * Name of database table to use in query.
-     * Will be used only if we query from one table.
+     * Name of base table to use when using default join()
+     * This is set by table(). If you are using multiple
+     * tables or selecting from expression, then $main_table
+     * is set to false as it is irrelevant.
      *
      * @var null|false|string
      */
@@ -550,11 +552,6 @@ class Query extends Expression
      */
     protected function _render_where()
     {
-        /**
-         * @todo Imants: To not duplicate code maybe replace this with
-         * $s = $this->_render_andwhere();
-         * return $s ? ' where '.$s : null;
-         */
         if (!isset($this->args['where'])) {
             return;
         }
