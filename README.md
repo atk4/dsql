@@ -1,6 +1,6 @@
 # dsql
 
-DSQL is a dynamic SQL query builder. You can write multi-vendor queries in PHP profiting from better security, clean syntax and most importantly – sub-query support. With DSQL you stay in control of when queries are executed and what data is transmitted. DSQL is easily composable – build one query and use it as a part of other qurey.
+DSQL is a dynamic SQL query builder. You can write multi-vendor queries in PHP profiting from better security, clean syntax and most importantly – sub-query support. With DSQL you stay in control of when queries are executed and what data is transmitted. DSQL is easily composable – build one query and use it as a part of other query.
 
 Goals of DSQL are:
 
@@ -31,7 +31,7 @@ $query  ->table('employees')
         ->where('birth_date','1961-05-02')
         ->field('count(*)')
         ;
-echo "Employees born on May 2 1961: ".$query->getOne();
+echo "Employees born on May 2, 1961: ".$query->getOne();
 ```
 
 ## DSQL is Part of Agile Toolkit
@@ -50,7 +50,7 @@ Our team intentionally keeps DSQL simple. The following features are deliberatly
  - no knowledge of your database schema
  - no reliance on any ussage pattern in your database or presence of specific tables
  - no decision making based on supplied data values
- - so active record or object relational mapping
+ - no active record or object relational mapping
  
 Read more on DSQL Restrictions
 
@@ -70,9 +70,9 @@ Many NoSQL databases are re-introducing SQL support today even if it's a limited
 
 ```
 // Estabish a query looking for a maximum salary
-$salary = new dsql\Query(['connection'=>$pdo]);
+$salary = new atk4\dsql\Query(['connection'=>$pdo]);
 
-// Create few expressions objects
+// Create few expression objects
 $e_ms = $salary->expr('max(salary)');
 $e_df = $salary->expr('TimeStampDiff(month, from_date, to_date)');
 
