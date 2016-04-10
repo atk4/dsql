@@ -13,7 +13,7 @@ class Query extends Expression
      * @var array
      */
     public $templates = [
-        'select'   => 'select [field] [from] [table][where][having][order][limit]',
+        'select'   => 'select [field] [from] [table][join][where][having][order][limit]',
         'delete'   => 'delete [from] [table][where][having]',
         'insert'   => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
         'replace'  => 'replace into [table_noalias] ([set_fields]) values ([set_values])',
@@ -37,8 +37,10 @@ class Query extends Expression
     public $defaultField = '*';
 
     /**
-     * Name of database table to use in query.
-     * Will be used only if we query from one table.
+     * Name of base table to use when using default join()
+     * This is set by table(). If you are using multiple
+     * tables or selecting from expression, then $main_table
+     * is set to false as it is irrelevant.
      *
      * @var null|false|string
      */
@@ -317,6 +319,153 @@ class Query extends Expression
     }
     /// }}}
 
+    // {{{ join()
+    /**
+     * Joins your query with another table. Join will use $main_table in
+     * to reference the main table, unless you specify it explicitly
+     *
+     * Examples:
+     *  $q->join('address');         // on user.address_id=address.id
+     *  $q->join('address.user_id'); // on address.user_id=user.id
+     *  $q->join('address a');       // With alias
+     *  $q->join(array('a'=>'address')); // Also alias
+     *
+     * Second argument may specify the field of the master table
+     *  $q->join('address', 'billing_id');
+     *  $q->join('address.code', 'code');
+     *  $q->join('address.code', 'user.code');
+     *
+     * Third argument may specify which kind of join to use.
+     *  $q->join('address', null, 'left');
+     *  $q->join('address.code', 'user.code', 'inner');
+     *
+     * Using array syntax you can join multiple tables too
+     *  $q->join(array('a'=>'address', 'p'=>'portfolio'));
+     *
+     * You can use expression for more complex joins
+     *  $q->join('address',
+     *      $q->orExpr()
+     *          ->where('user.billing_id=address.id')
+     *          ->where('user.technical_id=address.id')
+     *  )
+     *
+     * @param string $foreign_table  Table to join with
+     * @param mixed  $master_field   Field in master table
+     * @param string $join_kind      'left' or 'inner', etc
+     * @param string $_foreign_alias Internal, don't use
+     *
+     * @return DB_dsql $this
+     */
+    public function join(
+        $foreign_table,
+        $master_field = null,
+        $join_kind = null,
+        $_foreign_alias = null
+    ) {
+        // If array - add recursively
+        if (is_array($foreign_table)) {
+            foreach ($foreign_table as $alias => $foreign) {
+                if (is_numeric($alias)) {
+                    $alias = null;
+                }
+
+                $this->join($foreign, $master_field, $join_kind, $alias);
+            }
+
+            return $this;
+        }
+        $j = array();
+
+        if (is_null($_foreign_alias)) {
+            @list($foreign_table, $_foreign_alias) = explode(' ', $foreign_table, 2);
+        }
+
+        // Split and deduce fields
+        @list($f1, $f2) = explode('.', $foreign_table, 2);
+
+        if (is_object($master_field)) {
+            $j['expr'] = $master_field;
+        } else {
+            // Split and deduce primary table
+            if (is_null($master_field)) {
+                list($m1, $m2) = array(null, null);
+            } else {
+                list($m1, $m2) = explode('.', $master_field, 2);
+            }
+            if (is_null($m2)) {
+                $m2 = $m1;
+                $m1 = null;
+            }
+            if (is_null($m1)) {
+                $m1 = $this->main_table;
+            }
+
+            // Identify fields we use for joins
+            if (is_null($f2) && is_null($m2)) {
+                $m2 = $f1.'_id';
+            }
+            if (is_null($m2)) {
+                $m2 = 'id';
+            }
+            $j['m1'] = $m1;
+            $j['m2'] = $m2;
+        }
+        $j['f1'] = $f1;
+        if (is_null($f2)) {
+            $f2 = 'id';
+        }
+        $j['f2'] = $f2;
+
+        $j['t'] = $join_kind ?: 'left';
+        $j['fa'] = $_foreign_alias;
+
+        $this->args['join'][] = $j;
+
+        return $this;
+    }
+
+    /**
+     * Renders [join].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_join()
+    {
+        if (!isset($this->args['join'])) {
+            return'';
+        }
+        $joins = array();
+        foreach ($this->args['join'] as $j) {
+            $jj = '';
+
+            $jj .= $j['t'].' join ';
+
+            $jj .= $this->_escape($j['f1']);
+
+            if (!is_null($j['fa'])) {
+                $jj .= ' as '.$this->_escape($j['fa']);
+            }
+
+            $jj .= ' on ';
+
+            if (isset($j['expr'])) {
+                $jj .= $this->_consume($j['expr']);
+            } else {
+                $jj .=
+                    $this->_escape($j['fa'] ?: $j['f1']).'.'.
+                    $this->_escape($j['f2']).' = '.
+                    (is_null($j['m1'])?'':$this->_escape($j['m1']).'.').
+                    $this->_escape($j['m2']);
+            }
+            $joins[] = $jj;
+        }
+
+        return implode(' ', $joins);
+    }
+    // }}}
+
+
+
     // {{{ where() and having() specification and rendering
     /**
      * Adds condition to your query.
@@ -550,11 +699,6 @@ class Query extends Expression
      */
     protected function _render_where()
     {
-        /**
-         * @todo Imants: To not duplicate code maybe replace this with
-         * $s = $this->_render_andwhere();
-         * return $s ? ' where '.$s : null;
-         */
         if (!isset($this->args['where'])) {
             return;
         }
