@@ -762,6 +762,36 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test Join
+     *
+     * @covers ::join
+     * @covers ::_render_join
+     */
+    public function testJoin()
+    {
+        $this->assertEquals(
+            'left join `address` on `address`.`id` = `address_id`',
+            $this->q('[join]')->join('address')->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`id` = `address_id`',
+            $this->q('[join]')->join('address a')->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`id` = `user`.`address_id`',
+            $this->q('[join]')->table('user')->join('address a')->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`id` = `u`.`address_id`',
+            $this->q('[join]')->table('user','u')->join('address a')->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`user_id` = `u`.`id`',
+            $this->q('[join]')->table('user','u')->join('address.user_id a')->render()
+        );
+    }
+
+    /**
      * Combined execution of where() clauses
      *
      * @covers ::where
