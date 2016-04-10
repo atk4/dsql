@@ -762,6 +762,32 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test Group
+     *
+     * @covers ::group
+     * @covers ::_render_group
+     */
+    public function testGroup()
+    {
+        $this->assertEquals(
+            'group by `gender`',
+            $this->q('[group]')->group('gender')->render()
+        );
+        $this->assertEquals(
+            'group by `gender`, `age`',
+            $this->q('[group]')->group('gender,age')->render()
+        );
+        $this->assertEquals(
+            'group by `gender`, `age`',
+            $this->q('[group]')->group(['gender','age'])->render()
+        );
+        $this->assertEquals(
+            'group by `gender`, `age`',
+            $this->q('[group]')->group('gender')->group('age')->render()
+        );
+    }
+
+    /**
      * Test Join
      *
      * @covers ::join
