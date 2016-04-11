@@ -751,8 +751,8 @@ class Query extends Expression
 
     // {{{ group()
     /**
-     * Implemens GROUP BY functionality. Simply pass either string field
-     * or expression.
+     * Implements GROUP BY functionality. Simply pass either field name
+     * as string or expression.
      *
      * @param string|object $group Group by this
      *
@@ -787,8 +787,7 @@ class Query extends Expression
             return '';
         }
 
-
-        $g = implode(', ', array_map(function($a){ return $this->_consume($a, 'escape');}, $this->args['group']));
+        $g = implode(', ', array_map(function($a){return $this->_consume($a, 'escape');}, $this->args['group']));
 
         return ' group by '.$g;
     }

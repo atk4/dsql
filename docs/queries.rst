@@ -8,7 +8,7 @@ Queries
 
 Query class represents your SQL query in-the-making. Once you create object of the Query
 class, call some of the methods listed below to modify your query. To actually execute
-your query and start retrieving data, see :ref:`fetching` section.
+your query and start retrieving data, see :ref:`fetching-result` section.
 
 You should use :ref:`Query <queries>` to build a specific statements that are understood
 by your SQL database, such as SELECT or INSERT.
@@ -172,11 +172,12 @@ Modifying your Query
 Setting Table
 -------------
 
-  .. php:method:: table($table)
+  .. php:method:: table($table, $alias)
 
       Specify a table to be used in a query.
 
       :param mixed $table: table such as "employees"
+      :param mixed $alias: alias of table
       :returns: $this
 
 This method can be invoked using different combinations of arguments. Follow
@@ -480,28 +481,103 @@ Use this to order your :php:class:`Query` result-set::
     $q->order('name',true);         // .. order by name desc
 
 
-.. _fetching:
-
-Fetching data
-=============
-
-.. todo::
-
-
 Public Methods
 ==============
 
-.. todo::
+.. php:method:: field($field, $table, $alias)
 
+    Adds new column to resulting select by querying $field. See :ref:`Setting Fields`.
 
-Internal Methods
-================
+.. php:method:: table($table, $alias)
 
-.. todo::
+    Adds table to resulting query. See :ref:`Setting Table`.
 
+.. php:method:: join($foreign_table, $master_field, $join_kind, $_foreign_alias)
+
+    Joins your query with another table. Join will use $main_table to reference
+    the main table, unless you specify it explicitly. See :ref:`Joining with other tables`.
+
+.. php:method:: where($field, $cond, $value, $kind, $num_args)
+
+    Adds condition to your query. See :ref:`Setting where clauses`.
+
+.. php:method:: having($field, $cond, $value)
+
+    Adds condition to your query. Same syntax as :php:meth:`where()`.
+    See :ref:`Setting where clauses`.
+
+.. php:method:: group($group)
+
+    Group by functionality. Simply pass either field name as string or
+    :class:`Expression` object. See :ref:`Grouping results by field`.
+
+.. php:method:: set($field, $value)
+
+    Sets field value for INSERT or UPDATE statements. See :ref:`Query Modes`.
+
+.. php:method:: select()
+
+    Execute `select` statement. See :ref:`Query Modes`.
+
+.. php:method:: insert()
+
+    Execute `insert` statement. See :ref:`Query Modes`.
+
+.. php:method:: update()
+
+    Execute `update` statement. See :ref:`Query Modes`.
+
+.. php:method:: replace()
+
+    Execute `replace` statement. See :ref:`Query Modes`.
+
+.. php:method:: delete()
+
+    Execute `delete` statement. See :ref:`Query Modes`.
+
+.. php:method:: truncate()
+
+    Execute `truncate` statement. See :ref:`Query Modes`.
+
+.. php:method:: limit($cnt, $shift)
+
+    Limit how many rows will be returned. See :ref:`Limiting result-set`.
+
+.. php:method:: order($order, $desc)
+
+    Orders results by field or :class:`Expression`. See :ref:`Ordering result-set`.
+
+.. php:method:: selectTemplate($mode)
+
+    Switch template for this query. Determines what would be done on execute.
+    See :ref:`Query Modes`.
+
+.. php:method:: dsql($properties)
+
+    Use this instead of `new Query()` if you want to automatically bind
+    query to the same connection as the parent.
+
+.. php:method:: orExpr()
+
+    Returns new Query object of [or] expression.
+
+.. php:method:: andExpr()
+
+    Returns new Query object of [and] expression.
 
 Properties
 ==========
 
-.. todo::
+.. php:attr:: templates
 
+    Array of templates for basic queries. See :ref:`Query Modes`.
+
+.. php:attr:: mode
+
+    Query will use one of the predefined "templates". The mode will contain
+    name of template used. Basically it's array key of $templates property.
+    See :ref:`Query Modes`.
+
+.. php:attr:: defaultField
+
+    If no fields are defined, this field is used.
