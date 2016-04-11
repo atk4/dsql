@@ -1,6 +1,6 @@
 .. _expr:
 
-.. php:class:: Expressions
+.. php:class:: Expression
 
 ===========
 Expressions
@@ -69,41 +69,49 @@ Creating Expression
 
     use atk4\dsql;
 
-    $expr = new dsql\Expression("NOW()");
+    $expr = new Expression("NOW()");
 
-You can also use `dsql()` method to create expression, in which case
-you do not have to define "use" block:
+You can also use :php:meth:`Expression::expr()` method to create expression, in
+which case you do not have to define "use" block:
 
 .. code-block:: php
 
     $query -> where('time', '>', $query->expr('NOW()'));
+
+    // Produces: .. where `time` > NOW()
 
 You can specify some of the expression properties through first argument
 of the constructor:
 
 .. code-block:: php
 
-    $expr = new dsql\Expression(["NOW()", 'escapeChar'=>'*']);
+    $expr = new Expression(["NOW()", 'escapeChar' => '*']);
 
-Scroll down for full list of properties.
+:ref:`Scroll down <Properties>` for full list of properties.
 
-Query Template
-==============
+Expression Template
+===================
 
-When you create a template the first argument is the template. It will
-be stored in Query::$template property. The query string can contain
-arguments in a square brackers:
+When you create a template the first argument is the template. It will be stored
+in :php:attr:`Expression::$template` property. Template string can contain
+arguments in a square brackets:
 
  - `coalesce([], [])` is same as `coalesce([0], [1])`
  - `coalesce([one], [two])`
 
 Arguments can be specified immediatelly through an array as a second argument
-into constructor or you can specify parameters later
+into constructor or you can specify arguments later
 
 .. code-block:: php
 
+    $expr = new Expression(
+        "coalesce([name], [surname])",
+        ['name' => $name, 'surname' => $surname]
+    );
 
-    $expr = new dsql\Expression("coalesce([name], [surname])");
+    // is the same as
+
+    $expr = new Expression("coalesce([name], [surname])");
     $expr['name'] = $name;
     $expr['surname'] = $surname;
 
@@ -114,34 +122,86 @@ Expressions can be nested several times
 
 .. code-block:: php
 
-    $age = new dsql\Expression("coalesce([age], [default_age])");
-    $age['age'] = new dsql\Expression("year(now()) - year(birth_date)");
+    $age = new Expression("coalesce([age], [default_age])");
+    $age['age'] = new Expression("year(now()) - year(birth_date)");
     $age['default_age'] = 18;
 
-    $query -> field($age, 'calculated_age');
+    $query -> table('user') -> field($age, 'calculated_age');
 
     // select coalesce(year(now()) - year(birth_date), :a) `calculated_age` from `user`
 
-When you specify one query to another query, it will automatically take care
-of all user-defined parameters (such as 18 above) which will make sure
+When you include one query into another query, it will automatically take care
+of all user-defined parameters (such as value `18` above) which will make sure
 that SQL injections could not be introduced at any stage.
 
-Expression Rendering
-====================
+Public Methods
+==============
 
+.. php:method:: execute($connection)
 
-.. php:method:: render()
+    Executes expression using current database connection.
 
-    Converts expression into a string. Parameters are replaced with :a, :b, etc.
+.. php:method:: expr($properties, $arguments)
 
+    Creates new Expression which inherits current :php:attr:`Expression::$connection` property.
+
+.. php:method:: get()
+
+    Executes expression and return array of whole result-set.
+
+.. php:method:: getOne()
+
+    Executes expression and return first value of first row of data from result-set.
+
+.. php:method:: getRow()
+
+    Executes expression and returns one row of data from result-set.
 
 .. php:method:: getDebugQuery()
 
-    Outputs debug-query by placing parameters into their respective places. The
-    parameters will be escaped, but you should still avoid using generated
-    qurey as it can potentially make you vulnerable to SQL injection.
+    Outputs debug-query as a string by placing parameters into their respective
+    places. The parameters will be escaped, but you should still avoid using
+    generated query as it can potentially make you vulnerable to SQL injection.
 
     This method will use HTML tags to highlight parameters.
+
+.. php:method:: render()
+
+    Converts expression object to a string. Parameters are replaced with :a, :b, etc.
+
+
+Internal Methods
+================
+
+You probably won't have to use those methods, unless you're working with
+DSQL internally.
+
+  .. php:method:: _consume($sql_code)
+
+      Makes $sql_code part of $this expression. Argument may be either
+      a string (which will be escaped) or another Expression or Query.
+      If specified Query implements a "select", then it's automatically
+      placed inside brackets.
+
+      .. code-block:: php
+
+          $query->_consume('first_name');  // `first_name`
+          $query->_consume($other_query);  // will merge parameters and return string
+
+  .. php:method:: _escape($sql_code)
+
+      Surrounds $sql code with :php:attr:`Expression::$escapeChar`.
+      If escapeChar is `null` will do nothing.
+
+      Will also do nothing if it finds "*", "." or "(" character in $sql_code
+
+      .. code-block:: php
+
+          $query->_escape('first_name');  // `first_name`
+          $query->_escape('first.name');  // first.name
+          $query->_escape('(2+2)');       // (2+2)
+          $query->_escape('*');           // *
+
 
 Properties
 ==========
@@ -151,6 +211,10 @@ Properties
     Template which is used when rendering. You can set this with either
     `new Expression("show tables")` or `new Expression(["show tables"])`
     or `new Expression(["template" => "show tables"])`.
+
+.. php:attr:: connection
+
+    PDO connection object or any other DB connection object.
 
 .. php:attr:: escapeChar
 
