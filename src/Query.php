@@ -510,8 +510,8 @@ class Query extends Expression
      *  $q->where($q->orExpr()->where('a',1)->where('b',1));
      *
      * @param mixed  $field     Field, array for OR or Expression
-     * @param string $cond      Condition such as '=', '>' or 'is not'
-     * @param string $value     Value. Will be quoted unless you pass expression
+     * @param mixed  $cond      Condition such as '=', '>' or 'is not'
+     * @param mixed  $value     Value. Will be quoted unless you pass expression
      * @param string $kind      Do not use directly. Use having()
      * @param string $num_args  When $kind is passed, we can't determine number of
      *                          actual arguments, so this argumen must be specified.
@@ -751,8 +751,8 @@ class Query extends Expression
 
     // {{{ group()
     /**
-     * Implemens GROUP BY functionality. Simply pass either string field
-     * or expression.
+     * Implements GROUP BY functionality. Simply pass either field name
+     * as string or expression.
      *
      * @param string|object $group Group by this
      *
@@ -787,8 +787,7 @@ class Query extends Expression
             return '';
         }
 
-
-        $g = implode(', ', array_map(function($a){ return $this->_consume($a, 'escape');}, $this->args['group']));
+        $g = implode(', ', array_map(function($a){return $this->_consume($a, 'escape');}, $this->args['group']));
 
         return ' group by '.$g;
     }

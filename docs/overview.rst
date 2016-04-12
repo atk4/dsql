@@ -33,14 +33,14 @@ DSQL by example
 ===============
 The simplest way to explain DSQL is by example::
 
- 
+
     use atk4\dsql;
 
-    $query = new dsql\Query(['connection' => $pdo]);
+    $query = new Query(['connection' => $pdo]);
 
     $query
         ->table('employees')
-        ->where('birth_date','1961-05-02')
+        ->where('birth_date', '1961-05-02')
         ->field('count(*)')
         ;
 
@@ -57,7 +57,7 @@ DSQL can also execute queries with multiple sub-queries, joins, expressions
 grouping, ordering, unions as well as queries on result-set.
 
  - See :ref:`quickstart` if you would like to learn more about basics.
- - https://github.com/atk4/dsql-example project contains various working
+ - https://github.com/atk4/dsql-primer project contains various working
    examples of using DSQL with a real data-set.
 
 DSQL in ORM
@@ -66,21 +66,21 @@ Frankly, not many developers are keen to write queries today and prefer
 use of ORM (Object Relational Mapper). DSQL is designed in such a way
 so that a higher-level ORM library could use it in it's foundation.
 
-Agile ORM is a Functional-ORM library for PHP, that combines database
-mapping with query-building to create one of the most powerful and
-flexible database manipalation libraries available today.
+Agile ORM (https://github.com/atk4/orm) is a Functional-ORM library for PHP,
+that combines database mapping with query-building to create one of the most
+powerful and flexible database manipalation libraries available today.
 
-.. warning:: 
-    Before start using DSQL, look into Agile ORM. It may be a more approprite
+.. warning::
+    Before you start using DSQL, look into Agile ORM. It may be a more appropriate
     library tool for your application that retains full power of DSQL.
 
     If you want to learn more about Agile ORM you need to understand how
-    DSQL functions, so continue reading.
+    DSQL functions work, so continue reading.
 
 Requirements
 ============
 
-#. PHP 5.3
+#. PHP 5.5 and above
 
 .. _installation:
 
@@ -89,8 +89,8 @@ Installation
 
 The recommended way to install DSQL is with
 `Composer <http://getcomposer.org>`_. Composer is a dependency management tool
-for PHP that allows you to declare the dependencies your project needs and
-installs them into your project.
+for PHP that allows you to declare the dependencies your project has and it
+automatically installs them into your project.
 
 
 .. code-block:: bash
@@ -168,11 +168,13 @@ set database. To run them:
 
 .. code-block:: bash
 
-    phpunit --config phpunit-sqlite.xml
-    
+    # All unit tests including SQLite database engine tests
+    phpunit --config phpunit.xml
+
+    # MySQL database engine tests
     phpunit --config phpunit-mysql.xml
 
-Look inside the .xml files for further information and connection details.
+Look inside these the .xml files for further information and connection details.
 
 License
 =======
@@ -211,7 +213,7 @@ Publicly disclosing a vulnerability can put the entire community at risk. If
 you've discovered a security concern, please email us at
 security@agiletoolkit.org. We'll work with you to make sure that we understand the
 scope of the issue, and that we fully address your concern. We consider
-correspondence sent to security@guzzlephp.org our highest priority, and work to
+correspondence sent to security@agiletoolkit.org our highest priority, and work to
 address any issues that arise as quickly as possible.
 
 After a security vulnerability has been corrected, a security hotfix release will
