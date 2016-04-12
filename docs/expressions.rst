@@ -33,8 +33,8 @@ Another use of expression is to supply field instead of value and vice versa.
     // Produces: where :a between time_from and time_to
 
 Yet another curious use for the DSQL library is if you have certain object
-in your ORM define "Expressionable" interface. Then you can also use it within
-expressions:
+in your ORM implementing :php:class:`Expressionable` interface. Then you can
+also use it within expressions:
 
 .. code-block:: php
 
@@ -44,6 +44,10 @@ expressions:
     ));
 
     // Produces: where :a between `time_from` and `time_to`
+
+.. todo::
+    add more info or more precise example of Expressionable interface usage.
+
 
 Another uses for expressions could be:
 
@@ -58,8 +62,8 @@ Properties, Arguments and Parameters
 
 Be careful when using those similar terms as they refer to different things:
 
- - Properties refer to object properties, e.g. `$expr->template`
- - Arguments refer to template arguments, e.g. `select * from [table]`
+ - Properties refer to object properties, e.g. `$expr->template`, see :ref:`properties`
+ - Arguments refer to template arguments, e.g. `select * from [table]`, see :ref:`expression-template`
  - Parameters refer to the way of passing user values within a query `where id=:a`
 
 Creating Expression
@@ -71,7 +75,7 @@ Creating Expression
 
     $expr = new Expression("NOW()");
 
-You can also use :php:meth:`Expression::expr()` method to create expression, in
+You can also use :php:meth:`expr()` method to create expression, in
 which case you do not have to define "use" block:
 
 .. code-block:: php
@@ -87,13 +91,13 @@ of the constructor:
 
     $expr = new Expression(["NOW()", 'escapeChar' => '*']);
 
-:ref:`Scroll down <Properties>` for full list of properties.
+:ref:`Scroll down <properties>` for full list of properties.
 
 Expression Template
 ===================
 
 When you create a template the first argument is the template. It will be stored
-in :php:attr:`Expression::$template` property. Template string can contain
+in :php:attr:`$template` property. Template string can contain
 arguments in a square brackets:
 
  - `coalesce([], [])` is same as `coalesce([0], [1])`
@@ -143,23 +147,24 @@ Public Methods
 
 .. php:method:: expr($properties, $arguments)
 
-    Creates new Expression which inherits current :php:attr:`Expression::$connection` property.
+    Creates new :php:class:`Expression` which inherits current
+    :php:attr:`$connection` property.
 
 .. php:method:: get()
 
-    Executes expression and return array of whole result-set.
+    Executes expression and return whole result-set.
+
+.. php:method:: getRow()
+
+    Executes expression and returns first row of data from result-set.
 
 .. php:method:: getOne()
 
     Executes expression and return first value of first row of data from result-set.
 
-.. php:method:: getRow()
-
-    Executes expression and returns one row of data from result-set.
-
 .. php:method:: getDebugQuery()
 
-    Outputs debug-query as a string by placing parameters into their respective
+    Outputs query as a string by placing parameters into their respective
     places. The parameters will be escaped, but you should still avoid using
     generated query as it can potentially make you vulnerable to SQL injection.
 
@@ -167,7 +172,8 @@ Public Methods
 
 .. php:method:: render()
 
-    Converts expression object to a string. Parameters are replaced with :a, :b, etc.
+    Converts :php:class:`Expression` object to a string. Parameters are
+    replaced with :a, :b, etc.
 
 
 Internal Methods
@@ -176,40 +182,52 @@ Internal Methods
 You probably won't have to use those methods, unless you're working with
 DSQL internally.
 
-  .. php:method:: _consume($sql_code)
+.. php:method:: _consume($sql_code)
 
-      Makes $sql_code part of $this expression. Argument may be either
-      a string (which will be escaped) or another Expression or Query.
-      If specified Query implements a "select", then it's automatically
-      placed inside brackets.
+  Makes `$sql_code` part of `$this` expression. Argument may be either
+  a string (which will be escaped) or another :php:class:`Expression` or
+  :php:class:`Query`.
+  If specified :php:class:`Query` is in "select" mode, then it's
+  automatically placed inside brackets.
 
-      .. code-block:: php
+  .. code-block:: php
 
-          $query->_consume('first_name');  // `first_name`
-          $query->_consume($other_query);  // will merge parameters and return string
+      $query->_consume('first_name');  // `first_name`
+      $query->_consume($other_query);  // will merge parameters and return string
 
-  .. php:method:: _escape($sql_code)
+.. php:method:: _escape($sql_code)
 
-      Surrounds $sql code with :php:attr:`Expression::$escapeChar`.
-      If escapeChar is `null` will do nothing.
+  Surrounds `$sql code` with :php:attr:`$escapeChar`.
+  If escapeChar is `null` will do nothing.
 
-      Will also do nothing if it finds "*", "." or "(" character in $sql_code
+  Will also do nothing if it finds "*", "." or "(" character in `$sql_code`.
 
-      .. code-block:: php
+  .. code-block:: php
 
-          $query->_escape('first_name');  // `first_name`
-          $query->_escape('first.name');  // first.name
-          $query->_escape('(2+2)');       // (2+2)
-          $query->_escape('*');           // *
+      $query->_escape('first_name');  // `first_name`
+      $query->_escape('first.name');  // first.name
+      $query->_escape('(2+2)');       // (2+2)
+      $query->_escape('*');           // *
 
+.. php:method:: _param($value)
+
+    Converts value into parameter and returns reference. Used only during
+    query rendering. Consider using :php:meth:`_consume()` instead, which
+    will also handle nested expressions properly.
+
+
+
+
+.. _properties:
 
 Properties
 ==========
 
 .. php:attr:: template
 
-    Template which is used when rendering. You can set this with either
-    `new Expression("show tables")` or `new Expression(["show tables"])`
+    Template which is used when rendering.
+    You can set this with either `new Expression("show tables")`
+    or `new Expression(["show tables"])`
     or `new Expression(["template" => "show tables"])`.
 
 .. php:attr:: connection

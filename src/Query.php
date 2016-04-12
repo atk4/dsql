@@ -354,7 +354,7 @@ class Query extends Expression
      * @param string $join_kind      'left' or 'inner', etc
      * @param string $_foreign_alias Internal, don't use
      *
-     * @return DB_dsql $this
+     * @return $this
      */
     public function join(
         $foreign_table,
@@ -756,7 +756,7 @@ class Query extends Expression
      *
      * @param string|object $group Group by this
      *
-     * @return DB_dsql $this
+     * @return $this
      */
     public function group($group)
     {
@@ -959,7 +959,7 @@ class Query extends Expression
      * @param int $cnt   Number of rows to return
      * @param int $shift Offset, how many rows to skip
      *
-     * @return DB_dsql $this
+     * @return $this
      */
     public function limit($cnt, $shift = null)
     {
@@ -999,7 +999,7 @@ class Query extends Expression
      * @param string|array $order Order by
      * @param string|bool $desc  true to sort descending
      *
-     * @return DB_dsql $this
+     * @return $this
      */
     public function order($order, $desc = null)
     {
