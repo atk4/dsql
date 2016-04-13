@@ -102,6 +102,16 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Casting to string will execute expression and return getOne() value.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getOne();
+    }
+
+    /**
      * Assigns a value to the specified offset.
      *
      * @param string The offset to assign the value to
