@@ -108,7 +108,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function __toString()
     {
-        return $this->getOne();
+        try {
+            return $this->getOne();
+        } catch (\Exception $e) {
+            return $e->getMessage();
+
+        }
     }
 
     /**
@@ -422,11 +427,21 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     // {{{ Result Querying
+    /**
+     * Returns array of all selected data
+     *
+     * @return array
+     */
     public function get()
     {
         return $this->execute()->fetchAll();
     }
 
+    /**
+     * Returns one value
+     *
+     * @return string
+     */
     public function getOne()
     {
         $data = $this->getRow();
@@ -434,6 +449,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return $one;
     }
 
+    /**
+     * Returns first row of selected data
+     *
+     * @return array
+     */
     public function getRow()
     {
         return $this->execute()->fetch();

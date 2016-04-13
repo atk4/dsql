@@ -132,10 +132,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         $q = $this->q('employee')->field('surname')->where('name', 'Jack');
         $this->assertEquals(
             ['Williams', 'Williams'],
-            [
-                (string)$q,
-                (string)$q
-            ]
+            [ (string)$q, (string)$q ]
         );
         // cast custom Expression to string
         $this->assertEquals(
