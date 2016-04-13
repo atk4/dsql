@@ -457,7 +457,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return iterator_to_array($stmt);
         }
 
-        $stmt->fetchAll();
+        return $stmt->fetchAll();
     }
 
     /**
@@ -479,7 +479,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function getRow()
     {
-        return $this->execute()->current();
+        $stmt = $this->execute();
+
+
+        if($stmt instanceof \Generator){
+            return $stmt->current();
+        }
+
+        return $stmt->fetch();
     }
     // }}}
 }
