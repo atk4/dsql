@@ -102,7 +102,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * @covers Expression::__toString
+     * covers Expression::__toString, but on PHP 5.5 this hint doesn't work
      */
     public function testCastingToString()
     {
