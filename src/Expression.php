@@ -121,8 +121,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             }
             return $value;
         } catch (\Exception $e) {
-            return 'ok';
-            return false;;
             $previousHandler = set_exception_handler(function (){});
             restore_error_handler();
             if ($previousHandler !== null ) {
@@ -479,6 +477,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function getRow()
     {
+
+        // UNCOMMENT THIS FOR BUG
+        //return $this->execute()->fetch();
+
         $stmt = $this->execute();
 
 

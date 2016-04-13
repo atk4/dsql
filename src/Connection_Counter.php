@@ -15,27 +15,34 @@ class Connection_Counter extends Connection_Proxy
 
     protected $rows = 0;
 
+    public function iterate($ret){
+        foreach($ret as $key => $row) {
+            $this->rows++;
+            yield $key => $row;
+        }
+    }
+
     public function execute(Expression $expr) {
 
         $ret = parent::execute($expr);
 
 
-        foreach($ret as $key => $row) {
-            yield $key => $row;
-        }
+        return $this->iterate($ret);
+    }
+    function __destruct(){
 
-        return false; // should't be reached
+
 
         
+        return;
 
-        $ret = $this->connection->execute($expr);
         $took = time() + microtime() - $this->start_time;
 
         if ($this->callback) {
             $c = $this->callback;
             $c($expr, $took);
         } else {
-            printf("[%02.6f] %s\n", $took, strip_tags($expr->getDebugQuery()));
+            printf("[%02.6f] Queries: %i, Rows fetched: %i\n", $took, strip_tags($expr->getDebugQuery()));
         }
 
         return $ret;
