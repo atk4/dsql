@@ -8,7 +8,7 @@ use atk4\dsql\Connection;
 class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
 {
     protected $pdo;
-    
+
     public function __construct()
     {
         $this->c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
@@ -23,7 +23,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     {
         return $this->createDefaultDBConnection($this->pdo, $GLOBALS['DB_DBNAME']);
     }
-    
+
     /**
      * @return PHPUnit_Extensions_Database_DataSet_IDataSet
      */
@@ -31,13 +31,14 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     {
         return $this->createFlatXMLDataSet(dirname(__FILE__).'/SelectTest.xml');
     }
-    
-    private function q($table = null)
+
+    private function q($table = null, $alias = null)
     {
         $q = $this->c->dsql();
 
+        // add table to query if specified
         if ($table !== null) {
-            $q->table($table);
+            $q->table($table, $alias);
         }
         return $q;
     }
@@ -45,7 +46,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     {
         return $this->c->expr($template, $args);
     }
-    
+
 
 
     public function testBasicQueries()
@@ -97,6 +98,39 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(
             'foo',
             $this->e('select []', ['foo'])->getOne()
+        );
+    }
+
+    public function testCastingToString()
+    {
+        // simple value
+        $this->assertEquals(
+            'Williams',
+            (string)$this->q('employee')->field('surname')->where('name', 'Jack')
+        );
+        // table as sub-query
+        // @todo - currently this will not work on MySQL. See https://github.com/atk4/dsql/issues/33
+        /*
+        $this->assertEquals(
+            'Williams',
+            (string)$this->q($this->q('employee'), 'e2')->field('surname')->where('name', 'Jack')
+        );
+        */
+        // field as expression
+        $this->assertEquals(
+            'Williams',
+            (string)$this->q('employee')->field($this->e('surname'))->where('name', 'Jack')
+        );
+        // cast to string multiple times
+        $q = $this->q('employee')->field('surname')->where('name', 'Jack');
+        $this->assertEquals(
+            ['Williams', 'Williams'],
+            [ (string)$q, (string)$q ]
+        );
+        // cast custom Expression to string
+        $this->assertEquals(
+            '7',
+            (string)$this->e('select 3+4')
         );
     }
 
