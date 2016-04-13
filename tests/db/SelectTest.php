@@ -121,12 +121,12 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         // table as sub-query
         $this->assertEquals(
             'Williams',
-            (string)$this->q($this->q('employee'))->field('surname')->where('name', 'Jack');
+            (string)$this->q($this->q('employee'))->field('surname')->where('name', 'Jack')
         );
         // field as expression
         $this->assertEquals(
             'Jack Williams',
-            (string)$this->q('employee')->field($this->e("concat(name,' ',surname)"))->where('name', 'Jack');
+            (string)$this->q('employee')->field($this->e("concat(name,' ',surname)"))->where('name', 'Jack')
         );
         // cast to string multiple times
         $q = $this->q('employee')->field('surname')->where('name', 'Jack');
