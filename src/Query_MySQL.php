@@ -1,12 +1,10 @@
 <?php // vim:ts=4:sw=4:et:fdm=marker
 
-namespace atk4\dsql\Query;
-
-use atk4\dsql\Query;
+namespace atk4\dsql;
 
 /**
  * Perform query operation on MySQL server
  */
-class MySQL extends Query
+class Query_MySQL extends Query
 {
 }
