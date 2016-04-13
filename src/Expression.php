@@ -479,7 +479,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     {
 
         // UNCOMMENT THIS FOR BUG
-        //return $this->execute()->fetch();
+        return $this->execute()->fetch();
 
         $stmt = $this->execute();
 
