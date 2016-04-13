@@ -3,7 +3,8 @@
 namespace atk4\dsql;
 
 /**
- * 
+ * @license MIT
+ * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Connection_Counter extends Connection_Proxy
 {
@@ -15,19 +16,22 @@ class Connection_Counter extends Connection_Proxy
 
     protected $rows = 0;
 
-    public function iterate($ret){
-        foreach($ret as $key => $row) {
+    public function iterate($ret)
+    {
+        foreach ($ret as $key => $row) {
             $this->rows++;
             yield $key => $row;
         }
     }
 
-    public function execute(Expression $expr) {
-
+    public function execute(Expression $expr)
+    {
         if ($expr instanceof Query) {
             $this->queries++;
-            if ($expr->mode === 'select' || $expr->mode === null) $this->selects++;
-        }else{
+            if ($expr->mode === 'select' || $expr->mode === null) {
+                $this->selects++;
+            }
+        } else {
             $this->expressions++;
         }
 
@@ -36,14 +40,19 @@ class Connection_Counter extends Connection_Proxy
 
         return $this->iterate($ret);
     }
-    function __destruct(){
-
+    public function __destruct()
+    {
         if ($this->callback) {
             $c = $this->callback;
             $c($this->selects, $this->rows, $this->queries, $this->expressions);
         } else {
-            printf("Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n", 
-                $this->queries, $this->selects, $this->rows, $this->expressions);
+            printf(
+                "Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
+                $this->queries,
+                $this->selects,
+                $this->rows,
+                $this->expressions
+            );
         }
 
 

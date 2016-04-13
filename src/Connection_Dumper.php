@@ -3,15 +3,16 @@
 namespace atk4\dsql;
 
 /**
- * 
+ * @license MIT
+ * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Connection_Dumper extends Connection_Proxy
 {
     protected $callback  = null;
 
 
-    public function execute(Expression $expr) {
-
+    public function execute(Expression $expr)
+    {
         $this->start_time = time() + microtime();
         $ret = parent::execute($expr);
         $took = time() + microtime() - $this->start_time;

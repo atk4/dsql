@@ -3,11 +3,12 @@
 namespace atk4\dsql;
 
 /**
- * 
+ * @license MIT
+ * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Connection_Proxy extends Connection
 {
-    function connection()
+    public function connection()
     {
         return $this->connection->connection();
     }

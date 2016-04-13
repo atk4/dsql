@@ -121,9 +121,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             }
             return $value;
         } catch (\Exception $e) {
-            $previousHandler = set_exception_handler(function (){});
+            $previousHandler = set_exception_handler(function () {
+            });
             restore_error_handler();
-            if ($previousHandler !== null ) {
+            if (is_callable($previousHandler)) {
                 call_user_func($previousHandler, $e);
             }
             die($e->getMessage());
@@ -451,7 +452,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     {
         $stmt = $this->execute();
 
-        if($stmt instanceof \Generator){
+        if ($stmt instanceof \Generator) {
             return iterator_to_array($stmt);
         }
 
@@ -477,10 +478,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function getRow()
     {
-
         $stmt = $this->execute();
 
-        if($stmt instanceof \Generator){
+        if ($stmt instanceof \Generator) {
             return $stmt->current();
         }
 

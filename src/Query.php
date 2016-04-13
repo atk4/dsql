@@ -769,7 +769,7 @@ class Query extends Expression
         }
 
         if (is_array($group)) {
-            foreach($group as $g){
+            foreach ($group as $g) {
                 $this->args['group'][] = $g;
             }
             return $this;
@@ -790,7 +790,9 @@ class Query extends Expression
             return '';
         }
 
-        $g = implode(', ', array_map(function($a){return $this->_consume($a, 'escape');}, $this->args['group']));
+        $g = implode(', ', array_map(function ($a) {
+            return $this->_consume($a, 'escape');
+        }, $this->args['group']));
 
         return ' group by '.$g;
     }
