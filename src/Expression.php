@@ -102,6 +102,32 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Casting to string will execute expression and return getOne() value.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        try {
+            $value = $this->getOne();
+            if (!is_string($value)) {
+                // we must throw an exception manually here because if $value
+                // is not a string, PHP will trigger an error right after the
+                // return statement, thus escaping our try/catch.
+                throw new \LogicException(__CLASS__ . "__toString() must return a string");
+            }
+            return $value;
+        } catch (\Exception $e) {
+            $previousHandler = set_exception_handler(function (){});
+            restore_error_handler();
+            if ($previousHandler !== null ) {
+                call_user_func($previousHandler, $e);
+            }
+            die($e->getMessage());
+        }
+    }
+
+    /**
      * Assigns a value to the specified offset.
      *
      * @param string The offset to assign the value to
@@ -412,11 +438,21 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     // {{{ Result Querying
+    /**
+     * Executes expression and return whole result-set in form of array of hashes
+     *
+     * @return array
+     */
     public function get()
     {
         return $this->execute()->fetchAll();
     }
 
+    /**
+     * Executes expression and return first value of first row of data from result-set
+     *
+     * @return string
+     */
     public function getOne()
     {
         $data = $this->getRow();
@@ -424,6 +460,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return $one;
     }
 
+    /**
+     * Executes expression and returns first row of data from result-set as a hash
+     *
+     * @return array
+     */
     public function getRow()
     {
         return $this->execute()->fetch();
