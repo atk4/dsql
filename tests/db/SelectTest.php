@@ -101,6 +101,9 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
     }
 
+    /**
+     * @covers Expression::__toString
+     */
     public function testCastingToString()
     {
         // simple value
