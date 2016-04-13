@@ -5,15 +5,30 @@ namespace atk4\dsql;
 /**
  * 
  */
-class Connection_Dumper extends Connection_Proxy
+class Connection_Counter extends Connection_Proxy
 {
     protected $callback  = null;
 
+    protected $select = 0;
+    protected $query = 0;
+    protected $expressions = 0;
+
+    protected $rows = 0;
 
     public function execute(Expression $expr) {
 
-        $this->start_time = time() + microtime();
         $ret = parent::execute($expr);
+
+
+        foreach($ret as $key => $row) {
+            yield $key => $row;
+        }
+
+        return false; // should't be reached
+
+        
+
+        $ret = $this->connection->execute($expr);
         $took = time() + microtime() - $this->start_time;
 
         if ($this->callback) {

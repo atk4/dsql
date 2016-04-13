@@ -33,6 +33,17 @@ class Connection {
                     'connection'=>Connection::connect($rest)
                 ]);
 
+            case 'counter':
+                return new Connection_Counter([
+                    'connection'=>Connection::connect($rest)
+                ]);
+
+                // let PDO handle the rest
+            default:
+                return new Connection([
+                    'connection'=>new \PDO($dsn, $user, $password)
+                ]);
+
         }
     }
 

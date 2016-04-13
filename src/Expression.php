@@ -121,6 +121,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             }
             return $value;
         } catch (\Exception $e) {
+            return 'ok';
+            return false;;
             $previousHandler = set_exception_handler(function (){});
             restore_error_handler();
             if ($previousHandler !== null ) {
@@ -449,7 +451,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function get()
     {
-        return $this->execute()->fetchAll();
+        $stmt = $this->execute();
+
+        if($stmt instanceof \Generator){
+            return iterator_to_array($stmt);
+        }
+
+        $stmt->fetchAll();
     }
 
     /**
@@ -471,7 +479,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function getRow()
     {
-        return $this->execute()->fetch();
+        return $this->execute()->current();
     }
     // }}}
 }
