@@ -15,6 +15,8 @@ Contents:
     quickstart
     expressions
     queries
+    connection
+    results
 
 
 

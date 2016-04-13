@@ -59,7 +59,7 @@ Read more on DSQL Restrictions
 
 Many NoSQL databases are re-introducing SQL support today even if it's a limited subset. DSQL is designed to work with those vendors and is therefore extremely extensive. The features that come out of the box include:
 
- - querying data from [table()](http://dsql.readthedocs.org/en/latest/queries.html#modifying-your-query) or sub-select with join(), where(), order(), group(), limit(), having() and option() 
+ - querying data from [table()](http://dsql.readthedocs.org/en/latest/queries.html#modifying-your-query) or sub-select with [join()](http://dsql.readthedocs.org/en/develop/queries.html#joining-with-other-tables), where(), order(), [group()](http://dsql.readthedocs.org/en/develop/queries.html#grouping-results-by-field), limit(), having() and option() 
  - update/replace single or multiple records with set(), where() and option()
  - insert one or multiple records with set() or setAll() and option()
  - delete records with where()
