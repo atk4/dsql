@@ -394,6 +394,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         // If it's a PDO connection, we're cool
         if ($connection instanceof \PDO) {
+            $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             // We support PDO
             $query = $this->render();
             $statement = $connection->prepare($query);
