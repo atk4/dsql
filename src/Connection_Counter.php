@@ -9,8 +9,8 @@ class Connection_Counter extends Connection_Proxy
 {
     protected $callback  = null;
 
-    protected $select = 0;
-    protected $query = 0;
+    protected $selects = 0;
+    protected $queries = 0;
     protected $expressions = 0;
 
     protected $rows = 0;
@@ -24,6 +24,13 @@ class Connection_Counter extends Connection_Proxy
 
     public function execute(Expression $expr) {
 
+        if ($expr instanceof Query) {
+            $this->queries++;
+            if ($expr->mode === 'select' || $expr->mode === null) $this->selects++;
+        }else{
+            $this->expressions++;
+        }
+
         $ret = parent::execute($expr);
 
 
@@ -31,6 +38,13 @@ class Connection_Counter extends Connection_Proxy
     }
     function __destruct(){
 
+        if ($this->callback) {
+            $c = $this->callback;
+            $c($this->selects, $this->rows, $this->queries, $this->expressions);
+        } else {
+            printf("Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n", 
+                $this->queries, $this->selects, $this->rows, $this->expressions);
+        }
 
 
         
@@ -38,12 +52,6 @@ class Connection_Counter extends Connection_Proxy
 
         $took = time() + microtime() - $this->start_time;
 
-        if ($this->callback) {
-            $c = $this->callback;
-            $c($expr, $took);
-        } else {
-            printf("[%02.6f] Queries: %i, Rows fetched: %i\n", $took, strip_tags($expr->getDebugQuery()));
-        }
 
         return $ret;
     }

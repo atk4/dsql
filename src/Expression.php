@@ -480,7 +480,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         $stmt = $this->execute();
 
-
         if($stmt instanceof \Generator){
             return $stmt->current();
         }
