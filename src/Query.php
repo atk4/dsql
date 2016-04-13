@@ -4,6 +4,9 @@ namespace atk4\dsql;
 
 /**
  * Perform query operation on SQL server (such as select, insert, delete, etc)
+ *
+ * @license MIT
+ * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Query extends Expression
 {

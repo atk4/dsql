@@ -2,6 +2,12 @@
 
 namespace atk4\dsql;
 
+/**
+ * Class for establishing and maintaining connection with your database.
+ *
+ * @license MIT
+ * @copyright Agile Toolkit (c) http://agiletoolkit.org/
+ */
 class Connection {
     protected $query_class = 'atk4\dsql\Query';
     protected $expression_class = 'atk4\dsql\Expression';
