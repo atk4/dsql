@@ -52,7 +52,7 @@ grouping, ordering, unions as well as queries on result-set.
 
 
 DSQL is Part of Agile Toolkit
-===========
+=============================
 DSQL is a stand-alone and lightweight library with no dependencies and
 can be used in any PHP project, big or small.
 

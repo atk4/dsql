@@ -63,9 +63,9 @@ Be careful when using those similar terms as they refer to different things:
 Parameters
 ----------
 
-Because some values are un-safe to remais in the query and can contain dangerous
+Because some values are un-safe to use in the query and can contain dangerous
 values they are kept outside of the SQL query string and are using
-`PDO's bindParam <http://php.net/manual/en/pdostatement.bindparam.php>`_ 
+`PDO's bindParam <http://php.net/manual/en/pdostatement.bindparam.php>`_
 instead. DSQL can consist of multiple objects and each object may have
 some parameters. During `rendering`_ those parameters are joined together
 to produce one complete query.
@@ -166,11 +166,11 @@ property set. (See `Connecting to Database` on more details). In short the
 following code will connect your expression with the database::
 
     $expr = new Expression('connection'=>$pdo_dbh);
-    
+
 If you are looking to use connection :php:class:`Query` class, you may want to
 consider using a proper vendor-specific subclass::
 
-    $query = new Query_MySQL('conneciton'=>$pdo_dbh);
+    $query = new Query_MySQL('connection'=>$pdo_dbh);
 
 
 If your expression already exist and you wish to associate it with connection
@@ -178,13 +178,13 @@ you can simply change the value of :php:attr:`$connection` property::
 
     $expr -> connection = $pdo_dbh;
 
-Finally, when can pass connection class into :php:meth:`execute` directly.
+Finally, you can pass connection class into :php:meth:`execute` directly.
 
 .. php:method:: execute($connection = null)
 
     Executes expression using current database connection or the one you
     specify as the argument::
-        
+
         $stmt = $expr -> execute($pdo_dbh);
 
     returns `PDOStamement <http://php.net/manual/en/class.pdostatement.php>`_ if
@@ -198,26 +198,29 @@ Finally, when can pass connection class into :php:meth:`execute` directly.
 
 .. php:method:: expr($properties, $arguments)
 
-    Creates a new :php:class:`Expression` object that will inherits current
+    Creates a new :php:class:`Expression` object that will inherit current
     :php:attr:`$connection` property. Also if you are creating a
     vendor-specific expression/query support, this method must return
-    instance your own verison of Expression.
+    instance of your own version of Expression class.
 
-    The main principle here is the new object must be capable of working
+    The main principle here is that the new object must be capable of working
     with database connection.
 
 .. php:method:: get()
 
     Executes expression and return whole result-set in form of array of hashes::
 
-        $data = new Expression('connection'=>$pdo_dbh)->get('show databases');
+        $data = new Expression([
+                'connection' => $pdo_dbh,
+                'template'   => 'show databases'
+            ])->get();
         echo json_encode($data);
 
     The output would be
 
     .. code-block:: json
 
-        [ 
+        [
             { "Database": "mydb1" },
             { "Database": "mysql" },
             { "Database": "test" }
@@ -228,8 +231,10 @@ Finally, when can pass connection class into :php:meth:`execute` directly.
 
     Executes expression and returns first row of data from result-set as a hash::
 
-        $data = new Expression('connection'=>$pdo_dbh)
-            ->getRow('SELECT @@global.time_zone, @@session.time_zone')
+        $data = new Expression([
+                'connection' => $pdo_dbh,
+                'template'   => 'SELECT @@global.time_zone, @@session.time_zone'
+            ])->getRow()
 
         echo json_encode($data);
 
@@ -243,27 +248,29 @@ Finally, when can pass connection class into :php:meth:`execute` directly.
 
     Executes expression and return first value of first row of data from result-set::
 
-        $time = new Expression('connection'=>$pdo_dbh)->get('now()');
+        $time = new Expression([
+                'connection' => $pdo_dbh,
+                'template'   => 'now()'
+            ])->getOne();
 
 Magic an Debug Methods
 ======================
 
 .. php:method:: __toString()
 
-    You may use :php:class:`Expression` or :php:class:`Query` as a string. It will
+    You may use :php:class:`Expression` or :php:class:`Query` as a string. It will be
     automatically executed when being cast by executing :php:meth:`getOne`. Because
     the `__toString() <http://php.net/manual/en/language.oop5.magic.php#object.tostring>`_
     is not allowed to throw exceptions we encourage you not to use this format.
 
 .. php:method:: __debugInfo()
 
-    This method will is used to prepare a sensible informaiton about your query
-    when you executing ``var_dump($expr)``. The output will be HTML-safe.
-
+    This method will is used to prepare a sensible information about your query
+    when you are executing ``var_dump($expr)``. The output will be HTML-safe.
 
 .. php:method:: debug()
 
-    Calling this method will set :php:meth:`debug` into ``true`` and 
+    Calling this method will set :php:attr:`debug` into ``true`` and
     the further execution to :php:meth:`render` will also attempt
     to echo query.
 

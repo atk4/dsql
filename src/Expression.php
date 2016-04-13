@@ -439,7 +439,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     // {{{ Result Querying
     /**
-     * Returns array of all selected data
+     * Executes expression and return whole result-set in form of array of hashes
      *
      * @return array
      */
@@ -449,7 +449,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Returns one value
+     * Executes expression and return first value of first row of data from result-set
      *
      * @return string
      */
@@ -461,7 +461,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Returns first row of selected data
+     * Executes expression and returns first row of data from result-set as a hash
      *
      * @return array
      */
