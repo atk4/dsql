@@ -478,9 +478,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     public function getRow()
     {
 
-        // UNCOMMENT THIS FOR BUG
-        return $this->execute()->fetch();
-
         $stmt = $this->execute();
 
 
