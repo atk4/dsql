@@ -1,5 +1,7 @@
 # dsql
 
+[![Join the chat at https://gitter.im/atk4/dsql](https://badges.gitter.im/atk4/dsql.svg)](https://gitter.im/atk4/dsql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 DSQL is a dynamic SQL query builder. You can write multi-vendor queries in PHP profiting from better security, clean syntax and most importantly – sub-query support. With DSQL you stay in control of when queries are executed and what data is transmitted. DSQL is easily composable – build one query and use it as a part of other query.
 
 Goals of DSQL are:
