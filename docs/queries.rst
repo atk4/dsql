@@ -33,9 +33,10 @@ Method invocation principles
 ============================
 
 Methods of Query are designed to be safe to use through a higher level
-framework. Most of the methods will accept either a string or expression.
-If you pass a string, it will be escaped. Using expression you can bypass
-the escaping.
+framework. Most of the methods will accept either a string or
+:php:class:`Expression`.
+If you pass a string, it will be escaped. By using :php:class:`Expression`
+you can bypass the escaping.
 
 There are 2 types of escaping:
 
@@ -105,9 +106,9 @@ Otherwise an insert operation will be performed:
 Chaining
 ========
 
-Majority of methods return `$this` when called, which makes it pretty convenient
-for you to chain calls by using `->fx()` multiple times as illustrated in my
-last example.
+Majority of methods return `$this` when called, which makes it pretty
+convenient for you to chain calls by using `->fx()` multiple times as
+illustrated in last example.
 
 You can also combine creation of the object with method chaining:
 
@@ -127,11 +128,11 @@ treatment where it will be surrounded in brackets. Here are few examples:
         ->table('employee');
 
     $q2 = (new Query())
-        ->field('name')
-        ->table($q)
+            ->field('name')
+            ->table($q)
         );
 
-    $q->getData();
+    $q->get();
 
 This query will perform `select name from (select * from employee)`
 
@@ -154,7 +155,7 @@ This query will perform `select name from (select * from employee)`
         ->table($u)
         ;
 
-    $q->getData();
+    $q->get();
 
 This query will perform union between 2 table selects resulting in the following
 query:
@@ -184,8 +185,9 @@ This method can be invoked using different combinations of arguments. Follow
 the principle of specifying the table first, and then
 optionally provide an alias. You can specify multiple tables at the same
 time by using comma or array (although you won't be able to use the
-alias there). Using keys in your array will also
-specify the aliases::
+alias there). Using keys in your array will also specify the aliases.
+
+Basic Examples::
 
     $query->table('user');
         // SELECT * from `user`
@@ -207,7 +209,7 @@ specify the aliases::
         // SELECT * from `user` `u`, `salary` `s`
 
 Inside your query table names and aliases will always be surrounded by backticks.
-If you want to use a more complex expression, use :php:class:`Expression`::
+If you want to use a more complex expression, use :php:class:`Expression` as table::
 
     $query->table($query->expr(
         '(SELECT id FROM user UNION select id from document) tbl'
@@ -227,7 +229,7 @@ passing another :php:class:`Query` object::
 
     // SELECT `surname` FROM (SELECT * FROM employee WHERE `name` = :a)
 
-Method table() can be executed several times on the same query object.
+Method can be executed several times on the same Query object.
 
 Setting Fields
 --------------
@@ -235,11 +237,11 @@ Setting Fields
   .. php:method:: field($fields, $table = null, $alias = null)
 
       Adds additional field that you would like to query. If never called,
-      will default to `defaultField`, which normally is `*`.
+      will default to :php:attr:`defaultField`, which normally is `*`.
 
       This method has several call options. $field can be array of fields
-      and also can be an expression. If you specify expression in $field
-      then alias is mandatory.
+      and also can be an :php:class:`Expression`. If you specify expression
+      in $field then alias is mandatory.
 
       :param string|array|object $fields: Specify list of fields to fetch
       :param string $table: Optionally specify a table to query from
@@ -269,20 +271,21 @@ Basic Examples::
     $query->field(['name'=>'first_name'],'employee');
         // SELECT `employee`.`first_name` `name` from `user`
 
-If the first parameter of field method contains non-alphanumeric values such as spaces
-or brackets, then field() will assume that you're passing an expression::
+If the first parameter of field() method contains non-alphanumeric values
+such as spaces or brackets, then field() will assume that you're passing an
+expression::
 
     $query->field('now()');
 
     $query->field('now()', 'time_now');
 
-You may also pass array as first argument. In such case array keys will be used as aliases
-(if they are specified)::
+You may also pass array as first argument. In such case array keys will be
+used as aliases (if they are specified)::
 
     $query->field(['time_now'=>'now()', 'time_created']);
         // SELECT now() `time_now`, `time_created` ...
 
-Obviously you can call field() multiple times.
+Method can be executed several times on the same Query object.
 
 Setting where clauses
 ---------------------
@@ -299,11 +302,11 @@ Setting where clauses
 This method can be invoked with different arguments, as long as you specify
 them in the correct order.
 
-Pass string (field name), :php:class:`Expression` (or even :php:class:`Query`) as
+Pass string (field name), :php:class:`Expression` or even :php:class:`Query` as
 first argument. If you are using string, you may end it with operation, such as "age>"
-or "parent_id is not" DSQL will recognize <,>,=,!=,<>,is,is not.
+or "parent_id is not" DSQL will recognize <, >, =, !=, <>, is, is not.
 
-If you havent specified parameter as a part of field, specify it through a second
+If you havent specified parameter as a part of $field, specify it through a second
 parameter - $operation. If unspecified, will default to '='.
 
 Last argument is value. You can specify number, string, array or even null.
@@ -327,7 +330,7 @@ Starting with the basic examples::
     $q->where('id', [1,2]);  // renders as id in (1,2)
 
 You may call where() multiple times, and conditions are always additive (uses AND).
-The easiest way to supply OR condition is if you specify multiple condition
+The easiest way to supply OR condition is to specify multiple conditions
 through array::
 
     $q->where([['name', 'like', '%john%'], ['surname', 'like', '%john%']);
@@ -341,6 +344,8 @@ You can also mix and match with expressions and strings::
     $q->where([['name', 'like', '%john%'], new Expression('surname is null')]);
         // .. WHERE `name` like '%john%' AND surname is null
 
+Method can be executed several times on the same Query object.
+
 .. todo::
     strict mode
 
@@ -353,6 +358,7 @@ Grouping results by field
       Group results with same values in $field
 
       :param mixed $field: field such as "name"
+      :returns: $this
 
 The "group by" clause in SQL query accepts one or several fields. It can also
 accept expressions. You can call `group()` with one or several comma-separated
@@ -371,7 +377,7 @@ Few examples::
 
     $q->group(new Expression('year(date)'));
 
-You may call group() multiple times.
+Method can be executed several times on the same Query object.
 
 
 Joining with other tables
@@ -384,8 +390,9 @@ Joining with other tables
       :param string|array $foreign_table: table to join (may include field and alias)
       :param mixed  $master_field:  main field (and table) to join on or Expression
       :param string $join_kind:     'left' (default), 'inner', 'right' etc - which join type to use
+      :returns: $this
 
-When joinin with a different table, the results will be stacked by the SQL server
+When joining with a different table, the results will be stacked by the SQL server
 so that fields from both tables are available. The first argument can specify
 the table to join, but may contain more information::
 
@@ -446,6 +453,8 @@ and you'll have to define name of the table explicitly::
 The third argument specifies type of join and defaults to "left" join. You can specify
 "inner", "straight" or any other join type that your database support.
 
+Method can be executed several times on the same Query object.
+
 
 Limiting result-set
 -------------------
@@ -456,6 +465,7 @@ Limiting result-set
 
       :param int $cnt: number of rows to return
       :param int $shift: offset, how many rows to skip
+      :returns: $this
 
 Use this to limit your :php:class:`Query` result-set::
 
@@ -468,10 +478,12 @@ Ordering result-set
 
   .. php:method:: order($order, $desc)
 
-      Orders query result-set.
+      Orders query result-set in ascending or descending order by single or
+      multiple fields.
 
       :param int $order: one or more field names, expression etc.
       :param int $desc: pass true to sort descending
+      :returns: $this
 
 Use this to order your :php:class:`Query` result-set::
 
@@ -479,6 +491,8 @@ Use this to order your :php:class:`Query` result-set::
     $q->order('name desc');         // .. order by name desc
     $q->order('name desc, id asc')  // .. order by name desc, id asc
     $q->order('name',true);         // .. order by name desc
+
+Method can be executed several times on the same Query object.
 
 
 Public Methods
