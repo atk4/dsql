@@ -152,7 +152,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->insert();
         $this->assertEquals(
             [['id'=>1, 'name'=>'John'], ['id'=>2, 'name'=>'Jane']],
-            $this->q('employee')->field('id,name')->select()->fetchAll()
+            $this->q('employee')->field('id,name')->get()
         );
 
         // update
@@ -162,7 +162,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->update();
         $this->assertEquals(
             [['id'=>1, 'name'=>'Johnny'], ['id'=>2, 'name'=>'Jane']],
-            $this->q('employee')->field('id,name')->select()->fetchAll()
+            $this->q('employee')->field('id,name')->get()
         );
 
         // replace
@@ -175,7 +175,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         // So order of records after REPLACE in SQLite will be [Jane, Peter] not [Peter, Jane] as in MySQL,
         // which in theory does the same thing, but returns [Peter, Jane] - in original order.
         // That's why we add usort here.
-        $data = $this->q('employee')->field('id,name')->select()->fetchAll();
+        $data = $this->q('employee')->field('id,name')->get();
         usort($data, function ($a, $b) {
             return $a['id'] - $b['id'];
         });
@@ -190,7 +190,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->delete();
         $this->assertEquals(
             [['id'=>2, 'name'=>'Jane']],
-            $this->q('employee')->field('id,name')->select()->fetchAll()
+            $this->q('employee')->field('id,name')->get()
         );
     }
 }

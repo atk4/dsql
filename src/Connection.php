@@ -1,4 +1,4 @@
-<?php
+<?php // vim:ts=4:sw=4:et:fdm=marker
 
 namespace atk4\dsql;
 
@@ -8,16 +8,17 @@ namespace atk4\dsql;
  * @license MIT
  * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
-class Connection {
+class Connection
+{
     protected $query_class = 'atk4\dsql\Query';
     protected $expression_class = 'atk4\dsql\Expression';
     protected $connection = null;
 
-    static function connect($dsn, $user=null, $password=null){
+    public static function connect($dsn, $user = null, $password = null)
+    {
+        list($driver, $rest) = explode(':', $dsn, 2);
 
-        list($driver,$rest)=explode(':',$dsn,2);
-
-        switch(strtolower($driver)){
+        switch (strtolower($driver)) {
             case 'mysql':
                 return new Connection([
                     'connection'=>new \PDO($dsn, $user, $password),
@@ -33,6 +34,17 @@ class Connection {
                     'connection'=>Connection::connect($rest)
                 ]);
 
+            case 'counter':
+                return new Connection_Counter([
+                    'connection'=>Connection::connect($rest)
+                ]);
+
+                // let PDO handle the rest
+            default:
+                return new Connection([
+                    'connection'=>new \PDO($dsn, $user, $password)
+                ]);
+
         }
     }
 
@@ -44,8 +56,10 @@ class Connection {
      */
     public function __construct($attributes = null)
     {
-        if ($attributes) foreach ($attributes as $key => $val) {
-            $this->$key = $val;
+        if ($attributes) {
+            foreach ($attributes as $key => $val) {
+                $this->$key = $val;
+            }
         }
     }
 
@@ -67,14 +81,13 @@ class Connection {
         return $e;
     }
 
-    function connection() 
+    public function connection()
     {
         return $this->connection;
     }
 
-    function execute(Expression $expr)
+    public function execute(Expression $expr)
     {
-
         // If custom connection is set, execute again using that
         if ($this->connection && $this->connection !== $this) {
             return $expr->execute($this->connection);

@@ -809,11 +809,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             'left join `address` as `a` on `a`.`id` = `u`.`address_id`',
-            $this->q('[join]')->table('user','u')->join('address a')->render()
+            $this->q('[join]')->table('user', 'u')->join('address a')->render()
         );
         $this->assertEquals(
             'left join `address` as `a` on `a`.`user_id` = `u`.`id`',
-            $this->q('[join]')->table('user','u')->join('address.user_id a')->render()
+            $this->q('[join]')->table('user', 'u')->join('address.user_id a')->render()
         );
     }
 
