@@ -1,10 +1,9 @@
 <?php
 namespace atk4\dsql\tests;
 
-use atk4\dsql\Expression;
 use atk4\dsql\Query;
-use atk4\dsql\Query\MySQL as Query_MySQL;
-use atk4\dsql\Query\SQLite as Query_SQLite;
+use atk4\dsql\Expression;
+use atk4\dsql\Connection;
 
 class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
 {
@@ -12,7 +11,9 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     
     public function __construct()
     {
-        $this->pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
+        $this->c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
+        $this->pdo = $this->c->connection();
+
         $this->pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
     }
     /**
@@ -33,17 +34,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     
     private function q($table = null)
     {
-        $engine = strtolower(explode(':', $GLOBALS['DB_DSN'])[0]);
-        switch ($engine) {
-            case 'sqlite':
-                $q = new Query_SQLite(['connection'=>$this->pdo]);
-                break;
-            case 'mysql':
-                $q = new Query_MySQL(['connection'=>$this->pdo]);
-                break;
-            default:
-                $q = new Query(['connection'=>$this->pdo]);
-        }
+        $q = $this->c->dsql();
 
         if ($table !== null) {
             $q->table($table);
@@ -52,7 +43,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     }
     private function e($template = null, $args = null)
     {
-        return $this->q()->expr($template, $args);
+        return $this->c->expr($template, $args);
     }
     
 
