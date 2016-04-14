@@ -11,8 +11,6 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test constructor
-     *
-     * @covers ::__construct
      */
     public function testInit()
     {
