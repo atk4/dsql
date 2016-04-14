@@ -198,6 +198,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->q()->table(['employee','jobs'], 'u');
     }
+
+    /**
+     * Alias is mandatory when pass table as Expression
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException3()
+    {
+        $this->q()->table($this->q()->expr('test'));
+    }
+
+    /**
+     * Alias is mandatory when pass table as Query
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException4()
+    {
+        $this->q()->table($this->q()->table('test'));
+    }
+
     /**
      * can't use table with expression
      *
@@ -211,6 +234,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->table($q->expr('test'))
             ->table('user');
     }
+
     /**
      * can't use table with expression
      *
@@ -344,9 +368,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q = $this->q()->table('employee');
 
         $this->assertEquals(
-            'select `name` from (select * from `employee`)',
+            'select `e`.`name` from (select * from `employee`) `e`',
             $this->q()
-                ->field('name')->table($q)
+                ->field('name')->table($q, 'e')
                 ->render()
         );
 
@@ -437,7 +461,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testVarDump3()
     {
         $this->expectOutputRegex('/.*Hello :a.*/');
-        var_dump(new Expression('Hello [world]',['world'=>'php']));
+        var_dump(new Expression('Hello [world]', ['world'=>'php']));
     }
 
     /**
@@ -869,13 +893,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'left join `bank_details` on `bank_details`.`id` = `bank`.`details_id`',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a'=>'address.user_id','b'=>'bank'])
-                ->join('bank_details','bank.details_id')->render()
+                ->join('bank_details', 'bank.details_id')->render()
         );
 
         $this->assertEquals(
             'left join `address` as `a` on a.name like u.pattern',
             $this->q('[join]')->table('user', 'u')
-                ->join('address a',new Expression('a.name like u.pattern'))->render()
+                ->join('address a', new Expression('a.name like u.pattern'))->render()
         );
     }
 
@@ -926,8 +950,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'update `user` set `active`=:a  where `id` in (select `user_id` from `expired_users`)',
             $this->q()
                 ->table('user')
-                ->where('id','in',$user_ids)
-                ->set('active',0)
+                ->where('id', 'in', $user_ids)
+                ->set('active', 0)
                 ->selectTemplate('update')
                 ->render()
         );

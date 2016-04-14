@@ -123,7 +123,7 @@ class Query extends Expression
         $ret = [];
 
         // If no fields were defined, use defaultField
-        if (!isset($this->args['fields']) || empty($this->args['fields'])) {
+        if (empty($this->args['fields'])) {
             if ($this->defaultField instanceof Expression) {
                 return $this->_consume($this->defaultField);
             }
@@ -298,11 +298,16 @@ class Query extends Expression
                 throw new Exception('Table cannot be expression for UPDATE, INSERT etc. queries');
             }
 
+            // add alias only if it's not the same as table name
+            if ($add_alias === false || (is_string($table) && $alias === $table)) {
+                $alias = '';
+            }
+
             // consume or escape table
             $table = $this->_consume($table, 'escape');
 
             // add alias if it's not the same as table name
-            if ($add_alias && $alias != $table) {
+            if ($alias) {
                 $table .= ' ' . $this->_escape($alias);
             }
 
@@ -385,7 +390,7 @@ class Query extends Expression
 
     // {{{ join()
     /**
-     * Joins your query with another table. Join will use $main_table in
+     * Joins your query with another table. Join will use $main_table
      * to reference the main table, unless you specify it explicitly
      *
      * Examples:
