@@ -409,7 +409,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q = $this->q()->table('user')->field($age, 'calculated_age');
 
         $this->assertEquals(
-            'select coalesce(year(now()) - year(birth_date), 18, "foo", NULL) `calculated_age` from `user` [:c, :b, :a]',
+            "select coalesce(year(now()) - year(birth_date), 18, 'foo', NULL) `calculated_age` from `user` [:c, :b, :a]",
             strip_tags($q->getDebugQuery())
         );
     }
@@ -511,7 +511,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where foo >=    bar',
             $this->q('[where]')->where('foo >=    bar')->render()
         );
-        
+
         // two parameters - field, value
         $this->assertEquals(
             'where `id` = :a',
@@ -543,7 +543,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where `id` = :a',
             $this->q('[where]')->where('id', '=', 1)->render()
         );
-        
+
         // two parameters - more_than_just_a_field, value
         $this->assertEquals(
             'where `id` = :a',
@@ -624,7 +624,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where `id` not in (:a,:b)',
             $this->q('[where]')->where('id', 'not', '1,2')->render()
         );
-        
+
         // is | is not
         $this->assertEquals(
             'where `id` is :a',
@@ -650,7 +650,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where `id` is not :a',
             $this->q('[where]')->where('id', '!=', null)->render()
         );
-        
+
         // like | not like
         $this->assertEquals(
             'where `name` like :a',
@@ -660,7 +660,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where `name` not like :a',
             $this->q('[where]')->where('name', 'not like', 'foo')->render()
         );
-        
+
         // two parameters - more_than_just_a_field, value
         // is | is not
         $this->assertEquals(
@@ -714,6 +714,110 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test Limits
+     *
+     * @covers ::limit
+     * @covers ::_render_limit
+     */
+    public function testLimit()
+    {
+        $this->assertEquals(
+            'limit 0, 100',
+            $this->q('[limit]')->limit(100)->render()
+        );
+        $this->assertEquals(
+            'limit 200, 100',
+            $this->q('[limit]')->limit(100, 200)->render()
+        );
+    }
+
+    /**
+     * Test Order
+     *
+     * @covers ::order
+     * @covers ::_render_order
+     */
+    public function testOrder()
+    {
+        $this->assertEquals(
+            'order by `name`',
+            $this->q('[order]')->order('name')->render()
+        );
+        $this->assertEquals(
+            'order by `name`, `surname`',
+            $this->q('[order]')->order('name,surname')->render()
+        );
+        $this->assertEquals(
+            'order by `name` desc, `surname` desc',
+            $this->q('[order]')->order('name desc,surname desc')->render()
+        );
+        $this->assertEquals(
+            'order by `name` desc, `surname`',
+            $this->q('[order]')->order(['name desc','surname'])->render()
+        );
+        $this->assertEquals(
+            'order by `name` desc, `surname`',
+            $this->q('[order]')->order('surname')->order('name desc')->render()
+        );
+    }
+
+    /**
+     * Test Group
+     *
+     * @covers ::group
+     * @covers ::_render_group
+     */
+    public function testGroup()
+    {
+        $this->assertEquals(
+            'group by `gender`',
+            $this->q('[group]')->group('gender')->render()
+        );
+        $this->assertEquals(
+            'group by `gender`, `age`',
+            $this->q('[group]')->group('gender,age')->render()
+        );
+        $this->assertEquals(
+            'group by `gender`, `age`',
+            $this->q('[group]')->group(['gender','age'])->render()
+        );
+        $this->assertEquals(
+            'group by `gender`, `age`',
+            $this->q('[group]')->group('gender')->group('age')->render()
+        );
+    }
+
+    /**
+     * Test Join
+     *
+     * @covers ::join
+     * @covers ::_render_join
+     */
+    public function testJoin()
+    {
+        $this->assertEquals(
+            'left join `address` on `address`.`id` = `address_id`',
+            $this->q('[join]')->join('address')->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`id` = `address_id`',
+            $this->q('[join]')->join('address a')->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`id` = `user`.`address_id`',
+            $this->q('[join]')->table('user')->join('address a')->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`id` = `u`.`address_id`',
+            $this->q('[join]')->table('user', 'u')->join('address a')->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`user_id` = `u`.`id`',
+            $this->q('[join]')->table('user', 'u')->join('address.user_id a')->render()
+        );
+    }
+
+    /**
      * Combined execution of where() clauses
      *
      * @covers ::where
@@ -752,6 +856,21 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->field('name')->table('employee')->where('employee.a', 1)
                 ->render()
         );
+
+
+        $user_ids = $this->q()->table('expired_users')->field('user_id');
+
+        $this->assertEquals(
+            'update `user` set `active`=:a  where `id` in (select `user_id` from `expired_users`)',
+            $this->q()
+                ->table('user')
+                ->where('id','in',$user_ids)
+                ->set('active',0)
+                ->selectTemplate('update')
+                ->render()
+        );
+
+
     }
 
     /**
@@ -836,7 +955,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->selectTemplate('insert')
                 ->render()
         );
-        
+
         // set as array
         $this->assertEquals(
             'insert into `employee` (`time`,`name`) values (now(),:a)',

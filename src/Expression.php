@@ -7,6 +7,9 @@ namespace atk4\dsql;
  * of SQL code that will become expression template and arguments.
  *
  * See below for call patterns
+ *
+ * @license MIT
+ * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
@@ -80,7 +83,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         } elseif (!is_array($properties)) {
             throw new Exception('Incorect use of Expression constructor');
         }
-        
+
         // supports passing template as property value without key 'template'
         if (isset($properties[0])) {
             $properties['template'] = $properties[0];
@@ -98,6 +101,33 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // deal with remaining properties
         foreach ($properties as $key => $val) {
             $this->$key = $val;
+        }
+    }
+
+    /**
+     * Casting to string will execute expression and return getOne() value.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        try {
+            $value = $this->getOne();
+            if (!is_string($value)) {
+                // we must throw an exception manually here because if $value
+                // is not a string, PHP will trigger an error right after the
+                // return statement, thus escaping our try/catch.
+                throw new \LogicException(__CLASS__ . "__toString() must return a string");
+            }
+            return $value;
+        } catch (\Exception $e) {
+            $previousHandler = set_exception_handler(function () {
+            });
+            restore_error_handler();
+            if (is_callable($previousHandler)) {
+                call_user_func($previousHandler, $e);
+            }
+            die($e->getMessage());
         }
     }
 
@@ -210,7 +240,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         if ($sql_code instanceof Query) {
             $ret = '(' . $ret . ')';
         }
-        
+
         // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
         // if we unset() first, we’re safe.
         unset($sql_code->params);
@@ -301,7 +331,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 // [foo] will attempt to call $this->_render_foo()
                 $fx = '_render_'.$matches[1];
 
-                if (array_key_exists($identifier,$this->args['custom'])) {
+                if (array_key_exists($identifier, $this->args['custom'])) {
                     return $this->_consume($this->args['custom'][$identifier]);
                 } elseif (method_exists($this, $fx)) {
                     return $this->$fx();
@@ -329,8 +359,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         $d = preg_replace('/`([^`]*)`/', '`<span style="color:black">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', '"<span style="color:green">'.
-                    htmlspecialchars(addslashes($val)).'</span>"\1', $d);
+                $d = preg_replace('/'.$key.'([^_]|$)/', '\'<span style="color:green">'.
+                    htmlspecialchars(addslashes($val)).'</span>\'\1', $d);
             } elseif (is_null($val)) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
@@ -368,6 +398,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         // If it's a PDO connection, we're cool
         if ($connection instanceof \PDO) {
+            $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             // We support PDO
             $query = $this->render();
             $statement = $connection->prepare($query);
@@ -394,7 +425,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $statement->setFetchMode(\PDO::FETCH_ASSOC);
             $statement->execute();
             return $statement;
-            
+
         } else {
             return $connection->execute($this);
         }
@@ -412,11 +443,27 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     // {{{ Result Querying
+    /**
+     * Executes expression and return whole result-set in form of array of hashes
+     *
+     * @return array
+     */
     public function get()
     {
-        return $this->execute()->fetchAll();
+        $stmt = $this->execute();
+
+        if ($stmt instanceof \Generator) {
+            return iterator_to_array($stmt);
+        }
+
+        return $stmt->fetchAll();
     }
 
+    /**
+     * Executes expression and return first value of first row of data from result-set
+     *
+     * @return string
+     */
     public function getOne()
     {
         $data = $this->getRow();
@@ -424,9 +471,20 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return $one;
     }
 
+    /**
+     * Executes expression and returns first row of data from result-set as a hash
+     *
+     * @return array
+     */
     public function getRow()
     {
-        return $this->execute()->fetch();
+        $stmt = $this->execute();
+
+        if ($stmt instanceof \Generator) {
+            return $stmt->current();
+        }
+
+        return $stmt->fetch();
     }
     // }}}
 }

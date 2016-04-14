@@ -4,6 +4,9 @@ namespace atk4\dsql;
 
 /**
  * Perform query operation on SQL server (such as select, insert, delete, etc)
+ *
+ * @license MIT
+ * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Query extends Expression
 {
@@ -13,10 +16,12 @@ class Query extends Expression
      * @var array
      */
     public $templates = [
-        'select' => 'select [field] [from] [table][where][having]',
-        'delete' => 'delete [from] [table][where][having]',
-        'insert' => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
-        'update' => 'update [table_noalias] set [set] [where]',
+        'select'   => 'select [field] [from] [table][join][where][having][order][limit]',
+        'delete'   => 'delete [from] [table][where][having]',
+        'insert'   => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
+        'replace'  => 'replace into [table_noalias] ([set_fields]) values ([set_values])',
+        'update'   => 'update [table_noalias] set [set] [where]',
+        'truncate' => 'truncate table [table_noalias]',
     ];
 
     /**
@@ -35,8 +40,10 @@ class Query extends Expression
     public $defaultField = '*';
 
     /**
-     * Name of database table to use in query.
-     * Will be used only if we query from one table.
+     * Name of base table to use when using default join()
+     * This is set by table(). If you are using multiple
+     * tables or selecting from expression, then $main_table
+     * is set to false as it is irrelevant.
      *
      * @var null|false|string
      */
@@ -315,6 +322,153 @@ class Query extends Expression
     }
     /// }}}
 
+    // {{{ join()
+    /**
+     * Joins your query with another table. Join will use $main_table in
+     * to reference the main table, unless you specify it explicitly
+     *
+     * Examples:
+     *  $q->join('address');         // on user.address_id=address.id
+     *  $q->join('address.user_id'); // on address.user_id=user.id
+     *  $q->join('address a');       // With alias
+     *  $q->join(array('a'=>'address')); // Also alias
+     *
+     * Second argument may specify the field of the master table
+     *  $q->join('address', 'billing_id');
+     *  $q->join('address.code', 'code');
+     *  $q->join('address.code', 'user.code');
+     *
+     * Third argument may specify which kind of join to use.
+     *  $q->join('address', null, 'left');
+     *  $q->join('address.code', 'user.code', 'inner');
+     *
+     * Using array syntax you can join multiple tables too
+     *  $q->join(array('a'=>'address', 'p'=>'portfolio'));
+     *
+     * You can use expression for more complex joins
+     *  $q->join('address',
+     *      $q->orExpr()
+     *          ->where('user.billing_id=address.id')
+     *          ->where('user.technical_id=address.id')
+     *  )
+     *
+     * @param string $foreign_table  Table to join with
+     * @param mixed  $master_field   Field in master table
+     * @param string $join_kind      'left' or 'inner', etc
+     * @param string $_foreign_alias Internal, don't use
+     *
+     * @return $this
+     */
+    public function join(
+        $foreign_table,
+        $master_field = null,
+        $join_kind = null,
+        $_foreign_alias = null
+    ) {
+        // If array - add recursively
+        if (is_array($foreign_table)) {
+            foreach ($foreign_table as $alias => $foreign) {
+                if (is_numeric($alias)) {
+                    $alias = null;
+                }
+
+                $this->join($foreign, $master_field, $join_kind, $alias);
+            }
+
+            return $this;
+        }
+        $j = array();
+
+        if (is_null($_foreign_alias)) {
+            @list($foreign_table, $_foreign_alias) = explode(' ', $foreign_table, 2);
+        }
+
+        // Split and deduce fields
+        @list($f1, $f2) = explode('.', $foreign_table, 2);
+
+        if (is_object($master_field)) {
+            $j['expr'] = $master_field;
+        } else {
+            // Split and deduce primary table
+            if (is_null($master_field)) {
+                list($m1, $m2) = array(null, null);
+            } else {
+                list($m1, $m2) = explode('.', $master_field, 2);
+            }
+            if (is_null($m2)) {
+                $m2 = $m1;
+                $m1 = null;
+            }
+            if (is_null($m1)) {
+                $m1 = $this->main_table;
+            }
+
+            // Identify fields we use for joins
+            if (is_null($f2) && is_null($m2)) {
+                $m2 = $f1.'_id';
+            }
+            if (is_null($m2)) {
+                $m2 = 'id';
+            }
+            $j['m1'] = $m1;
+            $j['m2'] = $m2;
+        }
+        $j['f1'] = $f1;
+        if (is_null($f2)) {
+            $f2 = 'id';
+        }
+        $j['f2'] = $f2;
+
+        $j['t'] = $join_kind ?: 'left';
+        $j['fa'] = $_foreign_alias;
+
+        $this->args['join'][] = $j;
+
+        return $this;
+    }
+
+    /**
+     * Renders [join].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_join()
+    {
+        if (!isset($this->args['join'])) {
+            return'';
+        }
+        $joins = array();
+        foreach ($this->args['join'] as $j) {
+            $jj = '';
+
+            $jj .= $j['t'].' join ';
+
+            $jj .= $this->_escape($j['f1']);
+
+            if (!is_null($j['fa'])) {
+                $jj .= ' as '.$this->_escape($j['fa']);
+            }
+
+            $jj .= ' on ';
+
+            if (isset($j['expr'])) {
+                $jj .= $this->_consume($j['expr']);
+            } else {
+                $jj .=
+                    $this->_escape($j['fa'] ?: $j['f1']).'.'.
+                    $this->_escape($j['f2']).' = '.
+                    (is_null($j['m1'])?'':$this->_escape($j['m1']).'.').
+                    $this->_escape($j['m2']);
+            }
+            $joins[] = $jj;
+        }
+
+        return implode(' ', $joins);
+    }
+    // }}}
+
+
+
     // {{{ where() and having() specification and rendering
     /**
      * Adds condition to your query.
@@ -359,8 +513,8 @@ class Query extends Expression
      *  $q->where($q->orExpr()->where('a',1)->where('b',1));
      *
      * @param mixed  $field     Field, array for OR or Expression
-     * @param string $cond      Condition such as '=', '>' or 'is not'
-     * @param string $value     Value. Will be quoted unless you pass expression
+     * @param mixed  $cond      Condition such as '=', '>' or 'is not'
+     * @param mixed  $value     Value. Will be quoted unless you pass expression
      * @param string $kind      Do not use directly. Use having()
      * @param string $num_args  When $kind is passed, we can't determine number of
      *                          actual arguments, so this argumen must be specified.
@@ -548,11 +702,6 @@ class Query extends Expression
      */
     protected function _render_where()
     {
-        /**
-         * @todo Imants: To not duplicate code maybe replace this with
-         * $s = $this->_render_andwhere();
-         * return $s ? ' where '.$s : null;
-         */
         if (!isset($this->args['where'])) {
             return;
         }
@@ -600,6 +749,52 @@ class Query extends Expression
         }
 
         return ' having '.implode(' and ', $this->__render_where('having'));
+    }
+    // }}}
+
+    // {{{ group()
+    /**
+     * Implements GROUP BY functionality. Simply pass either field name
+     * as string or expression.
+     *
+     * @param string|object $group Group by this
+     *
+     * @return $this
+     */
+    public function group($group)
+    {
+        // Case with comma-separated fields
+        if (is_string($group) && strpos($group, ',') !== false) {
+            $group = explode(',', $group);
+        }
+
+        if (is_array($group)) {
+            foreach ($group as $g) {
+                $this->args['group'][] = $g;
+            }
+            return $this;
+        }
+
+        $this->args['group'][] = $group;
+        return $this;
+    }
+
+    /**
+     * Renders [group].
+     *
+     * @return string rendered SQL chunk
+     */
+    protected function _render_group()
+    {
+        if (!isset($this->args['group'])) {
+            return '';
+        }
+
+        $g = implode(', ', array_map(function ($a) {
+            return $this->_consume($a, 'escape');
+        }, $this->args['group']));
+
+        return ' group by '.$g;
     }
     // }}}
 
@@ -700,6 +895,179 @@ class Query extends Expression
     }
     /// }}}
 
+    // {{{ Query Modes
+    /**
+     * Execute select statement
+     *
+     * @return PDOStatement
+     */
+    public function select()
+    {
+        return $this->selectTemplate('select')->execute();
+    }
+
+    /**
+     * Execute insert statement
+     *
+     * @return PDOStatement
+     */
+    public function insert()
+    {
+        return $this->selectTemplate('insert')->execute();
+    }
+
+    /**
+     * Execute update statement
+     *
+     * @return PDOStatement
+     */
+    public function update()
+    {
+        return $this->selectTemplate('update')->execute();
+    }
+
+    /**
+     * Execute replace statement
+     *
+     * @return PDOStatement
+     */
+    public function replace()
+    {
+        return $this->selectTemplate('replace')->execute();
+    }
+
+    /**
+     * Execute delete statement
+     *
+     * @return PDOStatement
+     */
+    public function delete()
+    {
+        return $this->selectTemplate('delete')->execute();
+    }
+
+    /**
+     * Execute truncate statement
+     *
+     * @return PDOStatement
+     */
+    public function truncate()
+    {
+        return $this->selectTemplate('truncate')->execute();
+    }
+    // }}}
+
+    // {{{ Limit
+    /**
+     * Limit how many rows will be returned.
+     *
+     * @param int $cnt   Number of rows to return
+     * @param int $shift Offset, how many rows to skip
+     *
+     * @return $this
+     */
+    public function limit($cnt, $shift = null)
+    {
+        $this->args['limit'] = array(
+            'cnt' => $cnt,
+            'shift' => $shift,
+        );
+
+        return $this;
+    }
+    /**
+     * Renders [limit].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_limit()
+    {
+        if (isset($this->args['limit'])) {
+            return ' limit '.
+                (int) $this->args['limit']['shift'].
+                ', '.
+                (int) $this->args['limit']['cnt'];
+        }
+    }
+    // }}}
+
+    // {{{ Order
+    /**
+     * Orders results by field or Expression. See documentation for full
+     * list of possible arguments.
+     *
+     * $q->order('name');
+     * $q->order('name desc');
+     * $q->order('name desc, id asc')
+     * $q->order('name',true);
+     *
+     * @param string|array $order Order by
+     * @param string|bool $desc  true to sort descending
+     *
+     * @return $this
+     */
+    public function order($order, $desc = null)
+    {
+        // Case with comma-separated fields or first argument being an array
+        if (is_string($order) && strpos($order, ',') !== false) {
+            // Check for multiple
+            $order = explode(',', $order);
+        }
+        if (is_array($order)) {
+            if (!is_null($desc)) {
+                throw new Exception(
+                    'If first argument is array, second argument must not be used'
+                );
+            }
+            foreach (array_reverse($order) as $o) {
+                $this->order($o);
+            }
+
+            return $this;
+        }
+
+        // First argument may contain space, to divide field and keyword
+        if (is_null($desc) && is_string($order) && strpos($order, ' ') !== false) {
+            list($order, $desc) = array_map('trim', explode(' ', trim($order), 2));
+        }
+
+        if (is_string($order) && strpos($order, '.') !== false) {
+            $order = implode('.', $this->_escape(explode('.', $order)));
+        }
+
+        if (is_bool($desc)) {
+            $desc = $desc ? 'desc' : '';
+        } elseif (strtolower($desc) === 'asc') {
+            $desc = '';
+        } elseif ($desc && strtolower($desc) != 'desc') {
+            throw new Exception(['Incorrect ordering keyword', 'order by'=>$desc]);
+        }
+
+        $this->args['order'][] = array($order, $desc);
+
+        return $this;
+    }
+
+    /**
+     * Renders [order].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_order()
+    {
+        if (!isset($this->args['order'])) {
+            return'';
+        }
+        $x = array();
+        foreach ($this->args['order'] as $tmp) {
+            list($arg, $desc) = $tmp;
+            $x[] = $this->_consume($arg, 'escape').($desc ? (' '.$desc) : '');
+        }
+
+        return ' order by '.implode(', ', array_reverse($x));
+    }
+    // }}}
+
     // {{{ Miscelanious
     /**
      * Renders query template. If the template is not explicitly set will use "select" mode.
@@ -745,7 +1113,7 @@ class Query extends Expression
     {
         $q = new Query($properties);
         $q->connection = $this->connection;
-        
+
         return $q;
     }
 
