@@ -222,6 +222,71 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException5()
+    {
+        $this->q()
+            ->table('foo', 'a')
+            ->table('bar', 'a');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException6()
+    {
+        $this->q()
+            ->table('foo', 'bar')
+            ->table('bar');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException7()
+    {
+        $this->q()
+            ->table('foo')
+            ->table('foo');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException8()
+    {
+        $this->q()
+            ->table($this->q()->table('test'), 'foo')
+            ->table('foo');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException9()
+    {
+        $this->q()
+            ->table('foo')
+            ->table($this->q()->table('test'), 'foo');
+    }
+
+    /**
      * can't use table with expression
      *
      * @covers ::table
@@ -383,20 +448,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
          *  (select * from `customer`) `c`
          * In such case table alias should better be mandatory.
          */
-
-        /**
-         * @todo Add some tests with non-unique table aliases.
-         *  They will currently generate: SELECT * FROM `foo` `a`, `bar` `a` which is wrong!
-         * We have to check uniquness of table aliases and in such cases throw appropriate exception.
-         */
-        $q = $this->q()
-            ->table('foo', 'a')
-            ->table('bar', 'a');
-        $this->assertEquals(
-            'select * from `foo` `a`,`bar` `a`', // <-- aliases should be unique and THIS SHOULD THROW EXCEPTION
-            $q->render()
-        );
-
     }
 
     /**
