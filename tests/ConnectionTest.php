@@ -55,7 +55,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $c->expr('select (2+2)')->getOne()
         );
 
-        $this->expectOutputRegex("/\[0.0000..\] select \(2\+2\) \[\]/");
+        $this->expectOutputRegex("/\[0.0000..\] select \(2\+2\).*/");
     }
 
     public function testCounter()
