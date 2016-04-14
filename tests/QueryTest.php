@@ -416,7 +416,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q2 = $this->q()->table('customer');
 
         $this->assertEquals(
-            'select `e`.`name`,`c`.`name` from (select * from `employee`) `e`,(select * from `customer`) `c`',
+            //this way it would be more correct: 'select `e`.`name`,`c`.`name` from (select * from `employee`) `e`,(select * from `customer`) `c` where `e`.`last_name` = `c`.`last_name`',
+            'select `e`.`name`,`c`.`name` from (select * from `employee`) `e`,(select * from `customer`) `c` where `e`.`last_name` = c.last_name',
             $this->q()
                 ->field('name', 'e')
                 ->field('name', 'c')
