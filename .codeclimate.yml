@@ -32,6 +32,8 @@ engines:
         enabled: false
       Controversial/CamelCaseVariableName:
         enabled: false
+      Controversial/CamelCaseClassName:
+        enabled: false
       Naming/ShortVariable:
         enabled: false
       CleanCode/ElseExpression:
