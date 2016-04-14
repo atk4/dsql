@@ -14,19 +14,20 @@ Expression (see :ref:`expr`)
     :php:class:`Expression` object, represents a part of a SQL query. It can
     be used to express advanced logic in some part of a query, which
     :php:class:`Query` itself might not support or can express a full statement
-    Newer try to look for "raw" queries, instead build expressions and think
+    Never try to look for "raw" queries, instead build expressions and think
     about escaping.
 
 Query (see :ref:`query`)
-    Object of a :php:class:`Query` class is using for building and executing
-    valid SQL statement such as SELECT, INSERT, UPDATE, etc. After creating
+    Object of a :php:class:`Query` class can be used for building and executing
+    valid SQL statements such as SELECT, INSERT, UPDATE, etc. After creating
     :php:class:`Query` object you can call various methods to add "table",
     "where", "from" parts of your query.
 
 Connection
-    Represents a connection to the database. A you already have a PDO object
-    you can feed it into Expression or Query, but for your comfort there is
-    a Connection class with very little overhead. 
+    Represents a connection to the database. If you already have a PDO object
+    you can feed it into :php:class:`Expression` or :php:class:`Query`, but
+    for your comfort there is a :php:class:`Connection` class with very little
+    overhead.
 
 Getting Started
 ===============
@@ -135,23 +136,23 @@ to get the final query string::
 
     use atk4\dsql\Query;
 
-    $q = new Query()->table('user')->where('id',1)->field('name');
+    $q = (new Query())->table('user')->where('id', 1)->field('name');
     $query = $q->render();
     $params = $q->params;
 
 When used in application you would typically generate queries with the
 purpose of executing them, which makes it very useful to create a
-Connection class. The usage changes slightly::
+:php:class:`Connection` object. The usage changes slightly::
 
     $c = atk4\dsql\Connection::connect($dsn, $user, $password);
-    $q = $c->dsql()->table('user')->where('id',1)->field('name');
+    $q = $c->dsql()->table('user')->where('id', 1)->field('name');
 
-    name = $q->getOne();
+    $name = $q->getOne();
 
-You no longer need "use" statement and Connection class will automatically
-do some of the hard work to adopt query building for your database vendor.
+You no longer need "use" statement and :php:class:`Connection` class will
+automatically do some of the hard work to adopt query building for your
+database vendor.
 There are more ways to create connection, see `Advanced Connections`_ section.
-
 
 The format of the ``$dsn`` is the same as with
 `PDO class <http://php.net/manual/en/ref.pdo-mysql.connection.php>`_. If
@@ -167,13 +168,13 @@ you can avoid some nasty problems::
     $sqlite_c ->dsql()->table('user')->truncate();
 
 The above code will work even though SQLite does not support
-truncate.
+truncate. That's because DSQL takes care of this.
 
 
 Query Building
 ==============
 
-Each Query object represents a query to the database in-the-making.  
+Each Query object represents a query to the database in-the-making.
 Calling methods such as :php:meth:`Query::table` or :php:meth:`Query::where`
 affect part of the query you're making. At any time you can either
 execute your query or use it inside another query.
