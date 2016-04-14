@@ -172,7 +172,7 @@ class Query extends Expression
     {
         // comma-separated table names
         if (is_string($table) && strpos($table, ',') !== false) {
-            $table = explode(',', $table);
+            $table = array_map('trim', explode(',', $table));
         }
 
         // array of tables - recursively process each
@@ -201,9 +201,6 @@ class Query extends Expression
         if (!isset($this->args['table'])) {
             $this->args['table'] = array();
         }
-
-        // trim table name just in case developer called it like 'employees,    jobs'
-        $table = trim($table);
 
         // if no alias is set, then we will use table name as alias
         // in such case alias will not render, but will be used as array key
@@ -306,7 +303,7 @@ class Query extends Expression
             // consume or escape table
             $table = $this->_consume($table, 'escape');
 
-            // add alias if it's not the same as table name
+            // add alias if needed
             if ($alias) {
                 $table .= ' ' . $this->_escape($alias);
             }
