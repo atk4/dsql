@@ -54,14 +54,5 @@ class Connection_Counter extends Connection_Proxy
                 $this->expressions
             );
         }
-
-
-        
-        return;
-
-        $took = time() + microtime() - $this->start_time;
-
-
-        return $ret;
     }
 }

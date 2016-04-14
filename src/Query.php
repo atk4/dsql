@@ -142,13 +142,6 @@ class Query extends Expression
             // Will parameterize the value and backtick if necessary
             $field = $this->_consume($field, 'escape');
 
-            /* TODO: Commented until I figure out what this does
-            if (!$field) {
-                $field = $table;
-                $table = null;
-            }
-            */
-
             if ($table) {
                 // table name cannot be expression, so only backtick
                 $field = $this->_escape($table) . '.' . $field;
