@@ -40,10 +40,10 @@ class Query extends Expression
     public $defaultField = '*';
 
     /**
-     * Name of base table to use when using default join()
-     * This is set by table(). If you are using multiple
-     * tables or selecting from expression, then $main_table
-     * is set to false as it is irrelevant.
+     * Name of base table to use when using default join().
+     *
+     * This is set by table(). If you are using multiple tables,
+     * then $main_table is set to false as it is irrelevant.
      *
      * @var null|false|string
      */
@@ -192,8 +192,44 @@ class Query extends Expression
             return $this;
         }
 
+        // if table is set as Expression, then alias is mandatory
+        if ($table instanceof Expression && $alias === null) {
+            throw new Exception('If table is set as Expression, then table alias is mandatory');
+        }
+
+        // initialize args[table] array
+        if (!isset($this->args['table'])) {
+            $this->args['table'] = array();
+        }
+
+        // trim table name just in case developer called it like 'employees,    jobs'
+        $table = trim($table);
+
+        // if no alias is set, then we will use table name as alias
+        // in such case alias will not render, but will be used as array key
+        if ($alias === null) {
+            $alias = $table;
+        }
+
+        // don't allow multiple tables with same alias
+        if (isset($this->args['table'][$alias])) {
+            throw new Exception('Table alias should be unique');
+        }
+
+        // main_table will be set only if table() is called once.
+        // it's used as "default table" when joining with other tables, see join().
+        // on multiple calls, main_table will be false and we won't
+        // be able to join easily anymore.
+        $this->main_table = ($this->main_table === null ? $alias : false);
+
+       // if all is fine, then save table in args
+        $this->args['table'][$alias] = $table;
+
+
+
         // table can be expression, but then we can only set the table once
         // @todo WHY such restriction ?
+        /*
         if ($table instanceof Expression) {
 
             if (isset($this->args['table'])) {
@@ -232,6 +268,7 @@ class Query extends Expression
         }
 
         $this->args['table'][] = array($table, $alias);
+        */
 
         return $this;
     }
@@ -240,14 +277,45 @@ class Query extends Expression
      * Renders part of the template: [table]
      * Do not call directly.
      *
+     * @param bool $add_alias Should we add aliases, see _render_table_noalias()
+     *
      * @return string Parsed template chunk
      */
-    protected function _render_table()
+    protected function _render_table($add_alias = true)
     {
         // will be joined for output
         $ret = [];
 
-        if (!isset($this->args['table'])) {
+        if (empty($this->args['table'])) {
+            return '';
+        }
+
+        // process tables one by one
+        foreach ($this->args['table'] as $alias => $table) {
+
+            // throw exception if we don't want to add alias and table is defined as Expression
+            if ($add_alias === false && $table instanceof Expression) {
+                throw new Exception('Table cannot be expression for UPDATE, INSERT etc. queries');
+            }
+
+            // consume or escape table
+            $table = $this->_consume($table, 'escape');
+
+            // add alias if it's not the same as table name
+            if ($add_alias && $alias != $table) {
+                $table .= ' ' . $this->_escape($alias);
+            }
+
+            $ret[] = $table;
+        }
+
+
+
+        /*
+        // will be joined for output
+        $ret = [];
+
+        if (empty($this->args['table'])) {
             return '';
         }
 
@@ -268,6 +336,7 @@ class Query extends Expression
 
             $ret[] = $table;
         }
+        */
 
         return implode(',', $ret);
     }
@@ -280,6 +349,9 @@ class Query extends Expression
      */
     protected function _render_table_noalias()
     {
+        return $this->_render_table(false);
+
+        /*
         // will be joined for output
         $ret = [];
 
@@ -296,6 +368,7 @@ class Query extends Expression
         }
 
         return implode(', ', $ret);
+        */
     }
 
     /**
@@ -1057,7 +1130,7 @@ class Query extends Expression
     }
     // }}}
 
-    function __debugInfo()
+    public function __debugInfo()
     {
         $arr =  [
             'R'=>false,
