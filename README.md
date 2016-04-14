@@ -1,14 +1,29 @@
-# dsql
+# DSQL
 
 [![Join the chat at https://gitter.im/atk4/dsql](https://badges.gitter.im/atk4/dsql.svg)](https://gitter.im/atk4/dsql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-DSQL is a dynamic SQL query builder. You can write multi-vendor queries in PHP profiting from better security, clean syntax and most importantly – sub-query support. With DSQL you stay in control of when queries are executed and what data is transmitted. DSQL is easily composable – build one query and use it as a part of other query.
+DSQL is a composable SQL query builder. You can write multi-vendor queries in PHP profiting from better security, clean syntax. 
 
-Goals of DSQL are:
+
+## Hold on! Why not use existing query builder?
+
+There are few good reasons why use DSQL over the other similar libraries:
+
+1. Composability. Unlike other libraries, we render queries recursively allowing many levels of sub-selects.
+2. NoSQL support. In addition to supporting PDO, DSQL can be extended to deal with SQL-compatible NoSQL servers.
+3. Small footprint. We don't duplicate query code for all vendors, instead we use clever templating systim.
+4. Extensibility. Extend query class, expression class or conneciton class. Also you can use Proxy Connections.
+5. Most extensible sysntax with smallest PHP code print. 
+6. No dependencies. Use DSQL in any PHP application or framework.
+
+[Familiar with Fluent, DBAL, Pixie, LessQL? See side-by-side features comparison](https://github.com/atk4/dsql/wiki/Feature-Comparison)"
+
+
+## Goals of DSQL
 
  - simple and consise syntax
- - consistently scalable (e.g. 5 levels of sub-queries, 10 with joins and 15 parameters? no problem)
- - "One Query" paradigm
+ - supports scary queries (5 sub-queries, 10 joins and 15 parameters? no problem!)
+ - support for NoSQL vendors.
  - support for PDO vendors as well as NoSQL databases (with query language smilar to SQL)
  - small code footprint (over 50% less than competing frameworks)
  - free, licensed under MIT
