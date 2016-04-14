@@ -436,7 +436,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testVarDump3()
     {
-        $this->expectOutputRegex('/.*Heillo :a.*/');
+        $this->expectOutputRegex('/.*Hello :a.*/');
         var_dump(new Expression('Hello [world]',['world'=>'php']));
     }
 
