@@ -12,24 +12,21 @@ Basic Concepts
 
 Expression (see :ref:`expr`)
     :php:class:`Expression` object, represents a part of a SQL query. It can
-    be used to express advanced logic, which :php:class:`Query` itself migth
-    not support. Expressions take extra care of parameters, making sure they
-    are either escaped or passed as parameters.
+    be used to express advanced logic in some part of a query, which
+    :php:class:`Query` itself might not support or can express a full statement
+    Newer try to look for "raw" queries, instead build expressions and think
+    about escaping.
 
 Query (see :ref:`query`)
     Object of a :php:class:`Query` class is using for building and executing
-    valid SQL statement as SELECT, INSERT, UPDATE, etc. After creating
+    valid SQL statement such as SELECT, INSERT, UPDATE, etc. After creating
     :php:class:`Query` object you can call various methods to add "table",
     "where", "from" parts of your query.
 
-Connection (optional)
-    Represents a connection to the database. A standard PDO class can be
-    used, but if database vendor does not support PDO (e.g. RestAPI) you
-    can create a custom connection class.
-
-ResultSet (optional)
-    Represents a result set returned in response to your query. When used
-    with PDO, PDOStatement will be used.
+Connection
+    Represents a connection to the database. A you already have a PDO object
+    you can feed it into Expression or Query, but for your comfort there is
+    a Connection class with very little overhead. 
 
 Getting Started
 ===============
@@ -37,7 +34,7 @@ Getting Started
 We will start by looking at the :php:class:`Query` building, because you do
 not need a database to create a query::
 
-    use atk4\dsql;
+    use atk4\dsql\Query;
 
     $query = new Query(['connection' => $pdo]);
 
@@ -55,14 +52,17 @@ Finally you can get the data::
     $count = $query->getOne();
 
 While DSQL is simple to use for basic queries, it also gives a huge
-power and consistency when you are building complex queries. The
-unique trait of DSQL builder, is its object-oriented design and
-incredible consistency when you need to **optionally** modify
-your current query.
+power and consistency when you are building complex queries. Unlike
+other query builders that sometimes rely on "hacks" (such as
+method whereOr()) and claim to be useful for "most" database operations,
+with DSQL, you can use DSQL to build ALL of your database queries.
 
 This is hugely benificial for frameworks and large applications, where
-various classes need to interact and inject more code into your
+various classes need to interact and inject more clauses/fields/joins into your
 SQL query.
+
+DSQL does not resolve conflicts between similarly named tables, but
+it gives you all the options to use aliases.
 
 The next example might be a bit too complex for you, but still read
 through and try to understand what each section does to your base
@@ -131,60 +131,79 @@ Creating Objects and PDO
 DSQL classes does not need database connection for most of it's work. Once
 you create new instance of :ref:`Expression <expr>` or :ref:`Query <query>`
 you can perform operation and finally call :php:meth:`Expression::render()`
-to get the final query string.
+to get the final query string::
+
+    use atk4\dsql\Query;
+
+    $q = new Query()->table('user')->where('id',1)->field('name');
+    $query = $q->render();
+    $params = $q->params;
 
 When used in application you would typically generate queries with the
-purpose of executing them, which makes it very useful to specify
-"connection" to DSQL objects during initialization::
+purpose of executing them, which makes it very useful to create a
+Connection class. The usage changes slightly::
 
-    $expr = new Expression('show tables', ['connection' => $pdo]);
-    $tables = $expr->getAll();
+    $c = atk4\dsql\Connection::connect($dsn, $user, $password);
+    $q = $c->dsql()->table('user')->where('id',1)->field('name');
 
-(You can also pass connection to the :php:meth:`Expression::execute`)
+    name = $q->getOne();
 
-To save you some time, you can re-use existing *connection* from
-existing object, by calling :php:meth:`Query::dsql` and
-:php:meth:`Expression::expr()`.
+You no longer need "use" statement and Connection class will automatically
+do some of the hard work to adopt query building for your database vendor.
+There are more ways to create connection, see `Advanced Connections`_ section.
 
-.. note::
-    Even though code reads :php:meth:`Expression::expr`, you can call this
-    method on any query, because :php:class:`Query` class extends
-    :php:class:`Expression` class and anything said about
-    :php:class:`Expression` also applies on :php:class:`Query`.
 
-In the above example, I have used those methods on multiple occassions::
+The format of the ``$dsn`` is the same as with
+`PDO class <http://php.net/manual/en/ref.pdo-mysql.connection.php>`_. If
+you need to execute query that is not supported by DSQL, you should always
+use expressions::
 
-    $e_ms = $salary->expr('max(salary)');
-    $e_df = $salary->expr('TimeStampDiff(month, from_date, to_date)');
+    $tables = $c -> expr('show tables like []', [$like_str])->get();
 
-.. note::
-    DSQL classes are mindful about your SQL vendor and it's quirks,
-    so when you're building sub-queries with :php:meth:`Query::dsql`,
-    you can avoid some nasty problems.
+DSQL classes are mindful about your SQL vendor and it's quirks,
+so when you're building sub-queries with :php:meth:`Query::dsql`,
+you can avoid some nasty problems::
+
+    $sqlite_c ->dsql()->table('user')->truncate();
+
+The above code will work even though SQLite does not support
+truncate.
 
 
 Query Building
 ==============
 
+Each Query object represents a query to the database in-the-making.  
 Calling methods such as :php:meth:`Query::table` or :php:meth:`Query::where`
-affect part of the query you're making. To learn more about all the methods
-and their arguments, continue to :php:class:`Query` documentation.
+affect part of the query you're making. At any time you can either
+execute your query or use it inside another query.
 
-:php:class:`Query` class can be further extended and you can introduce new
-ways to extend queries.
+:php:class:`Query` supports majority of SQL syntax out of the box.
+Some unusual statements can be easily added by customizing
+template for specific query and we will look into examples in :ref:`extending_query`
 
 Query Mode
 ==========
 
-When you create a new :php:class:`Query`, it is going to be a *SELECT* query
-by default.
-You can, however, perform other operations by calling :php:meth:`Query::update`,
-:php:meth:`Query::delete` (etc).
-For more information see :ref:`query-modes`::
+When you create a new :php:class:`Query` object, it is going to be a *SELECT* query
+by default. If you wish to execute ``update`` operation instead, you simply call :php:meth:`Query::update`,
+for delete - :php:meth:`Query::delete` (etc). For more information see :ref:`query-modes`.
+You can actually perform multiple operations::
 
-    $query->table('employee')->where('emp_no', 1234)->delete();
+    $q = $c->dsql()->table('employee')->where('emp_no', 1234);
+    $backup_data = $q->get();
+    $q->delete();
 
-A good practice is to re-use your condition where possible.
+A good practice is to re-use the same query object before you branch out
+and perform the action::
+
+    $q = $c->dsql()->table('employee')->where('emp_no', 1234);
+
+    if ($confirmed) {
+        $q->delete();
+    } else {
+        echo "Are you sure you want to delete ".$q->field('count(*)')." employees?";
+    }
 
 
 .. _fething-result:
@@ -192,24 +211,19 @@ A good practice is to re-use your condition where possible.
 Fetching Result
 ===============
 
-When you are using default "select" mode for :php:class:`Query`, there are
-several ways how you can go over the resulting data-set.
-
-DSQL does not implement any additional overheads or iterating, instead
-it simply uses PDOStatement if you try to iterate over it::
-
+When you are selecting data from your database, DSQL will prepare and execute
+statement for you. Depending on the connection, there may be some magic
+involved, but once the query is executed, you can start streaming your data::
 
     foreach ($query->table('employee')->where('dep_no',123) as $employee) {
         echo $employee['first_name']."\n";
     }
 
-If you want to do more stuff to PDO before fetching data, you can use
-:php:meth:`Expression::execute` directly which returns PDOStatement object
-back to you.
+In most cases, when iterating you'll have PDOStatement, however this may not
+always be the case, so be cautious. Remember that DQSL can support vendors
+that PDO does not support as well or can use :ref:`proxy`.
+In that case you may end up with other Generator/Iterator but regardless,
+`$employee` will always contain associative array representing one row
+of data. (See also `Manual Query Execution`_).
 
-When you expect only one row of results or just a single value you can use
-:php:meth:`Expression::getRow` or :php:meth:`Expression::getOne`.
 
-Finally - there is :php:meth:`Expression::get` which will give you array
-with all of results, however it's always a better idea to iterate over
-results where possible instead of storing them all in an array.
