@@ -8,7 +8,7 @@ namespace atk4\dsql;
  */
 class Connection_Dumper extends Connection_Proxy
 {
-    protected $callback  = null;
+    public $callback  = null;
 
 
     public function execute(Expression $expr)
