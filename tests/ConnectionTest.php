@@ -46,6 +46,18 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDumperEcho()
+    {
+        $c = Connection::connect('dumper:sqlite::memory:');
+
+        $this->assertEquals(
+            4,
+            $c->expr('select (2+2)')->getOne()
+        );
+
+        $this->expectOutputRegex("/\[0.0000..\] select \(2\+2\) \[\]/");
+    }
+
     public function testCounter()
     {
         $c = Connection::connect('counter:sqlite::memory:');
@@ -66,6 +78,23 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $result
         );
     }
+
+    public function testCounterEcho()
+    {
+        $c = Connection::connect('counter:sqlite::memory:');
+
+
+        $this->assertEquals(
+            4,
+            $c->expr('select ([]+[])', [$c->expr('2'), 2])->getOne()
+        );
+
+        $this->expectOutputString("Queries:   0, Selects:   0, Rows fetched:    1, Expressions   1\n");
+        
+
+        unset($c);
+    }
+
 
     public function testCounter2()
     {
