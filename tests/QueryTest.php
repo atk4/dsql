@@ -22,7 +22,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
 
-
     /**
      * Test constructor
      *
@@ -561,6 +560,18 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'where `id` = :a',
             $this->q('[where]')->where('id', '=', 1)->render()
         );
+        $this->assertEquals(
+            'where `id` in (:a,:b)',
+            $this->q('[where]')->where('id', '=', [1, 2])->render()
+        );
+        $this->assertEquals(
+            'where `id` in (:a,:b)',
+            $this->q('[where]')->where('id', [1, 2])->render()
+        );
+        $this->assertEquals(
+            'where `id` in (select * from `user`)',
+            $this->q('[where]')->where('id', $this->q()->table('user'))->render()
+        );
 
         // two parameters - more_than_just_a_field, value
         $this->assertEquals(
@@ -826,12 +837,36 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $this->q('[join]')->table('user')->join('address a')->render()
         );
         $this->assertEquals(
+            'left join `address` as `a` on `a`.`id` = `user`.`my_address_id`',
+            $this->q('[join]')->table('user')->join('address a', 'my_address_id')->render()
+        );
+        $this->assertEquals(
             'left join `address` as `a` on `a`.`id` = `u`.`address_id`',
             $this->q('[join]')->table('user', 'u')->join('address a')->render()
         );
         $this->assertEquals(
             'left join `address` as `a` on `a`.`user_id` = `u`.`id`',
             $this->q('[join]')->table('user', 'u')->join('address.user_id a')->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`user_id` = `u`.`id` '.
+            'left join `bank` as `b` on `b`.`id` = `u`.`bank_id`',
+            $this->q('[join]')->table('user', 'u')
+                ->join(['a'=>'address.user_id','b'=>'bank'])->render()
+        );
+        $this->assertEquals(
+            'left join `address` as `a` on `a`.`user_id` = `u`.`id` '.
+            'left join `bank` as `b` on `b`.`id` = `u`.`bank_id` '.
+            'left join `bank_details` on `bank_details`.`id` = `bank`.`details_id`',
+            $this->q('[join]')->table('user', 'u')
+                ->join(['a'=>'address.user_id','b'=>'bank'])
+                ->join('bank_details','bank.details_id')->render()
+        );
+
+        $this->assertEquals(
+            'left join `address` as `a` on a.name like u.pattern',
+            $this->q('[join]')->table('user', 'u')
+                ->join('address a',new Expression('a.name like u.pattern'))->render()
         );
     }
 
