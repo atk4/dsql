@@ -413,7 +413,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /*
+    /**
      * @requires PHP 5.6
      */
     public function testVarDump()
@@ -422,7 +422,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         var_dump($this->q()->table('user'));
     }
 
-    /*
+    /**
      * @requires PHP 5.6
      */
     public function testVarDump2()
@@ -431,12 +431,12 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         var_dump(new Expression('Hello [world]'));
     }
 
-    /*
+    /**
      * @requires PHP 5.6
      */
     public function testVarDump3()
     {
-        $this->expectOutputRegex('/.*Hello :a.*/');
+        $this->expectOutputRegex('/.*Heillo :a.*/');
         var_dump(new Expression('Hello [world]',['world'=>'php']));
     }
 
