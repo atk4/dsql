@@ -21,7 +21,7 @@ expression or you can execute it in exchange for result set.
 
 Quick Example::
 
-    use atk4\dsql;
+    use atk4\dsql\Query;
 
     $query = new Query();
     $query -> field('name');
@@ -62,11 +62,9 @@ By default there are 6 query modes::
 The default mode is 'select'.
 
 With Query object you need to specify arguments first and then perform an operation.
-This actually allows you to re-use the same Query object for more than one operation.
+This actually allows you to re-use the same Query object for more than one operation::
 
-.. code-block:: php
-
-    use atk4\dsql;
+    use atk4\dsql\Query;
 
     $data = ['name'=>'John', 'surname'=>'Smith']
 
@@ -110,9 +108,7 @@ Majority of methods return `$this` when called, which makes it pretty
 convenient for you to chain calls by using `->fx()` multiple times as
 illustrated in last example.
 
-You can also combine creation of the object with method chaining:
-
-.. code-block:: php
+You can also combine creation of the object with method chaining::
 
     $age = (new Query())->table('user')->where('id',123)->field('age')->getOne();
 
@@ -120,9 +116,7 @@ Using query as expression
 =========================
 
 You can use query as expression where applicable. The query will get a special
-treatment where it will be surrounded in brackets. Here are few examples:
-
-.. code-block:: php
+treatment where it will be surrounded in brackets. Here are few examples::
 
     $q = (new Query())
         ->table('employee');
@@ -134,9 +128,7 @@ treatment where it will be surrounded in brackets. Here are few examples:
 
     $q->get();
 
-This query will perform `select name from (select * from employee)`
-
-.. code-block:: php
+This query will perform `select name from (select * from employee)`::
 
     $q1 = (new Query())
         ->table('sales')
