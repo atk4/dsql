@@ -396,7 +396,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         try {
             $arr['R'] = $this->render();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $arr['R'] = $e->getMessage();
         }
 
