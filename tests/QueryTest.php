@@ -211,14 +211,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Alias is mandatory when pass table as Query
+     * Alias is mandatory when pass table as any object
      *
      * @covers ::table
      * @expectedException Exception
      */
     public function testTableException4()
     {
-        $this->q()->table($this->q()->table('test'));
+        $this->q()->table(new \stdClass());
     }
 
     /**
@@ -368,7 +368,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q = $this->q()->table('employee');
 
         $this->assertEquals(
-            'select `e`.`name` from (select * from `employee`) `e`',
+            'select `name` from (select * from `employee`) `e`',
             $this->q()
                 ->field('name')->table($q, 'e')
                 ->render()

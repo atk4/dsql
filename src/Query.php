@@ -172,7 +172,7 @@ class Query extends Expression
     {
         // comma-separated table names
         if (is_string($table) && strpos($table, ',') !== false) {
-            $table = array_map('trim', explode(',', $table));
+            $table = explode(',', $table);
         }
 
         // array of tables - recursively process each
@@ -192,14 +192,14 @@ class Query extends Expression
             return $this;
         }
 
-        // if table is set as Expression, then alias is mandatory
-        if ($table instanceof Expression && $alias === null) {
+        // if table is set as object, then alias is mandatory
+        if (is_object($table) && $alias === null) {
             throw new Exception('If table is set as Expression, then table alias is mandatory');
         }
 
-        // initialize args[table] array
-        if (!isset($this->args['table'])) {
-            $this->args['table'] = array();
+        // trim table name just in case developer called it like 'employees,    jobs'
+        if (is_string($table)) {
+            $table = trim($table);
         }
 
         // if no alias is set, then we will use table name as alias
@@ -218,6 +218,11 @@ class Query extends Expression
         // on multiple calls, main_table will be false and we won't
         // be able to join easily anymore.
         $this->main_table = ($this->main_table === null ? $alias : false);
+
+        // initialize args[table] array
+        if (!isset($this->args['table'])) {
+            $this->args['table'] = array();
+        }
 
        // if all is fine, then save table in args
         $this->args['table'][$alias] = $table;
