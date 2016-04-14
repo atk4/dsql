@@ -8,19 +8,19 @@ incredibly powerful library.
 
 Advanced Connections
 ====================
-Connection are incredibly lightweight and powerful in DSQL. The class
-tries to get out of your way as much as possible.
+:php:class:`Connection` is incredibly lightweight and powerful in DSQL.
+The class tries to get out of your way as much as possible.
 
 Using DSQL without Connection
 -----------------------------
-You can use Query and Expression without connection at all. Simply
-create expression::
+You can use :php:class:`Query` and :php:class:`Expression` without connection
+at all. Simply create expression::
 
     $expr = new Expression('show tables like []', ['foo%']);
 
 or query::
 
-    $query = (new Query())->table('user')->where('id',1);
+    $query = (new Query())->table('user')->where('id', 1);
 
 When it's time to execute you can specify your PDO manually::
 
@@ -36,7 +36,7 @@ With queries you might need to select mode first::
 The :php:meth:`Expresssion::execute` is a convenient way to prepare query,
 bind all parameters and get PDOStatement, but if you wish to do it
 manually, see `Manual Query Execution`_.
-    
+
 
 Using in Existing Framework
 ---------------------------
@@ -48,11 +48,11 @@ by switching to DSQL::
     $c = new Connection(['connection'=>$pdo]);
 
     $user_ids = $c->dsql()->table('expired_users')->field('user_id');
-    $c->dsql()->table('user')->where('id','in',$user_ids)->set('active',0)->update();
+    $c->dsql()->table('user')->where('id', 'in', $user_ids)->set('active', 0)->update();
 
     // Native Laravel Database Query Builder
     // $user_ids = DB::table('expired_users')->lists('user_id');
-    // DB::table('user')->whereIn('id', $user_ids)->update(['active',0]);
+    // DB::table('user')->whereIn('id', $user_ids)->update(['active', 0]);
 
 The native query builder in the example above populates $user_id with array from
 `expired_users` table, then creates second query, which is an update. With
@@ -64,7 +64,7 @@ results too.
     UPDATE
         user
     SET
-        actine = 0
+        active = 0
     WHERE
         id in (SELECT user_id from expired_users)
 
@@ -81,7 +81,7 @@ Using Dumper and Counter
 
 DSQL comes with two nice features - "dumper" and "counter". Dumper will output
 all the executed queries and how much time each query took and Counter will record
-how many queries were executed and how many rows you have fetched throug DSQL.
+how many queries were executed and how many rows you have fetched through DSQL.
 
 In order to enable those extensions you can simply change your DSN from::
 
@@ -95,9 +95,9 @@ to::
 
 When this DSN is passed into :php:meth:`Connection::connect`, it will return
 a proxy connection object that will collect the necessary statistics and
-"echo" it out.
+"echo" them out.
 
-If you would like to do something else with this statistics, you can set
+If you would like to do something else with these statistics, you can set
 a callback. For Dumper::
 
     $c->callback = function($expression, $time) {
@@ -124,25 +124,27 @@ If you have used "dumper:counter:", then use this::
 
 Proxy Connection
 ----------------
-Connection class is designed ot create instances of Expression, Query as well as executing queries. 
-A standard Connection class with the PDO use will do nothing inside its execute() because
-:php:meth:`Expression::execute` would handle all the work.
+Connection class is designed to create instances of :php:class:`Expression`,
+:php:class:`Query` as well as executing queries.
+A standard :php:class:`Connection` class with the use of PDO will do nothing
+inside its execute() because :php:meth:`Expression::execute` would handle all the work.
 
-However if :php:attr:`Connection::ocnnection` is NOT PDO, then :php:class:`Expression` will not
+However if :php:attr:`Connection::connection` is NOT PDO, then :php:class:`Expression` will not
 know how to execute query and will simply call::
 
     return $connection->execute($this);
 
-Connection_Proxy class would re-execute the query with a different connection class. In other
-words Connection_Proxy allows you to "wrap" your actual connection class. As a benefit you
-get to extend Proxy class implementing some unified features that would work with any other
+:php:class:`Connection_Proxy` class would re-execute the query with a different connection class. In other
+words :php:class:`Connection_Proxy` allows you to "wrap" your actual connection class. As a benefit you
+get to extend :php:class:`Proxy` class implementing some unified features that would work with any other
 connection class. Often this will require you to know externals, but let's build a proxy
 class that will add "DELAYED" options for all INSERT operations::
 
-    class Connection_DelayInserts extensd \atk4\dsql\Connection_Proxy
+    class Connection_DelayInserts extends \atk4\dsql\Connection_Proxy
     {
-        function execute(\atk4\dsql\Expression $expr){
-            if ($expr instanceof Query) {
+        function execute(\atk4\dsql\Expression $expr)
+        {
+            if ($expr instanceof \atk4\dsql\Query) {
 
                 if ($expr->mode == 'insert') {
                     $expr->insertOption('delayed');
@@ -162,14 +164,14 @@ quite simple to do::
 
     // use the new $c
 
-Connection_Proxy can be used for many different things.
+:php:class:`Connection_Proxy` can be used for many different things.
 
 .. _extending_query:
 
 Extending Query Class
 =====================
 
-You can add support for new database vendors by creating yoru own Query class.
+You can add support for new database vendors by creating your own :php:class:`Query` class.
 Let's say you want to add support for new SQL vendor::
 
     class Query_MyVendor extends atk4\dsql\Query
@@ -178,7 +180,8 @@ Let's say you want to add support for new SQL vendor::
         protected $template_truncate = 'delete [from] [table]';
 
         // also join is not supported
-        public function join($foreign_table, $master_field = null, $join_kind = null, $_foreign_alias = null) {
+        public function join($foreign_table, $master_field = null, $join_kind = null, $_foreign_alias = null)
+        {
             throw new atk4\dsql\Exception("Join is not supported by the database");
         }
     }
@@ -198,13 +201,13 @@ a separate add-on with it's own namespace. Let's say you have created `myname/ds
 1. Create your own Query_* class inside your library. If necessary create your own Connection_* class too.
 2. Make use of composer and add dependency to DSQL.
 3. Add a nice README file explaining all the quirks or extensions. Provide install instructions.
-4. Fork DSQL library
-5. Modify Connection::connect to recognize your database identifier and refer to your namespace
+4. Fork DSQL library.
+5. Modify :php:meth:`Connection::connect` to recognize your database identifier and refer to your namespace.
 6. Modify docs/extensions.rst to list name of your database and link to your repository / composer requirement.
-7. copy phpunit-mysql.php into phpunit-myvendor.php and make sure that dsql/tests/db/* works with your database.
+7. Copy phpunit-mysql.xml into phpunit-myvendor.xml and make sure that dsql/tests/db/* works with your database.
 
 Finally:
- - Submit pull request for only the Connection clas and docs/extensions.rst
+ - Submit pull request for only the Connection class and docs/extensions.rst.
 
 
 If you would like that your vendor support be bundled with DSQL, you should contact copyright@agiletoolkit.org
@@ -224,10 +227,10 @@ By Default DSQL comes with the following :ref:`query-modes`:
 
 You can add new mode if you wish. Let's look at how to add a MySQL specific query "LOAD DATA INFILE":
 
-1. Define new property inside your query class $template_load_data
-2. Add public method allowing to specify necessary parameters
-3. Re-use existing methods/template tags if you can
-4. create _render method if your tag rendering is complex
+1. Define new property inside your :php:class:`Query` class $template_load_data.
+2. Add public method allowing to specify necessary parameters.
+3. Re-use existing methods/template tags if you can.
+4. Create _render method if your tag rendering is complex.
 
 So to implement our task, you might need a class like this::
 
@@ -260,20 +263,20 @@ Manual Query Execution
 If you are not satisfied with :php:meth:`Expression::execute` you can execute query yourself.
 
 1. :php:meth:`Expression::render` query, then send it into PDO::prepare();
-2. use new $statement to bindValue with the contents of :php:attr:`Expression::params`
-3. set result fetch mode and parameters.
+2. use new $statement to bindValue with the contents of :php:attr:`Expression::params`;
+3. set result fetch mode and parameters;
 4. execute() your statement
 
 
 
 Exception Class
 ===============
-DSQL slightly extends and improves Exception class
+DSQL slightly extends and improves :php:class:`Exception` class
 
 .. php:class:: Exception
 
 The main goal of the new exception is to be able to accept additional information in addition
-to the message. We realize that often $e->getMessage() will be localized but if you stick
+to the message. We realize that often $e->getMessage() will be localized, but if you stick
 some variables in there, this will no longger be possible. You also risk injection or expose
 some sensitive data to the user.
 
@@ -300,5 +303,5 @@ if you really need it:
     :returns: array
 
 Any DSQL-related code must always throw atk4\dsql\Exception. Query-related errors will generate PDO exceptions.
-If you use a custom conneciton and doing some vendor-specific operations, you may also throw other vendor-specific
+If you use a custom connection and doing some vendor-specific operations, you may also throw other vendor-specific
 exceptions.

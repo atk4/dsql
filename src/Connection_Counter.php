@@ -8,7 +8,7 @@ namespace atk4\dsql;
  */
 class Connection_Counter extends Connection_Proxy
 {
-    protected $callback  = null;
+    public $callback  = null;
 
     protected $selects = 0;
     protected $queries = 0;
@@ -38,13 +38,14 @@ class Connection_Counter extends Connection_Proxy
         $ret = parent::execute($expr);
 
 
+
         return $this->iterate($ret);
     }
     public function __destruct()
     {
         if ($this->callback) {
             $c = $this->callback;
-            $c($this->queries, $this->selects, $this->queries, $this->expressions);
+            $c($this->queries, $this->selects, $this->rows, $this->expressions);
         } else {
             printf(
                 "Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
@@ -54,14 +55,5 @@ class Connection_Counter extends Connection_Proxy
                 $this->expressions
             );
         }
-
-
-        
-        return;
-
-        $took = time() + microtime() - $this->start_time;
-
-
-        return $ret;
     }
 }
