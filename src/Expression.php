@@ -383,6 +383,26 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
     }
 
+    function __debugInfo()
+    {
+
+        $arr = [
+            'R'=>false,
+            'template'=>$this->template,
+            'params'=>$this->params,
+            'connection'=>$this->connection,
+            'args'=>$this->args,
+        ];
+
+        try {
+            $arr['R'] = $this->render();
+        } catch (Exception $e) {
+            $arr['R'] = $e->getMessage();
+        }
+
+        return $arr;
+    }
+
     /**
      * Execute expression
      *

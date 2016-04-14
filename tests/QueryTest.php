@@ -414,6 +414,24 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testVarDump()
+    {
+        $this->expectOutputRegex('/select \* from `user`/');
+        var_dump($this->q()->table('user'));
+    }
+
+    public function testVarDump2()
+    {
+        $this->expectOutputRegex('/Expression could not render tag/');
+        var_dump(new Expression('Hello [world]'));
+    }
+
+    public function testVarDump3()
+    {
+        $this->expectOutputRegex('/Hello :a/');
+        var_dump(new Expression('Hello [world]',['world'=>'php']));
+    }
+
     /**
      * @covers ::field
      * @covers ::_render_field

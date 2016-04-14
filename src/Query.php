@@ -1061,6 +1061,27 @@ class Query extends Expression
     }
     // }}}
 
+    function __debugInfo()
+    {
+        $arr =  [
+            'R'=>false,
+            'mode'=>$this->mode,
+            'template'=>$this->template,
+            'params'=>$this->params,
+            'connection'=>$this->connection,
+            'main_table'=>$this->main_table,
+            'args'=>$this->args,
+        ];
+
+        try {
+            $arr['R'] = $this->render();
+        } catch (Exception $e) {
+            $arr['R'] = $this->getMessage();
+        }
+
+        return $arr;
+    }
+
     // {{{ Miscelanious
     /**
      * Renders query template. If the template is not explicitly set will use "select" mode.
