@@ -9,7 +9,7 @@ Welcome to DSQL's documentation!
 Contents:
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
 
     overview
     quickstart
@@ -17,6 +17,8 @@ Contents:
     queries
     connection
     results
+    advanced
+    extensions
 
 
 
