@@ -44,7 +44,7 @@ class Connection_Counter extends Connection_Proxy
     {
         if ($this->callback) {
             $c = $this->callback;
-            $c($this->selects, $this->rows, $this->queries, $this->expressions);
+            $c($this->queries, $this->selects, $this->queries, $this->expressions);
         } else {
             printf(
                 "Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
