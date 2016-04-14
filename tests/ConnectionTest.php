@@ -31,6 +31,11 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         };
 
         $this->assertEquals(
+            'PDO',
+            get_class($c->connection())
+        );
+
+        $this->assertEquals(
             4,
             $c->expr('select (2+2)')->getOne()
         );
@@ -135,6 +140,19 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testException3()
     {
         $this->setExpectedException('atk4\dsql\Exception');
-        $c = Connection::connect('');
+        $c = new Connection('sqlite::memory');
+    }
+    public function testException4()
+    {
+        $c = new Connection();
+        $q = $c->expr('select (2+2)');
+
+        $this->assertEquals(
+            'select (2+2)',
+            $q->render()
+        );
+
+        $this->setExpectedException('atk4\dsql\Exception');
+        $q->execute();
     }
 }
