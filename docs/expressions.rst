@@ -82,7 +82,7 @@ Creating Expression
 
 ::
 
-    use atk4\dsql;
+    use atk4\dsql\Expression;
 
     $expr = new Expression("NOW()");
 
@@ -295,9 +295,7 @@ circumstances.
   a string (which will be escaped) or another :php:class:`Expression` or
   :php:class:`Query`.
   If specified :php:class:`Query` is in "select" mode, then it's
-  automatically placed inside brackets.
-
-  .. code-block:: php
+  automatically placed inside brackets::
 
       $query->_consume('first_name');  // `first_name`
       $query->_consume($other_query);  // will merge parameters and return string
@@ -307,9 +305,7 @@ circumstances.
   Surrounds `$sql code` with :php:attr:`$escapeChar`.
   If escapeChar is `null` will do nothing.
 
-  Will also do nothing if it finds "*", "." or "(" character in `$sql_code`.
-
-  .. code-block:: php
+  Will also do nothing if it finds "*", "." or "(" character in `$sql_code`::
 
       $query->_escape('first_name');  // `first_name`
       $query->_escape('first.name');  // first.name

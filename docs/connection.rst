@@ -10,7 +10,7 @@ For current status on database support see: :ref:`databases`
 .. php:class:: Connection
 
 Connection class is handy to have if you plan on building and executing
-queries in your application. It's more appropriate to store 
+queries in your application. It's more appropriate to store
 connection in a global variable or global class::
 
     $app->db = atk4\dsql\Connection::connect($dsn, $user, $pass);
@@ -54,7 +54,7 @@ generate either new Query or Expression class::
     :returns: new Expression
 
 
-Here is how you can use this all togetether::
+Here is how you can use all of this together::
 
 
     $dsn = 'mysql:host=localhost;port=3307;dbname=testdb';
@@ -68,8 +68,8 @@ Here is how you can use this all togetether::
 can be used for this DSN string. This can be a PDO class
 or it may try to use a 3rd party connection class.
 
-Connection class is also responsibel for executing queries. This is only used
-if you connected to vendor that does not use PDO.
+Connection class is also responsible for executing queries. This is only used
+if you connect to vendor that does not use PDO.
 
 .. php:method:: execute(Expression $expr)
 
