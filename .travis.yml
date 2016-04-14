@@ -7,7 +7,7 @@ services:
     - mysql
 
 before_script:
-    - composer install --dev
+    - composer install
     - mysql -e 'create database dsql_test;'
 
 after_script:
