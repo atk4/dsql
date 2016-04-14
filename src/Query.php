@@ -40,7 +40,7 @@ class Query extends Expression
     public $defaultField = '*';
 
     /**
-     * Name of base table to use when using default join().
+     * Name or alias of base table to use when using default join().
      *
      * This is set by table(). If you are using multiple tables,
      * then $main_table is set to false as it is irrelevant.
@@ -227,51 +227,6 @@ class Query extends Expression
        // if all is fine, then save table in args
         $this->args['table'][$alias] = $table;
 
-
-
-        // table can be expression, but then we can only set the table once
-        // @todo WHY such restriction ?
-        /*
-        if ($table instanceof Expression) {
-
-            if (isset($this->args['table'])) {
-                throw new Exception('You cannot use table(expression). table() was called before');
-            }
-
-            $this->main_table = false;
-            // @todo Imants: Only saves table (expression) and doesn't save table/expression alias!?!
-            $this->args['table'] = $table;
-
-            return $this;
-        }
-
-        // initialize args[table] array
-        if (!isset($this->args['table'])) {
-            $this->args['table'] = array();
-        }
-
-        // @todo WHY such restriction ?
-        if ($this->args['table'] instanceof Expression) {
-            throw new Exception('You cannot use table(). You have already used table(expression) previously.');
-        }
-
-        // trim table name just in case developer called it like 'employees,    jobs'
-        $table = trim($table);
-
-        // main_table will be set only if table() is called once. It's used
-        // when joining with other tables
-        if ($this->main_table === null) {
-            $this->main_table = $alias ?: $table;
-
-            // on multiple calls, main_table will be false and we won't
-            // be able to join easily anymore.
-        } elseif ($this->main_table) {
-            $this->main_table = false;   // query from multiple tables
-        }
-
-        $this->args['table'][] = array($table, $alias);
-        */
-
         return $this;
     }
 
@@ -316,35 +271,6 @@ class Query extends Expression
             $ret[] = $table;
         }
 
-
-
-        /*
-        // will be joined for output
-        $ret = [];
-
-        if (empty($this->args['table'])) {
-            return '';
-        }
-
-        if ($this->args['table'] instanceof Expression) {
-
-            // This will wrap into () if Query object is used here
-            return $this->_consume($this->args['table']);
-        }
-
-        foreach ($this->args['table'] as $row) {
-            list($table, $alias) = $row;
-
-            $table = $this->_escape($table);
-
-            if ($alias !== null) {
-                $table .= ' ' . $this->_escape($alias);
-            }
-
-            $ret[] = $table;
-        }
-        */
-
         return implode(',', $ret);
     }
 
@@ -357,25 +283,6 @@ class Query extends Expression
     protected function _render_table_noalias()
     {
         return $this->_render_table(false);
-
-        /*
-        // will be joined for output
-        $ret = [];
-
-        if ($this->args['table'] instanceof Expression) {
-            throw new Exception('Table cannot be expression for UPDATE / INSERT queries in '.__METHOD__);
-        }
-
-        foreach ($this->args['table'] as $row) {
-            list($table, ) = $row;
-
-            $table = $this->_escape($table);
-
-            $ret[] = $table;
-        }
-
-        return implode(', ', $ret);
-        */
     }
 
     /**

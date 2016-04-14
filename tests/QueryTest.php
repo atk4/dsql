@@ -287,34 +287,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * can't use table with expression
-     *
-     * @covers ::table
-     * @expectedException Exception
-     */
-    public function testTableExprException1()
-    {
-        $q = $this->q();
-        $q
-            ->table($q->expr('test'))
-            ->table('user');
-    }
-
-    /**
-     * can't use table with expression
-     *
-     * @covers ::table
-     * @expectedException Exception
-     */
-    public function testTableExprException2()
-    {
-        $q = $this->q();
-        $q
-            ->table('user')
-            ->table($q->expr('test'));
-    }
-
-    /**
      * table() should return $this Query for chaining
      *
      * @covers ::table
@@ -439,15 +411,19 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->render()
         );
 
-        /**
-         * @todo Add more tests with multiple tables & subqueries
-         * Currently that's restricted, but I believe it should be allowed to create query like this
-         * SELECT `e`.`name`, `c`.`name`
-         * FROM
-         *  (select * from `employee`) `e`,
-         *  (select * from `customer`) `c`
-         * In such case table alias should better be mandatory.
-         */
+        // test with multiple sub-queries as tables
+        $q1 = $this->q()->table('employee');
+        $q2 = $this->q()->table('customer');
+
+        $this->assertEquals(
+            'select `e`.`name`,`c`.`name` from (select * from `employee`) `e`,(select * from `customer`) `c`',
+            $this->q()
+                ->field('name', 'e')
+                ->field('name', 'c')
+                ->table($q1, 'e')
+                ->table($q2, 'c')
+                ->render()
+        );
     }
 
     /**
