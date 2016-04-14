@@ -14,7 +14,7 @@ Goals of DSQL are:
  - free, licensed under MIT
  - no dependencies
  - follows design paradigms:
-     - "PHP the Agile way"
+     - "[PHP the Agile way](https://github.com/atk4/dsql/wiki/PHP-the-Agile-Way)"
      - "[Functional ORM](https://github.com/atk4/dsql/wiki/Functional-ORM)"
      - "[Open to extend](https://github.com/atk4/dsql/wiki/Open-to-Extend)"
      - "[Vendor Transparency](https://github.com/atk4/dsql/wiki/Vendor-Transparency)"
