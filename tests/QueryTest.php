@@ -422,6 +422,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->field('name', 'c')
                 ->table($q1, 'e')
                 ->table($q2, 'c')
+                ->where('e.last_name', 'c.last_name')
                 ->render()
         );
     }
