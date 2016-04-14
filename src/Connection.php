@@ -14,36 +14,36 @@ class Connection
     protected $expression_class = 'atk4\dsql\Expression';
     protected $connection = null;
 
-    public static function connect($dsn, $user = null, $password = null)
+    public static function connect($dsn, $user = null, $password = null, $args = [])
     {
         list($driver, $rest) = explode(':', $dsn, 2);
 
         switch (strtolower($driver)) {
             case 'mysql':
-                return new Connection([
+                return new Connection(array_merge([
                     'connection'=>new \PDO($dsn, $user, $password),
                     'query_class'=>'atk4\dsql\Query_MySQL'
-                ]);
+                ],$args));
             case 'sqlite':
-                return new Connection([
+                return new Connection(array_merge([
                     'connection'=>new \PDO($dsn, $user, $password),
                     'query_class'=>'atk4\dsql\Query_SQLite'
-                ]);
+                ],$args));
             case 'dumper':
-                return new Connection_Dumper([
+                return new Connection_Dumper(array_merge([
                     'connection'=>Connection::connect($rest)
-                ]);
+                ],$args));
 
             case 'counter':
-                return new Connection_Counter([
+                return new Connection_Counter(array_merge([
                     'connection'=>Connection::connect($rest)
-                ]);
+                ],$args));
 
                 // let PDO handle the rest
             default:
-                return new Connection([
+                return new Connection(array_merge([
                     'connection'=>new \PDO($dsn, $user, $password)
-                ]);
+                ],$args));
 
         }
     }
