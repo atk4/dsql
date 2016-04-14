@@ -16,6 +16,9 @@ class Connection
 
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
+        if (strpos($dsn,':') === false) {
+            throw new Exception(["Your DSN format is invalid. Must be in 'driver:host:options' format", 'dsn'=>$dsn]);
+        }
         list($driver, $rest) = explode(':', $dsn, 2);
 
         switch (strtolower($driver)) {
@@ -57,6 +60,10 @@ class Connection
     public function __construct($attributes = null)
     {
         if ($attributes) {
+            if (!is_array($attributes)) {
+                throw new Exception('Invalid arguments for "new Connection()". Did you mean to call Connection::connect()?');
+            }
+
             foreach ($attributes as $key => $val) {
                 $this->$key = $val;
             }

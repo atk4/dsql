@@ -30,7 +30,7 @@ class Query extends Expression
      *
      * @var string
      */
-    public $mode = null;
+    public $mode = 'select';
 
     /**
      * If no fields are defined, this field is used.
@@ -386,7 +386,7 @@ class Query extends Expression
             if (is_null($master_field)) {
                 list($m1, $m2) = array(null, null);
             } else {
-                list($m1, $m2) = explode('.', $master_field, 2);
+                @list($m1, $m2) = explode('.', $master_field, 2);
             }
             if (is_null($m2)) {
                 $m2 = $m1;
@@ -644,6 +644,7 @@ class Query extends Expression
             // if no condition defined - set default condition
             if (count($row) == 2) {
                 $value = $cond;
+
                 if (is_array($value)) {
                     $cond = 'in';
                 } elseif ($value instanceof Query && $value->mode === 'select') {
