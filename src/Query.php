@@ -306,12 +306,7 @@ class Query extends Expression
      */
     protected function _render_from()
     {
-        return isset($this->main_table) ? 'from' : '';
-        /**
-         * @todo Imants: maybe we can change this to
-         *  return !empty($this->args['table']) ? 'from' : ''
-         * and get rid of main_table.
-         */
+        return empty($this->args['table']) ? '' : 'from';
     }
     /// }}}
 
