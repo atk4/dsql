@@ -413,18 +413,27 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /*
+     * @requires PHP 5.6
+     */
     public function testVarDump()
     {
         $this->expectOutputRegex('/.*select \* from `user`.*/');
         var_dump($this->q()->table('user'));
     }
 
+    /*
+     * @requires PHP 5.6
+     */
     public function testVarDump2()
     {
         $this->expectOutputRegex('/.*Expression could not render tag.*/');
         var_dump(new Expression('Hello [world]'));
     }
 
+    /*
+     * @requires PHP 5.6
+     */
     public function testVarDump3()
     {
         $this->expectOutputRegex('/.*Hello :a.*/');
