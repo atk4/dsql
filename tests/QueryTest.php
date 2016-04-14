@@ -856,6 +856,21 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->field('name')->table('employee')->where('employee.a', 1)
                 ->render()
         );
+
+
+        $user_ids = $this->q()->table('expired_users')->field('user_id');
+
+        $this->assertEquals(
+            'update `user` set `active`=:a  where `id` in (select `user_id` from `expired_users`)',
+            $this->q()
+                ->table('user')
+                ->where('id','in',$user_ids)
+                ->set('active',0)
+                ->selectTemplate('update')
+                ->render()
+        );
+
+
     }
 
     /**
