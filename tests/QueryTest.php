@@ -1180,4 +1180,49 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->where('surname', 'Doe');
         $this->assertEquals('select * from `user` where `surname` = :a', $q->render());
     }
+
+    /**
+     * Test [option]
+     *
+     * @covers ::option
+     * @covers ::_render_option
+     */
+    public function testOption()
+    {
+        // single option
+        $this->assertEquals(
+            'select calc_found_rows * from `test`',
+            $this->q()->table('test')->option('calc_found_rows')->render()
+        );
+        // multiple options
+        $this->assertEquals(
+            'select calc_found_rows ignore * from `test`',
+            $this->q()->table('test')->option('calc_found_rows,ignore')->render()
+        );
+        $this->assertEquals(
+            'select calc_found_rows ignore * from `test`',
+            $this->q()->table('test')->option(['calc_found_rows','ignore'])->render()
+        );
+        // options for specific modes
+        $q = $this->q()
+                ->table('test')
+                ->field('name')
+                ->set('name', 1)
+                ->option('calc_found_rows', 'select') // for default select mode
+                ->option('ignore', 'insert') // for insert mode
+                ;
+
+        $this->assertEquals(
+            'select calc_found_rows `name` from `test`',
+            $q->selectTemplate('select')->render()
+        );
+        $this->assertEquals(
+            'insert ignore into `test` (`name`) values (:a)',
+            $q->selectTemplate('insert')->render()
+        );
+        $this->assertEquals(
+            'update `test` set `name`=:a',
+            $q->selectTemplate('update')->render()
+        );
+    }
 }
