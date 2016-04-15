@@ -1163,7 +1163,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Test reset()
      *
-     * @covers Expression::reset
+     * @covers \atk4\dsql\Expression::reset
      */
     public function testReset()
     {
