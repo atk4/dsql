@@ -924,7 +924,7 @@ class Query extends Expression
      */
     public function select()
     {
-        return $this->selectTemplate('select')->execute();
+        return $this->mode('select')->execute();
     }
 
     /**
@@ -934,7 +934,7 @@ class Query extends Expression
      */
     public function insert()
     {
-        return $this->selectTemplate('insert')->execute();
+        return $this->mode('insert')->execute();
     }
 
     /**
@@ -944,7 +944,7 @@ class Query extends Expression
      */
     public function update()
     {
-        return $this->selectTemplate('update')->execute();
+        return $this->mode('update')->execute();
     }
 
     /**
@@ -954,7 +954,7 @@ class Query extends Expression
      */
     public function replace()
     {
-        return $this->selectTemplate('replace')->execute();
+        return $this->mode('replace')->execute();
     }
 
     /**
@@ -964,7 +964,7 @@ class Query extends Expression
      */
     public function delete()
     {
-        return $this->selectTemplate('delete')->execute();
+        return $this->mode('delete')->execute();
     }
 
     /**
@@ -974,7 +974,7 @@ class Query extends Expression
      */
     public function truncate()
     {
-        return $this->selectTemplate('truncate')->execute();
+        return $this->mode('truncate')->execute();
     }
     // }}}
 
@@ -1119,7 +1119,7 @@ class Query extends Expression
     public function render()
     {
         if (!$this->template) {
-            $this->selectTemplate('select');
+            $this->mode('select');
         }
 
         return parent::render();
@@ -1135,7 +1135,7 @@ class Query extends Expression
      *
      * @return $this
      */
-    public function selectTemplate($mode)
+    public function mode($mode)
     {
         $this->mode = $mode;
         $this->template = $this->templates[$mode];
