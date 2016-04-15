@@ -7,6 +7,7 @@
  - `$bt` property renamed to `$escapeChar`
  - `$sql_templates` renamed to `$template_select`, `$template_insert` etc.
  - `options()`, `options_insert()`, `options_replace` renamed to `option($option, $mode)`
+ - `del()` renamed to `reset()`
 
 
 ### Other changes
