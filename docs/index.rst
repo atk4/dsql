@@ -13,9 +13,9 @@ Contents:
 
     overview
     quickstart
+    connection
     expressions
     queries
-    connection
     results
     advanced
     extensions
