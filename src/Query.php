@@ -16,10 +16,10 @@ class Query extends Expression
      * @var array
      */
     public $templates = [
-        'select'   => 'select [field] [from] [table][join][where][having][order][limit]',
+        'select'   => 'select[option] [field] [from] [table][join][where][group][having][order][limit]',
+        'insert'   => 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])',
+        'replace'  => 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])',
         'delete'   => 'delete [from] [table][where][having]',
-        'insert'   => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
-        'replace'  => 'replace into [table_noalias] ([set_fields]) values ([set_values])',
         'update'   => 'update [table_noalias] set [set] [where]',
         'truncate' => 'truncate table [table_noalias]',
     ];
@@ -733,7 +733,7 @@ class Query extends Expression
      * Implements GROUP BY functionality. Simply pass either field name
      * as string or expression.
      *
-     * @param string|object $group Group by this
+     * @param mixed $group Group by this
      *
      * @return $this
      */
@@ -869,7 +869,52 @@ class Query extends Expression
 
         return implode(',', $ret);
     }
-    /// }}}
+    // }}}
+
+    // {{{ Option
+
+    /**
+     * Set options for particular mode
+     *
+     * @param mixed  $option
+     * @param string $mode select|insert|replace
+     *
+     * @return $this
+     */
+    public function option($option, $mode = 'select')
+    {
+        // Case with comma-separated options
+        if (is_string($option) && strpos($option, ',') !== false) {
+            $option = explode(',', $option);
+        }
+
+        if (is_array($option)) {
+            foreach ($option as $opt) {
+                $this->args['option'][$mode][] = $opt;
+            }
+            return $this;
+        }
+
+        $this->args['option'][$mode][] = $option;
+
+        return $this;
+    }
+
+    /**
+     * Renders [option].
+     *
+     * @return string rendered SQL chunk
+     */
+    protected function _render_option()
+    {
+        if (!isset($this->args['option'][$this->mode])) {
+            return '';
+        }
+
+        return ' '.implode(' ', $this->args['option'][$this->mode]);
+    }
+
+    // }}}
 
     // {{{ Query Modes
     /**
