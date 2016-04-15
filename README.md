@@ -12,16 +12,16 @@ Obviously because existing ones are not good enough. DSQL tries to do things dif
 1. Composability. Unlike other libraries, we render queries recursively allowing many levels of sub-selects.
 2. Small footprint. We don't duplicate query code for all vendors, instead we use clever templating system.
 3. Extensibility. We have 3 different ways to extend DSQL as well as 3rd party vendor driver support.
-4. Any Query. Any query with any complexity can be expressed through DSQL.
+4. **Any Query** - any query with any complexity can be expressed through DSQL.
 5. Zero dependencies. Use DSQL in any PHP application or framework.
 6. NoSQL support. In addition to supporting PDO, DSQL can be extended to deal with SQL-compatible NoSQL servers.
 
-[See our "Awesome Query" gallery](https://github.com/atk4/dsql/wiki/Awesome-Queries)"
+[See our "Awesome Queries" gallery](https://github.com/atk4/dsql/wiki/Awesome-Queries)
 
 
 ## DSQL Is Stable!
 
-DSQL is in fact a library from 2006, initially included in [AModules2](https://sourceforge.net/projects/amodules3/) and later [Agile Toolkit](https://github.com/atk4/atk4/blob/release-4.0.1/lib/DBlite/dsql.php). We simply forked it and cleaned it up:
+DSQL has been in production since 2006, initially included in [AModules2](https://sourceforge.net/projects/amodules3/) and later [Agile Toolkit](https://github.com/atk4/atk4/blob/release-4.0.1/lib/DBlite/dsql.php). We simply forked it and cleaned it up for you:
 
 [![Build Status](https://travis-ci.org/atk4/dsql.png?branch=develop)](https://travis-ci.org/atk4/dsql)
 [![Code Climate](https://codeclimate.com/github/atk4/dsql/badges/gpa.svg)](https://codeclimate.com/github/atk4/dsql)
@@ -29,7 +29,7 @@ DSQL is in fact a library from 2006, initially included in [AModules2](https://s
 [![Issue Count](https://codeclimate.com/github/atk4/dsql/badges/issue_count.svg)](https://codeclimate.com/github/atk4/dsql)
 
 
-## DSQL Is Simple!
+## DSQL Is Simple and Powerful
 
 ```
 $query = new atk4\dsql\Query();
@@ -40,20 +40,7 @@ $query  ->table('employees')
 echo "Employees born on May 2, 1961: ".$query->getOne();
 ```
 
-[Looking for "XXL" query examples?](https://github.com/atk4/dsql/wiki/Awesome-Queries)"
-
-
-## DSQL is part of Full Stack Web UI Framework
-
-![image](docs/files/agiletoolkit.png)
-
-DSQL is nibble enough to be used in your current project, but if you are looking to start a new web
-project, why not look into [Agile Toolkit](http://agiletoolkit.org/) framework?
-
-Our team is committed to fork [Agile Models](https://github.com/atk4/models) from Agile Toolkit, so
-that you could replace your ORM with a more powerful and scallable one. 
-
-## Sophisticated Example
+If the basic query is not fun, how about more complex?
 
 ```
 // Estabish a query looking for a maximum salary
@@ -92,7 +79,35 @@ foreach ($salary as $row) {
 }
 ```
 
-[Read more or contribute more examples in DSQL-Primer project](https://github.com/atk4/dsql-primer).
+This builds and executes a single query that looks like this:
+
+```
+SELECT
+    `emp_no`,
+    max(salary) `max_salary`,
+    TimeStampDiff(month, from_date, to_date) `months`
+FROM
+    `salary`
+JOIN
+    `employees` on `employees`.`emp_id` = `salary`.`emp_id`
+WHERE
+    `salary`.`emp_no` in (select `id` from `employees` where `birth_date` = :a)
+GROUP BY `emp_no`
+ORDER BY max_salary desc
+
+:a = "1961-05-02"
+```
+
+## DSQL is part of Full Stack Web UI Framework
+
+![image](docs/files/agiletoolkit.png)
+
+DSQL is nibble enough to be used in your current project, but if you are looking to start a new web
+project, why not look into [Agile Toolkit](http://agiletoolkit.org/)? It's a free to use full-stack
+framework that will blow your mind form the same team who brought you DSQL.
+
+Our team is also committed to fork [Agile Models](https://github.com/atk4/models) from Agile Toolkit,
+so that you could replace your ORM with ours. (Planned summer 2016)
 
 ## Limitations of DSQL
 
@@ -118,3 +133,5 @@ Many NoSQL databases are re-introducing SQL support today even if it's a limited
 ## Documentation
 
 http://dsql.readthedocs.org/
+
+
