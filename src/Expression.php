@@ -349,20 +349,24 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         $res= preg_replace_callback(
-            '/\[([a-z0-9_]*)\]/',
+            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}/',
             function ($matches) use (&$nameless_count) {
 
+                $identifier = substr($matches[0],1,-1);
+                $escaping = ($matches[0][0] == '[')?'param':'escape';
+
                 // Allow template to contain []
-                $identifier = $matches[1];
                 if ($identifier === "") {
                     $identifier = $nameless_count++;
+
+                    // use rendering only with named tags
                 }
+                    $fx = '_render_'.$identifier;
 
                 // [foo] will attempt to call $this->_render_foo()
-                $fx = '_render_'.$matches[1];
 
                 if (array_key_exists($identifier, $this->args['custom'])) {
-                    return $this->_consume($this->args['custom'][$identifier]);
+                    return $this->_consume($this->args['custom'][$identifier], $escaping);
                 } elseif (method_exists($this, $fx)) {
                     return $this->$fx();
                 }

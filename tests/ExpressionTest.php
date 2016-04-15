@@ -141,6 +141,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $e = $this->e('hello, [who]', ['who' => 'world']);
         $this->assertEquals('hello, :a', $e->render());
         $this->assertEquals('world', $e->params[':a']);
+
+        $e = $this->e('hello, {who}', ['who' => 'world']);
+        $this->assertEquals('hello, `world`', $e->render());
+        $this->assertEquals([], $e->params);
     }
 
     /**
