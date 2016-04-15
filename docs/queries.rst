@@ -675,8 +675,8 @@ you can modify :php:attr:`$template_update` to include those tags.
 Dropping attributes
 ===================
 
-If you have called where() several times, there is a way to
-remove all whe were clauses from the query and start from start:
+If you have called where() several times, there is a way to remove all the
+where clauses from the query and start from beginning:
 
 .. php:method:: del($tag)
 
@@ -688,7 +688,7 @@ Example::
     $q
         ->table('user')
         ->where('name', 'John');
-        ->del('name')
+        ->del('where')
         ->where('name', 'Peter');
 
     // where name = 'Peter'
