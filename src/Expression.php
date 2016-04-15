@@ -200,6 +200,36 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Resets arguments.
+     *
+     * @param string $tag
+     *
+     * @return $this
+     */
+    public function reset($tag = null)
+    {
+        // unset all arguments
+        if ($tag === null) {
+            $this->args = ['custom' => []];
+            return $this;
+        }
+
+        if (!is_string($tag)) {
+            throw new Exception('Tag should be string');
+        }
+
+        // unset custom/argument or argument if such exists
+        if ($this->offsetExists($tag)) {
+            $this->offsetUnset($tag);
+        } elseif (isset($this->args[$tag])) {
+            unset($this->args[$tag]);
+        }
+
+        return $this;
+    }
+
+
+    /**
      * Recursively renders sub-query or expression, combining parameters.
      * If the argument is more likely to be a field, use tick=true.
      *
