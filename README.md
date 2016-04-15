@@ -40,7 +40,7 @@ $query  ->table('employees')
 echo "Employees born on May 2, 1961: ".$query->getOne();
 ```
 
-If the basic query is not fun, how about more complex?
+If the basic query is not fun, how about more complex one?
 
 ```
 // Estabish a query looking for a maximum salary
@@ -117,10 +117,14 @@ Our team intentionally keeps DSQL simple. The following features are deliberatly
  - no reliance on any ussage pattern in your database or presence of specific tables
  - no decision making based on supplied data values
  - no active record or object relational mapping
- 
-## Supported SQL features
 
-Many NoSQL databases are re-introducing SQL support today even if it's a limited subset. DSQL is designed to work with those vendors and is therefore extremely extensive. The features that come out of the box include:
+If you need those features, then they are implemented by [Agile Models](https://github.com/atk4/models)
+by extending DSQL.
+ 
+## Documentation cheat-sheet
+
+DSQL has extensives documentation at http://dsql.readthedocs.org, but below we have linked some of the
+more demanded topics:
 
  - querying data from [table()](http://dsql.readthedocs.org/en/latest/queries.html#modifying-your-query) or sub-select with [join()](http://dsql.readthedocs.org/en/develop/queries.html#joining-with-other-tables), where(), order(), [group()](http://dsql.readthedocs.org/en/develop/queries.html#grouping-results-by-field), limit(), having() and option() 
  - update/replace single or multiple records with set(), where() and option()
@@ -128,10 +132,4 @@ Many NoSQL databases are re-introducing SQL support today even if it's a limited
  - delete records with where()
  - [iterate](http://dsql.readthedocs.org/en/latest/quickstart.html#fetching-result) through result-set or get() all data
  - supporting [sub-queries](http://dsql.readthedocs.org/en/latest/queries.html#using-query-as-expression) and [expressions](http://dsql.readthedocs.org/en/latest/expressions.html#expressions) anywhere
-
-
-## Documentation
-
-http://dsql.readthedocs.org/
-
 
