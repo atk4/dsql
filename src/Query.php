@@ -11,22 +11,9 @@ namespace atk4\dsql;
 class Query extends Expression
 {
     /**
-     * Define templates for the basic queries.
-     *
-     * @var array
-     */
-    public $templates = [
-        'select'   => 'select[option] [field] [from] [table][join][where][group][having][order][limit]',
-        'insert'   => 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])',
-        'replace'  => 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])',
-        'delete'   => 'delete [from] [table][where][having]',
-        'update'   => 'update [table_noalias] set [set] [where]',
-        'truncate' => 'truncate table [table_noalias]',
-    ];
-
-    /**
-     * Query will use one of the predefined "templates". The mode will contain
-     * name of template used. Basically it's array key of $templates property.
+     * Query will use one of the predefined templates. The $mode will contain
+     * name of template used. Basically it's part of Query property name -
+     * Query::template_[$mode].
      *
      * @var string
      */
@@ -39,6 +26,48 @@ class Query extends Expression
      */
     public $defaultField = '*';
 
+    /**
+     * SELECT template
+     *
+     * @var string
+     */
+    protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order][limit]';
+
+    /**
+     * INSERT template
+     *
+     * @var string
+     */
+    protected $template_insert = 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])';
+    
+    /**
+     * REPLACE template
+     *
+     * @var string
+     */
+    protected $template_replace = 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])';
+    
+    /**
+     * DELETE template
+     *
+     * @var string
+     */
+    protected $template_delete = 'delete [from] [table][where][having]';
+    
+    /**
+     * UPDATE template
+     *
+     * @var string
+     */
+    protected $template_update = 'update [table_noalias] set [set] [where]';
+    
+    /**
+     * TRUNCATE template
+     *
+     * @var string
+     */
+    protected $template_truncate = 'truncate table [table_noalias]';
+    
     /**
      * Name or alias of base table to use when using default join().
      *
@@ -1031,7 +1060,6 @@ class Query extends Expression
     {
         // Case with comma-separated fields or first argument being an array
         if (is_string($order) && strpos($order, ',') !== false) {
-            // Check for multiple
             $order = explode(',', $order);
         }
         if (is_array($order)) {
@@ -1131,14 +1159,20 @@ class Query extends Expression
      *
      * By default it is in SELECT mode
      *
-     * @param string $mode A key for $this->templates
+     * @param string $mode
      *
      * @return $this
      */
     public function mode($mode)
     {
-        $this->mode = $mode;
-        $this->template = $this->templates[$mode];
+        $fx = 'template_'.$mode;
+
+        if (isset($this->{$fx})) {
+            $this->mode = $mode;
+            $this->template = $this->{$fx};
+        } else {
+            throw new Exception(['Query does not have this mode', 'mode' => $mode]);
+        }
 
         return $this;
     }
