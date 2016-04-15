@@ -491,16 +491,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             'args',
             $e
         );
-
-        // reset everything in Query
-        $q = (new Query)->table('customer')->field('name');
-        $q->reset();
-        $this->assertEquals('select *', $q->render());
-
-        // reset particular tag in Query
-        $q = (new Query)->table('customer')->field('name');
-        $q->reset('field')->field('surname');
-        $this->assertEquals('select `surname` from `customer`', $q->render());
     }
 }
 

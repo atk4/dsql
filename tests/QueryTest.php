@@ -1159,4 +1159,25 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $q->render()
         );
     }
+
+    /**
+     * Test reset()
+     *
+     * @covers Expression::reset
+     */
+    public function testReset()
+    {
+        // reset everything
+        $q = $this->q()->table('user')->where('name', 'John');
+        $q->reset();
+        $this->assertEquals('select *', $q->render());
+
+        // reset particular tag
+        $q = $this->q()
+            ->table('user')
+            ->where('name', 'John')
+            ->reset('where')
+            ->where('surname', 'Doe');
+        $this->assertEquals('select * from `user` where `surname` = :a', $q->render());
+    }
 }
