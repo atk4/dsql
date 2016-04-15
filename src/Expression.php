@@ -231,7 +231,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             throw new Exception(['Only Expressions or Expressionable objects may be used in Expression','object'=>$sql_code]);
         }
 
-         //|| !$sql_code instanceof Expression) {
+        // at this point $sql_code is instance of Expression
         $sql_code->params = &$this->params;
         $sql_code->_paramBase = &$this->_paramBase;
         $ret = $sql_code->render();
@@ -383,7 +383,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
     }
 
-    function __debugInfo()
+    public function __debugInfo()
     {
 
         $arr = [

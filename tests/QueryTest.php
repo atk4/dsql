@@ -198,31 +198,92 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->q()->table(['employee','jobs'], 'u');
     }
+
     /**
-     * can't use table with expression
+     * Alias is mandatory when pass table as Expression
      *
      * @covers ::table
      * @expectedException Exception
      */
-    public function testTableExprException1()
+    public function testTableException3()
     {
-        $q = $this->q();
-        $q
-            ->table($q->expr('test'))
-            ->table('user');
+        $this->q()->table($this->q()->expr('test'));
     }
+
     /**
-     * can't use table with expression
+     * Alias is mandatory when pass table as any object
      *
      * @covers ::table
      * @expectedException Exception
      */
-    public function testTableExprException2()
+    public function testTableException4()
     {
-        $q = $this->q();
-        $q
-            ->table('user')
-            ->table($q->expr('test'));
+        $this->q()->table(new \stdClass());
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException5()
+    {
+        $this->q()
+            ->table('foo', 'a')
+            ->table('bar', 'a');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException6()
+    {
+        $this->q()
+            ->table('foo', 'bar')
+            ->table('bar');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException7()
+    {
+        $this->q()
+            ->table('foo')
+            ->table('foo');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException8()
+    {
+        $this->q()
+            ->table($this->q()->table('test'), 'foo')
+            ->table('foo');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException9()
+    {
+        $this->q()
+            ->table('foo')
+            ->table($this->q()->table('test'), 'foo');
     }
 
     /**
@@ -344,35 +405,27 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q = $this->q()->table('employee');
 
         $this->assertEquals(
-            'select `name` from (select * from `employee`)',
+            'select `name` from (select * from `employee`) `e`',
             $this->q()
-                ->field('name')->table($q)
+                ->field('name')->table($q, 'e')
                 ->render()
         );
 
-        /**
-         * @todo Add more tests with multiple tables & subqueries
-         * Currently that's restricted, but I believe it should be allowed to create query like this
-         * SELECT `e`.`name`, `c`.`name`
-         * FROM
-         *  (select * from `employee`) `e`,
-         *  (select * from `customer`) `c`
-         * In such case table alias should better be mandatory.
-         */
+        // test with multiple sub-queries as tables
+        $q1 = $this->q()->table('employee');
+        $q2 = $this->q()->table('customer');
 
-        /**
-         * @todo Add some tests with non-unique table aliases.
-         *  They will currently generate: SELECT * FROM `foo` `a`, `bar` `a` which is wrong!
-         * We have to check uniquness of table aliases and in such cases throw appropriate exception.
-         */
-        $q = $this->q()
-            ->table('foo', 'a')
-            ->table('bar', 'a');
         $this->assertEquals(
-            'select * from `foo` `a`,`bar` `a`', // <-- aliases should be unique and THIS SHOULD THROW EXCEPTION
-            $q->render()
+            //this way it would be more correct: 'select `e`.`name`,`c`.`name` from (select * from `employee`) `e`,(select * from `customer`) `c` where `e`.`last_name` = `c`.`last_name`',
+            'select `e`.`name`,`c`.`name` from (select * from `employee`) `e`,(select * from `customer`) `c` where `e`.`last_name` = c.last_name',
+            $this->q()
+                ->field('name', 'e')
+                ->field('name', 'c')
+                ->table($q1, 'e')
+                ->table($q2, 'c')
+                ->where('e.last_name', $this->q()->expr('c.last_name'))
+                ->render()
         );
-
     }
 
     /**
@@ -437,7 +490,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testVarDump3()
     {
         $this->expectOutputRegex('/.*Hello :a.*/');
-        var_dump(new Expression('Hello [world]',['world'=>'php']));
+        var_dump(new Expression('Hello [world]', ['world'=>'php']));
     }
 
     /**
@@ -869,13 +922,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'left join `bank_details` on `bank_details`.`id` = `bank`.`details_id`',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a'=>'address.user_id','b'=>'bank'])
-                ->join('bank_details','bank.details_id')->render()
+                ->join('bank_details', 'bank.details_id')->render()
         );
 
         $this->assertEquals(
             'left join `address` as `a` on a.name like u.pattern',
             $this->q('[join]')->table('user', 'u')
-                ->join('address a',new Expression('a.name like u.pattern'))->render()
+                ->join('address a', new Expression('a.name like u.pattern'))->render()
         );
     }
 
@@ -926,8 +979,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'update `user` set `active`=:a  where `id` in (select `user_id` from `expired_users`)',
             $this->q()
                 ->table('user')
-                ->where('id','in',$user_ids)
-                ->set('active',0)
+                ->where('id', 'in', $user_ids)
+                ->set('active', 0)
                 ->selectTemplate('update')
                 ->render()
         );
