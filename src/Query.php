@@ -766,11 +766,11 @@ class Query extends Expression
             return '';
         }
 
-        $g = implode(', ', array_map(function ($a) {
+        $g = array_map(function ($a) {
             return $this->_consume($a, 'escape');
-        }, $this->args['group']));
+        }, $this->args['group']);
 
-        return ' group by '.$g;
+        return ' group by '.implode(', ', $g);
     }
     // }}}
 

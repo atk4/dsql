@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/atk4/dsql](https://badges.gitter.im/atk4/dsql.svg)](https://gitter.im/atk4/dsql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-DSQL is a composable SQL query builder. You can write multi-vendor queries in PHP profiting from better security, clean syntax and avoid human errors. 
+DSQL is a composable SQL query builder. You can write multi-vendor queries in PHP profiting from better security, clean syntax and avoid human errors.
 
 
 ## Hold on! Why yet another query builder?
@@ -114,19 +114,19 @@ so that you could replace your ORM with ours. (Planned summer 2016)
 Our team intentionally keeps DSQL simple. The following features are deliberatly excluded:
 
  - no knowledge of your database schema
- - no reliance on any ussage pattern in your database or presence of specific tables
+ - no reliance on any usage pattern in your database or presence of specific tables
  - no decision making based on supplied data values
  - no active record or object relational mapping
 
 If you need those features, then they are implemented by [Agile Models](https://github.com/atk4/models)
 by extending DSQL.
- 
+
 ## Documentation cheat-sheet
 
 DSQL has extensives documentation at http://dsql.readthedocs.org, but below we have linked some of the
 more demanded topics:
 
- - querying data from [table()](http://dsql.readthedocs.org/en/latest/queries.html#modifying-your-query) or sub-select with [join()](http://dsql.readthedocs.org/en/develop/queries.html#joining-with-other-tables), where(), order(), [group()](http://dsql.readthedocs.org/en/develop/queries.html#grouping-results-by-field), limit(), having() and option() 
+ - querying data from [table()](http://dsql.readthedocs.org/en/latest/queries.html#modifying-your-query) or sub-select with [join()](http://dsql.readthedocs.org/en/develop/queries.html#joining-with-other-tables), where(), order(), [group()](http://dsql.readthedocs.org/en/develop/queries.html#grouping-results-by-field), limit(), having() and option()
  - update/replace single or multiple records with set(), where() and option()
  - insert one or multiple records with set() or setAll() and option()
  - delete records with where()

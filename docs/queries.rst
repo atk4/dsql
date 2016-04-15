@@ -39,7 +39,7 @@ Methods of Query are designed to be flexible and consise. Most methods
 have a variable number of arguments and some arguments can be skipped::
 
     $query -> where('id', 123);
-    $query -> where('id', '=', 123);  // same
+    $query -> where('id', '=', 123);  // the same
 
 Most methods will accept :php:class:`Expression` or strings. Strings are
 escaped or quoted (depending on type of argument). By using :php:class:`Expression`
@@ -59,7 +59,7 @@ In the next example $a is escaped but $b is parametrised::
 If you want to switch places and execute *where "b" = `a`*, then
 you can resort to Expressions::
 
-    $query -> where($c->expr('{} = []', ['a', 'b']));
+    $query -> where($c->expr('{} = []', ['b', 'a']));
 
 Parameters which you specify into Expression will be preserved and linked into
 the `$query` properly.
@@ -71,13 +71,13 @@ Query Modes
 
 When you create new Query it always start in "select" mode. You can switch
 query to a different mode using :php:meth:`mode`. Normally you shouldn't
-bother calling this method and instead use one of the next 5 methods. They
-will switch the query mode for you and execute query:
+bother calling this method and instead use one of the following methods.
+They will switch the query mode for you and execute query:
 
 .. php:method:: select()
 
     Switch back to "select" mode and execute `select` statement.
-    
+
     See `Modifying Select Query`_.
 
 .. php:method:: insert()
@@ -90,7 +90,7 @@ will switch the query mode for you and execute query:
 
     Switch to `update` mode and execute statement.
 
-    See `Upadte Query`_.
+    See `Update Query`_.
 
 .. php:method:: replace()
 
@@ -158,7 +158,7 @@ illustrated in last example.
 
 You can also combine creation of the object with method chaining::
 
-    $age = $c->dsql()->table('user')->where('id',123)->field('age')->getOne();
+    $age = $c->dsql()->table('user')->where('id', 123)->field('age')->getOne();
 
 Using query as expression
 =========================
@@ -187,11 +187,11 @@ This query will perform `select name from (select * from employee)`::
         ->field('date')
         ->field('amount', null, 'credit');
 
-    $u = $c->expr("([] union []) derrivedTable", [$q1, $q2]);
+    $u = $c->dsql("[] union []", [$q1, $q2]);
 
     $q = $c->dsql()
         ->field('date,debit,credit')
-        ->table($u)
+        ->table($u, 'derrivedTable')
         ;
 
     $q->get();
@@ -204,7 +204,7 @@ query:
     select `date`,`debit`,`credit` from (
         (select `date`,`amount` `debit` from `sales`) union
         (select `date`,`amount` `credit` from `purchases`)
-    ) derrivedTable
+    ) `derrivedTable`
 
 Modifying Select Query
 ======================
@@ -228,33 +228,33 @@ alias there). Using keys in your array will also specify the aliases.
 
 Basic Examples::
 
-    $query->table('user');
+    $c->dsql()->table('user');
         // SELECT * from `user`
 
-    $query->table('user','u');
+    $c->dsql()->table('user','u');
         // aliases table with "u"
         // SELECT * from `user` `u`
 
-    $query->table('user')->table('salary');
+    $c->dsql()->table('user')->table('salary');
         // specify multiple tables. Don't forget to link them by using "where"
         // SELECT * from `user`, `salary`
 
-    $query->table(['user','salary']);
+    $c->dsql()->table(['user','salary']);
         // identical to previous example
         // SELECT * from `user`, `salary`
 
-    $query->table(['u'=>'user','s'=>'salary']);
+    $c->dsql()->table(['u'=>'user','s'=>'salary']);
         // specify aliases for multiple tables
         // SELECT * from `user` `u`, `salary` `s`
 
 Inside your query table names and aliases will always be surrounded by backticks.
 If you want to use a more complex expression, use :php:class:`Expression` as table::
 
-    $query->table(
-        $query->expr('(SELECT id FROM user UNION select id from document)'),
+    $c->dsql()->table(
+        $c->expr('(SELECT id FROM user UNION select id from document)'),
         'tbl'
     );
-    // SELECT * FROM (SELECT id FROM user UNION SELECT id FROM document ) `tbl`
+    // SELECT * FROM (SELECT id FROM user UNION SELECT id FROM document) `tbl`
 
 Finally, you can also specify a different query instead of table, by simply
 passing another :php:class:`Query` object::
@@ -264,10 +264,10 @@ passing another :php:class:`Query` object::
     $sub_q -> where('name', 'John');
 
     $q = $c->dsql();
-    $t -> field('surname');
-    $t -> table($sub_q);
+    $q -> field('surname');
+    $q -> table($sub_q, 'sub');
 
-    // SELECT `surname` FROM (SELECT * FROM employee WHERE `name` = :a)
+    // SELECT `surname` FROM (SELECT * FROM `employee` WHERE `name` = :a) `sub`
 
 Method can be executed several times on the same Query object.
 
@@ -285,7 +285,7 @@ Setting Fields
 
     :param string|array|object $fields: Specify list of fields to fetch
     :param string $table: Optionally specify a table to query from
-    :param string $alias: Optionally specify alias for resulting query
+    :param string $alias: Optionally specify alias of field in resulting query
     :returns: $this
 
 Basic Examples::
@@ -359,10 +359,10 @@ or "parent_id is not" DSQL will recognize <, >, =, !=, <>, is, is not.
 If you havent specified parameter as a part of $field, specify it through a second
 parameter - $operation. If unspecified, will default to '='.
 
-Last argument is value. You can specify number, string, array or even null (specifying
-null is not the same as omitting this argument). This argument will always be
-parameterised unless you pass expression. If you specify array, all elements
-will be parametrised individually.
+Last argument is value. You can specify number, string, array, expression
+or even null (specifying null is not the same as omitting this argument).
+This argument will always be parameterised unless you pass expression.
+If you specify array, all elements will be parametrised individually.
 
 Starting with the basic examples::
 
@@ -420,8 +420,8 @@ Here is a sophisticated example::
             ->where('b', 1)
             ->where(
                 $q->andExpr()
-                    ->where('true')
-                    ->where('false')
+                    ->where('a', 2)
+                    ->where('b', 2)
             )
     );
 
@@ -433,9 +433,9 @@ The above code will result in the following query:
         `name`
     from
         `employee`
-    where 
+    where
         deleted  = 0 and
-        (`a` = :a or `b` = :b or (true and false))
+        (`a` = :a or `b` = :b or (`a` = :c and `b` = :d))
 
 Technically orExpr() generates a yet another object that is composed
 and renders its calls to where() method::
@@ -449,7 +449,7 @@ and renders its calls to where() method::
 
 .. code-block:: sql
 
-    having 
+    having
         (`a` = :a or `b` = :b)
 
 
@@ -528,8 +528,8 @@ tables so you need a different syntax::
 
     $q->table('user u');
     $q->join([
-        'a'=>'address.user_id', 
-        'c'=>'credit_card.user_id', 
+        'a'=>'address.user_id',
+        'c'=>'credit_card.user_id',
         'preferences.user_id'
     ]);
 
@@ -653,7 +653,7 @@ Other settings
 --------------
 
 Limit and Order are normally not included to avoid side-effects, but
-you can modify $template_update to include those tags.
+you can modify :php:attr:`$template_update` to include those tags.
 
 
 Delete Query
@@ -669,18 +669,18 @@ Other settings
 --------------
 
 Limit and Order are normally not included to avoid side-effects, but
-you can modify $template_update to include those tags.
+you can modify :php:attr:`$template_update` to include those tags.
 
 
 Dropping attributes
 ===================
 
 If you have called where() several times, there is a way to
-remove all whe were clauses from the query and strart from start:
+remove all whe were clauses from the query and start from start:
 
 .. php:method:: del($tag)
 
-    
+
     :param string $tag: part of the query to delete/reset.
 
 Example::
@@ -692,7 +692,7 @@ Example::
         ->where('name', 'Peter');
 
     // where name = 'Peter'
-    
+
 
 Other Methods
 ==============
