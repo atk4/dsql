@@ -678,7 +678,7 @@ Dropping attributes
 If you have called where() several times, there is a way to remove all the
 where clauses from the query and start from beginning:
 
-.. php:method:: del($tag)
+.. php:method:: reset($tag)
 
 
     :param string $tag: part of the query to delete/reset.
@@ -688,7 +688,7 @@ Example::
     $q
         ->table('user')
         ->where('name', 'John');
-        ->del('where')
+        ->reset('where')
         ->where('name', 'Peter');
 
     // where name = 'Peter'
