@@ -39,35 +39,35 @@ class Query extends Expression
      * @var string
      */
     protected $template_insert = 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])';
-    
+
     /**
      * REPLACE template
      *
      * @var string
      */
     protected $template_replace = 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])';
-    
+
     /**
      * DELETE template
      *
      * @var string
      */
     protected $template_delete = 'delete [from] [table][where][having]';
-    
+
     /**
      * UPDATE template
      *
      * @var string
      */
     protected $template_update = 'update [table_noalias] set [set] [where]';
-    
+
     /**
      * TRUNCATE template
      *
      * @var string
      */
     protected $template_truncate = 'truncate table [table_noalias]';
-    
+
     /**
      * Name or alias of base table to use when using default join().
      *
@@ -1165,11 +1165,11 @@ class Query extends Expression
      */
     public function mode($mode)
     {
-        $fx = 'template_'.$mode;
+        $prop = 'template_'.$mode;
 
-        if (isset($this->{$fx})) {
+        if (isset($this->{$prop})) {
             $this->mode = $mode;
-            $this->template = $this->{$fx};
+            $this->template = $this->{$prop};
         } else {
             throw new Exception(['Query does not have this mode', 'mode' => $mode]);
         }
