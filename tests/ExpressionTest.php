@@ -456,6 +456,42 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             $e->params
         );
     }
+
+    /**
+     * Test reset exception if tag is not a string
+     *
+     * @expectedException atk4\dsql\Exception
+     */
+    public function testResetException()
+    {
+        $this->e('test')->reset($this->e());
+    }
+
+    /**
+     * Test reset()
+     *
+     * @covers ::reset
+     */
+    public function testReset()
+    {
+        // reset everything
+        $e = $this->e('hello, [name] [surname]', ['name' => 'John', 'surname' => 'Doe']);
+        $e->reset();
+        $this->assertAttributeEquals(
+            ['custom' => []],
+            'args',
+            $e
+        );
+
+        // reset particular custom/tag
+        $e = $this->e('hello, [name] [surname]', ['name' => 'John', 'surname' => 'Doe']);
+        $e->reset('surname');
+        $this->assertAttributeEquals(
+            ['custom' => ['name' => 'John']],
+            'args',
+            $e
+        );
+    }
 }
 
 

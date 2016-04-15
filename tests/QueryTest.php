@@ -383,14 +383,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'insert into `employee` (`name`) values (:a)',
             $this->q()
                 ->field('name')->table('employee', 'emp')->set('name', 1)
-                ->selectTemplate('insert')
+                ->mode('insert')
                 ->render()
         );
         $this->assertEquals(
             'update `employee` set `name`=:a',
             $this->q()
                 ->field('name')->table('employee', 'emp')->set('name', 1)
-                ->selectTemplate('update')
+                ->mode('update')
                 ->render()
         );
     }
@@ -937,7 +937,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::where
      * @covers ::_render_where
-     * @covers ::selectTemplate
+     * @covers ::mode
      */
     public function testCombinedWhere()
     {
@@ -967,7 +967,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'delete from `employee` where `employee`.`a` = :a',
             $this->q()
-                ->selectTemplate('delete')
+                ->mode('delete')
                 ->field('name')->table('employee')->where('employee.a', 1)
                 ->render()
         );
@@ -981,7 +981,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->table('user')
                 ->where('id', 'in', $user_ids)
                 ->set('active', 0)
-                ->selectTemplate('update')
+                ->mode('update')
                 ->render()
         );
 
@@ -1016,7 +1016,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Test insert, update and delete templates.
      *
-     * @covers ::selectTemplate
+     * @covers ::mode
      * @covers ::where
      * @covers ::set
      * @covers ::_render_set
@@ -1030,7 +1030,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'delete from `employee` where `name` = :a',
             $this->q()
                 ->field('name')->table('employee')->where('name', 1)
-                ->selectTemplate('delete')
+                ->mode('delete')
                 ->render()
         );
 
@@ -1039,7 +1039,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'update `employee` set `name`=:a',
             $this->q()
                 ->field('name')->table('employee')->set('name', 1)
-                ->selectTemplate('update')
+                ->mode('update')
                 ->render()
         );
 
@@ -1047,7 +1047,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'update `employee` set `name`=`name`+1',
             $this->q()
                 ->field('name')->table('employee')->set('name', new Expression('`name`+1'))
-                ->selectTemplate('update')
+                ->mode('update')
                 ->render()
         );
 
@@ -1056,7 +1056,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'insert into `employee` (`name`) values (:a)',
             $this->q()
                 ->field('name')->table('employee')->set('name', 1)
-                ->selectTemplate('insert')
+                ->mode('insert')
                 ->render()
         );
 
@@ -1067,7 +1067,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->field('time')->field('name')->table('employee')
                 ->set('time', new Expression('now()'))
                 ->set('name', 'unknown')
-                ->selectTemplate('insert')
+                ->mode('insert')
                 ->render()
         );
 
@@ -1077,7 +1077,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $this->q()
                 ->field('time')->field('name')->table('employee')
                 ->set(['time' => new Expression('now()'), 'name' => 'unknown'])
-                ->selectTemplate('insert')
+                ->mode('insert')
                 ->render()
         );
     }
@@ -1157,6 +1157,72 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or `b` = :b or (true and false))',
             $q->render()
+        );
+    }
+
+    /**
+     * Test reset()
+     *
+     * @covers \atk4\dsql\Expression::reset
+     */
+    public function testReset()
+    {
+        // reset everything
+        $q = $this->q()->table('user')->where('name', 'John');
+        $q->reset();
+        $this->assertEquals('select *', $q->render());
+
+        // reset particular tag
+        $q = $this->q()
+            ->table('user')
+            ->where('name', 'John')
+            ->reset('where')
+            ->where('surname', 'Doe');
+        $this->assertEquals('select * from `user` where `surname` = :a', $q->render());
+    }
+
+    /**
+     * Test [option]
+     *
+     * @covers ::option
+     * @covers ::_render_option
+     */
+    public function testOption()
+    {
+        // single option
+        $this->assertEquals(
+            'select calc_found_rows * from `test`',
+            $this->q()->table('test')->option('calc_found_rows')->render()
+        );
+        // multiple options
+        $this->assertEquals(
+            'select calc_found_rows ignore * from `test`',
+            $this->q()->table('test')->option('calc_found_rows,ignore')->render()
+        );
+        $this->assertEquals(
+            'select calc_found_rows ignore * from `test`',
+            $this->q()->table('test')->option(['calc_found_rows','ignore'])->render()
+        );
+        // options for specific modes
+        $q = $this->q()
+                ->table('test')
+                ->field('name')
+                ->set('name', 1)
+                ->option('calc_found_rows', 'select') // for default select mode
+                ->option('ignore', 'insert') // for insert mode
+                ;
+
+        $this->assertEquals(
+            'select calc_found_rows `name` from `test`',
+            $q->mode('select')->render()
+        );
+        $this->assertEquals(
+            'insert ignore into `test` (`name`) values (:a)',
+            $q->mode('insert')->render()
+        );
+        $this->assertEquals(
+            'update `test` set `name`=:a',
+            $q->mode('update')->render()
         );
     }
 }

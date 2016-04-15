@@ -11,22 +11,9 @@ namespace atk4\dsql;
 class Query extends Expression
 {
     /**
-     * Define templates for the basic queries.
-     *
-     * @var array
-     */
-    public $templates = [
-        'select'   => 'select [field] [from] [table][join][where][having][order][limit]',
-        'delete'   => 'delete [from] [table][where][having]',
-        'insert'   => 'insert into [table_noalias] ([set_fields]) values ([set_values])',
-        'replace'  => 'replace into [table_noalias] ([set_fields]) values ([set_values])',
-        'update'   => 'update [table_noalias] set [set] [where]',
-        'truncate' => 'truncate table [table_noalias]',
-    ];
-
-    /**
-     * Query will use one of the predefined "templates". The mode will contain
-     * name of template used. Basically it's array key of $templates property.
+     * Query will use one of the predefined templates. The $mode will contain
+     * name of template used. Basically it's part of Query property name -
+     * Query::template_[$mode].
      *
      * @var string
      */
@@ -38,6 +25,48 @@ class Query extends Expression
      * @var string|Expression
      */
     public $defaultField = '*';
+
+    /**
+     * SELECT template
+     *
+     * @var string
+     */
+    protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order][limit]';
+
+    /**
+     * INSERT template
+     *
+     * @var string
+     */
+    protected $template_insert = 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])';
+
+    /**
+     * REPLACE template
+     *
+     * @var string
+     */
+    protected $template_replace = 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])';
+
+    /**
+     * DELETE template
+     *
+     * @var string
+     */
+    protected $template_delete = 'delete [from] [table][where][having]';
+
+    /**
+     * UPDATE template
+     *
+     * @var string
+     */
+    protected $template_update = 'update [table_noalias] set [set] [where]';
+
+    /**
+     * TRUNCATE template
+     *
+     * @var string
+     */
+    protected $template_truncate = 'truncate table [table_noalias]';
 
     /**
      * Name or alias of base table to use when using default join().
@@ -733,7 +762,7 @@ class Query extends Expression
      * Implements GROUP BY functionality. Simply pass either field name
      * as string or expression.
      *
-     * @param string|object $group Group by this
+     * @param mixed $group Group by this
      *
      * @return $this
      */
@@ -869,7 +898,52 @@ class Query extends Expression
 
         return implode(',', $ret);
     }
-    /// }}}
+    // }}}
+
+    // {{{ Option
+
+    /**
+     * Set options for particular mode
+     *
+     * @param mixed  $option
+     * @param string $mode select|insert|replace
+     *
+     * @return $this
+     */
+    public function option($option, $mode = 'select')
+    {
+        // Case with comma-separated options
+        if (is_string($option) && strpos($option, ',') !== false) {
+            $option = explode(',', $option);
+        }
+
+        if (is_array($option)) {
+            foreach ($option as $opt) {
+                $this->args['option'][$mode][] = $opt;
+            }
+            return $this;
+        }
+
+        $this->args['option'][$mode][] = $option;
+
+        return $this;
+    }
+
+    /**
+     * Renders [option].
+     *
+     * @return string rendered SQL chunk
+     */
+    protected function _render_option()
+    {
+        if (!isset($this->args['option'][$this->mode])) {
+            return '';
+        }
+
+        return ' '.implode(' ', $this->args['option'][$this->mode]);
+    }
+
+    // }}}
 
     // {{{ Query Modes
     /**
@@ -879,7 +953,7 @@ class Query extends Expression
      */
     public function select()
     {
-        return $this->selectTemplate('select')->execute();
+        return $this->mode('select')->execute();
     }
 
     /**
@@ -889,7 +963,7 @@ class Query extends Expression
      */
     public function insert()
     {
-        return $this->selectTemplate('insert')->execute();
+        return $this->mode('insert')->execute();
     }
 
     /**
@@ -899,7 +973,7 @@ class Query extends Expression
      */
     public function update()
     {
-        return $this->selectTemplate('update')->execute();
+        return $this->mode('update')->execute();
     }
 
     /**
@@ -909,7 +983,7 @@ class Query extends Expression
      */
     public function replace()
     {
-        return $this->selectTemplate('replace')->execute();
+        return $this->mode('replace')->execute();
     }
 
     /**
@@ -919,7 +993,7 @@ class Query extends Expression
      */
     public function delete()
     {
-        return $this->selectTemplate('delete')->execute();
+        return $this->mode('delete')->execute();
     }
 
     /**
@@ -929,7 +1003,7 @@ class Query extends Expression
      */
     public function truncate()
     {
-        return $this->selectTemplate('truncate')->execute();
+        return $this->mode('truncate')->execute();
     }
     // }}}
 
@@ -986,7 +1060,6 @@ class Query extends Expression
     {
         // Case with comma-separated fields or first argument being an array
         if (is_string($order) && strpos($order, ',') !== false) {
-            // Check for multiple
             $order = explode(',', $order);
         }
         if (is_array($order)) {
@@ -1074,7 +1147,7 @@ class Query extends Expression
     public function render()
     {
         if (!$this->template) {
-            $this->selectTemplate('select');
+            $this->mode('select');
         }
 
         return parent::render();
@@ -1086,14 +1159,20 @@ class Query extends Expression
      *
      * By default it is in SELECT mode
      *
-     * @param string $mode A key for $this->templates
+     * @param string $mode
      *
      * @return $this
      */
-    public function selectTemplate($mode)
+    public function mode($mode)
     {
-        $this->mode = $mode;
-        $this->template = $this->templates[$mode];
+        $prop = 'template_'.$mode;
+
+        if (isset($this->{$prop})) {
+            $this->mode = $mode;
+            $this->template = $this->{$prop};
+        } else {
+            throw new Exception(['Query does not have this mode', 'mode' => $mode]);
+        }
 
         return $this;
     }
