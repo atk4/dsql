@@ -714,17 +714,13 @@ Other Methods
         ->option('calc_found_rows') // for default select mode
         ->option('ignore', 'insert') // for insert mode
         ;
-    
+
     $q->select(); // select calc_found_rows `name` from `test`
     $q->insert(); // insert ignore into `test` (`name`) values (`name` = 'John')
 
 
 Properties
 ==========
-
-.. php:attr:: templates
-
-    Array of templates for basic queries. See :ref:`Query Modes`.
 
 .. php:attr:: mode
 
@@ -735,3 +731,27 @@ Properties
 .. php:attr:: defaultField
 
     If no fields are defined, this field is used.
+
+.. php:attr:: template_select
+
+    Template for SELECT query. See :ref:`Query Modes`.
+
+.. php:attr:: template_insert
+
+    Template for INSERT query. See :ref:`Query Modes`.
+
+.. php:attr:: template_replace
+
+    Template for REPLACE query. See :ref:`Query Modes`.
+
+.. php:attr:: template_update
+
+    Template for UPDATE query. See :ref:`Query Modes`.
+
+.. php:attr:: template_delete
+
+    Template for DELETE query. See :ref:`Query Modes`.
+
+.. php:attr:: template_truncate
+
+    Template for TRUNCATE query. See :ref:`Query Modes`.
