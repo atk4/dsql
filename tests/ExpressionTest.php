@@ -119,15 +119,15 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             'now()',
             $this->e(['template' => 'now()'])->render()
         );
-        // pass as array without key and custom escapeChar
+        // pass as array without key 
         $this->assertEquals(
             ':a Name',
-            $this->e(['[] Name', 'escapeChar' => '*'], ['First'])->render()
+            $this->e(['[] Name'], ['First'])->render()
         );
-        // pass as array with template key and custom escapeChar
+        // pass as array with template key
         $this->assertEquals(
             ':a Name',
-            $this->e(['template' => '[] Name', 'escapeChar' => '*'], ['Last'])->render()
+            $this->e(['template' => '[] Name'], ['Last'])->render()
         );
     }
 
