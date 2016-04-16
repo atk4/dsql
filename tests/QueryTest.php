@@ -71,6 +71,10 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->q()->field('first_name'), '_render_field')
         );
         $this->assertEquals(
+            '`last_name` `a`',
+            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name','a')->field('last_name','a'), '_render_field')
+        );
+        $this->assertEquals(
             '`first_name`,`last_name`',
             PHPUnitUtil::callProtectedMethod($this->q()->field('first_name,last_name'), '_render_field')
         );
