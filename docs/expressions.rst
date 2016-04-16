@@ -302,12 +302,18 @@ circumstances.
 
 .. php:method:: _escape($sql_code)
 
-  Surrounds `$sql code` with back-tick
+  Always surrounds `$sql code` with back-ticks.
 
-  Will also do nothing if it finds "*", "." or "(" character in `$sql_code`::
+.. php:method:: _escapeSoft($sql_code)
+
+  Surrounds `$sql code` with back-ticks.
+
+  It will smartly escape table.field type of strings resulting in `table`.`field`.
+
+  Will do nothing if it finds "*", "`" or "(" character in `$sql_code`::
 
       $query->_escape('first_name');  // `first_name`
-      $query->_escape('first.name');  // first.name
+      $query->_escape('first.name');  // `first`.`name`
       $query->_escape('(2+2)');       // (2+2)
       $query->_escape('*');           // *
 
