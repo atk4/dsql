@@ -31,13 +31,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     protected $args = ['custom' => []];
 
     /**
-     * Backticks are added around all fields. Set this to blank string to avoid.
-     *
-     * @var string
-     */
-    protected $escapeChar = '`';
-
-    /**
      * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc.
      *
      * @var string
@@ -246,6 +239,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     return $this->_param($sql_code);
                 case 'escape':
                     return $this->_escape($sql_code);
+                case 'soft-escape':
+                    return $this->_escapeSoft($sql_code);
                 case 'none':
                     return $sql_code;
             }
@@ -280,9 +275,42 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Soft-escaping SQL identifier. This method will attempt to
+     * put `..` around the identifier, however will not do so
+     * if you are using special characters like ".", "(" or "`"
+     *
+     * @param mixed $value Any string or array of strings
+     *
+     * @return string|array Escaped string or array of strings
+     */
+    protected function _escapeSoft($value)
+    {
+        // Supports array
+        if (is_array($value)) {
+            return array_map(__METHOD__, $value);
+        }
+
+        if (is_string($value) && strpos($value, '.') !== false) {
+            return implode('.', $this->_escapeSoft(explode('.', $value)));
+        }
+
+        // in some cases we should not escape
+        if (is_object($value)
+            || $value === '*'
+            || strpos($value, '(') !== false
+            || strpos($value, '`') !== false
+        ) {
+            return $value;
+        }
+
+        return '`' . str_replace('`', '``', $value) . '`';
+    }
+
+    /**
      * Escapes argument by adding backticks around it.
      * This will allow you to use reserved SQL words as table or field
-     * names such as "table".
+     * names such as "table" as well as other characters that SQL
+     * permits in the identifiers (e.g. spaces or equation signs)
      *
      * @param mixed $value Any string or array of strings
      *
@@ -295,19 +323,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return array_map(__METHOD__, $value);
         }
 
-        // in some cases we should not escape
-        if (!$this->escapeChar
-            || is_object($value)
-            || $value === '*'
-            || strpos($value, '.') !== false
-            || strpos($value, '(') !== false
-            || strpos($value, $this->escapeChar) !== false
-        ) {
-            return $value;
-        }
-
         // in all other cases we should escape
-        return $this->escapeChar . $value . $this->escapeChar;
+        return '`' . str_replace('`', '``', $value) . '`';
     }
 
     /**

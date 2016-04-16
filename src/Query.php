@@ -83,60 +83,66 @@ class Query extends Expression
     /**
      * Adds new column to resulting select by querying $field.
      *
-     * @todo I want to get rid of $table argument, because it's either
-     *  can embedded into a field directly or not necessary for expression.
-     *
      * Examples:
      *  $q->field('name');
      *
-     * Second argument specifies table for regular fields
-     *  $q->field('name', 'user');
-     *  $q->field('name', 'user')->field('line1', 'address');
+     * You can use a dot to prepend table name to the field:
+     *  $q->field('user.name');
+     *  $q->field('user.name')->field('address.line1');
      *
      * Array as a first argument will specify multiple fields, same as calling field() multiple times
-     *  $q->field(['name', 'surname']);
+     *  $q->field(['name', 'surname', 'address.line1']);
      *
-     * Associative array will assume that "key" holds the field alias.
-     * Value may be field name, expression or Query object itself
-     *  $q->field(['alias' => 'name', 'alias2' => 'surname']);
-     *  $q->field(['alias' => $q->expr(..), 'alias2' => $q->dsql()->.. ]);
-     *
-     * You may use array with aliases together with table specifier.
-     *  $q->field(['alias' => 'name', 'alias2' => 'surname'], 'user');
-     *
-     * You can specify $q->expr() for calculated fields. In such case field alias is mandatory
+     * You can pass first argument Expression or Query
      *  $q->field( $q->expr('2+2'), 'alias');   // must always use alias
      *
-     * You can use $q->dsql() for subqueries. In such case field alias is mandatory
-     *  $q->field( $q->dsql()->table('x')... , 'alias');    // must always use alias
+     * You can use $q->dsql() for subqueries. Subqueries are wrapped in
+     * brackets.
+     *  $q->field( $q->dsql()->table('x')... , 'alias');
+     *
+     * Associative array will assume that "key" holds the field alias.
+     * Value may be field name, Expression or Query.
+     *  $q->field(['alias' => 'name', 'alias2' => 'mother.surname']);
+     *  $q->field(['alias' => $q->expr(..), 'alias2' => $q->dsql()->.. ]);
+     *
+     * If you need to use funky name for the field (e.g, one condaiting 
+     * a dot or space), you should wrap it into expression:
+     *  $q->field($q->expr('{}', ['fun...ky.field']), 'f');
      *
      * @param mixed  $field Specifies field to select
-     * @param string $table Specify if not using primary table
      * @param string $alias Specify alias for this field
      *
      * @return $this
      */
-    public function field($field, $table = null, $alias = null)
+    public function field($field, $alias = null)
     {
         // field is passed as string, may contain commas
         if (is_string($field) && strpos($field, ',') !== false) {
             $field = explode(',', $field);
-        } elseif (is_object($field) && $alias === null) {
-            $alias = $table;
-            $table = null;
         }
 
         // recursively add array fields
         if (is_array($field)) {
+            if (!is_null($alias)) {
+                throw new Exception([
+                    'Alias must not be specified when $field is an array', 
+                    'alias'=>$alias
+                ]);
+            }
+
             foreach ($field as $alias => $f) {
                 if (is_numeric($alias)) {
                     $alias = null;
                 }
-                $this->field($f, $table, $alias);
+                $this->field($f, $alias);
             }
             return $this;
         }
-        $this->args['fields'][] = [$field, $table, $alias];
+        if (is_null($alias)) {
+            $this->args['fields'][] = $field;
+        } else {
+            $this->args['fields'][$alias] = $field;
+        }
 
         return $this;
     }
@@ -160,21 +166,18 @@ class Query extends Expression
         }
 
         // process each defined field
-        foreach ($this->args['fields'] as $row) {
-            list($field, $table, $alias) = $row;
-
+        foreach ($this->args['fields'] as $alias => $field) {
             // Do not use alias, if it's same as field
             if ($alias === $field) {
                 $alias = null;
             }
 
-            // Will parameterize the value and backtick if necessary
-            $field = $this->_consume($field, 'escape');
-
-            if ($table) {
-                // table name cannot be expression, so only backtick
-                $field = $this->_escape($table) . '.' . $field;
+            if (is_numeric($alias)) {
+                $alias = null;
             }
+
+            // Will parameterize the value and backtick if necessary
+            $field = $this->_consume($field, 'soft-escape');
 
             if ($alias) {
                 // field alias cannot be expression, so only backtick
@@ -635,14 +638,7 @@ class Query extends Expression
                 list($field) = $row;
             }
 
-            if (is_object($field)) {
-                // if first argument is object/expression, consume it, converting
-                // it to the string
-                $field = $this->_consume($field);
-            } else {
-                // otherwise, perform some escaping
-                $field = implode('.', $this->_escape(explode('.', $field)));
-            }
+            $field = $this->_consume($field, 'soft-escape');
 
             if (count($row) == 1) {
                 // Only a single parameter was passed, so we simply include all
@@ -687,7 +683,7 @@ class Query extends Expression
             if (is_array($value)) {
                 $value = '('.implode(',', $this->_param($value)).')';
                 $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
-                $ret[] = $this->_consume($field, 'escape').' '.$cond.' '.$value;
+                $ret[] = $field.' '.$cond.' '.$value;
                 continue;
             }
 
