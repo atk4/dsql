@@ -71,10 +71,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->q()->field('first_name'), '_render_field')
         );
         $this->assertEquals(
-            '`last_name` `a`',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name','a')->field('last_name','a'), '_render_field')
-        );
-        $this->assertEquals(
             '`first_name`,`last_name`',
             PHPUnitUtil::callProtectedMethod($this->q()->field('first_name,last_name'), '_render_field')
         );
@@ -203,6 +199,17 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * @covers ::table
      * @expectedException Exception
      */
+    public function testFieldException1()
+    {
+        $this->q()->field('name', 'a')->field('surname', 'a');
+    }
+
+    /**
+     * There shouldn't be alias when passing multiple tables
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
     public function testTableException1()
     {
         $this->q()->table('employee,jobs', 'u');
@@ -220,25 +227,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Alias is mandatory when pass table as Expression
+     * Alias is NOT mandatory when pass table as Expression
      *
      * @covers ::table
-     * @expectedException Exception
      */
     public function testTableException3()
     {
         $this->q()->table($this->q()->expr('test'));
-    }
-
-    /**
-     * Alias is mandatory when pass table as any object
-     *
-     * @covers ::table
-     * @expectedException Exception
-     */
-    public function testTableException4()
-    {
-        $this->q()->table(new \stdClass());
     }
 
     /**
@@ -454,6 +449,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'select `name` from (select * from `employee`) `e`',
             $this->q()
                 ->field('name')->table($q, 'e')
+                ->render()
+        );
+
+        $this->assertEquals(
+            'select `name` from `myt``able`',
+            $this->q()
+                ->field('name')->table(new Expression('{}', ['myt`able']))
                 ->render()
         );
 

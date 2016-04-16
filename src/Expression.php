@@ -303,7 +303,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return $value;
         }
 
-        return '`' . str_replace('`', '``', $value) . '`';
+        return '`' . trim($value) . '`';
     }
 
     /**
