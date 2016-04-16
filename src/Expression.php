@@ -294,7 +294,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (is_string($value) && strpos($value, '.') !== false) {
-            return implode('.', $this->_escapeSoft(explode('.', $value)));
+            return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
         // in some cases we should not escape
@@ -327,7 +327,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // in all other cases we should escape
-        return '`' . str_replace('`', '``', $value) . '`';
+        return '`' . str_replace('`', '``', trim($value)) . '`';
     }
 
     /**
@@ -372,7 +372,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             '/\[[a-z0-9_]*\]|{[a-z0-9_]*}/',
             function ($matches) use (&$nameless_count) {
 
-                $identifier = substr($matches[0],1,-1);
+                $identifier = substr($matches[0], 1, -1);
                 $escaping = ($matches[0][0] == '[')?'param':'escape';
 
                 // Allow template to contain []
