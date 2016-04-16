@@ -327,7 +327,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // in all other cases we should escape
-        return '`' . str_replace('`', '``', trim($value)) . '`';
+        return '`' . str_replace('`', '``', $value) . '`';
     }
 
     /**
