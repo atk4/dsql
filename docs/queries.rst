@@ -274,17 +274,15 @@ Method can be executed several times on the same Query object.
 Setting Fields
 --------------
 
-.. php:method:: field($fields, $table = null, $alias = null)
+.. php:method:: field($fields, $alias = null)
 
     Adds additional field that you would like to query. If never called,
     will default to :php:attr:`defaultField`, which normally is `*`.
 
     This method has several call options. $field can be array of fields
-    and also can be an :php:class:`Expression`. If you specify expression
-    in $field then alias is mandatory.
+    and also can be an :php:class:`Expression` or :php:class:`Query`
 
     :param string|array|object $fields: Specify list of fields to fetch
-    :param string $table: Optionally specify a table to query from
     :param string $alias: Optionally specify alias of field in resulting query
     :returns: $this
 
@@ -299,16 +297,16 @@ Basic Examples::
     $query->field('first_name,last_name');
         // SELECT `first_name`,`last_name` from `user`
 
-    $query->field('first_name','employee')
+    $query->field('employee.first_name')
         // SELECT `employee`.`first_name` from `user`
 
-    $query->field('first_name',null,'name')
+    $query->field('first_name','name')
         // SELECT `first_name` `name` from `user`
 
     $query->field(['name'=>'first_name'])
         // SELECT `first_name` `name` from `user`
 
-    $query->field(['name'=>'first_name'],'employee');
+    $query->field(['name'=>'employee.first_name']);
         // SELECT `employee`.`first_name` `name` from `user`
 
 If the first parameter of field() method contains non-alphanumeric values
@@ -324,6 +322,9 @@ used as aliases (if they are specified)::
 
     $query->field(['time_now'=>'now()', 'time_created']);
         // SELECT now() `time_now`, `time_created` ...
+
+    $query->field($query->dsql()->table('user')->field('max(age)'), 'max_age');
+        // SELECT (SELECT max(age) from user) `max_age` ...
 
 Method can be executed several times on the same Query object.
 

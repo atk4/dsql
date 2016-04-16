@@ -119,15 +119,15 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             'now()',
             $this->e(['template' => 'now()'])->render()
         );
-        // pass as array without key and custom escapeChar
+        // pass as array without key 
         $this->assertEquals(
             ':a Name',
-            $this->e(['[] Name', 'escapeChar' => '*'], ['First'])->render()
+            $this->e(['[] Name'], ['First'])->render()
         );
-        // pass as array with template key and custom escapeChar
+        // pass as array with template key
         $this->assertEquals(
             ':a Name',
-            $this->e(['template' => '[] Name', 'escapeChar' => '*'], ['Last'])->render()
+            $this->e(['template' => '[] Name'], ['Last'])->render()
         );
     }
 
@@ -141,6 +141,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $e = $this->e('hello, [who]', ['who' => 'world']);
         $this->assertEquals('hello, :a', $e->render());
         $this->assertEquals('world', $e->params[':a']);
+
+        $e = $this->e('hello, {who}', ['who' => 'world']);
+        $this->assertEquals('hello, `world`', $e->render());
+        $this->assertEquals([], $e->params);
     }
 
     /**
@@ -277,39 +281,48 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['first_name'])
         );
         $this->assertEquals(
-            '*first_name*',
-            PHPUnitUtil::callProtectedMethod($this->e(['escapeChar' => '*']), '_escape', ['first_name'])
-        );
-        $this->assertEquals(
             '`123`',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [123])
+        );
+        $this->assertEquals(
+            '`he``llo`',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['he`llo'])
         );
 
         // should not escape expressions
         $this->assertEquals(
             '*',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['*'])
+        );
+        $this->assertEquals(
+            '`*`',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['*'])
         );
         $this->assertEquals(
             '(2+2) age',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['(2+2) age'])
+        );
+        $this->assertEquals(
+            '`(2+2) age`',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['(2+2) age'])
         );
         $this->assertEquals(
-            'first_name.table',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['first_name.table'])
-        );
-        $this->assertEquals(
-            'first#name',
-            PHPUnitUtil::callProtectedMethod($this->e(['escapeChar'=>'#']), '_escape', ['first#name'])
+            '`first_name`.`table`',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['first_name.table'])
         );
         $this->assertEquals(
             true,
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [new \stdClass()]) instanceof \stdClass
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [new \stdClass()]) instanceof \stdClass
         );
 
         // escaping array - escapes each of its elements
         $this->assertEquals(
             ['`first_name`', '*', '`last_name`'],
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [ ['first_name', '*', 'last_name'] ])
+        );
+
+        $this->assertEquals(
+            ['`first_name`', '`*`', '`last_name`'],
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [ ['first_name', '*', 'last_name'] ])
         );
     }
