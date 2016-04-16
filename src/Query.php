@@ -139,9 +139,9 @@ class Query extends Expression
             return $this;
         }
         if (is_null($alias)) {
-            $this->args['fields'][] = $field;
+            $this->args['field'][] = $field;
         } else {
-            $this->args['fields'][$alias] = $field;
+            $this->args['field'][$alias] = $field;
         }
 
         return $this;
@@ -158,7 +158,7 @@ class Query extends Expression
         $ret = [];
 
         // If no fields were defined, use defaultField
-        if (empty($this->args['fields'])) {
+        if (empty($this->args['field'])) {
             if ($this->defaultField instanceof Expression) {
                 return $this->_consume($this->defaultField);
             }
@@ -166,7 +166,7 @@ class Query extends Expression
         }
 
         // process each defined field
-        foreach ($this->args['fields'] as $alias => $field) {
+        foreach ($this->args['field'] as $alias => $field) {
             // Do not use alias, if it's same as field
             if ($alias === $field) {
                 $alias = null;
