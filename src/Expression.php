@@ -275,9 +275,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Soft-escaping SQL identifier. This method will attempt to
-     * put `..` around the identifier, however will not do so
-     * if you are using special characters like ".", "(" or "`".
+     * Soft-escaping SQL identifier. This method will attempt to put
+     * backticks around the identifier, however will not do so if you
+     * are using special characters like ".", "(" or "`".
      *
      * It will smartly escape table.field type of strings resulting
      * in `table`.`field`.

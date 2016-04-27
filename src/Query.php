@@ -801,6 +801,7 @@ class Query extends Expression
         }
 
         $this->args['group'][] = $group;
+
         return $this;
     }
 
@@ -816,7 +817,7 @@ class Query extends Expression
         }
 
         $g = array_map(function ($a) {
-            return $this->_consume($a, 'escape');
+            return $this->_consume($a, 'soft-escape');
         }, $this->args['group']);
 
         return ' group by '.implode(', ', $g);
@@ -1082,6 +1083,7 @@ class Query extends Expression
         if (is_string($order) && strpos($order, ',') !== false) {
             $order = explode(',', $order);
         }
+
         if (is_array($order)) {
             if (!is_null($desc)) {
                 throw new Exception(
@@ -1095,13 +1097,14 @@ class Query extends Expression
             return $this;
         }
 
-        // First argument may contain space, to divide field and keyword
-        if (is_null($desc) && is_string($order) && strpos($order, ' ') !== false) {
-            list($order, $desc) = array_map('trim', explode(' ', trim($order), 2));
-        }
-
-        if (is_string($order) && strpos($order, '.') !== false) {
-            $order = implode('.', $this->_escape(explode('.', $order)));
+        // First argument may contain space, to divide field and ordering keyword.
+        // Explode string only if ordering keyword is 'desc' or 'asc'.
+        if (is_string($order) && strpos($order, ' ') !== false && is_null($desc)) {
+            list($_order, $_desc) = array_map('trim', explode(' ', trim($order), 2));
+            if (in_array(strtolower($_desc), ['desc', 'asc'])) {
+                $order = $_order;
+                $desc = $_desc;
+            }
         }
 
         if (is_bool($desc)) {
@@ -1127,10 +1130,11 @@ class Query extends Expression
         if (!isset($this->args['order'])) {
             return'';
         }
+
         $x = array();
         foreach ($this->args['order'] as $tmp) {
             list($arg, $desc) = $tmp;
-            $x[] = $this->_consume($arg, 'escape').($desc ? (' '.$desc) : '');
+            $x[] = $this->_consume($arg, 'soft-escape') . ($desc ? (' '.$desc) : '');
         }
 
         return ' order by '.implode(', ', array_reverse($x));

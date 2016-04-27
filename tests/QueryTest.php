@@ -345,19 +345,19 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'select `na``me` from `employee`',
             $this->q()
-                ->field(new Expression('{}',['na`me']))->table('employee')
+                ->field(new Expression('{}', ['na`me']))->table('employee')
                 ->render()
         );
         $this->assertEquals(
             'select `жук` from `employee`',
             $this->q()
-                ->field(new Expression('{}',['жук']))->table('employee')
+                ->field(new Expression('{}', ['жук']))->table('employee')
                 ->render()
         );
         $this->assertEquals(
             'select `this is 💩` from `employee`',
             $this->q()
-                ->field(new Expression('{}',['this is 💩']))->table('employee')
+                ->field(new Expression('{}', ['this is 💩']))->table('employee')
                 ->render()
         );
 
@@ -902,6 +902,28 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'order by `name` desc, `surname`',
             $this->q('[order]')->order('surname')->order('name desc')->render()
         );
+        // table name|alias included
+        $this->assertEquals(
+            'order by `users`.`name`',
+            $this->q('[order]')->order('users.name')->render()
+        );
+        // strange field names
+        $this->assertEquals(
+            'order by `na``me` desc',
+            $this->q('[order]')->order('na`me desc')->render()
+        );
+        $this->assertEquals(
+            'order by `жук`',
+            $this->q('[order]')->order('жук asc')->render()
+        );
+        $this->assertEquals(
+            'order by `this is 💩`',
+            $this->q('[order]')->order('this is 💩')->render()
+        );
+        $this->assertEquals(
+            'order by `this is жук` desc',
+            $this->q('[order]')->order('this is жук desc')->render()
+        );
     }
 
     /**
@@ -927,6 +949,28 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'group by `gender`, `age`',
             $this->q('[group]')->group('gender')->group('age')->render()
+        );
+        // table name|alias included
+        $this->assertEquals(
+            'group by `users`.`gender`',
+            $this->q('[group]')->group('users.gender')->render()
+        );
+        // strange field names
+        $this->assertEquals(
+            'group by `na``me`',
+            $this->q('[group]')->group('na`me')->render()
+        );
+        $this->assertEquals(
+            'group by `жук`',
+            $this->q('[group]')->group('жук')->render()
+        );
+        $this->assertEquals(
+            'group by `this is 💩`',
+            $this->q('[group]')->group('this is 💩')->render()
+        );
+        $this->assertEquals(
+            'group by `this is жук`',
+            $this->q('[group]')->group('this is жук')->render()
         );
     }
 
