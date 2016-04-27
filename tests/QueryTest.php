@@ -909,8 +909,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         // strange field names
         $this->assertEquals(
-            'order by `na``me` desc',
-            $this->q('[order]')->order('na`me desc')->render()
+            'order by `my name` desc',
+            $this->q('[order]')->order('`my name` desc')->render()
         );
         $this->assertEquals(
             'order by `жук`',
@@ -957,8 +957,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         // strange field names
         $this->assertEquals(
-            'group by `na``me`',
-            $this->q('[group]')->group('na`me')->render()
+            'group by `my name`',
+            $this->q('[group]')->group('`my name`')->render()
         );
         $this->assertEquals(
             'group by `жук`',
