@@ -1099,13 +1099,15 @@ class Query extends Expression
 
         // First argument may contain space, to divide field and ordering keyword.
         // Explode string only if ordering keyword is 'desc' or 'asc'.
-        if (is_string($order) && strpos($order, ' ') !== false && is_null($desc)) {
-            list($_order, $_desc) = array_map('trim', explode(' ', trim($order), 2));
-            if (in_array(strtolower($_desc), ['desc', 'asc'])) {
-                $order = $_order;
+        if (is_null($desc) && is_string($order) && strpos($order, ' ') !== false) {
+            $_chunks = explode(' ', $order);
+            $_desc = strtolower(array_pop($_chunks));
+            if (in_array($_desc, ['desc', 'asc'])) {
+                $order = implode(' ', $_chunks);
                 $desc = $_desc;
             }
         }
+
 
         if (is_bool($desc)) {
             $desc = $desc ? 'desc' : '';
