@@ -1108,7 +1108,6 @@ class Query extends Expression
             }
         }
 
-
         if (is_bool($desc)) {
             $desc = $desc ? 'desc' : '';
         } elseif (strtolower($desc) === 'asc') {
