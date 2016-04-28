@@ -272,6 +272,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Fully covers _escape method
      *
      * @covers ::_escape
+     * @covers ::escape
      */
     public function testEscape()
     {
@@ -319,15 +320,29 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [new \stdClass()]) instanceof \stdClass
         );
 
-        // escaping array - escapes each of its elements
+        // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
             ['`first_name`', '*', '`last_name`'],
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [ ['first_name', '*', 'last_name'] ])
         );
 
+        // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
             ['`first_name`', '`*`', '`last_name`'],
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [ ['first_name', '*', 'last_name'] ])
+        );
+
+        $this->assertEquals(
+            '`first_name`',
+            $this->e()->escape('first_name')->render()
+        );
+        $this->assertEquals(
+            '`first``_name`',
+            $this->e()->escape('first`_name')->render()
+        );
+        $this->assertEquals(
+            '`first``_name {}`',
+            $this->e()->escape('first`_name {}')->render()
         );
     }
 

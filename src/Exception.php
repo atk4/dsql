@@ -19,7 +19,7 @@ class Exception extends \Exception
     public function __construct(
         $message = "",
         $code = 0,
-        Throwable $previous = null
+        \Throwable $previous = null
     ) {
         if (is_array($message)) {
             // message contain additional parameters

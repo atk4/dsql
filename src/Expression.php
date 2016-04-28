@@ -309,6 +309,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return '`' . trim($value) . '`';
     }
 
+    public function escape($value)
+    {
+        return $this->expr('{}', [$value]);
+    }
+
     /**
      * Escapes argument by adding backticks around it.
      * This will allow you to use reserved SQL words as table or field

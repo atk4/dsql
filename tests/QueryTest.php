@@ -924,6 +924,26 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'order by `this is жук` desc',
             $this->q('[order]')->order('this is жук desc')->render()
         );
+        $this->assertEquals(
+            'order by * desc',
+            $this->q('[order]')->order(['* desc'])->render()
+        );
+        $this->assertEquals(
+            'order by `{}` desc',
+            $this->q('[order]')->order(['{} desc'])->render()
+        );
+        $this->assertEquals(
+            'order by `* desc`',
+            $this->q('[order]')->order(new Expression('`* desc`'))->render()
+        );
+        $this->assertEquals(
+            'order by `* desc`',
+            $this->q('[order]')->order($this->q()->escape('* desc'))->render()
+        );
+        $this->assertEquals(
+            'order by `* desc {}`',
+            $this->q('[order]')->order($this->q()->escape('* desc {}'))->render()
+        );
     }
 
     /**
