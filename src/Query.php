@@ -210,7 +210,7 @@ class Query extends Expression
 
     // {{{ Table specification and rendering
     /**
-     * @todo Method description
+     * Specify a table to be used in a query.
      *
      * @param mixed  $table
      * @param string $alias
