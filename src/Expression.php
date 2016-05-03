@@ -309,6 +309,16 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return '`' . trim($value) . '`';
     }
 
+    /**
+     * Creates new expression where $sql_code appears escaped. Use this
+     * method as a conventional means of specifying arguments when you
+     * think they might have a nasty back-ticks or commas in the field
+     * names.
+     * 
+     * @param string $value
+     * 
+     * @return string
+     */
     public function escape($value)
     {
         return $this->expr('{}', [$value]);
