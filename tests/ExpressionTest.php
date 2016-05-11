@@ -119,7 +119,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             'now()',
             $this->e(['template' => 'now()'])->render()
         );
-        // pass as array without key 
+        // pass as array without key
         $this->assertEquals(
             ':a Name',
             $this->e(['[] Name'], ['First'])->render()
@@ -272,6 +272,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Fully covers _escape method
      *
      * @covers ::_escape
+     * @covers ::escape
      */
     public function testEscape()
     {
@@ -307,23 +308,41 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['(2+2) age'])
         );
         $this->assertEquals(
-            '`first_name`.`table`',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['first_name.table'])
+            '`users`.`first_name`',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['users.first_name'])
+        );
+        $this->assertEquals(
+            '`users`.*',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['users.*'])
         );
         $this->assertEquals(
             true,
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [new \stdClass()]) instanceof \stdClass
         );
 
-        // escaping array - escapes each of its elements
+        // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
             ['`first_name`', '*', '`last_name`'],
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [ ['first_name', '*', 'last_name'] ])
         );
 
+        // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
             ['`first_name`', '`*`', '`last_name`'],
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [ ['first_name', '*', 'last_name'] ])
+        );
+
+        $this->assertEquals(
+            '`first_name`',
+            $this->e()->escape('first_name')->render()
+        );
+        $this->assertEquals(
+            '`first``_name`',
+            $this->e()->escape('first`_name')->render()
+        );
+        $this->assertEquals(
+            '`first``_name {}`',
+            $this->e()->escape('first`_name {}')->render()
         );
     }
 

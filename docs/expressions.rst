@@ -300,6 +300,21 @@ circumstances.
       $query->_consume('first_name');  // `first_name`
       $query->_consume($other_query);  // will merge parameters and return string
 
+.. php:method:: escape($sql_code)
+
+  Creates new expression where $sql_code appears escaped. Use this method as a
+  conventional means of specifying arguments when you think they might have
+  a nasty back-ticks or commas in the field names. I generally **discourage** you
+  from using this method. Example use would be::
+
+      $query->field('foo,bar');  // escapes and adds 2 fields to the query
+      $query->field($query->escape('foo,bar')); // adds field `foo,bar` to the query
+      $query->field(['foo,bar']);  // adds single field `foo,bar` 
+
+      $query->order('foo desc');  // escapes and add `foo` desc to the query
+      $query->field($query->escape('foo desc')); // adds field `foo desc` to the query
+      $query->field(['foo desc']); // adds `foo` desc anyway
+
 .. php:method:: _escape($sql_code)
 
   Always surrounds `$sql code` with back-ticks.
