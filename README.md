@@ -1,6 +1,6 @@
 # DSQL
 
-[![Join the chat at https://gitter.im/atk4/dsql](https://badges.gitter.im/atk4/dsql.svg)](https://gitter.im/atk4/dsql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/atk4/data](https://badges.gitter.im/atk4/data.svg)](https://gitter.im/atk4/data?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 DSQL is a composable SQL query builder. You can write multi-vendor queries in PHP profiting from better security, clean syntax and avoid human errors.
 
