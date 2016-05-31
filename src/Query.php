@@ -146,7 +146,7 @@ class Query extends Expression
         }
 
         // if all is fine, then save field in args
-        if (is_null($alias)) {
+        if ($alias === null) {
             $this->args['field'][] = $field;
         } else {
 
@@ -265,7 +265,7 @@ class Query extends Expression
         }
 
         // if all is fine, then save table in args
-        if (is_null($alias)) {
+        if ($alias === null) {
             $this->args['table'][] = $table;
         } else {
 
@@ -411,7 +411,7 @@ class Query extends Expression
         }
         $j = array();
 
-        if (is_null($_foreign_alias)) {
+        if ($_foreign_alias === null) {
             @list($foreign_table, $_foreign_alias) = explode(' ', $foreign_table, 2);
         }
 
@@ -422,31 +422,31 @@ class Query extends Expression
             $j['expr'] = $master_field;
         } else {
             // Split and deduce primary table
-            if (is_null($master_field)) {
+            if ($master_field === null) {
                 list($m1, $m2) = array(null, null);
             } else {
                 @list($m1, $m2) = explode('.', $master_field, 2);
             }
-            if (is_null($m2)) {
+            if ($m2 === null) {
                 $m2 = $m1;
                 $m1 = null;
             }
-            if (is_null($m1)) {
+            if ($m1 === null) {
                 $m1 = $this->main_table;
             }
 
             // Identify fields we use for joins
-            if (is_null($f2) && is_null($m2)) {
+            if ($f2 === null && $m2 === null) {
                 $m2 = $f1.'_id';
             }
-            if (is_null($m2)) {
+            if ($m2 === null) {
                 $m2 = 'id';
             }
             $j['m1'] = $m1;
             $j['m2'] = $m2;
         }
         $j['f1'] = $f1;
-        if (is_null($f2)) {
+        if ($f2 === null) {
             $f2 = 'id';
         }
         $j['f2'] = $f2;
@@ -477,7 +477,7 @@ class Query extends Expression
 
             $jj .= $this->_escape($j['f1']);
 
-            if (!is_null($j['fa'])) {
+            if ($j['fa'] !== null) {
                 $jj .= ' as '.$this->_escape($j['fa']);
             }
 
@@ -489,7 +489,7 @@ class Query extends Expression
                 $jj .=
                     $this->_escape($j['fa'] ?: $j['f1']).'.'.
                     $this->_escape($j['f2']).' = '.
-                    (is_null($j['m1'])?'':$this->_escape($j['m1']).'.').
+                    ($j['m1'] === null ? '' : $this->_escape($j['m1']).'.').
                     $this->_escape($j['m2']);
             }
             $joins[] = $jj;
@@ -556,7 +556,7 @@ class Query extends Expression
     public function where($field, $cond = null, $value = null, $kind = 'where', $num_args = null)
     {
         // Number of passed arguments will be used to determine if arguments were specified or not
-        if (is_null($num_args)) {
+        if ($num_args === null) {
             $num_args = func_num_args();
         }
 
@@ -1085,7 +1085,7 @@ class Query extends Expression
         }
 
         if (is_array($order)) {
-            if (!is_null($desc)) {
+            if ($desc !== null) {
                 throw new Exception(
                     'If first argument is array, second argument must not be used'
                 );
@@ -1099,7 +1099,7 @@ class Query extends Expression
 
         // First argument may contain space, to divide field and ordering keyword.
         // Explode string only if ordering keyword is 'desc' or 'asc'.
-        if (is_null($desc) && is_string($order) && strpos($order, ' ') !== false) {
+        if ($desc === null && is_string($order) && strpos($order, ' ') !== false) {
             $_chunks = explode(' ', $order);
             $_desc = strtolower(array_pop($_chunks));
             if (in_array($_desc, ['desc', 'asc'])) {

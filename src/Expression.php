@@ -133,7 +133,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
+        if ($offset === null) {
             $this->args['custom'][] = $value;
         } else {
             $this->args['custom'][$offset] = $value;
@@ -314,9 +314,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * method as a conventional means of specifying arguments when you
      * think they might have a nasty back-ticks or commas in the field
      * names.
-     * 
+     *
      * @param string $value
-     * 
+     *
      * @return string
      */
     public function escape($value)
@@ -430,7 +430,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             if (is_string($val)) {
                 $d = preg_replace('/'.$key.'([^_]|$)/', '\'<span style="color:green">'.
                     htmlspecialchars(addslashes($val)).'</span>\'\1', $d);
-            } elseif (is_null($val)) {
+            } elseif ($val === null) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
                     '<span style="color:black">NULL</span>\1',
@@ -497,7 +497,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     $type = \PDO::PARAM_INT;
                 } elseif (is_bool($val)) {
                     $type = \PDO::PARAM_BOOL;
-                } elseif (is_null($val)) {
+                } elseif ($val === null) {
                     $type = \PDO::PARAM_NULL;
                 } elseif (is_string($val)) {
                     $type = \PDO::PARAM_STR;
