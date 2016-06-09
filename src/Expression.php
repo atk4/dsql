@@ -249,7 +249,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         // User may add Expressionable trait to any class, then pass it's objects
         if ($sql_code instanceof Expressionable) {
-            $sql_code = $sql_code->getDSQLExpression();
+            $sql_code = $sql_code->getDSQLExpression($this);
         }
 
         if (!$sql_code instanceof Expression) {
