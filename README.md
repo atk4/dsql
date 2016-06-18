@@ -1,6 +1,5 @@
 # DSQL
 
-[![Join the chat at https://gitter.im/atk4/data](https://badges.gitter.im/atk4/data.svg)](https://gitter.im/atk4/data?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 DSQL is a composable SQL query builder. You can write multi-vendor queries in PHP profiting from better security, clean syntax and avoid human errors.
 
@@ -23,14 +22,12 @@ Obviously because existing ones are not good enough. DSQL tries to do things dif
 
 DSQL has been in production since 2006, initially included in [AModules2](https://sourceforge.net/projects/amodules3/) and later [Agile Toolkit](https://github.com/atk4/atk4/blob/release-4.0.1/lib/DBlite/dsql.php). We simply forked it and cleaned it up for you:
 
+[![Gitter](https://img.shields.io/gitter/room/atk4/data.svg?maxAge=2592000)](https://gitter.im/atk4/dataset?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Documentation Status](https://readthedocs.org/projects/dsql/badge/?version=latest)](http://dsql.readthedocs.io/en/latest/?badge=latest)
+[![GitHub release](https://img.shields.io/github/release/atk4/dsql.svg?maxAge=2592000)]()
 [![Build Status](https://travis-ci.org/atk4/dsql.png?branch=develop)](https://travis-ci.org/atk4/dsql)
-[![Latest Stable](https://poser.pugx.org/atk4/dsql/version)](https://packagist.org/packages/atk4/dsql)
 [![Code Climate](https://codeclimate.com/github/atk4/dsql/badges/gpa.svg)](https://codeclimate.com/github/atk4/dsql)
 [![Test Coverage](https://codeclimate.com/github/atk4/dsql/badges/coverage.svg)](https://codeclimate.com/github/atk4/dsql/coverage)
-[![Issue Count](https://codeclimate.com/github/atk4/dsql/badges/issue_count.svg)](https://codeclimate.com/github/atk4/dsql)
-[![Total Downloads](https://poser.pugx.org/atk4/dsql/downloads.png)](https://packagist.org/packages/atk4/dsql)
-![DailyDownloads](https://img.shields.io/packagist/dd/atk4/dsql.svg)
-[![PHP 7 ready](http://php7ready.timesplinter.ch/atk4/dsql/badge.svg)](https://travis-ci.org/atk4/dsql)
 
 ## DSQL Is Simple and Powerful
 
