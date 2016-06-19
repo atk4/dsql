@@ -1205,12 +1205,11 @@ class Query extends Expression
     /**
      * Sets value in args array. Doesn't allow duplicate aliases.
      *
-     * @param string $what Where to set it - table|field|etc
+     * @param string $what Where to set it - table|field
      * @param string $alias Alias name
      * @param mixed $value Value to set in args array
-     * @param bool $deny_overwrite Should we restrict to overwrite existing values
      */
-    protected function _set_args($what, $alias, $value, $deny_overwrite = true)
+    protected function _set_args($what, $alias, $value)
     {
         // save value in args
         if ($alias === null) {
@@ -1218,7 +1217,7 @@ class Query extends Expression
         } else {
 
             // don't allow multiple values with same alias
-            if ($deny_overwrite && isset($this->args[$what][$alias])) {
+            if (isset($this->args[$what][$alias])) {
                 throw new Exception([
                     ucfirst($what) . ' alias should be unique',
                     'alias' => $alias
