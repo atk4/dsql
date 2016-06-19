@@ -110,11 +110,11 @@ class Query extends Expression
      *  $q->field($q->expr('{}', ['fun...ky.field']), 'f');
      *
      * @param mixed  $field Specifies field to select
-     * @param string $field_alias Specify alias for this field
+     * @param string $alias Specify alias for this field
      *
      * @return $this
      */
-    public function field($field, $field_alias = null)
+    public function field($field, $alias = null)
     {
         // field is passed as string, may contain commas
         if (is_string($field) && strpos($field, ',') !== false) {
@@ -124,10 +124,10 @@ class Query extends Expression
         // recursively add array fields
         if (is_array($field)) {
 
-            if ($field_alias !== null) {
+            if ($alias !== null) {
                 throw new Exception([
                     'Alias must not be specified when $field is an array',
-                    'alias' => $field_alias
+                    'alias' => $alias
                 ]);
             }
 
@@ -140,26 +140,8 @@ class Query extends Expression
             return $this;
         }
 
-        // initialize args[field] array
-        if (!isset($this->args['field'])) {
-            $this->args['field'] = array();
-        }
-
-        // if all is fine, then save field in args
-        if ($field_alias === null) {
-            $this->args['field'][] = $field;
-        } else {
-
-            // don't allow multiple fields with same alias
-            if (isset($this->args['field'][$field_alias])) {
-                throw new Exception([
-                    'Field alias should be unique',
-                    'alias' => $field_alias
-                ]);
-            }
-
-            $this->args['field'][$field_alias] = $field;
-        }
+        // save field in args
+        $this->_set_args('field', $alias, $field);
 
         return $this;
     }
@@ -213,11 +195,11 @@ class Query extends Expression
      * Specify a table to be used in a query.
      *
      * @param mixed  $table Specifies table
-     * @param string $table_alias Specify alias for this table
+     * @param string $alias Specify alias for this table
      *
      * @return $this
      */
-    public function table($table, $table_alias = null)
+    public function table($table, $alias = null)
     {
         // comma-separated table names
         if (is_string($table) && strpos($table, ',') !== false) {
@@ -227,10 +209,10 @@ class Query extends Expression
         // array of tables - recursively process each
         if (is_array($table)) {
 
-            if ($table_alias !== null) {
+            if ($alias !== null) {
                 throw new Exception([
                     'You cannot use single alias with multiple tables',
-                    'alias' => $table_alias
+                    'alias' => $alias
                 ]);
             }
 
@@ -245,40 +227,22 @@ class Query extends Expression
         }
 
         // if table is set as sub-Query, then alias is mandatory
-        if ($table instanceof Query && $table_alias === null) {
+        if ($table instanceof Query && $alias === null) {
             throw new Exception('If table is set as Query, then table alias is mandatory');
         }
 
-        if (is_string($table) && $table_alias === null) {
-            $table_alias = $table;
+        if (is_string($table) && $alias === null) {
+            $alias = $table;
         }
 
         // main_table will be set only if table() is called once.
         // it's used as "default table" when joining with other tables, see join().
         // on multiple calls, main_table will be false and we won't
         // be able to join easily anymore.
-        $this->main_table = ($this->main_table === null && $table_alias !== null ? $table_alias : false);
+        $this->main_table = ($this->main_table === null && $alias !== null ? $alias : false);
 
-        // initialize args[table] array
-        if (!isset($this->args['table'])) {
-            $this->args['table'] = array();
-        }
-
-        // if all is fine, then save table in args
-        if ($table_alias === null) {
-            $this->args['table'][] = $table;
-        } else {
-
-            // don't allow multiple tables with same alias
-            if (isset($this->args['table'][$table_alias])) {
-                throw new Exception([
-                    'Table alias should be unique',
-                    'alias' => $table_alias
-                ]);
-            }
-
-            $this->args['table'][$table_alias] = $table;
-        }
+        // save table in args
+        $this->_set_args('table', $alias, $table);
 
         return $this;
     }
@@ -1236,6 +1200,33 @@ class Query extends Expression
     public function andExpr()
     {
         return $this->dsql(['template' => '[andwhere]']);
+    }
+
+    /**
+     * Sets value in args array. Doesn't allow duplicate aliases.
+     *
+     * @param string $what Where to set it - table|field|etc
+     * @param string $alias Alias name
+     * @param mixed $value Value to set in args array
+     * @param bool $deny_overwrite Should we restrict to overwrite existing values
+     */
+    protected function _set_args($what, $alias, $value, $deny_overwrite = true)
+    {
+        // save value in args
+        if ($alias === null) {
+            $this->args[$what][] = $value;
+        } else {
+
+            // don't allow multiple values with same alias
+            if ($deny_overwrite && isset($this->args[$what][$alias])) {
+                throw new Exception([
+                    ucfirst($what) . ' alias should be unique',
+                    'alias' => $alias
+                ]);
+            }
+
+            $this->args[$what][$alias] = $value;
+        }
     }
     /// }}}
 }
