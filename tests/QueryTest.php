@@ -615,9 +615,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testVarDump4()
     {
-        $this->expectOutputRegex('/.*multiple tables.*/');
-        // should throw exception "You cannot use single alias with multiple tables"
-        var_dump($this->q()->table(['a','b'], 'c'));
+        $this->expectOutputRegex('/.*Table cannot be Query.*/');
+        // should throw exception "Table cannot be Query in UPDATE, INSERT etc. query modes"
+        var_dump(
+            $this->q()
+                ->mode('update')
+                ->table($this->q()->table('test'), 'foo')
+        );
+
     }
 
     /**
