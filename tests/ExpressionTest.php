@@ -258,6 +258,16 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::__toString
+     * @expectedException \LogicException
+     */
+    public function testToStringException1()
+    {
+        $e = new MyBadExpression('Hello');
+        $s = (string)$e;
+    }
+
+    /**
      * expr() should return new Expression object and inherit connection from it.
      *
      * @covers ::expr
@@ -535,10 +545,19 @@ class JsonExpression extends Expression
         return json_encode($value);
     }
 }
-class MyField implements Expressionable {
-    function getDSQLExpression($e)
+class MyField implements Expressionable
+{
+    public function getDSQLExpression($e)
     {
         return $e->expr('`myfield`');
     }
 }
+class MyBadExpression extends Expression
+{
+    public function getOne()
+    {
+        return array();
+    }
+}
+
 // @codingStandardsIgnoreEnd

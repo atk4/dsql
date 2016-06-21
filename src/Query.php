@@ -1120,7 +1120,7 @@ class Query extends Expression
         try {
             $arr['R'] = $this->render();
         } catch (\Exception $e) {
-            $arr['R'] = $this->getMessage();
+            $arr['R'] = $e->getMessage();
         }
 
         return $arr;
