@@ -615,8 +615,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testVarDump4()
     {
-        $this->expectOutputRegex('/.*Missing argument.*/');
-        var_dump($this->q()->table()); // should throw warning "Missing argument ..."
+        $this->expectOutputRegex('/.*multiple tables.*/');
+        // should throw exception "You cannot use single alias with multiple tables"
+        var_dump($this->q()->table(['a','b'], 'c'));
     }
 
     /**
