@@ -127,7 +127,7 @@ class Query extends Expression
             if ($alias !== null) {
                 throw new Exception([
                     'Alias must not be specified when $field is an array',
-                    'alias'=>$alias
+                    'alias' => $alias
                 ]);
             }
 
@@ -140,26 +140,8 @@ class Query extends Expression
             return $this;
         }
 
-        // initialize args[field] array
-        if (!isset($this->args['field'])) {
-            $this->args['field'] = array();
-        }
-
-        // if all is fine, then save field in args
-        if ($alias === null) {
-            $this->args['field'][] = $field;
-        } else {
-
-            // don't allow multiple fields with same alias
-            if (isset($this->args['field'][$alias])) {
-                throw new Exception([
-                    'Field alias should be unique',
-                    'alias'=>$alias
-                ]);
-            }
-
-            $this->args['field'][$alias] = $field;
-        }
+        // save field in args
+        $this->_set_args('field', $alias, $field);
 
         return $this;
     }
@@ -212,8 +194,8 @@ class Query extends Expression
     /**
      * Specify a table to be used in a query.
      *
-     * @param mixed  $table
-     * @param string $alias
+     * @param mixed  $table Specifies table
+     * @param string $alias Specify alias for this table
      *
      * @return $this
      */
@@ -230,7 +212,7 @@ class Query extends Expression
             if ($alias !== null) {
                 throw new Exception([
                     'You cannot use single alias with multiple tables',
-                    'alias'=>$alias
+                    'alias' => $alias
                 ]);
             }
 
@@ -259,26 +241,8 @@ class Query extends Expression
         // be able to join easily anymore.
         $this->main_table = ($this->main_table === null && $alias !== null ? $alias : false);
 
-        // initialize args[table] array
-        if (!isset($this->args['table'])) {
-            $this->args['table'] = array();
-        }
-
-        // if all is fine, then save table in args
-        if ($alias === null) {
-            $this->args['table'][] = $table;
-        } else {
-
-            // don't allow multiple tables with same alias
-            if (isset($this->args['table'][$alias])) {
-                throw new Exception([
-                    'Table alias should be unique',
-                    'alias'=>$alias
-                ]);
-            }
-
-            $this->args['table'][$alias] = $table;
-        }
+        // save table in args
+        $this->_set_args('table', $alias, $table);
 
         return $this;
     }
@@ -889,7 +853,7 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as $field => $value) {
+            foreach (array_keys($this->args['set']) as $field) {
                 $field = $this->_consume($field, 'escape');
 
                 $ret[] = $field;
@@ -910,7 +874,7 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as $field => $value) {
+            foreach ($this->args['set'] as $value) {
                 $value = $this->_consume($value, 'param');
 
                 $ret[] = $value;
@@ -1236,6 +1200,32 @@ class Query extends Expression
     public function andExpr()
     {
         return $this->dsql(['template' => '[andwhere]']);
+    }
+
+    /**
+     * Sets value in args array. Doesn't allow duplicate aliases.
+     *
+     * @param string $what Where to set it - table|field
+     * @param string $alias Alias name
+     * @param mixed $value Value to set in args array
+     */
+    protected function _set_args($what, $alias, $value)
+    {
+        // save value in args
+        if ($alias === null) {
+            $this->args[$what][] = $value;
+        } else {
+
+            // don't allow multiple values with same alias
+            if (isset($this->args[$what][$alias])) {
+                throw new Exception([
+                    ucfirst($what) . ' alias should be unique',
+                    'alias' => $alias
+                ]);
+            }
+
+            $this->args[$what][$alias] = $value;
+        }
     }
     /// }}}
 }
