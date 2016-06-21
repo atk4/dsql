@@ -338,9 +338,10 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testTableException10()
     {
         $this->q()
+            ->mode('update')
             ->table($this->q()->table('test'), 'foo')
             ->field('name')->set('name', 1)
-            ->mode('update');
+            ->render();
     }
 
     /**
@@ -352,9 +353,10 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testTableException11()
     {
         $this->q()
+            ->mode('insert')
             ->table($this->q()->table('test'), 'foo')
             ->field('name')->set('name', 1)
-            ->mode('insert');
+            ->render();
     }
 
     /**
