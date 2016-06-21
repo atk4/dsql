@@ -265,7 +265,7 @@ Magic an Debug Methods
 
 .. php:method:: __debugInfo()
 
-    This method will is used to prepare a sensible information about your query
+    This method is used to prepare a sensible information about your query
     when you are executing ``var_dump($expr)``. The output will be HTML-safe.
 
 .. php:method:: debug()
@@ -309,7 +309,7 @@ circumstances.
 
       $query->field('foo,bar');  // escapes and adds 2 fields to the query
       $query->field($query->escape('foo,bar')); // adds field `foo,bar` to the query
-      $query->field(['foo,bar']);  // adds single field `foo,bar` 
+      $query->field(['foo,bar']);  // adds single field `foo,bar`
 
       $query->order('foo desc');  // escapes and add `foo` desc to the query
       $query->field($query->escape('foo desc')); // adds field `foo desc` to the query

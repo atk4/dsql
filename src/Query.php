@@ -502,8 +502,7 @@ class Query extends Expression
      *  ]);
      *
      * The above use of OR conditions rely on orExpr() functionality. See
-     * that method for morer information, but in short it makes use of
-     * Expression_OR class
+     * that method for more information.
      *
      * To specify OR conditions
      *  $q->where($q->orExpr()->where('a',1)->where('b',1));
