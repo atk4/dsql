@@ -396,7 +396,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                     // use rendering only with named tags
                 }
-                    $fx = '_render_'.$identifier;
+                $fx = '_render_'.$identifier;
 
                 // [foo] will attempt to call $this->_render_foo()
 

@@ -292,6 +292,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Fully covers _escape method
      *
      * @covers ::_escape
+     * @covers ::_escapeSoft
      * @covers ::escape
      */
     public function testEscape()
@@ -374,7 +375,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     public function testParam()
     {
         $e = new Expression('hello, [who]', ['who' => 'world']);
-
         $this->assertEquals(
             'hello, :a',
             $e->render()
@@ -384,14 +384,13 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             $e->params
         );
 
-        $e = new Expression('hello, [who]', ['who' => 'world']);
-
+        $e = new Expression('hello, [who]', ['who' => ['cruel', 'world']]);
         $this->assertEquals(
             'hello, :a',
             $e->render()
         );
         $this->assertEquals(
-            [':a'=>'world'],
+            [':a'=>'cruel', ':b'=>'world'],
             $e->params
         );
     }
