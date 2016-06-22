@@ -10,8 +10,9 @@ engines:
     enabled: true
     exclude_fingerprints:
     - 9d462b7c90c564bf28007ee399340fad # table() NPath is too complex.
-    - 7c90035f65bb3bdbd2c03c648a705aac # we use static for factory, so it's good
-    - 80ef7f404dd4f054ca51d9ee12d9e9dd # we exit from toStrign() because it can't throw exceptions
+    - c96f14f28e3586694e93ad4a7185804a # we use static for factory, so it's good
+    - e4eedf458a989182e975f6cd334d2d12 # we exit from toStrign() because it can't throw exceptions
+    - 31780bbd56396145ce17ca6e15095d99 # ignore Single Responsibility Principle in this case
     checks:
       CyclomaticComplexity:
         enabled: false

@@ -16,6 +16,11 @@ class Exception extends \Exception
      */
     private $params = [];
 
+    /**
+     * @param string $message
+     * @param int $code
+     * @param \Throwable $previous
+     */
     public function __construct(
         $message = "",
         $code = 0,
@@ -32,6 +37,8 @@ class Exception extends \Exception
 
     /**
      * Follow the getter-style of PHP Exception
+     *
+     * @return array
      */
     public function getParams()
     {
