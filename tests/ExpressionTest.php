@@ -268,6 +268,16 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::__toString
+     * @expectedException Exception
+     */
+    public function testToStringException2()
+    {
+        $e = new MyWorstExpression('Hello');
+        $s = (string)$e;
+    }
+
+    /**
      * expr() should return new Expression object and inherit connection from it.
      *
      * @covers ::expr
@@ -403,6 +413,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             123,
             PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'none'])
+        );
+        $this->assertEquals(
+            '(select *)',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [new Query()])
         );
 
         $this->assertEquals(
@@ -557,6 +571,13 @@ class MyBadExpression extends Expression
     public function getOne()
     {
         return array();
+    }
+}
+class MyWorstExpression extends Expression
+{
+    public function getOne()
+    {
+        throw new Exception('It is Monday');
     }
 }
 

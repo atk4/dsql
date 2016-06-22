@@ -622,7 +622,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->mode('update')
                 ->table($this->q()->table('test'), 'foo')
         );
-
     }
 
     /**
