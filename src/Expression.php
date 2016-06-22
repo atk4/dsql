@@ -356,6 +356,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     protected function _param($value)
     {
+        // @todo Imants: allowing to pass value as array looks wrong.
+        //      See test case in testParam() method.
+        //      Maybe we should add implode(' ', array_map(...)) here ?
         if (is_array($value)) {
             return array_map(__METHOD__, $value);
         }

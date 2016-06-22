@@ -91,6 +91,11 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             [['now'=>6]],
             $this->q()->field(new Expression('[]+[]', [3,3]), 'now')->get()
         );
+
+        $this->assertEquals(
+            5,
+            $this->q()->field(new Expression('IFNULL([],5)', [null]), 'null_test')->getOne()
+        );
     }
 
     public function testExpression()

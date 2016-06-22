@@ -384,6 +384,9 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             $e->params
         );
 
+        // @todo Imants: allowing to pass value as array looks wrong.
+        //      See test case in testParam() method.
+        //      Maybe we should add implode(' ', array_map(...)) here ?
         $e = new Expression('hello, [who]', ['who' => ['cruel', 'world']]);
         $this->assertEquals(
             'hello, :a',
