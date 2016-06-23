@@ -4,8 +4,10 @@
  - `consume()` renamed into `_consume()`
  - `render_*` methods renamed into `_render_*`
  - `bt()` renamed into `_escape()`
- - $bt property renamed to escapeChar
- - sql_templates renamed to templates
+ - `$bt` removed
+ - `$sql_templates` renamed to `$template_select`, `$template_insert` etc.
+ - `options()`, `options_insert()`, `options_replace` renamed to `option($option, $mode)`
+ - `del()` renamed to `reset()`
 
 
 ### Other changes

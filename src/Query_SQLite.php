@@ -11,18 +11,9 @@ namespace atk4\dsql;
 class Query_SQLite extends Query
 {
     /**
-     * SQLite specific template overwrites
+     * SQLite specific TRUNCATE template
      *
-     * @see Expression::__construct
-     *
-     * @param string|array $properties
-     * @param array        $arguments
+     * @var string
      */
-    public function __construct($properties = [], $arguments = null)
-    {
-        // SQLite doesn't support TRUNCATE TABLE myTable syntax, so we use DELETE instead
-        $this->templates['truncate'] = 'delete [from] [table]';
-
-        parent::__construct($properties, $arguments);
-    }
+    protected $template_truncate = 'delete [from] [table]';
 }

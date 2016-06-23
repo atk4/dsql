@@ -31,13 +31,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     protected $args = ['custom' => []];
 
     /**
-     * Backticks are added around all fields. Set this to blank string to avoid.
-     *
-     * @var string
-     */
-    protected $escapeChar = '`';
-
-    /**
      * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc.
      *
      * @var string
@@ -140,7 +133,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
+        if ($offset === null) {
             $this->args['custom'][] = $value;
         } else {
             $this->args['custom'][$offset] = $value;
@@ -200,6 +193,36 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Resets arguments.
+     *
+     * @param string $tag
+     *
+     * @return $this
+     */
+    public function reset($tag = null)
+    {
+        // unset all arguments
+        if ($tag === null) {
+            $this->args = ['custom' => []];
+            return $this;
+        }
+
+        if (!is_string($tag)) {
+            throw new Exception('Tag should be string');
+        }
+
+        // unset custom/argument or argument if such exists
+        if ($this->offsetExists($tag)) {
+            $this->offsetUnset($tag);
+        } elseif (isset($this->args[$tag])) {
+            unset($this->args[$tag]);
+        }
+
+        return $this;
+    }
+
+
+    /**
      * Recursively renders sub-query or expression, combining parameters.
      * If the argument is more likely to be a field, use tick=true.
      *
@@ -216,6 +239,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     return $this->_param($sql_code);
                 case 'escape':
                     return $this->_escape($sql_code);
+                case 'soft-escape':
+                    return $this->_escapeSoft($sql_code);
                 case 'none':
                     return $sql_code;
             }
@@ -224,14 +249,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         // User may add Expressionable trait to any class, then pass it's objects
         if ($sql_code instanceof Expressionable) {
-            $sql_code = $sql_code->getDSQLExpression();
+            $sql_code = $sql_code->getDSQLExpression($this);
         }
 
         if (!$sql_code instanceof Expression) {
             throw new Exception(['Only Expressions or Expressionable objects may be used in Expression','object'=>$sql_code]);
         }
 
-         //|| !$sql_code instanceof Expression) {
+        // at this point $sql_code is instance of Expression
         $sql_code->params = &$this->params;
         $sql_code->_paramBase = &$this->_paramBase;
         $ret = $sql_code->render();
@@ -250,9 +275,60 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Soft-escaping SQL identifier. This method will attempt to put
+     * backticks around the identifier, however will not do so if you
+     * are using special characters like ".", "(" or "`".
+     *
+     * It will smartly escape table.field type of strings resulting
+     * in `table`.`field`.
+     *
+     * @param mixed $value Any string or array of strings
+     *
+     * @return string|array Escaped string or array of strings
+     */
+    protected function _escapeSoft($value)
+    {
+        // Supports array
+        if (is_array($value)) {
+            return array_map(__METHOD__, $value);
+        }
+
+        if (is_string($value) && strpos($value, '.') !== false) {
+            return implode('.', array_map(__METHOD__, explode('.', $value)));
+        }
+
+        // in some cases we should not escape
+        if (is_object($value)
+            || $value === '*'
+            || strpos($value, '(') !== false
+            || strpos($value, '`') !== false
+        ) {
+            return $value;
+        }
+
+        return '`' . trim($value) . '`';
+    }
+
+    /**
+     * Creates new expression where $sql_code appears escaped. Use this
+     * method as a conventional means of specifying arguments when you
+     * think they might have a nasty back-ticks or commas in the field
+     * names.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public function escape($value)
+    {
+        return $this->expr('{}', [$value]);
+    }
+
+    /**
      * Escapes argument by adding backticks around it.
      * This will allow you to use reserved SQL words as table or field
-     * names such as "table".
+     * names such as "table" as well as other characters that SQL
+     * permits in the identifiers (e.g. spaces or equation signs)
      *
      * @param mixed $value Any string or array of strings
      *
@@ -265,19 +341,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return array_map(__METHOD__, $value);
         }
 
-        // in some cases we should not escape
-        if (!$this->escapeChar
-            || is_object($value)
-            || $value === '*'
-            || strpos($value, '.') !== false
-            || strpos($value, '(') !== false
-            || strpos($value, $this->escapeChar) !== false
-        ) {
-            return $value;
-        }
-
         // in all other cases we should escape
-        return $this->escapeChar . $value . $this->escapeChar;
+        return '`' . str_replace('`', '``', $value) . '`';
     }
 
     /**
@@ -319,20 +384,24 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         $res= preg_replace_callback(
-            '/\[([a-z0-9_]*)\]/',
+            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}/',
             function ($matches) use (&$nameless_count) {
 
+                $identifier = substr($matches[0], 1, -1);
+                $escaping = ($matches[0][0] == '[')?'param':'escape';
+
                 // Allow template to contain []
-                $identifier = $matches[1];
                 if ($identifier === "") {
                     $identifier = $nameless_count++;
+
+                    // use rendering only with named tags
                 }
+                    $fx = '_render_'.$identifier;
 
                 // [foo] will attempt to call $this->_render_foo()
-                $fx = '_render_'.$matches[1];
 
                 if (array_key_exists($identifier, $this->args['custom'])) {
-                    return $this->_consume($this->args['custom'][$identifier]);
+                    return $this->_consume($this->args['custom'][$identifier], $escaping);
                 } elseif (method_exists($this, $fx)) {
                     return $this->$fx();
                 }
@@ -361,7 +430,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             if (is_string($val)) {
                 $d = preg_replace('/'.$key.'([^_]|$)/', '\'<span style="color:green">'.
                     htmlspecialchars(addslashes($val)).'</span>\'\1', $d);
-            } elseif (is_null($val)) {
+            } elseif ($val === null) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
                     '<span style="color:black">NULL</span>\1',
@@ -383,7 +452,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
     }
 
-    function __debugInfo()
+    public function __debugInfo()
     {
 
         $arr = [
@@ -428,7 +497,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     $type = \PDO::PARAM_INT;
                 } elseif (is_bool($val)) {
                     $type = \PDO::PARAM_BOOL;
-                } elseif (is_null($val)) {
+                } elseif ($val === null) {
                     $type = \PDO::PARAM_NULL;
                 } elseif (is_string($val)) {
                     $type = \PDO::PARAM_STR;

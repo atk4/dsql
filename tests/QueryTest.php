@@ -31,8 +31,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         // passing properties in constructor
         $this->assertEquals(
-            '#q#',
-            PHPUnitUtil::callProtectedMethod($this->q(['escapeChar' => '#']), '_escape', ['q'])
+            '`q`',
+            PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['q'])
         );
     }
 
@@ -75,12 +75,28 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->q()->field('first_name,last_name'), '_render_field')
         );
         $this->assertEquals(
+            '`first_name`,`last_name`',
+            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name')->field('last_name'), '_render_field')
+        );
+        $this->assertEquals(
+            '`last_name`',
+            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name')->reset('field')->field('last_name'), '_render_field')
+        );
+        $this->assertEquals(
+            '*',
+            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name')->reset('field'), '_render_field')
+        );
+        $this->assertEquals(
+            '*',
+            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name')->reset(), '_render_field')
+        );
+        $this->assertEquals(
             '`employee`.`first_name`',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name', 'employee'), '_render_field')
+            PHPUnitUtil::callProtectedMethod($this->q()->field('employee.first_name'), '_render_field')
         );
         $this->assertEquals(
             '`first_name` `name`',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name', null, 'name'), '_render_field')
+            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name', 'name'), '_render_field')
         );
         $this->assertEquals(
             '`first_name` `name`',
@@ -92,14 +108,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             '`employee`.`first_name` `name`',
-            PHPUnitUtil::callProtectedMethod($this->q()->field(['name'=>'first_name'], 'employee'), '_render_field')
+            PHPUnitUtil::callProtectedMethod($this->q()->field(['name'=>'employee.first_name']), '_render_field')
         );
         $this->assertEquals(
             '*',
             PHPUnitUtil::callProtectedMethod($this->q()->field('*'), '_render_field')
         );
         $this->assertEquals(
-            'employee.first_name',
+            '`employee`.`first_name`',
             PHPUnitUtil::callProtectedMethod($this->q()->field('employee.first_name'), '_render_field')
         );
     }
@@ -151,7 +167,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $this->q('[field]')->field('first name')->render()
         );
         $this->assertEquals(
-            'first.name',
+            '`first`.`name`',
             $this->q('[field]')->field('first.name')->render()
         );
         $this->assertEquals(
@@ -165,7 +181,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         // Usage of field aliases
         $this->assertEquals(
             'now() `time`',
-            $this->q('[field]')->field('now()', null, 'time')->render()
+            $this->q('[field]')->field('now()', 'time')->render()
         );
         $this->assertEquals( // alias can be passed as 2nd argument
             'now() `time`',
@@ -173,8 +189,19 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals( // alias can be passed as 3nd argument
             'now() `time`',
-            $this->q('[field]')->field(new Expression('now()'), null, 'time')->render()
+            $this->q('[field]')->field(['time' => new Expression('now()')])->render()
         );
+    }
+
+    /**
+     * There shouldn't be alias when passing multiple tables
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testFieldException1()
+    {
+        $this->q()->field('name', 'a')->field('surname', 'a');
     }
 
     /**
@@ -198,31 +225,80 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->q()->table(['employee','jobs'], 'u');
     }
+
     /**
-     * can't use table with expression
+     * Alias is NOT mandatory when pass table as Expression
      *
      * @covers ::table
-     * @expectedException Exception
      */
-    public function testTableExprException1()
+    public function testTableException3()
     {
-        $q = $this->q();
-        $q
-            ->table($q->expr('test'))
-            ->table('user');
+        $this->q()->table($this->q()->expr('test'));
     }
+
     /**
-     * can't use table with expression
+     * Table aliases should be unique
      *
      * @covers ::table
      * @expectedException Exception
      */
-    public function testTableExprException2()
+    public function testTableException5()
     {
-        $q = $this->q();
-        $q
-            ->table('user')
-            ->table($q->expr('test'));
+        $this->q()
+            ->table('foo', 'a')
+            ->table('bar', 'a');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException6()
+    {
+        $this->q()
+            ->table('foo', 'bar')
+            ->table('bar');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException7()
+    {
+        $this->q()
+            ->table('foo')
+            ->table('foo');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException8()
+    {
+        $this->q()
+            ->table($this->q()->table('test'), 'foo')
+            ->table('foo');
+    }
+
+    /**
+     * Table aliases should be unique
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException9()
+    {
+        $this->q()
+            ->table('foo')
+            ->table($this->q()->table('test'), 'foo');
     }
 
     /**
@@ -259,6 +335,32 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->field('name')->table('employee')
                 ->render()
         );
+
+        $this->assertEquals(
+            'select `na#me` from `employee`',
+            $this->q()
+                ->field('`na#me`')->table('employee')
+                ->render()
+        );
+        $this->assertEquals(
+            'select `na``me` from `employee`',
+            $this->q()
+                ->field(new Expression('{}', ['na`me']))->table('employee')
+                ->render()
+        );
+        $this->assertEquals(
+            'select `жук` from `employee`',
+            $this->q()
+                ->field(new Expression('{}', ['жук']))->table('employee')
+                ->render()
+        );
+        $this->assertEquals(
+            'select `this is 💩` from `employee`',
+            $this->q()
+                ->field(new Expression('{}', ['this is 💩']))->table('employee')
+                ->render()
+        );
+
         $this->assertEquals(
             'select `name` from `employee` `e`',
             $this->q()
@@ -276,7 +378,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'select `employee`.`name` from `employee`,`jobs`',
             $this->q()
-                ->field('name', 'employee')->table('employee')->table('jobs')
+                ->field('employee.name')->table('employee')->table('jobs')
                 ->render()
         );
         $this->assertEquals(
@@ -322,14 +424,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'insert into `employee` (`name`) values (:a)',
             $this->q()
                 ->field('name')->table('employee', 'emp')->set('name', 1)
-                ->selectTemplate('insert')
+                ->mode('insert')
                 ->render()
         );
         $this->assertEquals(
             'update `employee` set `name`=:a',
             $this->q()
                 ->field('name')->table('employee', 'emp')->set('name', 1)
-                ->selectTemplate('update')
+                ->mode('update')
                 ->render()
         );
     }
@@ -344,35 +446,34 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q = $this->q()->table('employee');
 
         $this->assertEquals(
-            'select `name` from (select * from `employee`)',
+            'select `name` from (select * from `employee`) `e`',
             $this->q()
-                ->field('name')->table($q)
+                ->field('name')->table($q, 'e')
                 ->render()
         );
 
-        /**
-         * @todo Add more tests with multiple tables & subqueries
-         * Currently that's restricted, but I believe it should be allowed to create query like this
-         * SELECT `e`.`name`, `c`.`name`
-         * FROM
-         *  (select * from `employee`) `e`,
-         *  (select * from `customer`) `c`
-         * In such case table alias should better be mandatory.
-         */
-
-        /**
-         * @todo Add some tests with non-unique table aliases.
-         *  They will currently generate: SELECT * FROM `foo` `a`, `bar` `a` which is wrong!
-         * We have to check uniquness of table aliases and in such cases throw appropriate exception.
-         */
-        $q = $this->q()
-            ->table('foo', 'a')
-            ->table('bar', 'a');
         $this->assertEquals(
-            'select * from `foo` `a`,`bar` `a`', // <-- aliases should be unique and THIS SHOULD THROW EXCEPTION
-            $q->render()
+            'select `name` from `myt``able`',
+            $this->q()
+                ->field('name')->table(new Expression('{}', ['myt`able']))
+                ->render()
         );
 
+        // test with multiple sub-queries as tables
+        $q1 = $this->q()->table('employee');
+        $q2 = $this->q()->table('customer');
+
+        $this->assertEquals(
+            //this way it would be more correct: 'select `e`.`name`,`c`.`name` from (select * from `employee`) `e`,(select * from `customer`) `c` where `e`.`last_name` = `c`.`last_name`',
+            'select `e`.`name`,`c`.`name` from (select * from `employee`) `e`,(select * from `customer`) `c` where `e`.`last_name` = c.last_name',
+            $this->q()
+                ->field('e.name')
+                ->field('c.name')
+                ->table($q1, 'e')
+                ->table($q2, 'c')
+                ->where('e.last_name', $this->q()->expr('c.last_name'))
+                ->render()
+        );
     }
 
     /**
@@ -437,7 +538,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testVarDump3()
     {
         $this->expectOutputRegex('/.*Hello :a.*/');
-        var_dump(new Expression('Hello [world]',['world'=>'php']));
+        var_dump(new Expression('Hello [world]', ['world'=>'php']));
     }
 
     /**
@@ -453,8 +554,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q1 = $this->q()
             ->table('sales')
             ->field('date')
-            ->field('amount', null, 'debit')
-            ->field($this->q()->expr('0'), null, 'credit') // simply 0
+            ->field('amount', 'debit')
+            ->field($this->q()->expr('0'), 'credit') // simply 0
             ;
         $this->assertEquals(
             'select `date`,`amount` `debit`,0 `credit` from `sales`',
@@ -465,8 +566,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q2 = $this->q()
             ->table('purchases')
             ->field('date')
-            ->field($this->q()->expr('0'), null, 'debit') // simply 0
-            ->field('amount', null, 'credit')
+            ->field($this->q()->expr('0'), 'debit') // simply 0
+            ->field('amount', 'credit')
             ;
         $this->assertEquals(
             'select `date`,0 `debit`,`amount` `credit` from `purchases`',
@@ -550,6 +651,10 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'where `db`.`user`.`id` = :a',
             $this->q('[where]')->where('db.user.id', 1)->render()
+        );
+        $this->assertEquals(
+            'where `id` is :a',
+            $this->q('[where]')->where('id', null)->render()
         );
         $this->assertEquals(
             'where `id` is :a',
@@ -797,6 +902,48 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'order by `name` desc, `surname`',
             $this->q('[order]')->order('surname')->order('name desc')->render()
         );
+        // table name|alias included
+        $this->assertEquals(
+            'order by `users`.`name`',
+            $this->q('[order]')->order('users.name')->render()
+        );
+        // strange field names
+        $this->assertEquals(
+            'order by `my name` desc',
+            $this->q('[order]')->order('`my name` desc')->render()
+        );
+        $this->assertEquals(
+            'order by `жук`',
+            $this->q('[order]')->order('жук asc')->render()
+        );
+        $this->assertEquals(
+            'order by `this is 💩`',
+            $this->q('[order]')->order('this is 💩')->render()
+        );
+        $this->assertEquals(
+            'order by `this is жук` desc',
+            $this->q('[order]')->order('this is жук desc')->render()
+        );
+        $this->assertEquals(
+            'order by * desc',
+            $this->q('[order]')->order(['* desc'])->render()
+        );
+        $this->assertEquals(
+            'order by `{}` desc',
+            $this->q('[order]')->order(['{} desc'])->render()
+        );
+        $this->assertEquals(
+            'order by `* desc`',
+            $this->q('[order]')->order(new Expression('`* desc`'))->render()
+        );
+        $this->assertEquals(
+            'order by `* desc`',
+            $this->q('[order]')->order($this->q()->escape('* desc'))->render()
+        );
+        $this->assertEquals(
+            'order by `* desc {}`',
+            $this->q('[order]')->order($this->q()->escape('* desc {}'))->render()
+        );
     }
 
     /**
@@ -822,6 +969,28 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'group by `gender`, `age`',
             $this->q('[group]')->group('gender')->group('age')->render()
+        );
+        // table name|alias included
+        $this->assertEquals(
+            'group by `users`.`gender`',
+            $this->q('[group]')->group('users.gender')->render()
+        );
+        // strange field names
+        $this->assertEquals(
+            'group by `my name`',
+            $this->q('[group]')->group('`my name`')->render()
+        );
+        $this->assertEquals(
+            'group by `жук`',
+            $this->q('[group]')->group('жук')->render()
+        );
+        $this->assertEquals(
+            'group by `this is 💩`',
+            $this->q('[group]')->group('this is 💩')->render()
+        );
+        $this->assertEquals(
+            'group by `this is жук`',
+            $this->q('[group]')->group('this is жук')->render()
         );
     }
 
@@ -869,13 +1038,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'left join `bank_details` on `bank_details`.`id` = `bank`.`details_id`',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a'=>'address.user_id','b'=>'bank'])
-                ->join('bank_details','bank.details_id')->render()
+                ->join('bank_details', 'bank.details_id')->render()
         );
 
         $this->assertEquals(
             'left join `address` as `a` on a.name like u.pattern',
             $this->q('[join]')->table('user', 'u')
-                ->join('address a',new Expression('a.name like u.pattern'))->render()
+                ->join('address a', new Expression('a.name like u.pattern'))->render()
         );
     }
 
@@ -884,7 +1053,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::where
      * @covers ::_render_where
-     * @covers ::selectTemplate
+     * @covers ::mode
      */
     public function testCombinedWhere()
     {
@@ -914,7 +1083,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'delete from `employee` where `employee`.`a` = :a',
             $this->q()
-                ->selectTemplate('delete')
+                ->mode('delete')
                 ->field('name')->table('employee')->where('employee.a', 1)
                 ->render()
         );
@@ -926,9 +1095,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'update `user` set `active`=:a  where `id` in (select `user_id` from `expired_users`)',
             $this->q()
                 ->table('user')
-                ->where('id','in',$user_ids)
-                ->set('active',0)
-                ->selectTemplate('update')
+                ->where('id', 'in', $user_ids)
+                ->set('active', 0)
+                ->mode('update')
                 ->render()
         );
 
@@ -963,7 +1132,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Test insert, update and delete templates.
      *
-     * @covers ::selectTemplate
+     * @covers ::mode
      * @covers ::where
      * @covers ::set
      * @covers ::_render_set
@@ -977,7 +1146,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'delete from `employee` where `name` = :a',
             $this->q()
                 ->field('name')->table('employee')->where('name', 1)
-                ->selectTemplate('delete')
+                ->mode('delete')
                 ->render()
         );
 
@@ -986,7 +1155,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'update `employee` set `name`=:a',
             $this->q()
                 ->field('name')->table('employee')->set('name', 1)
-                ->selectTemplate('update')
+                ->mode('update')
                 ->render()
         );
 
@@ -994,7 +1163,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'update `employee` set `name`=`name`+1',
             $this->q()
                 ->field('name')->table('employee')->set('name', new Expression('`name`+1'))
-                ->selectTemplate('update')
+                ->mode('update')
                 ->render()
         );
 
@@ -1003,7 +1172,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'insert into `employee` (`name`) values (:a)',
             $this->q()
                 ->field('name')->table('employee')->set('name', 1)
-                ->selectTemplate('insert')
+                ->mode('insert')
                 ->render()
         );
 
@@ -1014,7 +1183,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->field('time')->field('name')->table('employee')
                 ->set('time', new Expression('now()'))
                 ->set('name', 'unknown')
-                ->selectTemplate('insert')
+                ->mode('insert')
                 ->render()
         );
 
@@ -1024,7 +1193,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $this->q()
                 ->field('time')->field('name')->table('employee')
                 ->set(['time' => new Expression('now()'), 'name' => 'unknown'])
-                ->selectTemplate('insert')
+                ->mode('insert')
                 ->render()
         );
     }
@@ -1104,6 +1273,72 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or `b` = :b or (true and false))',
             $q->render()
+        );
+    }
+
+    /**
+     * Test reset()
+     *
+     * @covers \atk4\dsql\Expression::reset
+     */
+    public function testReset()
+    {
+        // reset everything
+        $q = $this->q()->table('user')->where('name', 'John');
+        $q->reset();
+        $this->assertEquals('select *', $q->render());
+
+        // reset particular tag
+        $q = $this->q()
+            ->table('user')
+            ->where('name', 'John')
+            ->reset('where')
+            ->where('surname', 'Doe');
+        $this->assertEquals('select * from `user` where `surname` = :a', $q->render());
+    }
+
+    /**
+     * Test [option]
+     *
+     * @covers ::option
+     * @covers ::_render_option
+     */
+    public function testOption()
+    {
+        // single option
+        $this->assertEquals(
+            'select calc_found_rows * from `test`',
+            $this->q()->table('test')->option('calc_found_rows')->render()
+        );
+        // multiple options
+        $this->assertEquals(
+            'select calc_found_rows ignore * from `test`',
+            $this->q()->table('test')->option('calc_found_rows,ignore')->render()
+        );
+        $this->assertEquals(
+            'select calc_found_rows ignore * from `test`',
+            $this->q()->table('test')->option(['calc_found_rows','ignore'])->render()
+        );
+        // options for specific modes
+        $q = $this->q()
+                ->table('test')
+                ->field('name')
+                ->set('name', 1)
+                ->option('calc_found_rows', 'select') // for default select mode
+                ->option('ignore', 'insert') // for insert mode
+                ;
+
+        $this->assertEquals(
+            'select calc_found_rows `name` from `test`',
+            $q->mode('select')->render()
+        );
+        $this->assertEquals(
+            'insert ignore into `test` (`name`) values (:a)',
+            $q->mode('insert')->render()
+        );
+        $this->assertEquals(
+            'update `test` set `name`=:a',
+            $q->mode('update')->render()
         );
     }
 }

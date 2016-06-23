@@ -96,7 +96,7 @@ which case you do not have to define "use" block::
 You can specify some of the expression properties through first argument
 of the constructor::
 
-    $expr = new Expression(["NOW()", 'escapeChar' => '*']);
+    $expr = new Expression(["NOW()", 'connection' => $pdo]);
 
 :ref:`Scroll down <properties>` for full list of properties.
 
@@ -300,15 +300,35 @@ circumstances.
       $query->_consume('first_name');  // `first_name`
       $query->_consume($other_query);  // will merge parameters and return string
 
+.. php:method:: escape($sql_code)
+
+  Creates new expression where $sql_code appears escaped. Use this method as a
+  conventional means of specifying arguments when you think they might have
+  a nasty back-ticks or commas in the field names. I generally **discourage** you
+  from using this method. Example use would be::
+
+      $query->field('foo,bar');  // escapes and adds 2 fields to the query
+      $query->field($query->escape('foo,bar')); // adds field `foo,bar` to the query
+      $query->field(['foo,bar']);  // adds single field `foo,bar` 
+
+      $query->order('foo desc');  // escapes and add `foo` desc to the query
+      $query->field($query->escape('foo desc')); // adds field `foo desc` to the query
+      $query->field(['foo desc']); // adds `foo` desc anyway
+
 .. php:method:: _escape($sql_code)
 
-  Surrounds `$sql code` with :php:attr:`$escapeChar`.
-  If escapeChar is `null` will do nothing.
+  Always surrounds `$sql code` with back-ticks.
 
-  Will also do nothing if it finds "*", "." or "(" character in `$sql_code`::
+.. php:method:: _escapeSoft($sql_code)
+
+  Surrounds `$sql code` with back-ticks.
+
+  It will smartly escape table.field type of strings resulting in `table`.`field`.
+
+  Will do nothing if it finds "*", "`" or "(" character in `$sql_code`::
 
       $query->_escape('first_name');  // `first_name`
-      $query->_escape('first.name');  // first.name
+      $query->_escape('first.name');  // `first`.`name`
       $query->_escape('(2+2)');       // (2+2)
       $query->_escape('*');           // *
 
@@ -334,10 +354,6 @@ Other Properties
 .. php:attr:: connection
 
     PDO connection object or any other DB connection object.
-
-.. php:attr:: escapeChar
-
-    Field and table names are escaped using escapeChar which by default is: *`*.
 
 .. php:attr:: paramBase
 

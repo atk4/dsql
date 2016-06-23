@@ -249,7 +249,7 @@ So to implement our task, you might need a class like this::
 
         public function loadData()
         {
-            return $this->selectTemplate('load_data')->execute();
+            return $this->mode('load_data')->execute();
         }
     }
 
