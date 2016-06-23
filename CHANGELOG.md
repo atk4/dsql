@@ -1,3 +1,21 @@
+## 1.0.1
+
+This is now our first stable release. It features clean-ups from 1.0.0:
+
+* selectTemplate() is replaced with mode()
+* upadted docs to use $c->query() instead of "new Query()" (better use pattern)
+* added examples for having()
+* added method reset()
+* added method option()
+* Expressionable now receives parent $expression as argument
+* documented orExpr(), andExpr()
+* documented template_* properties
+* improved PSR compatibility
+* escapeChar is dropped (too generic)
+* introduced softEscape and made escape more strict
+* improved and cleaned up documentation
+* updated REDAME highlighting our USP
+
 ## 1.0.0-alpha2
 
 Mainly clean up the code and added more tests.
