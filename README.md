@@ -101,7 +101,7 @@ ORDER BY max_salary desc
 
 ## DSQL is part of Full Stack Web UI Framework
 
-![image](docs/files/agiletoolkit.png)
+<a href="http://agiletoolkit.org" target="_blank"><img src="docs/images/agiletoolkit.png" width="100%"/></a>
 
 DSQL is nibble enough to be used in your current project, but if you are looking to start a new web
 project, why not look into [Agile Toolkit](http://agiletoolkit.org/)? It's a free to use full-stack
