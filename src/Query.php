@@ -502,8 +502,7 @@ class Query extends Expression
      *  ]);
      *
      * The above use of OR conditions rely on orExpr() functionality. See
-     * that method for morer information, but in short it makes use of
-     * Expression_OR class
+     * that method for more information.
      *
      * To specify OR conditions
      *  $q->where($q->orExpr()->where('a',1)->where('b',1));
@@ -1121,7 +1120,7 @@ class Query extends Expression
         try {
             $arr['R'] = $this->render();
         } catch (\Exception $e) {
-            $arr['R'] = $this->getMessage();
+            $arr['R'] = $e->getMessage();
         }
 
         return $arr;

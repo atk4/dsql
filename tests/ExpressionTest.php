@@ -258,6 +258,26 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::__toString
+     * @expectedException \LogicException
+     */
+    public function testToStringException1()
+    {
+        $e = new MyBadExpression('Hello');
+        $s = (string)$e;
+    }
+
+    /**
+     * @covers ::__toString
+     * @expectedException Exception
+     */
+    public function testToStringException2()
+    {
+        $e = new MyWorstExpression('Hello');
+        $s = (string)$e;
+    }
+
+    /**
      * expr() should return new Expression object and inherit connection from it.
      *
      * @covers ::expr
@@ -272,6 +292,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Fully covers _escape method
      *
      * @covers ::_escape
+     * @covers ::_escapeSoft
      * @covers ::escape
      */
     public function testEscape()
@@ -354,7 +375,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     public function testParam()
     {
         $e = new Expression('hello, [who]', ['who' => 'world']);
-
         $this->assertEquals(
             'hello, :a',
             $e->render()
@@ -364,14 +384,16 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             $e->params
         );
 
-        $e = new Expression('hello, [who]', ['who' => 'world']);
-
+        // @todo Imants: allowing to pass value as array looks wrong.
+        //      See test case in testParam() method.
+        //      Maybe we should add implode(' ', array_map(...)) here ?
+        $e = new Expression('hello, [who]', ['who' => ['cruel', 'world']]);
         $this->assertEquals(
             'hello, :a',
             $e->render()
         );
         $this->assertEquals(
-            [':a'=>'world'],
+            [':a'=>'cruel', ':b'=>'world'],
             $e->params
         );
     }
@@ -393,6 +415,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             123,
             PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'none'])
+        );
+        $this->assertEquals(
+            '(select *)',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [new Query()])
         );
 
         $this->assertEquals(
@@ -535,10 +561,26 @@ class JsonExpression extends Expression
         return json_encode($value);
     }
 }
-class MyField implements Expressionable {
-    function getDSQLExpression($e)
+class MyField implements Expressionable
+{
+    public function getDSQLExpression($e)
     {
         return $e->expr('`myfield`');
     }
 }
+class MyBadExpression extends Expression
+{
+    public function getOne()
+    {
+        return array();
+    }
+}
+class MyWorstExpression extends Expression
+{
+    public function getOne()
+    {
+        throw new Exception('It is Monday');
+    }
+}
+
 // @codingStandardsIgnoreEnd

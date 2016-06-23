@@ -194,14 +194,26 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * There shouldn't be alias when passing multiple tables
+     * Duplicate alias of field
      *
      * @covers ::table
+     * @covers ::_set_args
      * @expectedException Exception
      */
     public function testFieldException1()
     {
         $this->q()->field('name', 'a')->field('surname', 'a');
+    }
+
+    /**
+     * There shouldn't be alias when passing fields as array
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testFieldException2()
+    {
+        $this->q()->field(['name', 'surname'], 'a');
     }
 
     /**
@@ -237,9 +249,21 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Alias is IS mandatory when pass table as Query
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException4()
+    {
+        $this->q()->table($this->q()->table('test'));
+    }
+
+    /**
      * Table aliases should be unique
      *
      * @covers ::table
+     * @covers ::_set_args
      * @expectedException Exception
      */
     public function testTableException5()
@@ -253,6 +277,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Table aliases should be unique
      *
      * @covers ::table
+     * @covers ::_set_args
      * @expectedException Exception
      */
     public function testTableException6()
@@ -266,6 +291,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Table aliases should be unique
      *
      * @covers ::table
+     * @covers ::_set_args
      * @expectedException Exception
      */
     public function testTableException7()
@@ -279,6 +305,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Table aliases should be unique
      *
      * @covers ::table
+     * @covers ::_set_args
      * @expectedException Exception
      */
     public function testTableException8()
@@ -292,6 +319,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Table aliases should be unique
      *
      * @covers ::table
+     * @covers ::_set_args
      * @expectedException Exception
      */
     public function testTableException9()
@@ -299,6 +327,47 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->q()
             ->table('foo')
             ->table($this->q()->table('test'), 'foo');
+    }
+
+    /**
+     * Table can't be set as sub-Query in Update query mode
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException10()
+    {
+        $this->q()
+            ->mode('update')
+            ->table($this->q()->table('test'), 'foo')
+            ->field('name')->set('name', 1)
+            ->render();
+    }
+
+    /**
+     * Table can't be set as sub-Query in Insert query mode
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testTableException11()
+    {
+        $this->q()
+            ->mode('insert')
+            ->table($this->q()->table('test'), 'foo')
+            ->field('name')->set('name', 1)
+            ->render();
+    }
+
+    /**
+     * Requesting non-existant query mode should throw exception
+     *
+     * @covers ::mode
+     * @expectedException Exception
+     */
+    public function testModeException1()
+    {
+        $this->q()->mode('non_existant_mode');
     }
 
     /**
@@ -539,6 +608,20 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectOutputRegex('/.*Hello :a.*/');
         var_dump(new Expression('Hello [world]', ['world'=>'php']));
+    }
+
+    /**
+     * @requires PHP 5.6
+     */
+    public function testVarDump4()
+    {
+        $this->expectOutputRegex('/.*Table cannot be Query.*/');
+        // should throw exception "Table cannot be Query in UPDATE, INSERT etc. query modes"
+        var_dump(
+            $this->q()
+                ->mode('update')
+                ->table($this->q()->table('test'), 'foo')
+        );
     }
 
     /**
@@ -857,7 +940,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test Limits
+     * Test Limit
      *
      * @covers ::limit
      * @covers ::_render_limit
@@ -902,6 +985,10 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'order by `name` desc, `surname`',
             $this->q('[order]')->order('surname')->order('name desc')->render()
         );
+        $this->assertEquals(
+            'order by `name` desc, `surname`',
+            $this->q('[order]')->order('surname', false)->order('name', true)->render()
+        );
         // table name|alias included
         $this->assertEquals(
             'order by `users`.`name`',
@@ -944,6 +1031,28 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'order by `* desc {}`',
             $this->q('[order]')->order($this->q()->escape('* desc {}'))->render()
         );
+    }
+
+    /**
+     * If first argument is array, second argument must not be used
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testOrderException1()
+    {
+        $this->q('[order]')->order(['name','surname'], 'desc');
+    }
+
+    /**
+     * Incorrect ordering keyword
+     *
+     * @covers ::table
+     * @expectedException Exception
+     */
+    public function testOrderException2()
+    {
+        $this->q('[order]')->order('name', 'random_order');
     }
 
     /**
@@ -1033,6 +1142,12 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->join(['a'=>'address.user_id','b'=>'bank'])->render()
         );
         $this->assertEquals(
+            'left join `address` on `address`.`user_id` = `u`.`id` '.
+            'left join `bank` on `bank`.`id` = `u`.`bank_id`',
+            $this->q('[join]')->table('user', 'u')
+                ->join(['address.user_id','bank'])->render()
+        );
+        $this->assertEquals(
             'left join `address` as `a` on `a`.`user_id` = `u`.`id` '.
             'left join `bank` as `b` on `b`.`id` = `u`.`bank_id` '.
             'left join `bank_details` on `bank_details`.`id` = `bank`.`details_id`',
@@ -1100,8 +1215,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->mode('update')
                 ->render()
         );
-
-
     }
 
     /**
@@ -1126,6 +1239,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $this->q()
                 ->field('name')->table('employee')->where([['a', 1],'a=b'])
                 ->render()
+        );
+    }
+
+    /**
+     * Test OrWhere and AndWhere without where condition. Should ignore them.
+     *
+     * @covers ::where
+     * @covers ::orExpr
+     * @covers ::andExpr
+     * @covers ::_render_where
+     * @covers ::_render_orwhere
+     * @covers ::_render_andwhere
+     */
+    public function testEmptyOrAndWhere()
+    {
+        $this->assertEquals(
+            '',
+            $this->q()->orExpr()->render()
+        );
+
+        $this->assertEquals(
+            '',
+            $this->q()->andExpr()->render()
         );
     }
 

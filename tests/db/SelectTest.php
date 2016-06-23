@@ -91,6 +91,11 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             [['now'=>6]],
             $this->q()->field(new Expression('[]+[]', [3,3]), 'now')->get()
         );
+
+        $this->assertEquals(
+            5,
+            $this->q()->field(new Expression('IFNULL([],5)', [null]), 'null_test')->getOne()
+        );
     }
 
     public function testExpression()
@@ -112,13 +117,10 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             (string)$this->q('employee')->field('surname')->where('name', 'Jack')
         );
         // table as sub-query
-        // @todo - currently this will not work on MySQL. See https://github.com/atk4/dsql/issues/33
-        /*
         $this->assertEquals(
             'Williams',
             (string)$this->q($this->q('employee'), 'e2')->field('surname')->where('name', 'Jack')
         );
-        */
         // field as expression
         $this->assertEquals(
             'Williams',
@@ -157,6 +159,10 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             [['id'=>1, 'name'=>'John'], ['id'=>2, 'name'=>'Jane']],
             $this->q('employee')->field('id,name')->get()
         );
+        $this->assertEquals(
+            [['id'=>1, 'name'=>'John'], ['id'=>2, 'name'=>'Jane']],
+            $this->q('employee')->field('id,name')->select()->fetchAll()
+        );
 
         // update
         $this->q('employee')
@@ -173,10 +179,12 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
             ->replace();
 
-        // In SQLite replace is just like insert, it just checks if there is duplicate key and if it is
-        // it deletes the row, and inserts the new one, otherwise it just inserts.
-        // So order of records after REPLACE in SQLite will be [Jane, Peter] not [Peter, Jane] as in MySQL,
-        // which in theory does the same thing, but returns [Peter, Jane] - in original order.
+        // In SQLite replace is just like insert, it just checks if there is
+        // duplicate key and if it is it deletes the row, and inserts the new
+        // one, otherwise it just inserts.
+        // So order of records after REPLACE in SQLite will be [Jane, Peter]
+        // not [Peter, Jane] as in MySQL, which in theory does the same thing,
+        // but returns [Peter, Jane] - in original order.
         // That's why we add usort here.
         $data = $this->q('employee')->field('id,name')->get();
         usort($data, function ($a, $b) {
