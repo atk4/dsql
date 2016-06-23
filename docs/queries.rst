@@ -719,6 +719,12 @@ Other Methods
     $q->select(); // select calc_found_rows `name` from `test`
     $q->insert(); // insert ignore into `test` (`name`) values (`name` = 'John')
 
+.. php:method:: _set_args($what, $alias, $value)
+
+    Internal method which sets value in :php:attr:`Expression::args` array.
+    It doesn't allow duplicate aliases and throws Exception in such case.
+    Argument $what can be 'table' or 'field'.
+
 
 Properties
 ==========

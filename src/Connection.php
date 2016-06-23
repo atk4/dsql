@@ -16,7 +16,7 @@ class Connection
 
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
-        if (strpos($dsn,':') === false) {
+        if (strpos($dsn, ':') === false) {
             throw new Exception(["Your DSN format is invalid. Must be in 'driver:host:options' format", 'dsn'=>$dsn]);
         }
         list($driver, $rest) = explode(':', $dsn, 2);
@@ -26,27 +26,27 @@ class Connection
                 return new Connection(array_merge([
                     'connection'=>new \PDO($dsn, $user, $password),
                     'query_class'=>'atk4\dsql\Query_MySQL'
-                ],$args));
+                ], $args));
             case 'sqlite':
                 return new Connection(array_merge([
                     'connection'=>new \PDO($dsn, $user, $password),
                     'query_class'=>'atk4\dsql\Query_SQLite'
-                ],$args));
+                ], $args));
             case 'dumper':
                 return new Connection_Dumper(array_merge([
                     'connection'=>Connection::connect($rest)
-                ],$args));
+                ], $args));
 
             case 'counter':
                 return new Connection_Counter(array_merge([
                     'connection'=>Connection::connect($rest)
-                ],$args));
+                ], $args));
 
                 // let PDO handle the rest
             default:
                 return new Connection(array_merge([
                     'connection'=>new \PDO($dsn, $user, $password)
-                ],$args));
+                ], $args));
 
         }
     }
