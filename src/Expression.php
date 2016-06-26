@@ -559,6 +559,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     public function getOne()
     {
         $data = $this->getRow();
+        if (!$data) {
+            throw new Exception([
+                'Unable to fetch single cell of data for getOne from this query',
+                'result'=>$data,
+                'query'=>$this->getDebugQuery()
+            ]);
+        }
         $one = array_shift($data);
         return $one;
     }
