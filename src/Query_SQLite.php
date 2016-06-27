@@ -15,5 +15,5 @@ class Query_SQLite extends Query
      *
      * @var string
      */
-    protected $template_truncate = 'delete [from] [table]';
+    protected $template_truncate = 'delete [from] [table_noalias]';
 }
