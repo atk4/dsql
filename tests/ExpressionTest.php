@@ -262,11 +262,13 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * @covers ::__toString
      * @expectedException \Exception
      */
+    /*
     public function testToStringException1()
     {
         $e = new MyBadExpression('Hello');
         $s = (string)$e;
     }
+    */
 
     /**
      * expr() should return new Expression object and inherit connection from it.
@@ -559,12 +561,14 @@ class MyField implements Expressionable
         return $e->expr('`myfield`');
     }
 }
+/*
 class MyBadExpression extends Expression
 {
     public function getOne()
     {
-        // should retyurn string, but for test case we return array to get \Exception
+        // should return string, but for test case we return array to get \Exception
         return array();
     }
 }
+*/
 // @codingStandardsIgnoreEnd

@@ -104,7 +104,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function __toString()
     {
-        return $this->getOne();
+        return (string) $this->getOne();
     }
 
     /**
@@ -207,12 +207,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Recursively renders sub-query or expression, combining parameters.
-     * If the argument is more likely to be a field, use tick=true.
      *
      * @param mixed   $sql_code    Expression
      * @param string  $escape_mode Fall-back escaping mode - param|escape|none
      *
-     * @return string Quoted expression
+     * @return string|array Quoted expression or array of param names
      */
     protected function _consume($sql_code, $escape_mode = 'param')
     {
@@ -386,9 +385,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                 if (array_key_exists($identifier, $this->args['custom'])) {
                     $value = $this->_consume($this->args['custom'][$identifier], $escaping);
-                    return is_array($value) ? '('.implode(',', $value).')' : $value;
                 } elseif (method_exists($this, $fx)) {
-                    return $this->$fx();
+                    $value = $this->$fx();
+                }
+
+                if (isset($value)) {
+                    return is_array($value) ? '('.implode(',', $value).')' : $value;
                 }
 
                 throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
