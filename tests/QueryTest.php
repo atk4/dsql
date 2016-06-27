@@ -196,7 +196,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Duplicate alias of field
      *
-     * @covers ::table
+     * @covers ::field
      * @covers ::_set_args
      * @expectedException Exception
      */
@@ -208,7 +208,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * There shouldn't be alias when passing fields as array
      *
-     * @covers ::table
+     * @covers ::field
      * @expectedException Exception
      */
     public function testFieldException2()
@@ -585,6 +585,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @requires PHP 5.6
+     * @covers ::__debugInfo
      */
     public function testVarDump()
     {
@@ -594,6 +595,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @requires PHP 5.6
+     * @covers ::__debugInfo
      */
     public function testVarDump2()
     {
@@ -603,6 +605,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @requires PHP 5.6
+     * @covers ::__debugInfo
      */
     public function testVarDump3()
     {
@@ -612,6 +615,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @requires PHP 5.6
+     * @covers ::__debugInfo
      */
     public function testVarDump4()
     {
@@ -1036,7 +1040,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * If first argument is array, second argument must not be used
      *
-     * @covers ::table
+     * @covers ::order
      * @expectedException Exception
      */
     public function testOrderException1()
@@ -1047,7 +1051,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Incorrect ordering keyword
      *
-     * @covers ::table
+     * @covers ::order
      * @expectedException Exception
      */
     public function testOrderException2()
