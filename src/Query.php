@@ -52,7 +52,7 @@ class Query extends Expression
      *
      * @var string
      */
-    protected $template_delete = 'delete [from] [table][where][having]';
+    protected $template_delete = 'delete [from] [table_noalias][where][having]';
 
     /**
      * UPDATE template
