@@ -120,7 +120,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             if (is_callable($previousHandler)) {
                 call_user_func($previousHandler, $e);
             }
-            die($e->getMessage());
+            fwrite(STDERR, $e->getMessage());
+            exit(1);
         }
     }
 
