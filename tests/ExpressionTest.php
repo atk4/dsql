@@ -4,6 +4,7 @@ namespace atk4\dsql\tests;
 
 use atk4\dsql\Expression;
 use atk4\dsql\Expressionable;
+use atk4\dsql\Query;
 
 /**
  * @coversDefaultClass \atk4\dsql\Expression
