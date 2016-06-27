@@ -271,7 +271,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     protected function _escapeSoft($value)
     {
-        // Supports array
+        // supports array
         if (is_array($value)) {
             return array_map(__METHOD__, $value);
         }
@@ -319,7 +319,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     protected function _escape($value)
     {
-        // Supports array
+        // supports array
         if (is_array($value)) {
             return array_map(__METHOD__, $value);
         }
@@ -333,15 +333,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * query rendering. Consider using `_consume()` instead, which will
      * also handle nested expressions properly.
      *
-     * @param string|array $value String literal containing input data
+     * @param string|array $value String literal or array of strings containing input data
      *
-     * @return string|array Safe and escaped string
+     * @return string|array Name of parameter or array of names
      */
     protected function _param($value)
     {
-        // @todo Imants: allowing to pass value as array looks wrong.
-        //      See test case in testParam() method.
-        //      Maybe we should add implode(' ', array_map(...)) here ?
+        // supports array
         if (is_array($value)) {
             return array_map(__METHOD__, $value);
         }
@@ -387,7 +385,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 // [foo] will attempt to call $this->_render_foo()
 
                 if (array_key_exists($identifier, $this->args['custom'])) {
-                    return $this->_consume($this->args['custom'][$identifier], $escaping);
+                    $value = $this->_consume($this->args['custom'][$identifier], $escaping);
+                    return is_array($value) ? '('.implode(',', $value).')' : $value;
                 } elseif (method_exists($this, $fx)) {
                     return $this->$fx();
                 }

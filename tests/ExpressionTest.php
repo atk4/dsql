@@ -380,7 +380,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         //      Maybe we should add implode(' ', array_map(...)) here ?
         $e = new Expression('hello, [who]', ['who' => ['cruel', 'world']]);
         $this->assertEquals(
-            'hello, :a',
+            'hello, (:a,:b)',
             $e->render()
         );
         $this->assertEquals(
