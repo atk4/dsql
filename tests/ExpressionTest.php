@@ -259,21 +259,11 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::__toString
-     * @expectedException \LogicException
+     * @expectedException \Exception
      */
     public function testToStringException1()
     {
         $e = new MyBadExpression('Hello');
-        $s = (string)$e;
-    }
-
-    /**
-     * @covers ::__toString
-     * @expectedException Exception
-     */
-    public function testToStringException2()
-    {
-        $e = new MyWorstExpression('Hello');
         $s = (string)$e;
     }
 
@@ -572,15 +562,8 @@ class MyBadExpression extends Expression
 {
     public function getOne()
     {
+        // should retyurn string, but for test case we return array to get \Exception
         return array();
     }
 }
-class MyWorstExpression extends Expression
-{
-    public function getOne()
-    {
-        throw new Exception('It is Monday');
-    }
-}
-
 // @codingStandardsIgnoreEnd
