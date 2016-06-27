@@ -387,14 +387,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     $value = $this->_consume($this->args['custom'][$identifier], $escaping);
                 } elseif (method_exists($this, $fx)) {
                     $value = $this->$fx();
+                } else {
+                    throw new Exception(['Expression could not render tag ['.$identifier.'|'.$value.'|'.$escaping.']', 'tag'=>$identifier]);
+                    //throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
                 }
 
-                if (isset($value)) {
-                    return is_array($value) ? '('.implode(',', $value).')' : $value;
-                }
-
-                throw new Exception(['Expression could not render tag ['.$identifier.'|'.$value.'|'.$escaping.']', 'tag'=>$identifier]);
-                //throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
+                return is_array($value) ? '('.implode(',', $value).')' : $value;
             },
             $this->template
         );
