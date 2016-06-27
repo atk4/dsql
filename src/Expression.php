@@ -388,8 +388,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (method_exists($this, $fx)) {
                     $value = $this->$fx();
                 } else {
-                    throw new Exception(['Expression could not render tag ['.$identifier.'|'.$value.'|'.$escaping.']', 'tag'=>$identifier]);
-                    //throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
+                    throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
                 }
 
                 return is_array($value) ? '('.implode(',', $value).')' : $value;

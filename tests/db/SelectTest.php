@@ -112,13 +112,11 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     public function testCastingToString()
     {
         // simple value
-        echo "A1";
         $this->assertEquals(
             'Williams',
             (string)$this->q('employee')->field('surname')->where('name', 'Jack')
         );
         // table as sub-query
-        echo "A2";
         $this->assertEquals(
             'Williams',
             (string)$this->q($this->q('employee'), 'e2')->field('surname')->where('name', 'Jack')
