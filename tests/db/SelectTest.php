@@ -107,46 +107,54 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * covers Expression::__toString, but on PHP 5.5 this hint doesn't work
+     * covers atk4\dsql\Expression::__toString, but on PHP 5.5 this hint doesn't work
      */
     public function testCastingToString()
     {
         // simple value
+        echo "A1";
         $this->assertEquals(
             'Williams',
             (string)$this->q('employee')->field('surname')->where('name', 'Jack')
         );
         // table as sub-query
+        echo "A2";
         $this->assertEquals(
             'Williams',
             (string)$this->q($this->q('employee'), 'e2')->field('surname')->where('name', 'Jack')
         );
         // field as expression
+        echo "A3";
         $this->assertEquals(
             'Williams',
             (string)$this->q('employee')->field($this->e('surname'))->where('name', 'Jack')
         );
         // cast to string multiple times
+        echo "A4";
         $q = $this->q('employee')->field('surname')->where('name', 'Jack');
         $this->assertEquals(
             ['Williams', 'Williams'],
             [ (string)$q, (string)$q ]
         );
         // cast custom Expression to string
+        echo "A5";
         $this->assertEquals(
             '7',
             (string)$this->e('select 3+4')
         );
+        echo "A6";
     }
 
     public function testOtherQueries()
     {
         // truncate table
+        echo "A7";
         $this->q('employee')->truncate();
         $this->assertEquals(
             0,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
+        echo "A8";
 
         // insert
         $this->q('employee')
@@ -159,12 +167,14 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             [['id'=>1, 'name'=>'John'], ['id'=>2, 'name'=>'Jane']],
             $this->q('employee')->field('id,name')->get()
         );
+        echo "A9";
         $this->assertEquals(
             [['id'=>1, 'name'=>'John'], ['id'=>2, 'name'=>'Jane']],
             $this->q('employee')->field('id,name')->select()->fetchAll()
         );
 
         // update
+        echo "A10";
         $this->q('employee')
             ->where('name', 'John')
             ->set('name', 'Johnny')
@@ -173,6 +183,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             [['id'=>1, 'name'=>'Johnny'], ['id'=>2, 'name'=>'Jane']],
             $this->q('employee')->field('id,name')->get()
         );
+        echo "A11";
 
         // replace
         $this->q('employee')
@@ -195,6 +206,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             $data
         );
 
+        echo "A12";
         // delete
         $this->q('employee')
             ->where('retired', 1)

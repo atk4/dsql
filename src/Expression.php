@@ -394,6 +394,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 }
 
                 throw new Exception(['Expression could not render tag ['.$identifier.'|'.$value.'|'.$escaping.']', 'tag'=>$identifier]);
+                //throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
             },
             $this->template
         );
