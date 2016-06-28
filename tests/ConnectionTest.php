@@ -46,6 +46,17 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+
+    /**
+     * @expectedException Exception
+     */
+    public function testMysqlFail()
+    {
+        $c = Connection::connect('mysql:host=localhost;dbname=nosuchdb');
+
+    }
+
+
     public function testDumperEcho()
     {
         $c = Connection::connect('dumper:sqlite::memory:');

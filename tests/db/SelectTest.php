@@ -204,4 +204,14 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q('employee')->field('id,name')->get()
         );
     }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testEmptyGetOne()
+    {
+        // truncate table
+        $this->q('employee')->truncate();
+        $this->q('employee')->field('name')->getOne();
+    }
 }
