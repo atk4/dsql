@@ -526,6 +526,8 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     public function testVarDump()
     {
         $this->e('test')->__debugInfo();
+
+        $this->e(' [nosuchtag] ')->__debugInfo();
     }
 
     /**
