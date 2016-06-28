@@ -104,24 +104,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function __toString()
     {
-        try {
-            $value = $this->getOne();
-            if (!is_string($value)) {
-                // we must throw an exception manually here because if $value
-                // is not a string, PHP will trigger an error right after the
-                // return statement, thus escaping our try/catch.
-                throw new \LogicException(__CLASS__ . "__toString() must return a string");
-            }
-            return $value;
-        } catch (\Exception $e) {
-            $previousHandler = set_exception_handler(function () {
-            });
-            restore_error_handler();
-            if (is_callable($previousHandler)) {
-                call_user_func($previousHandler, $e);
-            }
-            die($e->getMessage());
-        }
+        return (string) $this->getOne();
     }
 
     /**
@@ -224,12 +207,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Recursively renders sub-query or expression, combining parameters.
-     * If the argument is more likely to be a field, use tick=true.
      *
      * @param mixed   $sql_code    Expression
      * @param string  $escape_mode Fall-back escaping mode - param|escape|none
      *
-     * @return string Quoted expression
+     * @return string|array Quoted expression or array of param names
      */
     protected function _consume($sql_code, $escape_mode = 'param')
     {
@@ -288,7 +270,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     protected function _escapeSoft($value)
     {
-        // Supports array
+        // supports array
         if (is_array($value)) {
             return array_map(__METHOD__, $value);
         }
@@ -336,7 +318,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     protected function _escape($value)
     {
-        // Supports array
+        // supports array
         if (is_array($value)) {
             return array_map(__METHOD__, $value);
         }
@@ -350,12 +332,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * query rendering. Consider using `_consume()` instead, which will
      * also handle nested expressions properly.
      *
-     * @param string|array $value String literal containing input data
+     * @param string|array $value String literal or array of strings containing input data
      *
-     * @return string|array Safe and escaped string
+     * @return string|array Name of parameter or array of names
      */
     protected function _param($value)
     {
+        // supports array
         if (is_array($value)) {
             return array_map(__METHOD__, $value);
         }
@@ -396,17 +379,19 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                     // use rendering only with named tags
                 }
-                    $fx = '_render_'.$identifier;
+                $fx = '_render_'.$identifier;
 
                 // [foo] will attempt to call $this->_render_foo()
 
                 if (array_key_exists($identifier, $this->args['custom'])) {
-                    return $this->_consume($this->args['custom'][$identifier], $escaping);
+                    $value = $this->_consume($this->args['custom'][$identifier], $escaping);
                 } elseif (method_exists($this, $fx)) {
-                    return $this->$fx();
+                    $value = $this->$fx();
+                } else {
+                    throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
                 }
 
-                throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
+                return is_array($value) ? '('.implode(',', $value).')' : $value;
             },
             $this->template
         );
@@ -556,6 +541,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     public function getOne()
     {
         $data = $this->getRow();
+        if (!$data) {
+            throw new Exception([
+                'Unable to fetch single cell of data for getOne from this query',
+                'result'=>$data,
+                'query'=>$this->getDebugQuery()
+            ]);
+        }
         $one = array_shift($data);
         return $one;
     }

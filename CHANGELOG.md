@@ -1,3 +1,9 @@
+## 1.0.2
+
+Minor cleanups and improvements to code coverage
+
+* improve __toString() handling, will not attempt to catch exception
+
 ## 1.0.1
 
 This is now our first stable release. It features clean-ups from 1.0.0:
