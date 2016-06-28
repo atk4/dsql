@@ -519,6 +519,16 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test var-dump code for codecoverage
+     *
+     * @covers ::__debugInfo
+     */
+    public function testVarDump()
+    {
+        $this->e('test')->__debugInfo();
+    }
+
+    /**
      * Test reset()
      *
      * @covers ::reset
