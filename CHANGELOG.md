@@ -1,3 +1,7 @@
+## 1.0.3
+
+* fix bug preventing from passing float as parameters
+
 ## 1.0.2
 
 Minor cleanups and improvements to code coverage
