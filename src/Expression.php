@@ -415,7 +415,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @return string SQL syntax of query
      */
-    public function getDebugQuery()
+    public function getDebugQuery($html = true)
     {
         $d = $this->render();
 
@@ -444,7 +444,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $pp[] = $key;
         }
 
-        return $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
+        $result = $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
+
+        if (!$html) {
+            return strip_tags($result);
+        }
+
+        return $result;
     }
 
     public function __debugInfo()
