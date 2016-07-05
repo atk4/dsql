@@ -257,6 +257,20 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Given the string parameter, it will detect some "deal-braker" for our soft escaping, such
+     * as "*" or "(".  Those will typically indicate that expression is passed and shouldn't
+     * be escaped
+     */
+    protected function isUnescapablePattern($value)
+    {
+        return is_object($value)
+            || $value === '*'
+            || strpos($value, '(') !== false
+            || strpos($value, '`') !== false
+            ;
+    }
+
+    /**
      * Soft-escaping SQL identifier. This method will attempt to put
      * backticks around the identifier, however will not do so if you
      * are using special characters like ".", "(" or "`".
@@ -275,17 +289,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return array_map(__METHOD__, $value);
         }
 
-        if (is_string($value) && strpos($value, '.') !== false) {
-            return implode('.', array_map(__METHOD__, explode('.', $value)));
+        // in some cases we should not escape
+        if($this->isUnescapablePattern($value)) {
+            return $value;
         }
 
-        // in some cases we should not escape
-        if (is_object($value)
-            || $value === '*'
-            || strpos($value, '(') !== false
-            || strpos($value, '`') !== false
-        ) {
-            return $value;
+        if (is_string($value) && strpos($value, '.') !== false) {
+            return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
         return '`' . trim($value) . '`';
@@ -405,7 +415,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @return string SQL syntax of query
      */
-    public function getDebugQuery()
+    public function getDebugQuery($html = true)
     {
         $d = $this->render();
 
@@ -434,7 +444,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $pp[] = $key;
         }
 
-        return $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
+        $result = $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
+
+        if (!$html) {
+            return strip_tags($result);
+        }
+
+        return $result;
     }
 
     public function __debugInfo()

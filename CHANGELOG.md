@@ -1,3 +1,8 @@
+## 1.0.4
+
+* added getDebugQuery(false) which will output in TEXT instead of HTML
+* bugfixes
+
 ## 1.0.3
 
 * fix bug preventing from passing float as parameters

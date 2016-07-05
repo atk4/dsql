@@ -752,7 +752,7 @@ class Query extends Expression
     public function group($group)
     {
         // Case with comma-separated fields
-        if (is_string($group) && strpos($group, ',') !== false) {
+        if (is_string($group) && !$this->isUnescapablePattern($group) && strpos($group, ',') !== false) {
             $group = explode(',', $group);
         }
 

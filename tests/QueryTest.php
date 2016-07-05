@@ -1105,6 +1105,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'group by `this is жук`',
             $this->q('[group]')->group('this is жук')->render()
         );
+        $this->assertEquals(
+            'group by date_format(dat, "%Y")',
+            $this->q('[group]')->group(new Expression('date_format(dat, "%Y")'))->render()
+        );
+        $this->assertEquals(
+            'group by date_format(dat, "%Y")',
+            $this->q('[group]')->group('date_format(dat, "%Y")')->render()
+        );
     }
 
     /**
