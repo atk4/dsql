@@ -1,4 +1,6 @@
-<?php // vim:ts=4:sw=4:et:fdm=marker
+<?php
+
+// vim:ts=4:sw=4:et:fdm=marker
 
 namespace atk4\dsql;
 
@@ -12,10 +14,10 @@ class Connection
 {
     /** @var string Query classname */
     protected $query_class = 'atk4\dsql\Query';
-    
+
     /** @var string Expression classname */
     protected $expression_class = 'atk4\dsql\Expression';
-    
+
     /** @var Connection Connection object */
     protected $connection = null;
 
@@ -23,46 +25,47 @@ class Connection
     public $transaction_depth = 0;
 
     /**
-     * Connect database
+     * Connect database.
      *
      * @param string $dsn
      * @param string $user
      * @param string $password
-     * @param array $args
+     * @param array  $args
+     *
      * @return Connection
      */
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
         if (strpos($dsn, ':') === false) {
-            throw new Exception(["Your DSN format is invalid. Must be in 'driver:host:options' format", 'dsn'=>$dsn]);
+            throw new Exception(["Your DSN format is invalid. Must be in 'driver:host:options' format", 'dsn' => $dsn]);
         }
         list($driver, $rest) = explode(':', $dsn, 2);
 
         switch (strtolower($driver)) {
             case 'mysql':
-                return new Connection(array_merge([
-                    'connection' => new \PDO($dsn, $user, $password),
-                    'query_class' => 'atk4\dsql\Query_MySQL'
+                return new self(array_merge([
+                    'connection'  => new \PDO($dsn, $user, $password),
+                    'query_class' => 'atk4\dsql\Query_MySQL',
                 ], $args));
             case 'sqlite':
-                return new Connection(array_merge([
-                    'connection' => new \PDO($dsn, $user, $password),
-                    'query_class' => 'atk4\dsql\Query_SQLite'
+                return new self(array_merge([
+                    'connection'  => new \PDO($dsn, $user, $password),
+                    'query_class' => 'atk4\dsql\Query_SQLite',
                 ], $args));
             case 'dumper':
                 return new Connection_Dumper(array_merge([
-                    'connection' => Connection::connect($rest)
+                    'connection' => self::connect($rest),
                 ], $args));
 
             case 'counter':
                 return new Connection_Counter(array_merge([
-                    'connection' => Connection::connect($rest)
+                    'connection' => self::connect($rest),
                 ], $args));
 
                 // let PDO handle the rest
             default:
-                return new Connection(array_merge([
-                    'connection' => new \PDO($dsn, $user, $password)
+                return new self(array_merge([
+                    'connection' => new \PDO($dsn, $user, $password),
                 ], $args));
 
         }
@@ -88,9 +91,10 @@ class Connection
     }
 
     /**
-     * Returns new Query object with connection already set
+     * Returns new Query object with connection already set.
      *
      * @param array $properties
+     *
      * @return Query
      */
     public function dsql($properties = [])
@@ -103,10 +107,11 @@ class Connection
     }
 
     /**
-     * Returns Expression object with connection already set
+     * Returns Expression object with connection already set.
      *
      * @param array $properties
      * @param array $arguments
+     *
      * @return Expression
      */
     public function expr($properties = [], $arguments = null)
@@ -119,7 +124,7 @@ class Connection
     }
 
     /**
-     * Returns Connection object
+     * Returns Connection object.
      *
      * @return Connection
      */
@@ -129,9 +134,10 @@ class Connection
     }
 
     /**
-     * Execute Expression by using this connection
+     * Execute Expression by using this connection.
      *
      * @param Expression $expr
+     *
      * @return PDOStatement
      */
     public function execute(Expression $expr)

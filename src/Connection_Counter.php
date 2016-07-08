@@ -1,4 +1,6 @@
-<?php // vim:ts=4:sw=4:et:fdm=marker
+<?php
+
+// vim:ts=4:sw=4:et:fdm=marker
 
 namespace atk4\dsql;
 
@@ -8,7 +10,7 @@ namespace atk4\dsql;
  */
 class Connection_Counter extends Connection_Proxy
 {
-    public $callback  = null;
+    public $callback = null;
 
     protected $selects = 0;
     protected $queries = 0;
@@ -41,6 +43,7 @@ class Connection_Counter extends Connection_Proxy
 
         return $this->iterate($ret);
     }
+
     public function __destruct()
     {
         if ($this->callback) {

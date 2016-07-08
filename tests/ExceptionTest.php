@@ -1,7 +1,7 @@
 <?php
+
 namespace atk4\dsql\tests;
 
-use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 
 /**
@@ -9,9 +9,8 @@ use atk4\dsql\Expression;
  */
 class ExceptionTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
-     * Test constructor
+     * Test constructor.
      *
      * @covers ::__construct
      */
@@ -27,6 +26,7 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
         $e = new Expression('hello, [world]');
         $e->render();
     }
+
     public function testException3()
     {
         try {
@@ -42,7 +42,6 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
                 'world',
                 $e->getParams()['tag']
             );
-
         }
     }
 }

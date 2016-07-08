@@ -1,8 +1,9 @@
 <?php
+
 namespace atk4\dsql\tests;
 
-use atk4\dsql\Query;
 use atk4\dsql\Expression;
+use atk4\dsql\Query;
 
 /**
  * @coversDefaultClass \atk4\dsql\Query
@@ -18,12 +19,12 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             case 2:
                 return new Query($args[0], $args[1]);
         }
+
         return new Query();
     }
 
-
     /**
-     * Test constructor
+     * Test constructor.
      *
      * @covers ::__construct
      */
@@ -48,7 +49,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * field() should return $this Query for chaining
+     * field() should return $this Query for chaining.
      *
      * @covers ::field
      */
@@ -59,7 +60,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Testing field - basic cases
+     * Testing field - basic cases.
      *
      * @covers ::field
      * @covers ::_render_field
@@ -108,7 +109,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             '`employee`.`first_name` `name`',
-            PHPUnitUtil::callProtectedMethod($this->q()->field(['name'=>'employee.first_name']), '_render_field')
+            PHPUnitUtil::callProtectedMethod($this->q()->field(['name' => 'employee.first_name']), '_render_field')
         );
         $this->assertEquals(
             '*',
@@ -121,7 +122,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Testing field - defaultField
+     * Testing field - defaultField.
      *
      * @covers ::field
      * @covers ::_render_field
@@ -151,7 +152,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Testing field - basic cases
+     * Testing field - basic cases.
      *
      * @covers ::field
      * @covers ::_render_field
@@ -183,18 +184,18 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'now() `time`',
             $this->q('[field]')->field('now()', 'time')->render()
         );
-        $this->assertEquals( // alias can be passed as 2nd argument
+        $this->assertEquals(// alias can be passed as 2nd argument
             'now() `time`',
             $this->q('[field]')->field(new Expression('now()'), 'time')->render()
         );
-        $this->assertEquals( // alias can be passed as 3nd argument
+        $this->assertEquals(// alias can be passed as 3nd argument
             'now() `time`',
             $this->q('[field]')->field(['time' => new Expression('now()')])->render()
         );
     }
 
     /**
-     * Duplicate alias of field
+     * Duplicate alias of field.
      *
      * @covers ::field
      * @covers ::_set_args
@@ -206,7 +207,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * There shouldn't be alias when passing fields as array
+     * There shouldn't be alias when passing fields as array.
      *
      * @covers ::field
      * @expectedException Exception
@@ -217,7 +218,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * There shouldn't be alias when passing multiple tables
+     * There shouldn't be alias when passing multiple tables.
      *
      * @covers ::table
      * @expectedException Exception
@@ -228,18 +229,18 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * There shouldn't be alias when passing multiple tables
+     * There shouldn't be alias when passing multiple tables.
      *
      * @covers ::table
      * @expectedException Exception
      */
     public function testTableException2()
     {
-        $this->q()->table(['employee','jobs'], 'u');
+        $this->q()->table(['employee', 'jobs'], 'u');
     }
 
     /**
-     * Alias is NOT mandatory when pass table as Expression
+     * Alias is NOT mandatory when pass table as Expression.
      *
      * @covers ::table
      */
@@ -249,7 +250,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Alias is IS mandatory when pass table as Query
+     * Alias is IS mandatory when pass table as Query.
      *
      * @covers ::table
      * @expectedException Exception
@@ -260,7 +261,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Table aliases should be unique
+     * Table aliases should be unique.
      *
      * @covers ::table
      * @covers ::_set_args
@@ -274,7 +275,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Table aliases should be unique
+     * Table aliases should be unique.
      *
      * @covers ::table
      * @covers ::_set_args
@@ -288,7 +289,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Table aliases should be unique
+     * Table aliases should be unique.
      *
      * @covers ::table
      * @covers ::_set_args
@@ -302,7 +303,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Table aliases should be unique
+     * Table aliases should be unique.
      *
      * @covers ::table
      * @covers ::_set_args
@@ -316,7 +317,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Table aliases should be unique
+     * Table aliases should be unique.
      *
      * @covers ::table
      * @covers ::_set_args
@@ -330,7 +331,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Table can't be set as sub-Query in Update query mode
+     * Table can't be set as sub-Query in Update query mode.
      *
      * @covers ::table
      * @expectedException Exception
@@ -345,7 +346,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Table can't be set as sub-Query in Insert query mode
+     * Table can't be set as sub-Query in Insert query mode.
      *
      * @covers ::table
      * @expectedException Exception
@@ -360,7 +361,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Requesting non-existant query mode should throw exception
+     * Requesting non-existant query mode should throw exception.
      *
      * @covers ::mode
      * @expectedException Exception
@@ -371,7 +372,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * table() should return $this Query for chaining
+     * table() should return $this Query for chaining.
      *
      * @covers ::table
      */
@@ -379,7 +380,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $q = $this->q();
         $this->assertEquals($q, $q->table('employee'));
-
     }
 
     /**
@@ -479,13 +479,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'select `name` from `employee`,`jobs` `j`',
             $this->q()
-                ->field('name')->table(['employee', 'j'=>'jobs'])
+                ->field('name')->table(['employee', 'j' => 'jobs'])
                 ->render()
         );
         $this->assertEquals(
             'select `name` from `employee` `e`,`jobs` `j`',
             $this->q()
-                ->field('name')->table(['e'=>'employee', 'j'=>'jobs'])
+                ->field('name')->table(['e' => 'employee', 'j' => 'jobs'])
                 ->render()
         );
         // testing _render_table_noalias, shouldn't render table alias 'emp'
@@ -552,8 +552,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testBasicRenderSubquery()
     {
-        $age = new Expression("coalesce([age], [default_age])");
-        $age['age'] = new Expression("year(now()) - year(birth_date)");
+        $age = new Expression('coalesce([age], [default_age])');
+        $age['age'] = new Expression('year(now()) - year(birth_date)');
         $age['default_age'] = 18;
 
         $q = $this->q()->table('user')->field($age, 'calculated_age');
@@ -569,8 +569,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      */
     public function testgetDebugQuery()
     {
-        $age = new Expression("coalesce([age], [default_age], [foo], [bar])");
-        $age['age'] = new Expression("year(now()) - year(birth_date)");
+        $age = new Expression('coalesce([age], [default_age], [foo], [bar])');
+        $age['age'] = new Expression('year(now()) - year(birth_date)');
         $age['default_age'] = 18;
         $age['foo'] = 'foo';
         $age['bar'] = null;
@@ -610,7 +610,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testVarDump3()
     {
         $this->expectOutputRegex('/.*Hello :a.*/');
-        var_dump(new Expression('Hello [world]', ['world'=>'php']));
+        var_dump(new Expression('Hello [world]', ['world' => 'php']));
     }
 
     /**
@@ -643,7 +643,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->field('date')
             ->field('amount', 'debit')
             ->field($this->q()->expr('0'), 'credit') // simply 0
-            ;
+;
         $this->assertEquals(
             'select `date`,`amount` `debit`,0 `credit` from `sales`',
             $q1->render()
@@ -654,15 +654,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->table('purchases')
             ->field('date')
             ->field($this->q()->expr('0'), 'debit') // simply 0
-            ->field('amount', 'credit')
-            ;
+            ->field('amount', 'credit');
         $this->assertEquals(
             'select `date`,0 `debit`,`amount` `credit` from `purchases`',
             $q2->render()
         );
 
         // $q1 union $q2
-        $u = new Expression("[] union []", [$q1, $q2]);
+        $u = new Expression('[] union []', [$q1, $q2]);
         $this->assertEquals(
             '(select `date`,`amount` `debit`,0 `credit` from `sales`) union (select `date`,0 `debit`,`amount` `credit` from `purchases`)',
             $u->render()
@@ -671,9 +670,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         // SELECT date,debit,credit FROM ($q1 union $q2)
         $q = $this->q()
             ->field('date,debit,credit')
-            ->table($u, 'derrivedTable')
-            ;
-        /**
+            ->table($u, 'derrivedTable');
+        /*
          * @see https://github.com/atk4/dsql/issues/33
          * @see https://github.com/atk4/dsql/issues/34
          */
@@ -686,7 +684,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * where() should return $this Query for chaining
+     * where() should return $this Query for chaining.
      *
      * @covers ::where
      */
@@ -697,7 +695,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * having() should return $this Query for chaining
+     * having() should return $this Query for chaining.
      *
      * @covers ::field
      */
@@ -708,7 +706,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Basic where() tests
+     * Basic where() tests.
      *
      * @covers ::where
      * @covers ::_render_where
@@ -808,7 +806,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Testing where() with special values - null, array, like
+     * Testing where() with special values - null, array, like.
      *
      * @covers ::where
      * @covers ::_render_where
@@ -944,7 +942,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test Limit
+     * Test Limit.
      *
      * @covers ::limit
      * @covers ::_render_limit
@@ -962,7 +960,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test Order
+     * Test Order.
      *
      * @covers ::order
      * @covers ::_render_order
@@ -983,7 +981,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             'order by `name` desc, `surname`',
-            $this->q('[order]')->order(['name desc','surname'])->render()
+            $this->q('[order]')->order(['name desc', 'surname'])->render()
         );
         $this->assertEquals(
             'order by `name` desc, `surname`',
@@ -1038,18 +1036,18 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * If first argument is array, second argument must not be used
+     * If first argument is array, second argument must not be used.
      *
      * @covers ::order
      * @expectedException Exception
      */
     public function testOrderException1()
     {
-        $this->q('[order]')->order(['name','surname'], 'desc');
+        $this->q('[order]')->order(['name', 'surname'], 'desc');
     }
 
     /**
-     * Incorrect ordering keyword
+     * Incorrect ordering keyword.
      *
      * @covers ::order
      * @expectedException Exception
@@ -1060,7 +1058,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test Group
+     * Test Group.
      *
      * @covers ::group
      * @covers ::_render_group
@@ -1077,7 +1075,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             'group by `gender`, `age`',
-            $this->q('[group]')->group(['gender','age'])->render()
+            $this->q('[group]')->group(['gender', 'age'])->render()
         );
         $this->assertEquals(
             'group by `gender`, `age`',
@@ -1116,7 +1114,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test Join
+     * Test Join.
      *
      * @covers ::join
      * @covers ::_render_join
@@ -1151,20 +1149,20 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'left join `address` as `a` on `a`.`user_id` = `u`.`id` '.
             'left join `bank` as `b` on `b`.`id` = `u`.`bank_id`',
             $this->q('[join]')->table('user', 'u')
-                ->join(['a'=>'address.user_id','b'=>'bank'])->render()
+                ->join(['a' => 'address.user_id', 'b' => 'bank'])->render()
         );
         $this->assertEquals(
             'left join `address` on `address`.`user_id` = `u`.`id` '.
             'left join `bank` on `bank`.`id` = `u`.`bank_id`',
             $this->q('[join]')->table('user', 'u')
-                ->join(['address.user_id','bank'])->render()
+                ->join(['address.user_id', 'bank'])->render()
         );
         $this->assertEquals(
             'left join `address` as `a` on `a`.`user_id` = `u`.`id` '.
             'left join `bank` as `b` on `b`.`id` = `u`.`bank_id` '.
             'left join `bank_details` on `bank_details`.`id` = `bank`.`details_id`',
             $this->q('[join]')->table('user', 'u')
-                ->join(['a'=>'address.user_id','b'=>'bank'])
+                ->join(['a' => 'address.user_id', 'b' => 'bank'])
                 ->join('bank_details', 'bank.details_id')->render()
         );
 
@@ -1176,7 +1174,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Combined execution of where() clauses
+     * Combined execution of where() clauses.
      *
      * @covers ::where
      * @covers ::_render_where
@@ -1242,14 +1240,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or `b` = :b)',
             $this->q()
-                ->field('name')->table('employee')->where([['a', 1],['b', 1]])
+                ->field('name')->table('employee')->where([['a', 1], ['b', 1]])
                 ->render()
         );
 
         $this->assertEquals(
             'select `name` from `employee` where (`a` = :a or a=b)',
             $this->q()
-                ->field('name')->table('employee')->where([['a', 1],'a=b'])
+                ->field('name')->table('employee')->where([['a', 1], 'a=b'])
                 ->render()
         );
     }
@@ -1347,7 +1345,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * set() should return $this Query for chaining
+     * set() should return $this Query for chaining.
      *
      * @covers ::set
      */
@@ -1358,7 +1356,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Value [false] is not supported by SQL
+     * Value [false] is not supported by SQL.
      *
      * @covers ::set
      * @expectedException Exception
@@ -1425,7 +1423,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test reset()
+     * Test reset().
      *
      * @covers \atk4\dsql\Expression::reset
      */
@@ -1446,7 +1444,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test [option]
+     * Test [option].
      *
      * @covers ::option
      * @covers ::_render_option
@@ -1465,7 +1463,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             'select calc_found_rows ignore * from `test`',
-            $this->q()->table('test')->option(['calc_found_rows','ignore'])->render()
+            $this->q()->table('test')->option(['calc_found_rows', 'ignore'])->render()
         );
         // options for specific modes
         $q = $this->q()
@@ -1474,7 +1472,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->set('name', 1)
                 ->option('calc_found_rows', 'select') // for default select mode
                 ->option('ignore', 'insert') // for insert mode
-                ;
+;
 
         $this->assertEquals(
             'select calc_found_rows `name` from `test`',
