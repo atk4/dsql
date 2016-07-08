@@ -47,3 +47,9 @@ I recommend that you only use atomic() in your code.
 .. php:method:: rollBack
 
     roll-back the transaction.
+
+
+
+
+.. warning:: If you roll-back internal transaction and commit external transaction, then
+    result might be unpredictable. Please discuss this https://github.com/atk4/dsql/issues/89
