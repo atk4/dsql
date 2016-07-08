@@ -1,4 +1,6 @@
-<?php // vim:ts=4:sw=4:et:fdm=marker
+<?php
+
+// vim:ts=4:sw=4:et:fdm=marker
 
 namespace atk4\dsql;
 
@@ -8,8 +10,7 @@ namespace atk4\dsql;
  */
 class Connection_Dumper extends Connection_Proxy
 {
-    public $callback  = null;
-
+    public $callback = null;
 
     public function execute(Expression $expr)
     {
