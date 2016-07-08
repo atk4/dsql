@@ -17,6 +17,7 @@ Contents:
     expressions
     queries
     results
+    transactions
     advanced
     extensions
 
