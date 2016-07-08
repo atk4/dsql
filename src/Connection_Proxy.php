@@ -1,4 +1,6 @@
-<?php // vim:ts=4:sw=4:et:fdm=marker
+<?php
+
+// vim:ts=4:sw=4:et:fdm=marker
 
 namespace atk4\dsql;
 
@@ -12,10 +14,12 @@ class Connection_Proxy extends Connection
     {
         return $this->connection->connection();
     }
+
     public function dsql($properties = [])
     {
         $dsql = $this->connection->dsql($properties);
         $dsql->connection = $this;
+
         return $dsql;
     }
 
@@ -23,6 +27,7 @@ class Connection_Proxy extends Connection
     {
         $expr = $this->connection->expr($properties, $arguments);
         $expr->connection = $this;
+
         return $expr;
     }
 

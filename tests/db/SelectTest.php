@@ -1,11 +1,12 @@
 <?php
+
 namespace atk4\dsql\tests;
 
-use atk4\dsql\Query;
-use atk4\dsql\Expression;
 use atk4\dsql\Connection;
+use atk4\dsql\Expression;
+use atk4\dsql\Query;
 
-class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
+class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 {
     protected $pdo;
 
@@ -16,6 +17,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
 
         $this->pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
     }
+
     /**
      * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
      */
@@ -40,26 +42,26 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
         if ($table !== null) {
             $q->table($table, $alias);
         }
+
         return $q;
     }
+
     private function e($template = null, $args = null)
     {
         return $this->c->expr($template, $args);
     }
-
-
 
     public function testBasicQueries()
     {
         $this->assertEquals(4, $this->getConnection()->getRowCount('employee'));
 
         $this->assertEquals(
-            ['name'=>'Oliver','surname'=>'Smith'],
+            ['name' => 'Oliver', 'surname' => 'Smith'],
             $this->q('employee')->field('name,surname')->getRow()
         );
 
         $this->assertEquals(
-            ['surname'=>'Taylor'],
+            ['surname' => 'Taylor'],
             $this->q('employee')->field('surname')->where('retired', '1')->getRow()
         );
 
@@ -78,18 +80,18 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             $names[] = $row['name'];
         }
         $this->assertEquals(
-            ['Oliver','Jack','Charlie'],
+            ['Oliver', 'Jack', 'Charlie'],
             $names
         );
 
         $this->assertEquals(
-            [['now'=>4]],
+            [['now' => 4]],
             $this->q()->field(new Expression('2+2'), 'now')->get()
         );
 
         $this->assertEquals(
-            [['now'=>6]],
-            $this->q()->field(new Expression('[]+[]', [3,3]), 'now')->get()
+            [['now' => 6]],
+            $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
         );
 
         $this->assertEquals(
@@ -107,35 +109,35 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * covers atk4\dsql\Expression::__toString, but on PHP 5.5 this hint doesn't work
+     * covers atk4\dsql\Expression::__toString, but on PHP 5.5 this hint doesn't work.
      */
     public function testCastingToString()
     {
         // simple value
         $this->assertEquals(
             'Williams',
-            (string)$this->q('employee')->field('surname')->where('name', 'Jack')
+            (string) $this->q('employee')->field('surname')->where('name', 'Jack')
         );
         // table as sub-query
         $this->assertEquals(
             'Williams',
-            (string)$this->q($this->q('employee'), 'e2')->field('surname')->where('name', 'Jack')
+            (string) $this->q($this->q('employee'), 'e2')->field('surname')->where('name', 'Jack')
         );
         // field as expression
         $this->assertEquals(
             'Williams',
-            (string)$this->q('employee')->field($this->e('surname'))->where('name', 'Jack')
+            (string) $this->q('employee')->field($this->e('surname'))->where('name', 'Jack')
         );
         // cast to string multiple times
         $q = $this->q('employee')->field('surname')->where('name', 'Jack');
         $this->assertEquals(
             ['Williams', 'Williams'],
-            [ (string)$q, (string)$q ]
+            [(string) $q, (string) $q]
         );
         // cast custom Expression to string
         $this->assertEquals(
             '7',
-            (string)$this->e('select 3+4')
+            (string) $this->e('select 3+4')
         );
     }
 
@@ -156,11 +158,11 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->set(['id' => 2, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
             ->insert();
         $this->assertEquals(
-            [['id'=>1, 'name'=>'John'], ['id'=>2, 'name'=>'Jane']],
+            [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->get()
         );
         $this->assertEquals(
-            [['id'=>1, 'name'=>'John'], ['id'=>2, 'name'=>'Jane']],
+            [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->select()->fetchAll()
         );
 
@@ -170,7 +172,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->set('name', 'Johnny')
             ->update();
         $this->assertEquals(
-            [['id'=>1, 'name'=>'Johnny'], ['id'=>2, 'name'=>'Jane']],
+            [['id' => 1, 'name' => 'Johnny'], ['id' => 2, 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->get()
         );
 
@@ -191,7 +193,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             return $a['id'] - $b['id'];
         });
         $this->assertEquals(
-            [['id'=>1, 'name'=>'Peter'], ['id'=>2, 'name'=>'Jane']],
+            [['id' => 1, 'name' => 'Peter'], ['id' => 2, 'name' => 'Jane']],
             $data
         );
 
@@ -200,7 +202,7 @@ class dbSelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->where('retired', 1)
             ->delete();
         $this->assertEquals(
-            [['id'=>2, 'name'=>'Jane']],
+            [['id' => 2, 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->get()
         );
     }

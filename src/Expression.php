@@ -1,4 +1,6 @@
-<?php // vim:ts=4:sw=4:et:fdm=marker
+<?php
+
+// vim:ts=4:sw=4:et:fdm=marker
 
 namespace atk4\dsql;
 
@@ -38,14 +40,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     protected $paramBase = ':a';
 
     /**
-     * Used for Linking
+     * Used for Linking.
      *
      * @var string
      */
     public $_paramBase = null;
 
     /**
-     * Will be populated with actual values by _param()
+     * Will be populated with actual values by _param().
      *
      * @var array
      */
@@ -127,7 +129,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * Whether or not an offset exists.
      *
      * @param string An offset to check for
-     * @return boolean
+     *
+     * @return bool
      * @abstracting ArrayAccess
      */
     public function offsetExists($offset)
@@ -150,6 +153,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * Returns the value at specified offset.
      *
      * @param string The offset to retrieve
+     *
      * @return mixed
      * @abstracting ArrayAccess
      */
@@ -163,13 +167,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * new expression to the same connection as the parent.
      *
      * @param array|string $properties
-     * @param array $arguments
+     * @param array        $arguments
      *
      * @return Expression
      */
     public function expr($properties = [], $arguments = null)
     {
-        $e = new Expression($properties, $arguments);
+        $e = new self($properties, $arguments);
         $e->connection = $this->connection;
 
         return $e;
@@ -187,6 +191,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // unset all arguments
         if ($tag === null) {
             $this->args = ['custom' => []];
+
             return $this;
         }
 
@@ -204,12 +209,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return $this;
     }
 
-
     /**
      * Recursively renders sub-query or expression, combining parameters.
      *
-     * @param mixed   $sql_code    Expression
-     * @param string  $escape_mode Fall-back escaping mode - param|escape|none
+     * @param mixed  $sql_code    Expression
+     * @param string $escape_mode Fall-back escaping mode - param|escape|none
      *
      * @return string|array Quoted expression or array of param names
      */
@@ -226,7 +230,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 case 'none':
                     return $sql_code;
             }
-            throw new Exception(['$escape_mode value is incorrect','escape_mode'=>$escape_mode]);
+            throw new Exception(['$escape_mode value is incorrect', 'escape_mode' => $escape_mode]);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
@@ -234,8 +238,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $sql_code = $sql_code->getDSQLExpression($this);
         }
 
-        if (!$sql_code instanceof Expression) {
-            throw new Exception(['Only Expressions or Expressionable objects may be used in Expression','object'=>$sql_code]);
+        if (!$sql_code instanceof self) {
+            throw new Exception(['Only Expressions or Expressionable objects may be used in Expression', 'object' => $sql_code]);
         }
 
         // at this point $sql_code is instance of Expression
@@ -245,7 +249,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         // Queries should be wrapped in parentheses in most cases
         if ($sql_code instanceof Query) {
-            $ret = '(' . $ret . ')';
+            $ret = '('.$ret.')';
         }
 
         // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
@@ -259,15 +263,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Given the string parameter, it will detect some "deal-braker" for our soft escaping, such
      * as "*" or "(".  Those will typically indicate that expression is passed and shouldn't
-     * be escaped
+     * be escaped.
      */
     protected function isUnescapablePattern($value)
     {
         return is_object($value)
             || $value === '*'
             || strpos($value, '(') !== false
-            || strpos($value, '`') !== false
-            ;
+            || strpos($value, '`') !== false;
     }
 
     /**
@@ -290,7 +293,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // in some cases we should not escape
-        if($this->isUnescapablePattern($value)) {
+        if ($this->isUnescapablePattern($value)) {
             return $value;
         }
 
@@ -298,7 +301,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
-        return '`' . trim($value) . '`';
+        return '`'.trim($value).'`';
     }
 
     /**
@@ -320,7 +323,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * Escapes argument by adding backticks around it.
      * This will allow you to use reserved SQL words as table or field
      * names such as "table" as well as other characters that SQL
-     * permits in the identifiers (e.g. spaces or equation signs)
+     * permits in the identifiers (e.g. spaces or equation signs).
      *
      * @param mixed $value Any string or array of strings
      *
@@ -334,7 +337,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // in all other cases we should escape
-        return '`' . str_replace('`', '``', $value) . '`';
+        return '`'.str_replace('`', '``', $value).'`';
     }
 
     /**
@@ -376,15 +379,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             throw new Exception('Template is not defined for Expression');
         }
 
-        $res= preg_replace_callback(
+        $res = preg_replace_callback(
             '/\[[a-z0-9_]*\]|{[a-z0-9_]*}/',
             function ($matches) use (&$nameless_count) {
-
                 $identifier = substr($matches[0], 1, -1);
-                $escaping = ($matches[0][0] == '[')?'param':'escape';
+                $escaping = ($matches[0][0] == '[') ? 'param' : 'escape';
 
                 // Allow template to contain []
-                if ($identifier === "") {
+                if ($identifier === '') {
                     $identifier = $nameless_count++;
 
                     // use rendering only with named tags
@@ -398,7 +400,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (method_exists($this, $fx)) {
                     $value = $this->$fx();
                 } else {
-                    throw new Exception(['Expression could not render tag', 'tag'=>$identifier]);
+                    throw new Exception(['Expression could not render tag', 'tag' => $identifier]);
                 }
 
                 return is_array($value) ? '('.implode(',', $value).')' : $value;
@@ -419,7 +421,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     {
         $d = $this->render();
 
-        $pp = array();
+        $pp = [];
         $d = preg_replace('/`([^`]*)`/', '`<span style="color:black">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_string($val)) {
@@ -444,7 +446,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $pp[] = $key;
         }
 
-        $result = $d.' <span style="color:gray">[' . implode(', ', $pp) . ']</span>';
+        $result = $d.' <span style="color:gray">['.implode(', ', $pp).']</span>';
 
         if (!$html) {
             return strip_tags($result);
@@ -455,13 +457,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     public function __debugInfo()
     {
-
         $arr = [
-            'R'=>false,
-            'template'=>$this->template,
-            'params'=>$this->params,
-            'connection'=>$this->connection,
-            'args'=>$this->args,
+            'R'          => false,
+            'template'   => $this->template,
+            'params'     => $this->params,
+            'connection' => $this->connection,
+            'args'       => $this->args,
         ];
 
         try {
@@ -474,7 +475,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Execute expression
+     * Execute expression.
      *
      * @param PDO $connection
      *
@@ -493,7 +494,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $query = $this->render();
             $statement = $connection->prepare($query);
             foreach ($this->params as $key => $val) {
-
                 if (is_int($val)) {
                     $type = \PDO::PARAM_INT;
                 } elseif (is_bool($val)) {
@@ -507,22 +507,22 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 }
 
                 if (!$statement->bindValue($key, $val, $type)) {
-                    throw new Exception(['Unable to bind parameter','param'=>$key,
-                        'value'=>$val, 'type'=>$type ]);
+                    throw new Exception(['Unable to bind parameter', 'param' => $key,
+                        'value' => $val, 'type' => $type, ]);
                 }
             }
 
             $statement->setFetchMode(\PDO::FETCH_ASSOC);
             $statement->execute();
-            return $statement;
 
+            return $statement;
         } else {
             return $connection->execute($this);
         }
     }
 
     /**
-     * Returns ArrayIterator, for example PDOStatement
+     * Returns ArrayIterator, for example PDOStatement.
      *
      * @return PDOStatement
      * @abstracting IteratorAggregate
@@ -533,8 +533,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     // {{{ Result Querying
+
     /**
-     * Executes expression and return whole result-set in form of array of hashes
+     * Executes expression and return whole result-set in form of array of hashes.
      *
      * @return array
      */
@@ -550,7 +551,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Executes expression and return first value of first row of data from result-set
+     * Executes expression and return first value of first row of data from result-set.
      *
      * @return string
      */
@@ -560,16 +561,17 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         if (!$data) {
             throw new Exception([
                 'Unable to fetch single cell of data for getOne from this query',
-                'result'=>$data,
-                'query'=>$this->getDebugQuery()
+                'result' => $data,
+                'query'  => $this->getDebugQuery(),
             ]);
         }
         $one = array_shift($data);
+
         return $one;
     }
 
     /**
-     * Executes expression and returns first row of data from result-set as a hash
+     * Executes expression and returns first row of data from result-set as a hash.
      *
      * @return array
      */
@@ -583,5 +585,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         return $stmt->fetch();
     }
+
     // }}}
 }

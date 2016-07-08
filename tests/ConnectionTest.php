@@ -1,4 +1,5 @@
 <?php
+
 namespace atk4\dsql\tests;
 
 use atk4\dsql\Connection;
@@ -8,9 +9,8 @@ use atk4\dsql\Connection;
  */
 class ConnectionTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
-     * Test constructor
+     * Test constructor.
      */
     public function testInit()
     {
@@ -26,7 +26,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $c = Connection::connect('dumper:sqlite::memory:');
 
         $result = false;
-        $c->callback = function($expr, $time)use(&$result){
+        $c->callback = function ($expr, $time) use (&$result) {
             $result = $expr->render();
         };
 
@@ -46,16 +46,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-
     /**
      * @expectedException Exception
      */
     public function testMysqlFail()
     {
         $c = Connection::connect('mysql:host=localhost;dbname=nosuchdb');
-
     }
-
 
     public function testDumperEcho()
     {
@@ -74,7 +71,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $c = Connection::connect('counter:sqlite::memory:');
 
         $result = false;
-        $c->callback = function($a, $b, $c, $d)use(&$result){
+        $c->callback = function ($a, $b, $c, $d) use (&$result) {
             $result = [$a, $b, $c, $d];
         };
 
@@ -85,7 +82,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
         unset($c);
         $this->assertEquals(
-            [0,0,1,1],
+            [0, 0, 1, 1],
             $result
         );
     }
@@ -101,18 +98,17 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->expectOutputString("Queries:   0, Selects:   0, Rows fetched:    1, Expressions   1\n");
-        
+
 
         unset($c);
     }
-
 
     public function testCounter2()
     {
         $c = Connection::connect('counter:sqlite::memory:');
 
         $result = false;
-        $c->callback = function($a, $b, $c, $d)use(&$result){
+        $c->callback = function ($a, $b, $c, $d) use (&$result) {
             $result = [$a, $b, $c, $d];
         };
 
@@ -123,7 +119,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
         unset($c);
         $this->assertEquals(
-            [1,1,1,0],
+            [1, 1, 1, 0],
             // 1 query
             // 1 select
             // 1 result row
@@ -137,7 +133,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $c = Connection::connect('counter:sqlite::memory:');
 
         $result = false;
-        $c->callback = function($a, $b, $c, $d)use(&$result){
+        $c->callback = function ($a, $b, $c, $d) use (&$result) {
             $result = [$a, $b, $c, $d];
         };
 
@@ -145,16 +141,16 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $c->dsql()->table('test')->set('name', 'John')->insert();
         $c->dsql()->table('test')->set('name', 'Peter')->insert();
         $c->dsql()->table('test')->set('name', 'Joshua')->insert();
-        $res = $c->dsql()->table('test')->where('name','like','J%')->field('name')->get();
+        $res = $c->dsql()->table('test')->where('name', 'like', 'J%')->field('name')->get();
 
         $this->assertEquals(
-            [['name'=>'John'],['name'=>'Joshua']],
+            [['name' => 'John'], ['name' => 'Joshua']],
             $res
         );
 
         unset($c);
         $this->assertEquals(
-            [4,1,2,1],
+            [4, 1, 2, 1],
             // 4 queries, 3 inserts and select
             // 1 select
             // 2 result row, john, joshua
@@ -162,8 +158,6 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $result
         );
     }
-
-
 
     public function testException1()
     {
@@ -182,6 +176,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('atk4\dsql\Exception');
         $c = new Connection('sqlite::memory');
     }
+
     public function testException4()
     {
         $c = new Connection();
