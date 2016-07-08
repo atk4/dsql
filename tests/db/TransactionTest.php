@@ -1,11 +1,12 @@
 <?php
+
 namespace atk4\dsql\tests;
 
-use atk4\dsql\Query;
-use atk4\dsql\Expression;
 use atk4\dsql\Connection;
+use atk4\dsql\Expression;
+use atk4\dsql\Query;
 
-class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
+class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
 {
     protected $pdo;
 
@@ -16,6 +17,7 @@ class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
 
         $this->pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
     }
+
     /**
      * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
      */
@@ -40,15 +42,14 @@ class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
         if ($table !== null) {
             $q->table($table, $alias);
         }
+
         return $q;
     }
+
     private function e($template = null, $args = null)
     {
         return $this->c->expr($template, $args);
     }
-
-
-
 
     public function testTransactions()
     {
@@ -64,9 +65,9 @@ class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
                 ->set(['id' => 1, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                 ->insert();
             $this->q('employee')
-                ->set(['id' => 2, 'foo'=>'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                ->set(['id' => 2, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                 ->insert();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             // ignore
         }
 
@@ -103,15 +104,15 @@ class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         try {
-            $this->c->atomic(function(){
+            $this->c->atomic(function () {
                 $this->q('employee')
                     ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                     ->insert();
                 $this->q('employee')
-                    ->set(['id' => 4, 'foo'=>'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 4, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
-        } catch(\PDOException $e) {
+        } catch (\PDOException $e) {
             // ignore
         }
 
@@ -121,28 +122,28 @@ class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         try {
-            $this->c->atomic(function(){
+            $this->c->atomic(function () {
                 $this->q('employee')
                     ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                     ->insert();
 
                 // success, in, fail, out, fail
-                $this->c->atomic(function(){
+                $this->c->atomic(function () {
                     $this->q('employee')
                         ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                         ->insert();
                     $this->q('employee')
-                        ->set(['id' => 4, 'foo'=>'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                        ->set(['id' => 4, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                         ->insert();
                 });
 
 
 
                 $this->q('employee')
-                    ->set(['id' => 4, 'foo'=>'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 4, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
-        } catch(\PDOException $e) {
+        } catch (\PDOException $e) {
             // ignore
         }
 
@@ -152,13 +153,13 @@ class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         try {
-            $this->c->atomic(function(){
+            $this->c->atomic(function () {
                 $this->q('employee')
                     ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                     ->insert();
 
                 // success, in, success, out, fail
-                $this->c->atomic(function(){
+                $this->c->atomic(function () {
                     $this->q('employee')
                         ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                         ->insert();
@@ -167,10 +168,10 @@ class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
 
 
                 $this->q('employee')
-                    ->set(['id' => 4, 'foo'=>'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 4, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
-        } catch(\PDOException $e) {
+        } catch (\PDOException $e) {
             // ignore
         }
 
@@ -181,12 +182,12 @@ class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
 
 
         try {
-            $this->c->atomic(function(){
+            $this->c->atomic(function () {
                 $this->q('employee')
                     ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                     ->insert();
             });
-        } catch(\PDOException $e) {
+        } catch (\PDOException $e) {
             // ignore
         }
 
@@ -194,7 +195,5 @@ class dbTransactionTest extends \PHPUnit_Extensions_Database_TestCase
             2,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
-
-
     }
 }
