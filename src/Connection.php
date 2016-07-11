@@ -21,6 +21,9 @@ class Connection
     /** @var Connection Connection object */
     protected $connection = null;
 
+    /** @var int Current depth of transaction */
+    public $transaction_depth = 0;
+
     /**
      * Connect database.
      *
@@ -145,5 +148,120 @@ class Connection
         }
 
         throw new Exception('Queries cannot be executed through this connection');
+    }
+
+    /**
+     * Atomic executes operations within one begin/end transaction, so if
+     * the code inside callback will fail, then all of the transaction
+     * will be also rolled back.
+     */
+    public function atomic($f)
+    {
+        $this->beginTransaction();
+        try {
+            $res = call_user_func($f);
+            $this->commit();
+
+            return $res;
+        } catch (\Exception $e) {
+            $this->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Starts new transaction.
+     *
+     * Database driver supports statements for starting and committing
+     * transactions.
+     * Unfortunatelly most of them don't allow to nest transactions and commit
+     * gradually.
+     * With this method you have some implementation of nested transactions.
+     *
+     * When you call it for the first time it will begin transaction. If you
+     * call it more times, it will do nothing but will increase depth counter.
+     * You will need to call commit() for each execution of beginTransactions()
+     * and only the last commit will perform actual commit in database.
+     *
+     * So, if you have been working with the database and got unhandled
+     * exception in the middle of your code, everything will be rolled back.
+     *
+     * @return mixed Don't rely on any meaningful return
+     */
+    public function beginTransaction()
+    {
+        ++$this->transaction_depth;
+
+        // transaction starts only if it was not started before
+        if ($this->transaction_depth == 1) {
+            return $this->connection->beginTransaction();
+        }
+
+        return false;
+    }
+
+    /**
+     * Commits transaction.
+     *
+     * Each occurance of beginTransaction() must be matched with commit().
+     * Only when same amount of commits are executed, the actual commit will be
+     * issued to the database.
+     *
+     * @see beginTransaction()
+     *
+     * @return mixed Don't rely on any meaningful return
+     */
+    public function commit()
+    {
+        --$this->transaction_depth;
+
+        // This means we rolled something back and now we lost track of commits
+        if ($this->transaction_depth < 0) {
+            $this->transaction_depth = 0;
+        }
+
+        if ($this->transaction_depth == 0) {
+            return $this->connection->commit();
+        }
+
+        return false;
+    }
+
+    /**
+     * Will return true if currently running inside a transaction.
+     * This is useful if you are logging anything into a database. If you are
+     * inside a transaction, don't log or it may be rolled back.
+     * Perhaps use a hook for this?
+     *
+     * @see beginTransaction()
+     *
+     * @return bool if in transaction
+     */
+    public function inTransaction()
+    {
+        return $this->transaction_depth > 0;
+    }
+
+    /**
+     * Rollbacks queries since beginTransaction and resets transaction depth.
+     *
+     * @see beginTransaction()
+     *
+     * @return mixed Don't rely on any meaningful return
+     */
+    public function rollBack()
+    {
+        --$this->transaction_depth;
+
+        // This means we rolled something back and now we lost track of commits
+        if ($this->transaction_depth < 0) {
+            $this->transaction_depth = 0;
+        }
+
+        if ($this->transaction_depth == 0) {
+            return $this->connection->rollBack();
+        }
+
+        return false;
     }
 }
