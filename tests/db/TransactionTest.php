@@ -60,6 +60,9 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
+
+
+        // without transaction, ignoring exceptions
         try {
             $this->q('employee')
                 ->set(['id' => 1, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
@@ -71,17 +74,14 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             // ignore
         }
 
-
         $this->assertEquals(
             1,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
 
-        // begin, insert, 2, rollback, 1
 
-
-
+        // 1-level transaction: begin, insert, 2, rollback, 1
         $this->c->beginTransaction();
         $this->q('employee')
             ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
@@ -90,6 +90,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             2,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
+
         $this->c->rollBack();
         $this->assertEquals(
             1,
@@ -98,11 +99,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
 
 
 
-        $this->assertEquals(
-            1,
-            $this->q('employee')->field(new Expression('count(*)'))->getOne()
-        );
-
+        // atomic method, rolls back everything inside atomic() callback in case of exception
         try {
             $this->c->atomic(function () {
                 $this->q('employee')
@@ -121,6 +118,9 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
+
+
+        // atomic method, nested atomic transaction, rolls back everything
         try {
             $this->c->atomic(function () {
                 $this->q('employee')
@@ -130,17 +130,15 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                 // success, in, fail, out, fail
                 $this->c->atomic(function () {
                     $this->q('employee')
-                        ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                        ->set(['id' => 4, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                         ->insert();
                     $this->q('employee')
-                        ->set(['id' => 4, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                        ->set(['id' => 5, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                         ->insert();
                 });
 
-
-
                 $this->q('employee')
-                    ->set(['id' => 4, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 6, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
         } catch (\PDOException $e) {
@@ -152,6 +150,9 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
+
+
+        // atomic method, nested atomic transaction, rolls back everything
         try {
             $this->c->atomic(function () {
                 $this->q('employee')
@@ -161,14 +162,12 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                 // success, in, success, out, fail
                 $this->c->atomic(function () {
                     $this->q('employee')
-                        ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                        ->set(['id' => 4, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                         ->insert();
                 });
 
-
-
                 $this->q('employee')
-                    ->set(['id' => 4, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 5, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
         } catch (\PDOException $e) {
@@ -181,6 +180,37 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
 
+
+        // atomic method, nested atomic transaction, rolls back everything
+        try {
+            $this->c->atomic(function () {
+                $this->q('employee')
+                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                    ->insert();
+
+                // success, in, fail, out, catch exception
+                $this->c->atomic(function () {
+                    $this->q('employee')
+                        ->set(['id' => 4, 'foo' => 'bar', 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                        ->insert();
+                });
+
+                $this->q('employee')
+                    ->set(['id' => 5, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->insert();
+            });
+        } catch (\PDOException $e) {
+            // ignore
+        }
+
+        $this->assertEquals(
+            1,
+            $this->q('employee')->field(new Expression('count(*)'))->getOne()
+        );
+
+
+
+        // atomic method, success - commit
         try {
             $this->c->atomic(function () {
                 $this->q('employee')

@@ -151,10 +151,9 @@ class Connection
     }
 
     /**
-     * Atomic executes operations within one begin/end
-     * transaction look, so if the code inside callback
-     * will fail, then all of the transaction will be
-     * also rolled back.
+     * Atomic executes operations within one begin/end transaction, so if
+     * the code inside callback will fail, then all of the transaction
+     * will be also rolled back.
      */
     public function atomic($f)
     {
@@ -171,24 +170,28 @@ class Connection
     }
 
     /**
+     * Starts new transaction.
+     *
      * Database driver supports statements for starting and committing
      * transactions.
-     * Unfortunatelly they don't allow to nest them and commit gradually.
+     * Unfortunatelly most of them don't allow to nest transactions and commit
+     * gradually.
      * With this method you have some implementation of nested transactions.
      *
      * When you call it for the first time it will begin transaction. If you
      * call it more times, it will do nothing but will increase depth counter.
      * You will need to call commit() for each execution of beginTransactions()
-     * and the last commit will actually perform a real commit.
+     * and only the last commit will perform actual commit in database.
      *
-     * So if you have been working with the database and got unhandled exception
-     * in the middle of your code, everything would be rolled back.
+     * So, if you have been working with the database and got unhandled
+     * exception in the middle of your code, everything will be rolled back.
      *
      * @return mixed Don't rely on any meaningful return
      */
     public function beginTransaction()
     {
         ++$this->transaction_depth;
+
         // transaction starts only if it was not started before
         if ($this->transaction_depth == 1) {
             return $this->connection->beginTransaction();
@@ -198,8 +201,10 @@ class Connection
     }
 
     /**
+     * Commits transaction.
+     *
      * Each occurance of beginTransaction() must be matched with commit().
-     * Only when same amount of commits are executed, the ACTUAL commit will be
+     * Only when same amount of commits are executed, the actual commit will be
      * issued to the database.
      *
      * @see beginTransaction()
@@ -230,7 +235,7 @@ class Connection
      *
      * @see beginTransaction()
      *
-     * @return bool if in transactionn
+     * @return bool if in transaction
      */
     public function inTransaction()
     {
