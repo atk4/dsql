@@ -51,8 +51,6 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         return $this->c->expr($template, $args);
     }
 
-
-
     /**
      * @expectedException Exception
      */
@@ -94,7 +92,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * Tests simple and nested transactions
+     * Tests simple and nested transactions.
      */
     public function testTransactions()
     {
@@ -273,7 +271,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * Tests inTransaction()
+     * Tests inTransaction().
      */
     public function testInTransaction()
     {

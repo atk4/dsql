@@ -193,7 +193,7 @@ class Connection
         $r = $this->inTransaction()
             ? false
             : $this->connection->beginTransaction();
-        
+
         ++$this->transaction_depth;
 
         return $r;
