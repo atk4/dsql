@@ -22,7 +22,7 @@ class Connection_Dumper extends Connection_Proxy
             $c = $this->callback;
             $c($expr, $took);
         } else {
-            printf("[%02.6f] %s\n", $took, strip_tags($expr->getDebugQuery()));
+            printf("[%02.6f] %s\n", $took, $expr->getDebugQuery());
         }
 
         return $ret;
