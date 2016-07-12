@@ -417,7 +417,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @return string SQL syntax of query
      */
-    public function getDebugQuery($html = true)
+    public function getDebugQuery($html = false)
     {
         $d = $this->render();
 
