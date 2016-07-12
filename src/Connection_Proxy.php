@@ -35,4 +35,9 @@ class Connection_Proxy extends Connection
     {
         return $this->connection->execute($expr);
     }
+
+    public function lastInsertID()
+    {
+        return $this->connection()->lastInsertID();
+    }
 }
