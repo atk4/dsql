@@ -54,12 +54,12 @@ class Connection
                 ], $args));
             case 'dumper':
                 return new Connection_Dumper(array_merge([
-                    'connection' => self::connect($rest),
+                    'connection' => self::connect($rest, $user, $password),
                 ], $args));
 
             case 'counter':
                 return new Connection_Counter(array_merge([
-                    'connection' => self::connect($rest),
+                    'connection' => self::connect($rest, $user, $password),
                 ], $args));
 
                 // let PDO handle the rest
