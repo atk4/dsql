@@ -51,9 +51,52 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         return $this->c->expr($template, $args);
     }
 
+    /**
+     * @expectedException Exception
+     */
+    public function testCommitException1()
+    {
+        // try to commit when not in transaction
+        $this->c->commit();
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testCommitException2()
+    {
+        // try to commit when not in transaction anymore
+        $this->c->beginTransaction();
+        $this->c->commit();
+        $this->c->commit();
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testRollbackException1()
+    {
+        // try to rollback when not in transaction
+        $this->c->rollBack();
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testRollbackException2()
+    {
+        // try to rollback when not in transaction anymore
+        $this->c->beginTransaction();
+        $this->c->rollBack();
+        $this->c->rollBack();
+    }
+
+    /**
+     * Tests simple and nested transactions.
+     */
     public function testTransactions()
     {
-        // truncate table
+        // truncate table, prepare
         $this->q('employee')->truncate();
         $this->assertEquals(
             0,
@@ -68,7 +111,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                 ->set(['id' => 1, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                 ->insert();
             $this->q('employee')
-                ->set(['id' => 2, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                ->set(['id' => 2, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                 ->insert();
         } catch (\Exception $e) {
             // ignore
@@ -106,7 +149,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                     ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                     ->insert();
                 $this->q('employee')
-                    ->set(['id' => 4, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 4, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
         } catch (\PDOException $e) {
@@ -133,12 +176,12 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                         ->set(['id' => 4, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                         ->insert();
                     $this->q('employee')
-                        ->set(['id' => 5, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                        ->set(['id' => 5, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                         ->insert();
                 });
 
                 $this->q('employee')
-                    ->set(['id' => 6, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 6, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
         } catch (\PDOException $e) {
@@ -167,7 +210,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                 });
 
                 $this->q('employee')
-                    ->set(['id' => 5, 'foo' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 5, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
         } catch (\PDOException $e) {
@@ -191,7 +234,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                 // success, in, fail, out, catch exception
                 $this->c->atomic(function () {
                     $this->q('employee')
-                        ->set(['id' => 4, 'foo' => 'bar', 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                        ->set(['id' => 4, 'FOO' => 'bar', 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                         ->insert();
                 });
 
@@ -224,6 +267,37 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(
             2,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
+        );
+    }
+
+    /**
+     * Tests inTransaction().
+     */
+    public function testInTransaction()
+    {
+        // inTransaction tests
+        $this->assertEquals(
+            false,
+            $this->c->inTransaction()
+        );
+
+        $this->c->beginTransaction();
+        $this->assertEquals(
+            true,
+            $this->c->inTransaction()
+        );
+
+        $this->c->rollBack();
+        $this->assertEquals(
+            false,
+            $this->c->inTransaction()
+        );
+
+        $this->c->beginTransaction();
+        $this->c->commit();
+        $this->assertEquals(
+            false,
+            $this->c->inTransaction()
         );
     }
 }
