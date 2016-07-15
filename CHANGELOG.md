@@ -1,3 +1,9 @@
+## 1.0.5
+
+* added transaction support
+* made getDebugQuery() use false by default
+* Style Improvement
+
 ## 1.0.4
 
 * added getDebugQuery(false) which will output in TEXT instead of HTML
