@@ -1,9 +1,11 @@
-<?php // vim:ts=4:sw=4:et:fdm=marker
+<?php
+
+// vim:ts=4:sw=4:et:fdm=marker
 
 namespace atk4\dsql;
 
 /**
- * Perform query operation on SQLite server
+ * Perform query operation on SQLite server.
  *
  * @license MIT
  * @copyright Agile Toolkit (c) http://agiletoolkit.org/
@@ -11,7 +13,7 @@ namespace atk4\dsql;
 class Query_SQLite extends Query
 {
     /**
-     * SQLite specific TRUNCATE template
+     * SQLite specific TRUNCATE template.
      *
      * @var string
      */

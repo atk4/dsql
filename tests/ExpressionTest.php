@@ -11,7 +11,6 @@ use atk4\dsql\Query;
  */
 class ExpressionTest extends \PHPUnit_Framework_TestCase
 {
-
     public function e()
     {
         $args = func_get_args();
@@ -21,10 +20,9 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             case 2:
                 return new Expression($args[0], $args[1]);
         }
+
         return new Expression();
     }
-
-
 
     /**
      * Test constructor exception - wrong 1st parameter.
@@ -58,7 +56,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructorException_2nd_1()
     {
-        $this->e("hello, []", false);
+        $this->e('hello, []', false);
     }
 
     /**
@@ -69,11 +67,11 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructorException_2nd_2()
     {
-        $this->e("hello, []", "hello");
+        $this->e('hello, []', 'hello');
     }
 
     /**
-     * Test constructor exception - no arguments
+     * Test constructor exception - no arguments.
      *
      * @expectedException atk4\dsql\Exception
      * @expectedExceptionMessage Template is not defined for Expression
@@ -168,7 +166,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
                 '[what], [who]',
                 [
                     'what' => $this->e('hello'),
-                    'who'  => $this->e('world')
+                    'who'  => $this->e('world'),
                 ]
             )->render()
         );
@@ -183,9 +181,9 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
                         '[what], [who]',
                         [
                             'what' => $this->e('hello'),
-                            'who'  => $this->e('world')
+                            'who'  => $this->e('world'),
                         ]
-                    )
+                    ),
                 ]
             )->render()
         );
@@ -198,11 +196,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
                 ['who' => $this->e('world')]
             )->render()
         );
-
     }
 
     /**
-     * Test nested parameters
+     * Test nested parameters.
      *
      * @covers ::__construct
      * @covers ::_param
@@ -211,7 +208,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     public function testNestedParams()
     {
         // ++1 and --2
-        $e1 = $this->e("[] and []", [
+        $e1 = $this->e('[] and []', [
             $this->e('++[]', [1]),
             $this->e('--[]', [2]),
         ]);
@@ -221,7 +218,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             strip_tags($e1->getDebugQuery())
         );
 
-        $e2 = $this->e("=== [foo] ===", ['foo' => $e1]);
+        $e2 = $this->e('=== [foo] ===', ['foo' => $e1]);
 
         $this->assertEquals(
             '=== ++1 and --2 === [:b, :a]',
@@ -282,7 +279,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Fully covers _escape method
+     * Fully covers _escape method.
      *
      * @covers ::_escape
      * @covers ::_escapeSoft
@@ -337,13 +334,13 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
             ['`first_name`', '*', '`last_name`'],
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [ ['first_name', '*', 'last_name'] ])
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [['first_name', '*', 'last_name']])
         );
 
         // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
             ['`first_name`', '`*`', '`last_name`'],
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [ ['first_name', '*', 'last_name'] ])
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [['first_name', '*', 'last_name']])
         );
 
         $this->assertEquals(
@@ -361,7 +358,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Fully covers _param method
+     * Fully covers _param method.
      *
      * @covers ::_param
      */
@@ -373,7 +370,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             $e->render()
         );
         $this->assertEquals(
-            [':a'=>'world'],
+            [':a' => 'world'],
             $e->params
         );
 
@@ -386,7 +383,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             $e->render()
         );
         $this->assertEquals(
-            [':a'=>'cruel', ':b'=>'world'],
+            [':a' => 'cruel', ':b' => 'world'],
             $e->params
         );
     }
@@ -403,7 +400,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             ':x',
-            PHPUnitUtil::callProtectedMethod($this->e(['_paramBase'=>':x']), '_consume', [123, 'param'])
+            PHPUnitUtil::callProtectedMethod($this->e(['_paramBase' => ':x']), '_consume', [123, 'param'])
         );
         $this->assertEquals(
             123,
@@ -416,7 +413,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'hello, `myfield`',
-            $this->e('hello, []', [new MyField])->render()
+            $this->e('hello, []', [new MyField()])->render()
         );
     }
 
@@ -467,8 +464,8 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
         // testing absence of specific key in asignment
         $e = $this->e('[], []');
-        $e[]='Hello';
-        $e[]='World';
+        $e[] = 'Hello';
+        $e[] = 'World';
         $this->assertEquals("'Hello', 'World' [:b, :a]", strip_tags($e->getDebugQuery()));
 
         // real-life example
@@ -479,7 +476,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test IteratorAggregate implementation
+     * Test IteratorAggregate implementation.
      *
      * @covers ::getIterator
      */
@@ -509,7 +506,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test reset exception if tag is not a string
+     * Test reset exception if tag is not a string.
      *
      * @expectedException atk4\dsql\Exception
      */
@@ -519,7 +516,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test var-dump code for codecoverage
+     * Test var-dump code for codecoverage.
      *
      * @covers ::__debugInfo
      */
@@ -531,7 +528,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test reset()
+     * Test reset().
      *
      * @covers ::reset
      */

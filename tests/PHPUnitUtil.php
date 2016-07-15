@@ -1,4 +1,5 @@
 <?php
+
 namespace atk4\dsql\tests;
 
 class PHPUnitUtil
@@ -8,6 +9,7 @@ class PHPUnitUtil
         $class = new \ReflectionClass($obj);
         $method = $class->getMethod($name);
         $method->setAccessible(true);
+
         return $method->invokeArgs($obj, $args);
     }
 }
