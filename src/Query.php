@@ -33,7 +33,7 @@ class Query extends Expression
      *
      * @var string
      */
-    protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order][limit]';
+    protected $template_select = 'select[option] [field] [from] [table] [join][where][group][having][order][limit]';
 
     /**
      * INSERT template.
