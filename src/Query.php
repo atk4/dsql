@@ -1141,7 +1141,7 @@ class Query extends Expression
         ];
 
         try {
-            $arr['R'] = $this->render();
+            $arr['R'] = $this->getDebugQuery();
         } catch (\Exception $e) {
             $arr['R'] = $e->getMessage();
         }
