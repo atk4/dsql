@@ -461,7 +461,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             'R'          => false,
             'template'   => $this->template,
             'params'     => $this->params,
-            'connection' => $this->connection,
+//            'connection' => $this->connection,
             'args'       => $this->args,
         ];
 
