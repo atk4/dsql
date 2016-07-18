@@ -33,7 +33,7 @@ class Query extends Expression
      *
      * @var string
      */
-    protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order][limit]';
+    protected $template_select = 'select[option] [field] [from] [table] [join][where][group][having][order][limit]';
 
     /**
      * INSERT template.
@@ -1133,15 +1133,15 @@ class Query extends Expression
         $arr = [
             'R'          => false,
             'mode'       => $this->mode,
-            'template'   => $this->template,
-            'params'     => $this->params,
-            'connection' => $this->connection,
-            'main_table' => $this->main_table,
-            'args'       => $this->args,
+            //'template'   => $this->template,
+            //'params'     => $this->params,
+            //'connection' => $this->connection,
+            //'main_table' => $this->main_table,
+            //'args'       => $this->args,
         ];
 
         try {
-            $arr['R'] = $this->render();
+            $arr['R'] = $this->getDebugQuery();
         } catch (\Exception $e) {
             $arr['R'] = $e->getMessage();
         }

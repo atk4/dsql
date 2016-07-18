@@ -37,7 +37,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @var string
      */
-    protected $paramBase = ':a';
+    protected $paramBase = 'a';
 
     /**
      * Used for Linking.
@@ -356,7 +356,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return array_map(__METHOD__, $value);
         }
 
-        $name = $this->_paramBase;
+        $name = ':'.$this->_paramBase;
         $this->_paramBase++;
         $this->params[$name] = $value;
 
@@ -461,12 +461,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             'R'          => false,
             'template'   => $this->template,
             'params'     => $this->params,
-            'connection' => $this->connection,
+//            'connection' => $this->connection,
             'args'       => $this->args,
         ];
 
         try {
-            $arr['R'] = $this->render();
+            $arr['R'] = $this->getDebugQuery();
         } catch (\Exception $e) {
             $arr['R'] = $e->getMessage();
         }
