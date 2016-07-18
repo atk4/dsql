@@ -1,3 +1,8 @@
+## 1.0.6
+
+* Fix problem when more than 28 parameters are specified
+* Permit use of JOIN and table alias in MySQL update
+
 ## 1.0.5
 
 * added transaction support
