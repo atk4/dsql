@@ -400,7 +400,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             ':x',
-            PHPUnitUtil::callProtectedMethod($this->e(['_paramBase' => ':x']), '_consume', [123, 'param'])
+            PHPUnitUtil::callProtectedMethod($this->e(['_paramBase' => 'x']), '_consume', [123, 'param'])
         );
         $this->assertEquals(
             123,
