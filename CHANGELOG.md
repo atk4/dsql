@@ -1,3 +1,7 @@
+## 1.0.7
+
+* Fix test-suite bugs introduced in 1.0.6
+
 ## 1.0.6
 
 * Fix problem when more than 28 parameters are specified
