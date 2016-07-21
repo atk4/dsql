@@ -1367,10 +1367,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Field name should be array or string.
+     * Field name can be expression
      *
      * @covers ::set
-     * @expectedException Exception
      */
     public function testSetException2()
     {

@@ -824,10 +824,10 @@ class Query extends Expression
             return $this;
         }
 
-        if (is_string($field)) {
-            $this->args['set'][$field] = $value;
+        if (is_string($field) || $field instanceof Expression || $field instanceof Expressionable) {
+            $this->args['set'][] = [$field,$value];
         } else {
-            throw new Exception('Field name should be string in '.__METHOD__);
+            throw new Exception('Field name should be string or Expressionable in '.__METHOD__);
         }
 
         return $this;
@@ -844,7 +844,7 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as $field => $value) {
+            foreach ($this->args['set'] as list($field, $value)){ 
                 $field = $this->_consume($field, 'escape');
                 $value = $this->_consume($value, 'param');
 
@@ -865,8 +865,9 @@ class Query extends Expression
         // will be joined for output
         $ret = [];
 
+
         if ($this->args['set']) {
-            foreach (array_keys($this->args['set']) as $field) {
+            foreach ($this->args['set'] as list($field,$value)) {
                 $field = $this->_consume($field, 'escape');
 
                 $ret[] = $field;
@@ -887,7 +888,7 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as $value) {
+            foreach ($this->args['set'] as list($field, $value)) {
                 $value = $this->_consume($value, 'param');
 
                 $ret[] = $value;
