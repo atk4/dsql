@@ -466,7 +466,7 @@ class Query extends Expression
             $joins[] = $jj;
         }
 
-        return implode(' ', $joins);
+        return ' '.implode(' ', $joins);
     }
 
     // }}}
