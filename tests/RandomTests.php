@@ -24,7 +24,7 @@ class RandomTests extends \PHPUnit_Framework_TestCase
 
     public function testMiscInsert()
     {
-        $data = array (
+        $data = [
             'id'                    => null,
             'system_id'             => '3576',
             'system'                => null,
@@ -55,7 +55,7 @@ class RandomTests extends \PHPUnit_Framework_TestCase
             'exchanged_total_vat'   => null,
             'exchanged_total_a'     => null,
             'exchanged_total_b'     => null,
-        );
+        ];
         $q = $this->q();
         $q->mode('insert');
         foreach ($data as $key => $val) {
