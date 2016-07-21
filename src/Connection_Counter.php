@@ -18,6 +18,8 @@ class Connection_Counter extends Connection_Proxy
 
     protected $rows = 0;
 
+    public $output_file = 'php://stderr';
+
     /*
     public function iterate($ret)
     {
@@ -55,9 +57,9 @@ class Connection_Counter extends Connection_Proxy
                 $this->rows,
                 $this->expressions
             );
-            $stderr = fopen('php://stderr', 'w');
-            fwrite($stderr, $Message);
-            fclose($stderr);
+            $stderr = fopen($this->output_file, 'w'); 
+            fwrite($stderr, $Message); 
+            fclose($stderr); 
         }
     }
 }
