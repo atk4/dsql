@@ -1367,7 +1367,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Field name can be expression
+     * Field name can be expression.
      *
      * @covers ::set
      */
