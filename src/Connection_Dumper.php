@@ -22,7 +22,11 @@ class Connection_Dumper extends Connection_Proxy
             $c = $this->callback;
             $c($expr, $took);
         } else {
-            printf("[%02.6f] %s\n", $took, $expr->getDebugQuery());
+            $stderr = fopen('php://stderr', 'w'); 
+            $Message =  sprintf("[%02.6f] %s\n", $took, $expr->getDebugQuery());
+            fwrite($stderr,$Message); 
+            fclose($stderr); 
+            
         }
 
         return $ret;
