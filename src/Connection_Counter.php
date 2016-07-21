@@ -57,9 +57,9 @@ class Connection_Counter extends Connection_Proxy
                 $this->rows,
                 $this->expressions
             );
-            $stderr = fopen($this->output_file, 'w'); 
-            fwrite($stderr, $Message); 
-            fclose($stderr); 
+            $stderr = fopen($this->output_file, 'w');
+            fwrite($stderr, $Message);
+            fclose($stderr);
         }
     }
 }
