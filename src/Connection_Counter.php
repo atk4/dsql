@@ -18,6 +18,7 @@ class Connection_Counter extends Connection_Proxy
 
     protected $rows = 0;
 
+    /*
     public function iterate($ret)
     {
         foreach ($ret as $key => $row) {
@@ -25,6 +26,7 @@ class Connection_Counter extends Connection_Proxy
             yield $key => $row;
         }
     }
+     */
 
     public function execute(Expression $expr)
     {
@@ -37,11 +39,7 @@ class Connection_Counter extends Connection_Proxy
             $this->expressions++;
         }
 
-        $ret = parent::execute($expr);
-
-
-
-        return $this->iterate($ret);
+        return parent::execute($expr);
     }
 
     public function __destruct()
@@ -50,13 +48,16 @@ class Connection_Counter extends Connection_Proxy
             $c = $this->callback;
             $c($this->queries, $this->selects, $this->rows, $this->expressions);
         } else {
-            printf(
+            $Message = sprintf(
                 "Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
                 $this->queries,
                 $this->selects,
                 $this->rows,
                 $this->expressions
             );
+            $stderr = fopen('php://stderr', 'w'); 
+            fwrite($stderr,$Message); 
+            fclose($stderr); 
         }
     }
 }
