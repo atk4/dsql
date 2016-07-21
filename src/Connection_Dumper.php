@@ -24,10 +24,10 @@ class Connection_Dumper extends Connection_Proxy
             $c = $this->callback;
             $c($expr, $took);
         } else {
-            $stderr = fopen($this->output_file, 'w'); 
+            $stderr = fopen($this->output_file, 'w');
             $Message = sprintf("[%02.6f] %s\n", $took, $expr->getDebugQuery());
-            fwrite($stderr,$Message); 
-            fclose($stderr); 
+            fwrite($stderr, $Message);
+            fclose($stderr);
         }
 
         return $ret;
