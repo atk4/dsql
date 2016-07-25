@@ -1,3 +1,17 @@
+## 1.0.8
+
+Calling `$dsql->set('foo', 4)->set('foo', 10);` now works differently.
+It used to record "foo=10" in insert/update record, but now it will
+simply add both statement. With MySQL at least the first value is
+used.
+
+Calling set() multiple times should behave similarly how adding
+multiple conditions on the same field. It's not up to DSQL to
+select which value to use.
+
+* Field in set() can now be an expression
+* Improved formatting a bit
+
 ## 1.0.7
 
 * Fix test-suite bugs introduced in 1.0.6
