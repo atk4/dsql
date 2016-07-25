@@ -827,7 +827,7 @@ class Query extends Expression
         if (is_string($field) || $field instanceof Expression || $field instanceof Expressionable) {
             if (is_string($field)) {
                 if (isset($this->args['set']['_set_duplicate_verification'][$field])) {
-                    throw new Exception(['Calling set() multiple times for same field can cause problems. If it is intentional, use expression as field name', 'field'=>$field]);
+                    throw new Exception(['Calling set() multiple times for same field can cause problems. If it is intentional, use expression as field name', 'field' => $field]);
                 }
                 $this->args['set']['_set_duplicate_verification'][$field] = true;
             }
@@ -850,7 +850,7 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as $couple){
+            foreach ($this->args['set'] as $couple) {
                 if (!isset($couple[0])) {
                     continue;
                 }
