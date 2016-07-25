@@ -825,6 +825,12 @@ class Query extends Expression
         }
 
         if (is_string($field) || $field instanceof Expression || $field instanceof Expressionable) {
+            if (is_string($field)) {
+                if (isset($this->args['set']['_set_duplicate_verification'][$field])) {
+                    throw new Exception(['Calling set() multiple times for same field can cause problems. If it is intentional, use expression as field name', 'field'=>$field]);
+                }
+                $this->args['set']['_set_duplicate_verification'][$field] = true;
+            }
             $this->args['set'][] = [$field, $value];
         } else {
             throw new Exception('Field name should be string or Expressionable in '.__METHOD__);
@@ -844,7 +850,11 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as list($field, $value)) {
+            foreach ($this->args['set'] as $couple){
+                if (!isset($couple[0])) {
+                    continue;
+                }
+                list($field, $value) = $couple;
                 $field = $this->_consume($field, 'escape');
                 $value = $this->_consume($value, 'param');
 
@@ -867,7 +877,11 @@ class Query extends Expression
 
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as list($field, $value)) {
+            foreach ($this->args['set'] as $couple) {
+                if (!isset($couple[0])) {
+                    continue;
+                }
+                list($field, $value) = $couple;
                 $field = $this->_consume($field, 'escape');
 
                 $ret[] = $field;
@@ -888,7 +902,11 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as list($field, $value)) {
+            foreach ($this->args['set'] as $couple) {
+                if (!isset($couple[0])) {
+                    continue;
+                }
+                list($field, $value) = $couple;
                 $value = $this->_consume($value, 'param');
 
                 $ret[] = $value;
