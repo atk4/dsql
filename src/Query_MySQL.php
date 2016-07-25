@@ -12,5 +12,5 @@ namespace atk4\dsql;
  */
 class Query_MySQL extends Query
 {
-    protected $template_update = 'update [table] [join] set [set] [where]';
+    protected $template_update = 'update [table][join] set [set] [where]';
 }
