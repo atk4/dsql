@@ -24,7 +24,7 @@ class Connection_Dumper extends Connection_Proxy
             } else {
                 printf("[%02.6f] %s\n", $took, $expr->getDebugQuery());
             }
-        }catch(\Exception $e) {
+        } catch (\Exception $e) {
             $took = time() + microtime() - $this->start_time;
             if ($this->callback) {
                 $c = $this->callback;
