@@ -824,6 +824,10 @@ class Query extends Expression
             return $this;
         }
 
+        if (is_array($value)) {
+            throw new Exception('Array values are not supported by SQL');
+        }
+
         if (is_string($field) || $field instanceof Expression || $field instanceof Expressionable) {
             $this->args['set'][] = [$field, $value];
         } else {
