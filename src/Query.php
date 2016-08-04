@@ -816,16 +816,16 @@ class Query extends Expression
             throw new Exception('Value "false" is not supported by SQL for field '.$field.' in '.__METHOD__);
         }
 
+        if (is_array($value)) {
+            throw new Exception('Array values are not supported by SQL');
+        }
+
         if (is_array($field)) {
             foreach ($field as $key => $value) {
                 $this->set($key, $value);
             }
 
             return $this;
-        }
-
-        if (is_array($value)) {
-            throw new Exception('Array values are not supported by SQL');
         }
 
         if (is_string($field) || $field instanceof Expression || $field instanceof Expressionable) {

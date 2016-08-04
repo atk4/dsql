@@ -503,7 +503,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (is_string($val) || is_float($val)) {
                     $type = \PDO::PARAM_STR;
                 } else {
-                    throw new Exception('Incorrect param type in');
+                    throw new Exception('Incorrect param type');
                 }
 
                 if (!$statement->bindValue($key, $val, $type)) {
@@ -513,7 +513,18 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             }
 
             $statement->setFetchMode(\PDO::FETCH_ASSOC);
-            $statement->execute();
+
+            try {
+                $statement->execute();
+            } catch (\Exception $e) {
+                $new = new Exception([
+                    'DSQL got Exception when executing this query',
+                    'error' => $e->getMessage(),
+                    'query' => $this->getDebugQuery(),
+                ]);
+                $new->by_exception = $e;
+                throw $new;
+            }
 
             return $statement;
         } else {
