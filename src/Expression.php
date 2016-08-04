@@ -76,7 +76,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         if (is_string($properties)) {
             $properties = ['template' => $properties];
         } elseif (!is_array($properties)) {
-            throw new Exception('Incorect use of Expression constructor');
+            throw new Exception([
+                'Incorrect use of Expression constructor',
+                'properties' => $properties,
+                'arguments'  => $arguments,
+            ]);
         }
 
         // supports passing template as property value without key 'template'
@@ -88,7 +92,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // save arguments
         if ($arguments !== null) {
             if (!is_array($arguments)) {
-                throw new Exception('Expression arguments must be an array');
+                throw new Exception([
+                    'Expression arguments must be an array',
+                    'properties' => $properties,
+                    'arguments'  => $arguments,
+                ]);
             }
             $this->args['custom'] = $arguments;
         }
@@ -196,7 +204,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (!is_string($tag)) {
-            throw new Exception('Tag should be string');
+            throw new Exception([
+                'Tag should be string',
+                'tag' => $tag,
+            ]);
         }
 
         // unset custom/argument or argument if such exists
@@ -230,7 +241,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 case 'none':
                     return $sql_code;
             }
-            throw new Exception(['$escape_mode value is incorrect', 'escape_mode' => $escape_mode]);
+            throw new Exception([
+                '$escape_mode value is incorrect',
+                'escape_mode' => $escape_mode,
+            ]);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
@@ -239,7 +253,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (!$sql_code instanceof self) {
-            throw new Exception(['Only Expressions or Expressionable objects may be used in Expression', 'object' => $sql_code]);
+            throw new Exception([
+                'Only Expressions or Expressionable objects may be used in Expression',
+                'object' => $sql_code,
+            ]);
         }
 
         // at this point $sql_code is instance of Expression
@@ -400,7 +417,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (method_exists($this, $fx)) {
                     $value = $this->$fx();
                 } else {
-                    throw new Exception(['Expression could not render tag', 'tag' => $identifier]);
+                    throw new Exception([
+                        'Expression could not render tag',
+                        'tag' => $identifier,
+                    ]);
                 }
 
                 return is_array($value) ? '('.implode(',', $value).')' : $value;
@@ -503,12 +523,20 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (is_string($val) || is_float($val)) {
                     $type = \PDO::PARAM_STR;
                 } else {
-                    throw new Exception('Incorrect param type');
+                    throw new Exception([
+                        'Incorrect param type',
+                        'key'   => $key,
+                        'value' => $val,
+                    ]);
                 }
 
                 if (!$statement->bindValue($key, $val, $type)) {
-                    throw new Exception(['Unable to bind parameter', 'param' => $key,
-                        'value' => $val, 'type' => $type, ]);
+                    throw new Exception([
+                        'Unable to bind parameter',
+                        'param' => $key,
+                        'value' => $val,
+                        'type' => $type,
+                    ]);
                 }
             }
 

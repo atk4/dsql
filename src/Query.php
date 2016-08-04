@@ -813,11 +813,19 @@ class Query extends Expression
     public function set($field, $value = null)
     {
         if ($value === false) {
-            throw new Exception('Value "false" is not supported by SQL for field '.$field.' in '.__METHOD__);
+            throw new Exception([
+                'Value "false" is not supported by SQL',
+                'field' => $field,
+                'value' => $value,
+            ]);
         }
 
         if (is_array($value)) {
-            throw new Exception('Array values are not supported by SQL');
+            throw new Exception([
+                'Array values are not supported by SQL',
+                'field' => $field,
+                'value' => $value,
+            ]);
         }
 
         if (is_array($field)) {
@@ -831,7 +839,10 @@ class Query extends Expression
         if (is_string($field) || $field instanceof Expression || $field instanceof Expressionable) {
             $this->args['set'][] = [$field, $value];
         } else {
-            throw new Exception('Field name should be string or Expressionable in '.__METHOD__);
+            throw new Exception([
+                'Field name should be string or Expressionable',
+                'field' => $field,
+            ]);
         }
 
         return $this;
@@ -1103,7 +1114,11 @@ class Query extends Expression
         } elseif (strtolower($desc) === 'asc') {
             $desc = '';
         } elseif ($desc && strtolower($desc) != 'desc') {
-            throw new Exception(['Incorrect ordering keyword', 'order by' => $desc]);
+            throw new Exception([
+                'Incorrect ordering keyword',
+                'order by' => $order,
+                'desc'     => $desc,
+            ]);
         }
 
         $this->args['order'][] = [$order, $desc];
@@ -1188,7 +1203,10 @@ class Query extends Expression
             $this->mode = $mode;
             $this->template = $this->{$prop};
         } else {
-            throw new Exception(['Query does not have this mode', 'mode' => $mode]);
+            throw new Exception([
+                'Query does not have this mode',
+                'mode' => $mode,
+            ]);
         }
 
         return $this;
@@ -1247,7 +1265,8 @@ class Query extends Expression
             // don't allow multiple values with same alias
             if (isset($this->args[$what][$alias])) {
                 throw new Exception([
-                    ucfirst($what).' alias should be unique',
+                    'Alias should be unique',
+                    'what'  => $what,
                     'alias' => $alias,
                 ]);
             }
