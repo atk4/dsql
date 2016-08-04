@@ -12,7 +12,7 @@ Obviously because existing ones are not good enough. DSQL tries to do things dif
 2. Small footprint. We don't duplicate query code for all vendors, instead we use clever templating system.
 3. Extensibility. We have 3 different ways to extend DSQL as well as 3rd party vendor driver support.
 4. **Any Query** - any query with any complexity can be expressed through DSQL.
-5. Zero dependencies. Use DSQL in any PHP application or framework.
+5. Almost no dependencies. Use DSQL in any PHP application or framework.
 6. NoSQL support. In addition to supporting PDO, DSQL can be extended to deal with SQL-compatible NoSQL servers.
 
 [See our "Awesome Queries" gallery](https://github.com/atk4/dsql/wiki/Awesome-Queries)
