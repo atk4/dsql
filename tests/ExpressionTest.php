@@ -29,7 +29,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::__construct
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Incorect use of Expression constructor
      */
     public function testConstructorException_1st_1()
     {
@@ -41,7 +40,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::__construct
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Incorect use of Expression constructor
      */
     public function testConstructorException_1st_2()
     {
@@ -52,7 +50,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Test constructor exception - wrong 2nd parameter.
      *
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Expression arguments must be an array
      */
     public function testConstructorException_2nd_1()
     {
@@ -63,7 +60,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Test constructor exception - wrong 2nd parameter.
      *
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Expression arguments must be an array
      */
     public function testConstructorException_2nd_2()
     {
@@ -71,13 +67,13 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test constructor exception - no arguments.
+     * Test constructor exception - no arguments
      *
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Template is not defined for Expression
      */
     public function testConstructorException_0arg()
     {
+        // Template is not defined for Expression
         $this->e()->render();
     }
 
@@ -418,9 +414,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * $escape_mode value is incorrect
+     *
      * @covers ::_consume
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage $escape_mode value is incorrect
      */
     public function testConsumeException1()
     {
@@ -428,9 +425,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Only Expressions or Expressionable objects may be used in Expression
+     *
      * @covers ::_consume
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Only Expressions or Expressionable objects may be used in Expression
      */
     public function testConsumeException2()
     {
