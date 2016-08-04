@@ -535,7 +535,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                         'Unable to bind parameter',
                         'param' => $key,
                         'value' => $val,
-                        'type' => $type,
+                        'type'  => $type,
                     ]);
                 }
             }
