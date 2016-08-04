@@ -152,7 +152,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                     ->set(['id' => 4, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             // ignore
         }
 
@@ -184,7 +184,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                     ->set(['id' => 6, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             // ignore
         }
 
@@ -213,7 +213,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                     ->set(['id' => 5, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             // ignore
         }
 
@@ -242,7 +242,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                     ->set(['id' => 5, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
                     ->insert();
             });
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             // ignore
         }
 
@@ -260,7 +260,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
                     ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
                     ->insert();
             });
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             // ignore
         }
 

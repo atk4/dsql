@@ -67,7 +67,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test constructor exception - no arguments
+     * Test constructor exception - no arguments.
      *
      * @expectedException atk4\dsql\Exception
      */
@@ -414,7 +414,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * $escape_mode value is incorrect
+     * $escape_mode value is incorrect.
      *
      * @covers ::_consume
      * @expectedException atk4\dsql\Exception
@@ -425,7 +425,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Only Expressions or Expressionable objects may be used in Expression
+     * Only Expressions or Expressionable objects may be used in Expression.
      *
      * @covers ::_consume
      * @expectedException atk4\dsql\Exception
