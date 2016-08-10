@@ -127,10 +127,11 @@ by extending DSQL.
 DSQL has extensives documentation at http://dsql.readthedocs.org, but below we have linked some of the
 more demanded topics:
 
- - querying data from [table()](http://dsql.readthedocs.org/en/latest/queries.html#modifying-your-query) or sub-select with [join()](http://dsql.readthedocs.org/en/develop/queries.html#joining-with-other-tables), where(), order(), [group()](http://dsql.readthedocs.org/en/develop/queries.html#grouping-results-by-field), limit(), having() and option()
- - update/replace single or multiple records with set(), where() and option()
- - insert one or multiple records with set() or setAll() and option()
- - delete records with where()
- - [iterate](http://dsql.readthedocs.org/en/latest/quickstart.html#fetching-result) through result-set or get() all data
+ 
+ - querying data from [table()](http://dsql.readthedocs.org/en/latest/queries.html#modifying-your-query) or sub-select with [join()](http://dsql.readthedocs.org/en/develop/queries.html#joining-with-other-tables), [where()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=delete#Query::where), [order()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=order#ordering-result-set), [group()](http://dsql.readthedocs.org/en/develop/queries.html#grouping-results-by-field), [limit()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=limit#limiting-result-set), [having()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=having#Query::having) and [option()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=option#Query::option)
+ - [update](http://dsql.readthedocs.io/en/develop/queries.html?highlight=update#Query::update)/[replace](http://dsql.readthedocs.io/en/develop/queries.html?highlight=replace#Query::replace) single or multiple records with [set()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=set#set-value-to-a-field), [where()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=delete#Query::where) and [option()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=option#Query::option)
+ - [insert](http://dsql.readthedocs.io/en/develop/queries.html?highlight=insert#Query::insert) one or multiple records with [set()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=set#set-value-to-a-field) or setAll() and [option()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=option#Query::option)
+ - [delete](http://dsql.readthedocs.io/en/develop/queries.html?highlight=delete#Query::delete) records with [where()](http://dsql.readthedocs.io/en/develop/queries.html?highlight=delete#Query::where)
+ - [iterate](http://dsql.readthedocs.org/en/latest/quickstart.html#fetching-result) through [result-set](http://dsql.readthedocs.io/en/develop/results.html#results) or [get()](http://dsql.readthedocs.io/en/develop/expressions.html?highlight=get#Expression::get) all data
  - supporting [sub-queries](http://dsql.readthedocs.org/en/latest/queries.html#using-query-as-expression) and [expressions](http://dsql.readthedocs.org/en/latest/expressions.html#expressions) anywhere
 
