@@ -1443,6 +1443,56 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test Double-Set prevention.
+     *
+     * @covers \atk4\dsql\Query::set
+     * @covers \atk4\dsql\Query::_render_set
+     * @covers \atk4\dsql\Query::_render_set_values
+     * @covers \atk4\dsql\Query::_render_set_fields
+     */
+    public function testDoubleSet()
+    {
+        // Double Update
+        $q = $this->q()->table('user')
+            ->set($this->q()->escape('name'), 'John')
+            ->set($this->q()->escape('name'), 'Peter');
+        $this->assertEquals('update `user` set `name`=:a, `name`=:b', $q->mode('update')->render());
+
+        // Double Insert
+        $q = $this->q()->table('user')
+            ->set($this->q()->escape('name'), 'John')
+            ->set($this->q()->escape('name'), 'Peter');
+        $this->assertEquals('insert into `user` (`name`,`name`) values (:a,:b)', $q->mode('insert')->render());
+
+        // Double Insert
+        $q = $this->q()->table('user')
+            ->set('name', 'John')
+            ->reset('set')
+            ->set('name', 'Peter');
+        $this->assertEquals('insert into `user` (`name`) values (:a)', $q->mode('insert')->render());
+
+        // Double Insert
+        $q = $this->q()->table('user')
+            ->set('name', 'John')
+            ->reset()->table('user')
+            ->set('name', 'Peter');
+        $this->assertEquals('insert into `user` (`name`) values (:a)', $q->mode('insert')->render());
+    }
+
+    /**
+     * Test Double-Set prevention.
+     *
+     * @expectedException Exception
+     */
+    public function testDoubleSetE2()
+    {
+        $q = $this->q()->table('user')
+            ->set('name', 'John')
+            ->set('name', 'Peter');
+        $this->assertEquals('insert into `user` (`name`,`name`) values (:a,:b)', $q->mode('insert')->render());
+    }
+
+    /**
      * Test [option].
      *
      * @covers ::option
