@@ -858,7 +858,7 @@ class Query extends Expression
         // will be joined for output
         $ret = [];
 
-        if ($this->args['set']) {
+        if (isset($this->args['set']) && $this->args['set']) {
             foreach ($this->args['set'] as list($field, $value)) {
                 $field = $this->_consume($field, 'escape');
                 $value = $this->_consume($value, 'param');
