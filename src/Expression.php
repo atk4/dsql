@@ -519,7 +519,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (is_bool($val)) {
                     // SQL does not like booleans at all, so convert them INT
                     $type = \PDO::PARAM_INT;
-                    $val = (int)$val;
+                    $val = (int) $val;
                 } elseif ($val === null) {
                     $type = \PDO::PARAM_NULL;
                 } elseif (is_string($val) || is_float($val)) {
