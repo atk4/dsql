@@ -1,3 +1,13 @@
+## 1.0.9
+
+Exception class has been having the same functionality as the one
+from atk4/core, so we have finally added dependency for atk4/core
+and exndended their exception.
+
+To celebrate this fact, we have added additional infromation
+through params to all the places where we use Exceptions.
+
+
 ## 1.0.8
 
 Calling `$dsql->set('foo', 4)->set('foo', 10);` now works differently.
