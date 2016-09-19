@@ -355,10 +355,10 @@ class Query extends Expression
      *          ->where('user.technical_id=address.id')
      *  )
      *
-     * @param string $foreign_table  Table to join with
-     * @param mixed  $master_field   Field in master table
-     * @param string $join_kind      'left' or 'inner', etc
-     * @param string $_foreign_alias Internal, don't use
+     * @param string|array $foreign_table  Table to join with
+     * @param mixed        $master_field   Field in master table
+     * @param string       $join_kind      'left' or 'inner', etc
+     * @param string       $_foreign_alias Internal, don't use
      *
      * @return $this
      */
@@ -382,12 +382,13 @@ class Query extends Expression
         }
         $j = [];
 
+        // try to find alias in foreign table definition
         if ($_foreign_alias === null) {
-            @list($foreign_table, $_foreign_alias) = explode(' ', $foreign_table, 2);
+            list($foreign_table, $_foreign_alias) = array_pad(explode(' ', $foreign_table, 2), 2, null);
         }
 
         // Split and deduce fields
-        @list($f1, $f2) = explode('.', $foreign_table, 2);
+        list($f1, $f2) = array_pad(explode('.', $foreign_table, 2), 2, null);
 
         if (is_object($master_field)) {
             $j['expr'] = $master_field;
@@ -396,7 +397,7 @@ class Query extends Expression
             if ($master_field === null) {
                 list($m1, $m2) = [null, null];
             } else {
-                @list($m1, $m2) = explode('.', $master_field, 2);
+                list($m1, $m2) = array_pad(explode('.', $master_field, 2), 2, null);
             }
             if ($m2 === null) {
                 $m2 = $m1;
@@ -416,6 +417,7 @@ class Query extends Expression
             $j['m1'] = $m1;
             $j['m2'] = $m2;
         }
+
         $j['f1'] = $f1;
         if ($f2 === null) {
             $f2 = 'id';
