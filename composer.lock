@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "74cda9136acb5a36fae8397250c60a8a",
-    "content-hash": "df8eab3b351c66a770bca266fd6022ff",
+    "hash": "766a0a6cf9753627aec0864a069bbd3d",
+    "content-hash": "eb82ed3a91bfb5b46f64459f2ab0dfbb",
     "packages": [
         {
             "name": "atk4/core",
-            "version": "1.1.3",
+            "version": "1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/atk4/core.git",
-                "reference": "31ac6f5a31a258f24dc0d1e1c5e1980b6a421582"
+                "reference": "1523070dea1d9b0875a2b475805fdb6720b9b9c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/atk4/core/zipball/31ac6f5a31a258f24dc0d1e1c5e1980b6a421582",
-                "reference": "31ac6f5a31a258f24dc0d1e1c5e1980b6a421582",
+                "url": "https://api.github.com/repos/atk4/core/zipball/1523070dea1d9b0875a2b475805fdb6720b9b9c8",
+                "reference": "1523070dea1d9b0875a2b475805fdb6720b9b9c8",
                 "shasum": ""
             },
             "require": {
@@ -53,7 +53,7 @@
                 "php",
                 "trains"
             ],
-            "time": "2016-07-20 04:15:32"
+            "time": "2016-09-22 05:03:23"
         }
     ],
     "packages-dev": [
@@ -262,6 +262,7 @@
                 "rest",
                 "web service"
             ],
+            "abandoned": "guzzlehttp/guzzle",
             "time": "2015-03-18 18:23:50"
         },
         {
@@ -900,22 +901,30 @@
         },
         {
             "name": "psr/log",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b"
+                "reference": "5277094ed527a1c4477177d102fe4c53551953e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/fe0936ee26643249e916849d48e3a51d5f5e278b",
-                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/5277094ed527a1c4477177d102fe4c53551953e0",
+                "reference": "5277094ed527a1c4477177d102fe4c53551953e0",
                 "shasum": ""
             },
+            "require": {
+                "php": ">=5.3.0"
+            },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
-                "psr-0": {
-                    "Psr\\Log\\": ""
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -929,12 +938,13 @@
                 }
             ],
             "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
             "keywords": [
                 "log",
                 "psr",
                 "psr-3"
             ],
-            "time": "2012-12-21 11:40:51"
+            "time": "2016-09-19 16:02:08"
         },
         {
             "name": "satooshi/php-coveralls",
@@ -1481,7 +1491,7 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v2.8.10",
+            "version": "v2.8.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
