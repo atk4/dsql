@@ -22,8 +22,8 @@ after_script:
 
 script:
     - if [[ ${TRAVIS_PHP_VERSION:0:3} != "7.0" ]]; then NC="--no-coverage"; fi
-    - phpunit $NC
-    - phpunit --configuration phpunit-mysql.xml $NC
+    - ./vendor/phpunit/phpunit/phpunit $NC
+    - ./vendor/phpunit/phpunit/phpunit --configuration phpunit-mysql.xml $NC
 
 notifications:
     urls:
