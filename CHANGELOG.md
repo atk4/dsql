@@ -1,3 +1,7 @@
+## 1.0.10
+
+Clean code, instead of relying on error suppression.
+
 ## 1.0.9
 
 Exception class has been having the same functionality as the one
