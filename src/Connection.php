@@ -160,6 +160,10 @@ class Connection
      * Atomic executes operations within one begin/end transaction, so if
      * the code inside callback will fail, then all of the transaction
      * will be also rolled back.
+     *
+     * @param callable $f
+     *
+     * @return mixed
      */
     public function atomic($f)
     {
