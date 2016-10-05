@@ -450,7 +450,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     $d
                 );
             } elseif (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', '"'.addslashes($val).'"\1', $d);
+                $d = preg_replace('/'.$key.'([^_]|$)/', "'".addslashes($val)."'\\1", $d);
             } elseif ($val === null) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
@@ -458,7 +458,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     $d
                 );
             } else {
-                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\1', $d);
+                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\\1', $d);
             }
 
             $pp[] = $key;

@@ -578,7 +578,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q = $this->q()->table('user')->field($age, 'calculated_age');
 
         $this->assertEquals(
-            "select coalesce(year(now()) - year(birth_date), 18, 'foo', NULL) `calculated_age` from `user` [:c, :b, :a]",
+            "select coalesce(year(now()) - year(birth_date), 18, 'foo', NULL) `calculated_age` from `user`",
             strip_tags($q->getDebugQuery())
         );
     }
