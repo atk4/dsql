@@ -274,13 +274,19 @@ Magic an Debug Methods
     the further execution to :php:meth:`render` will also attempt
     to echo query.
 
-.. php:method:: getDebugQuery()
+.. php:method:: getDebugQuery($html = false)
 
     Outputs query as a string by placing parameters into their respective
     places. The parameters will be escaped, but you should still avoid using
     generated query as it can potentially make you vulnerable to SQL injection.
 
-    This method will use HTML tags to highlight parameters.
+    This method will use HTML formatting if argument is passed.
+
+In order for HTML parsing to work and to make your debug queries
+better formatted, install `sql-formatter`::
+
+    composer require jdorn/sql-formatter
+
 
 Escaping Methods
 ================
