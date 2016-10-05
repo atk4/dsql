@@ -465,7 +465,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (class_exists('SqlFormatter')) {
-            if($html) {
+            if ($html) {
                 $result = \SqlFormatter::format($d);
             } else {
                 $result = \SqlFormatter::format($d, false);
