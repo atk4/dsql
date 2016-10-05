@@ -445,7 +445,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         $d = preg_replace('/`([^`]*)`/', '`<span style="color:black">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', '\'<span style="color:green">'.
+                $d = preg_replace('/'.$key.'([^_]|$)(?![a-z])/', '\'<span style="color:green">'.
                     htmlspecialchars(addslashes($val)).'</span>\'\1', $d);
             } elseif ($val === null) {
                 $d = preg_replace(
