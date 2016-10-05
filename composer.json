@@ -16,6 +16,9 @@
         "php": ">=5.5.0",
         "atk4/core": "~1.1.3"
     },
+    "suggest": {
+         "jdorn/sql-formatter": "*"
+    },
     "require-dev": {
         "phpunit/phpunit": "~4.8",
         "phpunit/dbunit": ">=1.2",
