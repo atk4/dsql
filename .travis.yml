@@ -23,7 +23,8 @@ script:
     - ./vendor/bin/phpunit --configuration phpunit-mysql.xml $NC
 
 after_script:
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/test-reporter; fi
+    # - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/test-reporter; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then phpdbg -qrr ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml; fi
 
 notifications:
     urls:
