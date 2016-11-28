@@ -19,6 +19,6 @@
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-php" target="build/logs/cov_2.cov"/>
+        <log type="coverage-php" target="/tmp/coverage/coverage_mysql.cov"/>
     </logging>
 </phpunit>

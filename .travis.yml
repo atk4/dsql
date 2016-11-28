@@ -28,7 +28,7 @@ script:
 
 after_script:
     #- if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/test-reporter; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/phpcov merge build/logs/ --clover /build/logs/clover.xml; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/phpcov merge /tmp/coverage/ --clover /build/logs/clover.xml; fi
 
 notifications:
     urls:
