@@ -3,27 +3,27 @@ language: php
 php:
     - '5.5'
     - '5.6'
-    - '7.0.11'
+    - '7.0'
 
 cache:
   directories:
     - $HOME/.composer/cache
 
-
 services:
     - mysql
 
 before_script:
-    - composer install
+    - composer self-update
+    - composer install --no-ansi
     - mysql -e 'create database dsql_test;'
-
-after_script:
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/test-reporter; fi
 
 script:
     - if [[ ${TRAVIS_PHP_VERSION:0:3} != "7.0" ]]; then NC="--no-coverage"; fi
-    - ./vendor/phpunit/phpunit/phpunit $NC
-    - ./vendor/phpunit/phpunit/phpunit --configuration phpunit-mysql.xml $NC
+    - ./vendor/bin/phpunit $NC
+    - ./vendor/bin/phpunit --configuration phpunit-mysql.xml $NC
+
+after_script:
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/test-reporter; fi
 
 notifications:
     urls:
