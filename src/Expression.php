@@ -437,7 +437,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * Ignore false positive warnings of PHPMD
      *
-     * @SuppressWarnings(PHPMD.CleanCode.StaticAccess)
+     * @SuppressWarnings(PHPMD.StaticAccess)
      *
      * @param bool $html Show as HTML?
      *
