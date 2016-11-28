@@ -435,7 +435,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Return formatted debug output.
      *
-     * Ignore false positive warnings of PHPMD
+     * Ignore false positive warnings of PHPMD.
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      *
