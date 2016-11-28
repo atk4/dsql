@@ -23,11 +23,12 @@ script:
     #- ./vendor/bin/phpunit --configuration phpunit-mysql.xml $NC
     - if [[ ${TRAVIS_PHP_VERSION:0:3} != "7.0" ]]; then ./vendor/bin/phpunit --no-coverage; fi
     - if [[ ${TRAVIS_PHP_VERSION:0:3} != "7.0" ]]; then ./vendor/bin/phpunit --configuration phpunit-mysql.xml --no-coverage; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then phpdbg -qrr ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then phpdbg -qrr ./vendor/bin/phpunit --configuration phpunit-mysql.xml --coverage-clover build/logs/clover.xml; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then phpdbg -qrr ./vendor/bin/phpunit; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then phpdbg -qrr ./vendor/bin/phpunit --configuration phpunit-mysql.xml; fi
 
 after_script:
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/test-reporter; fi
+    #- if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/test-reporter; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then vendor/bin/phpcov merge build/logs/ --clover /build/logs/clover.xml; fi
 
 notifications:
     urls:
