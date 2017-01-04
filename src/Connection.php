@@ -36,6 +36,13 @@ class Connection
      */
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
+        if ($dsn instanceof \PDO) {
+            return new self(array_merge([
+                    'connection'  => $dsn,
+                    'query_class' => 'atk4\dsql\Query_MySQL',
+                ], $args));
+        }
+
         if (strpos($dsn, ':') === false) {
             throw new Exception([
                 "Your DSN format is invalid. Must be in 'driver:host:options' format",
@@ -160,10 +167,6 @@ class Connection
      * Atomic executes operations within one begin/end transaction, so if
      * the code inside callback will fail, then all of the transaction
      * will be also rolled back.
-     *
-     * @param callable $f
-     *
-     * @return mixed
      */
     public function atomic($f)
     {

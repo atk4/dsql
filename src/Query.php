@@ -884,7 +884,7 @@ class Query extends Expression
 
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as list($field, $value)) {
+            foreach ($this->args['set'] as list($field/*, $value*/)) {
                 $field = $this->_consume($field, 'escape');
 
                 $ret[] = $field;
@@ -905,7 +905,7 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as list($field, $value)) {
+            foreach ($this->args['set'] as list(/*$field*/, $value)) {
                 $value = $this->_consume($value, 'param');
 
                 $ret[] = $value;

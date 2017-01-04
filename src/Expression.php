@@ -435,9 +435,15 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Return formatted debug output.
      *
+     * Ignore false positive warnings of PHPMD.
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     *
+     * @param bool $html Show as HTML?
+     *
      * @return string SQL syntax of query
      */
-    public function getDebugQuery($html = false)
+    public function getDebugQuery($html = null)
     {
         $d = $this->render();
 
@@ -475,7 +481,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (!$html) {
-            return strip_tags($result);
+            return strip_tags($result, '<>');
         }
 
         return $result;
