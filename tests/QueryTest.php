@@ -1213,7 +1213,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->render()
         );
 
-
         $user_ids = $this->q()->table('expired_users')->field('user_id');
 
         $this->assertEquals(

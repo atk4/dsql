@@ -552,7 +552,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-
 // @codingStandardsIgnoreStart
 class JsonExpression extends Expression
 {
