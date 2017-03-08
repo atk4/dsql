@@ -477,7 +477,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $result = $d;  // output as-is
         }
         if (!$html) {
-            return strip_tags($result, '<>');
+            return str_replace('#lte#', '<=', strip_tags(str_replace('<=', '#lte#',$result), '<>'));
         }
 
         return $result;
