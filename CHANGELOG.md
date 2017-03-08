@@ -1,3 +1,7 @@
+## 1.1.1
+
+Bugfix and README.md update.
+
 ## 1.1.0
 
 This version now officially supports PHP 7.1, as well as adding
