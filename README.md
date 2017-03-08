@@ -32,7 +32,7 @@ DSQL has been in production since 2006, initially included in [AModules2](https:
 
 ## DSQL Is Simple and Powerful
 
-```
+``` php
 $query = new atk4\dsql\Query();
 $query  ->table('employees')
         ->where('birth_date','1961-05-02')
@@ -43,7 +43,7 @@ echo "Employees born on May 2, 1961: ".$query->getOne();
 
 If the basic query is not fun, how about more complex one?
 
-```
+``` php
 // Estabish a query looking for a maximum salary
 $salary = new atk4\dsql\Query(['connection'=>$pdo]);
 
@@ -82,7 +82,7 @@ foreach ($salary as $row) {
 
 This builds and executes a single query that looks like this:
 
-```
+``` sql
 SELECT
     `emp_no`,
     max(salary) `max_salary`,
