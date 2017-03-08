@@ -103,8 +103,6 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
-
-
         // without transaction, ignoring exceptions
         try {
             $this->q('employee')
@@ -122,8 +120,6 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
-
-
         // 1-level transaction: begin, insert, 2, rollback, 1
         $this->c->beginTransaction();
         $this->q('employee')
@@ -139,8 +135,6 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             1,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
-
-
 
         // atomic method, rolls back everything inside atomic() callback in case of exception
         try {
@@ -160,8 +154,6 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             1,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
-
-
 
         // atomic method, nested atomic transaction, rolls back everything
         try {
@@ -193,8 +185,6 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
-
-
         // atomic method, nested atomic transaction, rolls back everything
         try {
             $this->c->atomic(function () {
@@ -222,8 +212,6 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
-
-
         // atomic method, nested atomic transaction, rolls back everything
         try {
             $this->c->atomic(function () {
@@ -250,8 +238,6 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             1,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
-
-
 
         // atomic method, success - commit
         try {

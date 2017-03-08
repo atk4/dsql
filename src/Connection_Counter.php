@@ -39,8 +39,6 @@ class Connection_Counter extends Connection_Proxy
 
         $ret = parent::execute($expr);
 
-
-
         return $this->iterate($ret);
     }
 

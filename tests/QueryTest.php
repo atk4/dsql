@@ -578,7 +578,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $q = $this->q()->table('user')->field($age, 'calculated_age');
 
         $this->assertEquals(
-            "select coalesce(year(now()) - year(birth_date), 18, 'foo', NULL) `calculated_age` from `user` [:c, :b, :a]",
+            "select coalesce(year(now()) - year(birth_date), 18, 'foo', NULL) `calculated_age` from `user`",
             strip_tags($q->getDebugQuery())
         );
     }
@@ -1212,7 +1212,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->field('name')->table('employee')->where('employee.a', 1)
                 ->render()
         );
-
 
         $user_ids = $this->q()->table('expired_users')->field('user_id');
 

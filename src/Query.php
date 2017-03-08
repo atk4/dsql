@@ -80,7 +80,6 @@ class Query extends Expression
      */
     protected $main_table = null;
 
-
     // {{{ Field specification and rendering
 
     /**
@@ -472,8 +471,6 @@ class Query extends Expression
     }
 
     // }}}
-
-
 
     // {{{ where() and having() specification and rendering
 
@@ -882,9 +879,8 @@ class Query extends Expression
         // will be joined for output
         $ret = [];
 
-
         if ($this->args['set']) {
-            foreach ($this->args['set'] as list($field, $value)) {
+            foreach ($this->args['set'] as list($field/*, $value*/)) {
                 $field = $this->_consume($field, 'escape');
 
                 $ret[] = $field;
@@ -905,7 +901,7 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as list($field, $value)) {
+            foreach ($this->args['set'] as list(/*$field*/, $value)) {
                 $value = $this->_consume($value, 'param');
 
                 $ret[] = $value;

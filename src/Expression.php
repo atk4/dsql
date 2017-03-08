@@ -435,41 +435,49 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Return formatted debug output.
      *
+     * Ignore false positive warnings of PHPMD.
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     *
+     * @param bool $html Show as HTML?
+     *
      * @return string SQL syntax of query
      */
-    public function getDebugQuery($html = false)
+    public function getDebugQuery($html = null)
     {
         $d = $this->render();
-
         $pp = [];
-        $d = preg_replace('/`([^`]*)`/', '`<span style="color:black">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
-            if (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', '\'<span style="color:green">'.
-                    htmlspecialchars(addslashes($val)).'</span>\'\1', $d);
+            if (is_numeric($val)) {
+                $d = preg_replace(
+                    '/'.$key.'([^_]|$)/',
+                    $val.'\1',
+                    $d
+                );
+            } elseif (is_string($val)) {
+                $d = preg_replace('/'.$key.'([^_]|$)/', "'".addslashes($val)."'\\1", $d);
             } elseif ($val === null) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
-                    '<span style="color:black">NULL</span>\1',
-                    $d
-                );
-            } elseif (is_numeric($val)) {
-                $d = preg_replace(
-                    '/'.$key.'([^_]|$)/',
-                    '<span style="color:red">'.$val.'</span>\1',
+                    'NULL\1',
                     $d
                 );
             } else {
-                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\1', $d);
+                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\\1', $d);
             }
-
             $pp[] = $key;
         }
-
-        $result = $d.' <span style="color:gray">['.implode(', ', $pp).']</span>';
-
+        if (class_exists('SqlFormatter')) {
+            if ($html) {
+                $result = \SqlFormatter::format($d);
+            } else {
+                $result = \SqlFormatter::format($d, false);
+            }
+        } else {
+            $result = $d;  // output as-is
+        }
         if (!$html) {
-            return strip_tags($result);
+            return strip_tags($result, '<>');
         }
 
         return $result;

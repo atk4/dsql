@@ -1,3 +1,17 @@
+## 1.1.0
+
+This version now officially supports PHP 7.1, as well as adding
+optional dependency for SQL formatter (credit to
+[https://github.com/jdorn/sql-formatter](jdorn)). When running
+getDebugQuery(true) you'll be getting a well formatted and
+justified SQL query.
+
+If after upgrading to 1.1.* branch your application complains
+about missing class "SqlFormatter", then your autoloader is
+not configured correctly and as a work-around you would need to:
+
+ > composer require jdorn/sql-formatter
+
 ## 1.0.10
 
 Clean code, instead of relying on error suppression.

@@ -210,19 +210,19 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals(
-            '++1 and --2 [:b, :a]',
+            '++1 and --2',
             strip_tags($e1->getDebugQuery())
         );
 
         $e2 = $this->e('=== [foo] ===', ['foo' => $e1]);
 
         $this->assertEquals(
-            '=== ++1 and --2 === [:b, :a]',
+            '=== ++1 and --2 ===',
             strip_tags($e2->getDebugQuery())
         );
 
         $this->assertEquals(
-            '++1 and --2 [:b, :a]',
+            '++1 and --2',
             strip_tags($e1->getDebugQuery())
         );
     }
@@ -464,7 +464,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $e = $this->e('[], []');
         $e[] = 'Hello';
         $e[] = 'World';
-        $this->assertEquals("'Hello', 'World' [:b, :a]", strip_tags($e->getDebugQuery()));
+        $this->assertEquals("'Hello', 'World'", strip_tags($e->getDebugQuery()));
 
         // real-life example
         $age = $this->e('coalesce([age], [default_age])');
@@ -551,7 +551,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
-
 
 // @codingStandardsIgnoreStart
 class JsonExpression extends Expression

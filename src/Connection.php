@@ -36,6 +36,13 @@ class Connection
      */
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
+        if ($dsn instanceof \PDO) {
+            return new self(array_merge([
+                    'connection'  => $dsn,
+                    'query_class' => 'atk4\dsql\Query_MySQL',
+                ], $args));
+        }
+
         if (strpos($dsn, ':') === false) {
             throw new Exception([
                 "Your DSN format is invalid. Must be in 'driver:host:options' format",
