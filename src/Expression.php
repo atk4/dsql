@@ -444,7 +444,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         $d = $this->render();
 
         $pp = [];
-        $d = str_replace(['<','>'], ['#less#','#more#'], $d);
+        $d = str_replace(['<', '>'], ['#less#', '#more#'], $d);
         $d = preg_replace('/`([^`]*)`/', '`<span style="color:#000">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_string($val)) {
@@ -475,7 +475,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $result = strip_tags($result);
         }
 
-        $result = str_replace(['#less#','#more#'], ['<','>'], $result);
+        $result = str_replace(['#less#', '#more#'], ['<', '>'], $result);
 
         return $result;
     }
