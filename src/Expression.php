@@ -435,54 +435,47 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Return formatted debug output.
      *
-     * Ignore false positive warnings of PHPMD.
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     *
-     * @param bool $html Show as HTML?
+     * @param bool $html Should we output HTML formatted debug info
      *
      * @return string SQL syntax of query
      */
-    public function getDebugQuery($html = null)
+    public function getDebugQuery($html = false)
     {
         $d = $this->render();
 
         $pp = [];
+        $d = str_replace(['<','>'], ['#less#','#more#'], $d);
+        $d = preg_replace('/`([^`]*)`/', '`<span style="color:#000">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
-            if (is_numeric($val)) {
-                $d = preg_replace(
-                    '/'.$key.'([^_]|$)/',
-                    $val.'\1',
-                    $d
-                );
-            } elseif (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', "'".addslashes($val)."'\\1", $d);
+            if (is_string($val)) {
+                $d = preg_replace('/'.$key.'([^_]|$)/', '\'<span style="color:#0f0">'.
+                    htmlspecialchars(addslashes($val)).'</span>\'\1', $d);
             } elseif ($val === null) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
-                    'NULL\1',
+                    '<span style="color:#000">NULL</span>\1',
+                    $d
+                );
+            } elseif (is_numeric($val)) {
+                $d = preg_replace(
+                    '/'.$key.'([^_]|$)/',
+                    '<span style="color:#f00">'.$val.'</span>\1',
                     $d
                 );
             } else {
-                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\\1', $d);
+                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\1', $d);
             }
 
             $pp[] = $key;
         }
 
-        if (class_exists('SqlFormatter')) {
-            if ($html) {
-                $result = \SqlFormatter::format($d);
-            } else {
-                $result = \SqlFormatter::format($d, false);
-            }
-        } else {
-            $result = $d;  // output as-is
-        }
+        $result = $d.' <span style="color:#888">['.implode(', ', $pp).']</span>';
 
         if (!$html) {
-            return strip_tags($result, '<>');
+            $result = strip_tags($result);
         }
+
+        $result = str_replace(['#less#','#more#'], ['<','>'], $result);
 
         return $result;
     }
