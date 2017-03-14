@@ -1220,7 +1220,7 @@ class Query extends Expression
      */
     public function dsql($properties = [])
     {
-        $q = new self($properties);
+        $q = new static($properties);
         $q->connection = $this->connection;
 
         return $q;
