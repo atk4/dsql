@@ -20,7 +20,7 @@
          "jdorn/sql-formatter": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.8|~5.2",
+        "phpunit/phpunit": "^5.0",
         "phpunit/dbunit": ">=1.2",
         "phpunit/phpcov": "*",
         "codeclimate/php-test-reporter": "*"
