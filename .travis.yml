@@ -20,9 +20,8 @@ before_script:
     - mkdir -p build/logs
 
 script:
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then CM="phpdbg -qrr"; NC=""; else CM=""; NC="--no-coverage"; fi
-    # if above segfaults, use this:
-    #- if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then CM=""; NC=""; else CM=""; NC="--no-coverage"; fi
+    #- if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then CM="phpdbg -qrr"; NC=""; else CM=""; NC="--no-coverage"; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then CM=""; NC=""; else CM=""; NC="--no-coverage"; fi
     - $CM ./vendor/bin/phpunit $NC
     - $CM ./vendor/bin/phpunit --configuration phpunit-mysql.xml $NC
 
