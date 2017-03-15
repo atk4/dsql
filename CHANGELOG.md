@@ -1,3 +1,8 @@
+## 1.1.2
+
+ - Fix how getDebugQuery() works without sql-formatter
+ - Fix Query::dsql will return instance of same class if you extend. #116
+
 ## 1.1.1
 
 Bugfix and README.md update.

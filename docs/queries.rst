@@ -564,6 +564,14 @@ The third argument specifies type of join and defaults to "left" join. You can s
 
 Method can be executed several times on the same Query object.
 
+Joining on expression
+`````````````````````
+
+For a more complex join conditions, you can pass second argument as expression::
+
+    $q->table('user', 'u');
+    $q->join('address a', new Expression('a.name like u.pattern'));
+
 
 Limiting result-set
 -------------------
