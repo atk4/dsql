@@ -58,7 +58,7 @@ composer update
 echo "Press enter to publish the release"
 read junk
 
-git commit -m "Added release notes for $version" CHANGELOG.md
+git commit -m "Added release notes for $version" CHANGELOG.md || echo "but its ok"
 merge_tag=$(git rev-parse HEAD)
 
 git commit -m "Set up stable dependencies for $version" composer.json
