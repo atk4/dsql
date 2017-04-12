@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Dynamic SQL Builder in PHP",
     "keywords": ["framework", "sql", "builder", "orm"],
-    "homepage": "http://agiletoolkit.org/dsql/",
+    "homepage": "http://agiletoolkit.org/",
     "license": "MIT",
     "authors": [
         {
