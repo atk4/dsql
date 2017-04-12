@@ -24,6 +24,7 @@ read version
 function finish {
   git checkout develop
   git branch -d release/$version
+  git checkout composer.json
 }
 trap finish EXIT
 
@@ -52,7 +53,7 @@ open "https://github.com/atk4/$product/compare/$prev_version...develop"
 composer require atk4/core
 
 composer update
-/vendor/phpunit/phpunit/phpunit  --no-coverage
+./vendor/phpunit/phpunit/phpunit  --no-coverage
 
 echo "Press enter to publish the release"
 read junk
