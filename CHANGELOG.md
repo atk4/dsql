@@ -1,3 +1,7 @@
+## 1.1.3
+
+- Added release script
+
 ## 1.1.2
 
  - Fix how getDebugQuery() works without sql-formatter
