@@ -23,7 +23,7 @@ read version
 
 function finish {
   git checkout develop
-  git branch -d release/$version
+  git branch -D release/$version
   git checkout composer.json
 }
 trap finish EXIT
@@ -70,5 +70,12 @@ git push --tags
 git checkout develop
 git merge $merge_tag --no-edit
 git push
+
+echo '=[ SUCCESS ]================================================'
+echo "Released atk4/$product Version $version"
+echo '============================================================'
+echo
+
+open https://github.com/atk4/$product/releases/tag/$version
 
 # do we care about master branch? nah
