@@ -2,6 +2,8 @@
 
 set -e
 
+product='dsql'
+
 
 check=$(git symbolic-ref HEAD | cut -d / -f3)
 if [ $check != "develop" ]; then
@@ -27,6 +29,7 @@ trap finish EXIT
 
 # Create temporary branch (local only)
 git branch release/$version
+git checkout release/$version
 
 # Find out previous version
 prev_version=$(git log --tags --simplify-by-decoration --pretty="format:%d" | head -1 | grep -Eo '[0-9\.]+')
@@ -43,20 +46,21 @@ git log --pretty=full $prev_version... | grep '#[0-9]*' | sed 's/#\([0-9]*\)/\1/
     ghi --color show $i | head -50
 done
 
-open "https://github.com/atk4/dsql/compare/$prev_version...develop"
+open "https://github.com/atk4/$product/compare/$prev_version...develop"
 
 # Update dependency versions
 composer require atk4/core
 
 composer update
-phpunit --no-coverage
+/vendor/phpunit/phpunit/phpunit  --no-coverage
 
 echo "Press enter to publish the release"
+read junk
+
 git commit -m "Added release notes for $version" CHANGELOG.md
 merge_tag=$(git rev-parse HEAD)
 
-git add composer.json
-git commit -m "Set up stable dependencies for $version" CHANGELOG.md
+git commit -m "Set up stable dependencies for $version" composer.json
 
 git tag $version
 git push origin release/$version
