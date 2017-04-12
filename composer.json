@@ -12,11 +12,9 @@
             "homepage": "https://nearly.guru/"
         }
     ],
-    "minimum-stability": "dev",
-    "prefer-stable" : true,
     "require": {
         "php": ">=5.5.0",
-        "atk4/core": "*"
+        "atk4/core": "dev-master"
     },
     "suggest": {
          "jdorn/sql-formatter": "*"
