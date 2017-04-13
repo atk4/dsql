@@ -1,3 +1,7 @@
+## 1.1.4
+
+- Migrate to Agile Core 1.2
+
 ## 1.1.3
 
 - Added release script
