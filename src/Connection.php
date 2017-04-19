@@ -18,7 +18,7 @@ class Connection
     /** @var string Expression classname */
     protected $expression_class = 'atk4\dsql\Expression';
 
-    /** @var Connection|\PDO Connection or PDO object */
+    /** @var Connection Connection object */
     protected $connection = null;
 
     /** @var int Current depth of transaction */
@@ -137,9 +137,9 @@ class Connection
     }
 
     /**
-     * Returns Connection or PDO object.
+     * Returns Connection object.
      *
-     * @return Connection|\PDO
+     * @return Connection
      */
     public function connection()
     {
@@ -186,8 +186,9 @@ class Connection
      * Starts new transaction.
      *
      * Database driver supports statements for starting and committing
-     * transactions. Unfortunatelly most of them don't allow to nest
-     * transactions and commit gradually.
+     * transactions.
+     * Unfortunatelly most of them don't allow to nest transactions and commit
+     * gradually.
      * With this method you have some implementation of nested transactions.
      *
      * When you call it for the first time it will begin transaction. If you
@@ -202,14 +203,41 @@ class Connection
      */
     public function beginTransaction()
     {
-        // transaction starts only if it was not started before
-        $r = $this->inTransaction()
-            ? false
-            : $this->connection->beginTransaction();
-
         ++$this->transaction_depth;
 
-        return $r;
+        // transaction starts only if it was not started before
+        if ($this->transaction_depth == 1) {
+            return $this->connection->beginTransaction();
+        }
+
+        return false;
+    }
+
+    /**
+     * Commits transaction.
+     *
+     * Each occurance of beginTransaction() must be matched with commit().
+     * Only when same amount of commits are executed, the actual commit will be
+     * issued to the database.
+     *
+     * @see beginTransaction()
+     *
+     * @return mixed Don't rely on any meaningful return
+     */
+    public function commit()
+    {
+        --$this->transaction_depth;
+
+        // This means we rolled something back and now we lost track of commits
+        if ($this->transaction_depth < 0) {
+            $this->transaction_depth = 0;
+        }
+
+        if ($this->transaction_depth == 0) {
+            return $this->connection->commit();
+        }
+
+        return false;
     }
 
     /**
@@ -228,33 +256,6 @@ class Connection
     }
 
     /**
-     * Commits transaction.
-     *
-     * Each occurance of beginTransaction() must be matched with commit().
-     * Only when same amount of commits are executed, the actual commit will be
-     * issued to the database.
-     *
-     * @see beginTransaction()
-     *
-     * @return mixed Don't rely on any meaningful return
-     */
-    public function commit()
-    {
-        // check if transaction is actually started
-        if (!$this->inTransaction()) {
-            throw new Exception('Using commit() when no transaction has started');
-        }
-
-        --$this->transaction_depth;
-
-        if ($this->transaction_depth == 0) {
-            return $this->connection->commit();
-        }
-
-        return false;
-    }
-
-    /**
      * Rollbacks queries since beginTransaction and resets transaction depth.
      *
      * @see beginTransaction()
@@ -263,12 +264,12 @@ class Connection
      */
     public function rollBack()
     {
-        // check if transaction is actually started
-        if (!$this->inTransaction()) {
-            throw new Exception('Using rollBack() when no transaction has started');
-        }
-
         --$this->transaction_depth;
+
+        // This means we rolled something back and now we lost track of commits
+        if ($this->transaction_depth < 0) {
+            $this->transaction_depth = 0;
+        }
 
         if ($this->transaction_depth == 0) {
             return $this->connection->rollBack();
