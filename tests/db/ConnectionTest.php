@@ -38,5 +38,5 @@ class HelloWorldConnection extends Connection
         }
     }
 
-// @codingStandardsIgnoreEnd
+    // @codingStandardsIgnoreEnd
 }

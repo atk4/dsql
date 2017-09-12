@@ -17,6 +17,7 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
     public function testException1()
     {
         $this->setExpectedException('atk4\dsql\Exception');
+
         throw new \atk4\dsql\Exception();
     }
 
