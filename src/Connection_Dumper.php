@@ -15,6 +15,7 @@ class Connection_Dumper extends Connection_Proxy
     public function execute(Expression $expr)
     {
         $this->start_time = microtime(true);
+
         try {
             $ret = parent::execute($expr);
             $took = microtime(true) - $this->start_time;
@@ -32,6 +33,7 @@ class Connection_Dumper extends Connection_Proxy
             } else {
                 printf("[ERROR %02.6f] %s\n", $took, $expr->getDebugQuery());
             }
+
             throw $e;
         }
 
