@@ -1,3 +1,7 @@
+## 1.1.5
+
+- Migrate to Agile Core 1.3
+
 ## 1.1.4
 
 - Migrate to Agile Core 1.2
