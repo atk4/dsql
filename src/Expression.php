@@ -57,7 +57,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * When you are willing to execute the query, connection needs to be specified.
      * By default this is PDO object.
      *
-     * @var PDO
+     * @var PDO|Connection
      */
     public $connection = null;
 
