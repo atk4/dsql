@@ -209,7 +209,7 @@ class Connection
             ? false
             : $this->connection->beginTransaction();
 
-        ++$this->transaction_depth;
+        $this->transaction_depth++;
 
         return $r;
     }
@@ -247,7 +247,7 @@ class Connection
             throw new Exception('Using commit() when no transaction has started');
         }
 
-        --$this->transaction_depth;
+        $this->transaction_depth--;
 
         if ($this->transaction_depth == 0) {
             return $this->connection->commit();
@@ -270,7 +270,7 @@ class Connection
             throw new Exception('Using rollBack() when no transaction has started');
         }
 
-        --$this->transaction_depth;
+        $this->transaction_depth--;
 
         if ($this->transaction_depth == 0) {
             return $this->connection->rollBack();
