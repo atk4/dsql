@@ -506,7 +506,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Execute expression.
      *
-     * @param PDO $connection
+     * @param PDO|Connection $connection
      *
      * @return PDOStatement
      */
