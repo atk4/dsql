@@ -51,6 +51,20 @@ class Connection
         }
         list($driver, $rest) = explode(':', $dsn, 2);
 
+        // Try to dissect DSN into parts
+        if (is_array($dsn)) {
+            $parts = $dsn;
+        } else {
+            $parts = parse_url($dsn);
+        }
+        // If parts are usable, convert DSN format
+        if ($parts !== false && isset($parts['host']) && isset($parts['path']) && $user === null && $password === null) {
+            // DSN is using URL-like format, so we need to convert it
+            $dsn = $parts['scheme'].':host='.$parts['host'].';dbname='.substr($parts['path'], 1);
+            $user = $parts['user'];
+            $password = $parts['pass'];
+        }
+
         switch (strtolower($driver)) {
             case 'mysql':
                 return new self(array_merge([
