@@ -584,9 +584,26 @@ class Query extends Expression
                 $this->args[$kind][] = [$field];
                 break;
             case 2:
+                if (is_object($cond) && !$cond instanceof Expressionable && !$cond instanceof Expression) {
+                    throw new Exception([
+                        'Value cannot be converted to SQL-compatible expression', 
+                        'field'=>$field,
+                        'value'=>$cond,
+                    ]);
+                }
+
                 $this->args[$kind][] = [$field, $cond];
                 break;
             case 3:
+                if (is_object($value) && !$value instanceof Expressionable && !$value instanceof Expression) {
+                    throw new Exception([
+                        'Value cannot be converted to SQL-compatible expression', 
+                        'field'=>$field,
+                        'cond'=>$cond,
+                        'value'=>$value,
+                    ]);
+                }
+
                 $this->args[$kind][] = [$field, $cond, $value];
                 break;
         }
