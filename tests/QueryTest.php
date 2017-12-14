@@ -806,6 +806,39 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Verify that passing garbage to where throw exception.
+     *
+     * @covers ::order
+     * @expectedException Exception
+     */
+    public function testWhereIncompatibleObject1()
+    {
+        $this->q('[where]')->where('a', new \DateTime())->render();
+    }
+
+    /**
+     * Verify that passing garbage to where throw exception.
+     *
+     * @covers ::order
+     * @expectedException Exception
+     */
+    public function testWhereIncompatibleObject2()
+    {
+        $this->q('[where]')->where('a', new \DateTime());
+    }
+
+    /**
+     * Verify that passing garbage to where throw exception.
+     *
+     * @covers ::order
+     * @expectedException Exception
+     */
+    public function testWhereIncompatibleObject3()
+    {
+        $this->q('[where]')->where('a', '<>', new \DateTime());
+    }
+
+    /**
      * Testing where() with special values - null, array, like.
      *
      * @covers ::where
