@@ -586,9 +586,9 @@ class Query extends Expression
             case 2:
                 if (is_object($cond) && !$cond instanceof Expressionable && !$cond instanceof Expression) {
                     throw new Exception([
-                        'Value cannot be converted to SQL-compatible expression', 
-                        'field'=>$field,
-                        'value'=>$cond,
+                        'Value cannot be converted to SQL-compatible expression',
+                        'field'=> $field,
+                        'value'=> $cond,
                     ]);
                 }
 
@@ -597,10 +597,10 @@ class Query extends Expression
             case 3:
                 if (is_object($value) && !$value instanceof Expressionable && !$value instanceof Expression) {
                     throw new Exception([
-                        'Value cannot be converted to SQL-compatible expression', 
-                        'field'=>$field,
-                        'cond'=>$cond,
-                        'value'=>$value,
+                        'Value cannot be converted to SQL-compatible expression',
+                        'field'=> $field,
+                        'cond' => $cond,
+                        'value'=> $value,
                     ]);
                 }
 

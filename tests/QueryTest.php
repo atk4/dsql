@@ -806,7 +806,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Verify that passing garbage to where throw exception
+     * Verify that passing garbage to where throw exception.
      *
      * @covers ::order
      * @expectedException Exception
@@ -817,7 +817,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Verify that passing garbage to where throw exception
+     * Verify that passing garbage to where throw exception.
      *
      * @covers ::order
      * @expectedException Exception
@@ -828,7 +828,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Verify that passing garbage to where throw exception
+     * Verify that passing garbage to where throw exception.
      *
      * @covers ::order
      * @expectedException Exception
