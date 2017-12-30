@@ -180,7 +180,7 @@ class Query extends Expression
 
             if (is_object($field) && $field instanceof \atk4\data\Field && !$field instanceof Expressionable && !$field instanceof Expression) {
                 // special case for Agile Data Fields, not sure if this is a good code, but some workaround is needed.
-                $ret[] = $field->short_name;
+                $ret[] = $this->_escape($field->short_name);
                 continue;
             }
 
