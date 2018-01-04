@@ -64,7 +64,6 @@ class OracleTest extends \PHPUnit_Framework_TestCase
             'select "baz" "baz_alias" from (select rownum "__dsql_rownum", "baz" from "foo" where "bar" = :a) where "__dsql_rownum">0 and "__dsql_rownum"<=10',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz', 'baz_alias')->limit(10)->render()
         );
-
     }
 
     public function test12cOracleLimit()
