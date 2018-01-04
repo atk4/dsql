@@ -21,7 +21,9 @@ class Query_Oracle12c extends Query_Oracle_Abstract
             ' '.
             ($this->args['limit']['shift'] ? 'OFFSET '.((int) $this->args['limit']['shift']).' ROWS' : '').
             ' '.
-            ($this->args['limit']['cnt'] ? 'FETCH FIRST '.((int) $this->args['limit']['cnt']).' ROWS ONLY' : '');
+            // as per spec 'NEXT' is synonimus 'FIRST', so not bothering with it.
+            // https://docs.oracle.com/javadb/10.8.3.0/ref/rrefsqljoffsetfetch.html
+            ($this->args['limit']['cnt'] ? 'FETCH NEXT '.((int) $this->args['limit']['cnt']).' ROWS ONLY' : '');
 
         return $this->args['limit']['shift'];
     }
