@@ -29,11 +29,11 @@ class OracleTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function connect()
+    public function connect($ver='')
     {
         return new \atk4\dsql\Connection(array_merge([
             'connection'       => new \PDO('sqlite::memory:'),
-            'query_class'      => 'atk4\dsql\Query_Oracle',
+            'query_class'      => 'atk4\dsql\Query_Oracle'.$ver,
             'expression_class' => 'atk4\dsql\Expression_Oracle',
         ]));
     }
@@ -53,6 +53,33 @@ class OracleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'select "baz" from (select __dsql_rownum nrpk, "baz" from "foo" where "bar" = :a) where __dsql_rownum>=0 and __dsql_rownum<10',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10)->render()
+        );
+    }
+
+    public function test12cOracleLimit()
+    {
+        $c = $this->connect('12c');
+        $this->assertEquals(
+            'select "baz" from "foo" where "bar" = :a FETCH FIRST 10 ROWS ONLY',
+            $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10)->render()
+        );
+    }
+
+    public function testClassicOracleSkip()
+    {
+        $c = $this->connect();
+        $this->assertEquals(
+            'select "baz" from (select __dsql_rownum nrpk, "baz" from "foo" where "bar" = :a) where __dsql_rownum>=10',
+            $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(null, 10)->render()
+        );
+    }
+
+    public function test12cOracleSkip()
+    {
+        $c = $this->connect('12c');
+        $this->assertEquals(
+            'select "baz" from "foo" where "bar" = :a OFFSET 10 ROWS',
+            $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(null, 10)->render()
         );
     }
 }
