@@ -15,7 +15,7 @@ class Query_Oracle extends Query
     // [limit] not supported. TODO - add rownum implementation instead
     protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order]';
 
-    protected $template_select_limit = 'select [field] [from] (select[option] __dsql_rownum nrpk, [field] [from] [table][join][where][group][having][order]) where __dsql_rownum>=[limit_start][and_limit_end]';
+    protected $template_select_limit = 'select [field] [from] (select[option] rownum "__dsql_rownum", [field] [from] [table][join][where][group][having][order]) where "__dsql_rownum">=[limit_start][and_limit_end]';
 
     public function limit($cnt, $shift = null)
     {
@@ -36,7 +36,7 @@ class Query_Oracle extends Query
             return '';
         }
 
-        return ' and __dsql_rownum<'.
+        return ' and "__dsql_rownum"<'.
             ((int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']));
     }
 
