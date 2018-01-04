@@ -19,8 +19,10 @@ class Query_Oracle extends Query
     protected $template_select_limit = 'select [field] [from] (select[option] rownum nrpk, [field] [from] [table][join][where][group][having][order]) where nrpk>=[limit_start] and nrpk<[limit_end]';
 
 
-    function limit() {
+    function limit($cnt, $shift = NULL) {
         $this->template_select = $this->template_select_limit;
+
+        return parent::limit($cnt, $shift);
     }
 
     function _render_limit_start()
