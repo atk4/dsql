@@ -80,7 +80,7 @@ class Connection
                 return new self(array_merge([
                     'connection'  => new \PDO($dsn, $user, $password),
                     'query_class' => 'atk4\dsql\Query_Oracle',
-                    // 'expression_class' => 
+                    // 'expression_class' =>
                 ], $args));
             case 'dumper':
                 return new Connection_Dumper(array_merge([
