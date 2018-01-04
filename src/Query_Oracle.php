@@ -15,9 +15,9 @@ class Query_Oracle extends Query
     // [limit] not supported. TODO - add rownum implementation instead
     protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order]';
 
-    protected $template_select_limit = 'select [field] [from] (select[option] __dsql_rownum nrpk, [field] [from] [table][join][where][group][having][order]) where __dsql_rownum>=[limit_start] and __dsql_rownum<[limit_end]';
+    protected $template_select_limit = 'select [field] [from] (select[option] __dsql_rownum nrpk, [field] [from] [table][join][where][group][having][order]) where __dsql_rownum>=[limit_start][and_limit_end]';
 
-    public function limit($cnt, $shift = null)
+    public function limit($cnt, $shift = NULL)
     {
         // This is for pre- 12c version
         $this->template_select = $this->template_select_limit;
@@ -27,12 +27,16 @@ class Query_Oracle extends Query
 
     public function _render_limit_start()
     {
-        return (int) $this->args['limit']['shift'];
+        return (int)$this->args['limit']['shift'];
     }
 
-    public function _render_limit_end()
+    public function _render_and_limit_end()
     {
-        return (int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']);
+        if (!$this->args['limit']['cnt']) {
+            return '';
+        }
+        return ' and __dsql_rownum<'.
+            ((int)($this->args['limit']['cnt'] + $this->args['limit']['shift']));
     }
 
     public function _escape($value)
@@ -43,7 +47,6 @@ class Query_Oracle extends Query
 
         return '"'.$value.'"';
     }
-
     protected function _escapeSoft($value)
     {
         // supports array
