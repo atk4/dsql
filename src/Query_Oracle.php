@@ -40,34 +40,6 @@ class Query_Oracle extends Query_Oracle_Abstract
             ((int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']));
     }
 
-    public function _escape($value)
-    {
-        if (is_array($value)) {
-            return array_map(__METHOD__, $value);
-        }
-
-        return '"'.$value.'"';
-    }
-
-    protected function _escapeSoft($value)
-    {
-        // supports array
-        if (is_array($value)) {
-            return array_map(__METHOD__, $value);
-        }
-
-        // in some cases we should not escape
-        if ($this->isUnescapablePattern($value)) {
-            return $value;
-        }
-
-        if (is_string($value) && strpos($value, '.') !== false) {
-            return implode('.', array_map(__METHOD__, explode('.', $value)));
-        }
-
-        return '"'.trim($value).'"';
-    }
-
     public function field($field, $alias = null)
     {
         // field is passed as string, may contain commas

@@ -68,20 +68,21 @@ class Connection
         switch (strtolower($driver)) {
             case 'mysql':
                 return new self(array_merge([
-                    'connection'  => new \PDO($dsn, $user, $password),
-                    'query_class' => 'atk4\dsql\Query_MySQL',
+                    'connection'       => new \PDO($dsn, $user, $password),
+                    'expression_class' => 'atk4\dsql\Expression_MySQL',
+                    'query_class'      => 'atk4\dsql\Query_MySQL',
                 ], $args));
             case 'sqlite':
                 return new self(array_merge([
-                    'connection'  => new \PDO($dsn, $user, $password),
-                    'query_class' => 'atk4\dsql\Query_SQLite',
+                    'connection'       => new \PDO($dsn, $user, $password),
+                    'expression_class' => 'atk4\dsql\Expression',
+                    'query_class'      => 'atk4\dsql\Query_SQLite',
                 ], $args));
             case 'oci':
                 return new self(array_merge([
                     'connection'       => new \PDO($dsn, $user, $password),
+                    'expression_class' => 'atk4\dsql\Expression',
                     'query_class'      => 'atk4\dsql\Query_Oracle',
-                    'expression_class' => 'atk4\dsql\Expression_Oracle',
-                    // 'expression_class' =>
                 ], $args));
             case 'dumper':
                 return new Connection_Dumper(array_merge([

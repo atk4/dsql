@@ -40,6 +40,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     protected $paramBase = 'a';
 
     /**
+     * Field, table and alias name escaping symbol.
+     * By SQL Standard it's double quote, but MySQL uses backtick.
+     *
+     * @var string
+     */
+    protected $escape_char = '"';
+
+    /**
      * Used for Linking.
      *
      * @var string
@@ -279,8 +287,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Given the string parameter, it will detect some "deal-braker" for our soft escaping, such
-     * as "*" or "(".  Those will typically indicate that expression is passed and shouldn't
+     * Given the string parameter, it will detect some "deal-breaker" for our
+     * soft escaping, such as "*" or "(".
+     * Those will typically indicate that expression is passed and shouldn't
      * be escaped.
      */
     protected function isUnescapablePattern($value)
@@ -288,16 +297,16 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return is_object($value)
             || $value === '*'
             || strpos($value, '(') !== false
-            || strpos($value, '`') !== false;
+            || strpos($value, $this->escape_char) !== false;
     }
 
     /**
      * Soft-escaping SQL identifier. This method will attempt to put
-     * backticks around the identifier, however will not do so if you
-     * are using special characters like ".", "(" or "`".
+     * escaping char around the identifier, however will not do so if you
+     * are using special characters like ".", "(" or escaping char.
      *
      * It will smartly escape table.field type of strings resulting
-     * in `table`.`field`.
+     * in "table"."field".
      *
      * @param mixed $value Any string or array of strings
      *
@@ -319,7 +328,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
-        return '`'.trim($value).'`';
+        return $this->escape_char.trim($value).$this->escape_char;
     }
 
     /**
@@ -355,7 +364,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // in all other cases we should escape
-        return '`'.str_replace('`', '``', $value).'`';
+        return
+            $this->escape_char
+            .str_replace($this->escape_char, $this->escape_char.$this->escape_char, $value)
+            .$this->escape_char;
     }
 
     /**

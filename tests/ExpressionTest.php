@@ -138,7 +138,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('world', $e->params[':a']);
 
         $e = $this->e('hello, {who}', ['who' => 'world']);
-        $this->assertEquals('hello, `world`', $e->render());
+        $this->assertEquals('hello, "world"', $e->render());
         $this->assertEquals([], $e->params);
     }
 
@@ -285,16 +285,16 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     {
         // escaping expressions
         $this->assertEquals(
-            '`first_name`',
+            '"first_name"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['first_name'])
         );
         $this->assertEquals(
-            '`123`',
+            '"123"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [123])
         );
         $this->assertEquals(
-            '`he``llo`',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['he`llo'])
+            '"he""llo"',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['he"llo'])
         );
 
         // should not escape expressions
@@ -303,7 +303,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['*'])
         );
         $this->assertEquals(
-            '`*`',
+            '"*"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['*'])
         );
         $this->assertEquals(
@@ -311,15 +311,15 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['(2+2) age'])
         );
         $this->assertEquals(
-            '`(2+2) age`',
+            '"(2+2) age"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['(2+2) age'])
         );
         $this->assertEquals(
-            '`users`.`first_name`',
+            '"users"."first_name"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['users.first_name'])
         );
         $this->assertEquals(
-            '`users`.*',
+            '"users".*',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['users.*'])
         );
         $this->assertEquals(
@@ -329,27 +329,27 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
         // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
-            ['`first_name`', '*', '`last_name`'],
+            ['"first_name"', '*', '"last_name"'],
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [['first_name', '*', 'last_name']])
         );
 
         // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
-            ['`first_name`', '`*`', '`last_name`'],
+            ['"first_name"', '"*"', '"last_name"'],
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [['first_name', '*', 'last_name']])
         );
 
         $this->assertEquals(
-            '`first_name`',
+            '"first_name"',
             $this->e()->escape('first_name')->render()
         );
         $this->assertEquals(
-            '`first``_name`',
-            $this->e()->escape('first`_name')->render()
+            '"first""_name"',
+            $this->e()->escape('first"_name')->render()
         );
         $this->assertEquals(
-            '`first``_name {}`',
-            $this->e()->escape('first`_name {}')->render()
+            '"first""_name {}"',
+            $this->e()->escape('first"_name {}')->render()
         );
     }
 
@@ -391,7 +391,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     {
         // few brief tests on _consume
         $this->assertEquals(
-            '`123`',
+            '"123"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'escape'])
         );
         $this->assertEquals(
@@ -408,7 +408,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            'hello, `myfield`',
+            'hello, "myfield"',
             $this->e('hello, []', [new MyField()])->render()
         );
     }
@@ -564,7 +564,7 @@ class MyField implements Expressionable
 {
     public function getDSQLExpression($e)
     {
-        return $e->expr('`myfield`');
+        return $e->expr('"myfield"');
     }
 }
 /*
