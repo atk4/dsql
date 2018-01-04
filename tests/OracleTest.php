@@ -60,7 +60,7 @@ class OracleTest extends \PHPUnit_Framework_TestCase
     {
         $c = $this->connect('12c');
         $this->assertEquals(
-            'select "baz" from "foo" where "bar" = :a FETCH FIRST 10 ROWS ONLY',
+            'select "baz" from "foo" where "bar" = :a  FETCH FIRST 10 ROWS ONLY',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10)->render()
         );
     }
@@ -80,6 +80,24 @@ class OracleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'select "baz" from "foo" where "bar" = :a OFFSET 10 ROWS',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(null, 10)->render()
+        );
+    }
+
+    public function testClassicOracleLimitSkip()
+    {
+        $c = $this->connect();
+        $this->assertEquals(
+            'select "baz" from (select __dsql_rownum nrpk, "baz" from "foo" where "bar" = :a) where __dsql_rownum>=99 and __dsql_rownum<109',
+            $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10, 99)->render()
+        );
+    }
+
+    public function test12cOracleLimitSkip()
+    {
+        $c = $this->connect('12c');
+        $this->assertEquals(
+            'select "baz" from "foo" where "bar" = :a OFFSET 99 ROWS FETCH FIRST 10 ROWS ONLY',
+            $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10, 99)->render()
         );
     }
 }

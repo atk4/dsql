@@ -20,6 +20,7 @@ class Query_Oracle12c extends Query
         return
             ' '.
             ($this->args['limit']['shift'] ? 'OFFSET '.((int) $this->args['limit']['shift']).' ROWS' : '').
+            ' '.
             ($this->args['limit']['cnt'] ? 'FETCH FIRST '.((int) $this->args['limit']['cnt']).' ROWS ONLY' : '');
 
         return $this->args['limit']['shift'];
