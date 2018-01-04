@@ -70,7 +70,7 @@ class OracleTest extends \PHPUnit_Framework_TestCase
     {
         $c = $this->connect('12c');
         $this->assertEquals(
-            'select "baz" from "foo" where "bar" = :a  FETCH FIRST 10 ROWS ONLY',
+            'select "baz" from "foo" where "bar" = :a  FETCH NEXT 10 ROWS ONLY',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10)->render()
         );
     }
@@ -106,7 +106,7 @@ class OracleTest extends \PHPUnit_Framework_TestCase
     {
         $c = $this->connect('12c');
         $this->assertEquals(
-            'select "baz" from "foo" where "bar" = :a OFFSET 99 ROWS FETCH FIRST 10 ROWS ONLY',
+            'select "baz" from "foo" where "bar" = :a OFFSET 99 ROWS FETCH NEXT 10 ROWS ONLY',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10, 99)->render()
         );
     }
