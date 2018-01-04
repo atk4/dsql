@@ -19,7 +19,8 @@ class Query_Oracle extends Query
 
     public function limit($cnt, $shift = NULL)
     {
-        $this->template_select = $this->template_select_limit;
+        // This is for pre- 12c version
+        //$this->template_select = $this->template_select_limit;
 
         return parent::limit($cnt, $shift);
     }
@@ -40,6 +41,6 @@ class Query_Oracle extends Query
             return array_map(__METHOD__, $value);
         }
 
-        return $value;
+        return '"'.$value.'"';
     }
 }
