@@ -27,12 +27,12 @@ class Query_Oracle extends Query
 
     public function _render_limit_start()
     {
-        return (int)$this->args['limit']['shift'];
+        return (int) $this->args['limit']['shift'];
     }
 
     public function _render_limit_end()
     {
-        return (int)($this->args['limit']['cnt'] + $this->args['limit']['shift']);
+        return (int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']);
     }
 
     public function _escape($value)
@@ -43,6 +43,7 @@ class Query_Oracle extends Query
 
         return '"'.$value.'"';
     }
+
     protected function _escapeSoft($value)
     {
         // supports array

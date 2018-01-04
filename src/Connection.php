@@ -78,8 +78,8 @@ class Connection
                 ], $args));
             case 'oci':
                 return new self(array_merge([
-                    'connection'  => new \PDO($dsn, $user, $password),
-                    'query_class' => 'atk4\dsql\Query_Oracle',
+                    'connection'       => new \PDO($dsn, $user, $password),
+                    'query_class'      => 'atk4\dsql\Query_Oracle',
                     'expression_class' => 'atk4\dsql\Expression_Oracle',
                     // 'expression_class' =>
                 ], $args));

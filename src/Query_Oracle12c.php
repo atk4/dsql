@@ -17,11 +17,10 @@ class Query_Oracle12c extends Query
 
     public function _render_limit()
     {
-        return 
-            ($this->args['limit']['shift'] ? "OFFSET ".((int)$this->args['limit']['shift'])." ROWS":"").
-            ($this->args['limit']['cnt'] ? "FETCH ".($this->args['limit']['shift']?'NEXT':'FIRST')." ROWS":"").
-            " ONLY";
-
+        return
+            ($this->args['limit']['shift'] ? 'OFFSET '.((int) $this->args['limit']['shift']).' ROWS' : '').
+            ($this->args['limit']['cnt'] ? 'FETCH '.($this->args['limit']['shift'] ? 'NEXT' : 'FIRST').' ROWS' : '').
+            ' ONLY';
 
         return $this->args['limit']['shift'];
     }
@@ -34,6 +33,7 @@ class Query_Oracle12c extends Query
 
         return '"'.$value.'"';
     }
+
     protected function _escapeSoft($value)
     {
         // supports array

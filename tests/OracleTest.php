@@ -32,8 +32,8 @@ class OracleTest extends \PHPUnit_Framework_TestCase
     public function connect()
     {
         return new \atk4\dsql\Connection(array_merge([
-            'connection'  => new \PDO('sqlite::memory:'),
-            'query_class' => 'atk4\dsql\Query_Oracle',
+            'connection'       => new \PDO('sqlite::memory:'),
+            'query_class'      => 'atk4\dsql\Query_Oracle',
             'expression_class' => 'atk4\dsql\Expression_Oracle',
         ]));
     }

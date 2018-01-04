@@ -20,6 +20,7 @@ class Expression_Oracle extends Expression
 
         return '"'.$value.'"';
     }
+
     protected function _escapeSoft($value)
     {
         // supports array
