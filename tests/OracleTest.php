@@ -29,7 +29,7 @@ class OracleTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function connect($ver='')
+    public function connect($ver = '')
     {
         return new \atk4\dsql\Connection(array_merge([
             'connection'       => new \PDO('sqlite::memory:'),

@@ -17,7 +17,7 @@ class Query_Oracle extends Query
 
     protected $template_select_limit = 'select [field] [from] (select[option] __dsql_rownum nrpk, [field] [from] [table][join][where][group][having][order]) where __dsql_rownum>=[limit_start][and_limit_end]';
 
-    public function limit($cnt, $shift = NULL)
+    public function limit($cnt, $shift = null)
     {
         // This is for pre- 12c version
         $this->template_select = $this->template_select_limit;
@@ -27,7 +27,7 @@ class Query_Oracle extends Query
 
     public function _render_limit_start()
     {
-        return (int)$this->args['limit']['shift'];
+        return (int) $this->args['limit']['shift'];
     }
 
     public function _render_and_limit_end()
@@ -35,8 +35,9 @@ class Query_Oracle extends Query
         if (!$this->args['limit']['cnt']) {
             return '';
         }
+
         return ' and __dsql_rownum<'.
-            ((int)($this->args['limit']['cnt'] + $this->args['limit']['shift']));
+            ((int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']));
     }
 
     public function _escape($value)
@@ -47,6 +48,7 @@ class Query_Oracle extends Query
 
         return '"'.$value.'"';
     }
+
     protected function _escapeSoft($value)
     {
         // supports array
