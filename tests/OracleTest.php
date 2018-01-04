@@ -45,6 +45,11 @@ class OracleTest extends \PHPUnit_Framework_TestCase
             'select "baz" from "foo" where "bar" = :a',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->render()
         );
+
+        $this->assertEquals(
+            'select "baz" "ali" from "foo" where "bar" = :a',
+            $c->dsql()->table('foo')->where('bar', 1)->field('baz', 'ali')->render()
+        );
     }
 
     public function testClassicOracleLimit()
