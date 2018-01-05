@@ -458,7 +458,7 @@ class Query extends Expression
     public function _render_join()
     {
         if (!isset($this->args['join'])) {
-            return'';
+            return '';
         }
         $joins = [];
         foreach ($this->args['join'] as $j) {

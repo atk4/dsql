@@ -12,19 +12,24 @@ namespace atk4\dsql;
  */
 class Query_Oracle12c extends Query_Oracle_Abstract
 {
-    // [limit] not supported. TODO - add rownum implementation instead
-    protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order][limit]';
-
+    /**
+     * Renders [limit].
+     *
+     * @return string rendered SQL chunk
+     */
     public function _render_limit()
     {
-        return
-            ' '.
-            ($this->args['limit']['shift'] ? 'OFFSET '.((int) $this->args['limit']['shift']).' ROWS' : '').
-            ' '.
-            // as per spec 'NEXT' is synonimus to 'FIRST', so not bothering with it.
-            // https://docs.oracle.com/javadb/10.8.3.0/ref/rrefsqljoffsetfetch.html
-            ($this->args['limit']['cnt'] ? 'FETCH NEXT '.((int) $this->args['limit']['cnt']).' ROWS ONLY' : '');
+        if (isset($this->args['limit'])) {
+            $cnt = (int) $this->args['limit']['cnt'];
+            $shift = (int) $this->args['limit']['shift'];
 
-        return $this->args['limit']['shift'];
+            return ' ' . trim(
+                ($shift ? 'OFFSET '.$shift.' ROWS' : '').
+                ' '.
+                // as per spec 'NEXT' is synonymous to 'FIRST', so not bothering with it.
+                // https://docs.oracle.com/javadb/10.8.3.0/ref/rrefsqljoffsetfetch.html
+                ($cnt ? 'FETCH NEXT '.$cnt.' ROWS ONLY' : '')
+            );
+        }
     }
 }
