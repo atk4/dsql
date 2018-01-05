@@ -23,7 +23,7 @@ class Query_Oracle12c extends Query_Oracle_Abstract
             $cnt = (int) $this->args['limit']['cnt'];
             $shift = (int) $this->args['limit']['shift'];
 
-            return ' ' . trim(
+            return ' '.trim(
                 ($shift ? 'OFFSET '.$shift.' ROWS' : '').
                 ' '.
                 // as per spec 'NEXT' is synonymous to 'FIRST', so not bothering with it.
