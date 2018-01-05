@@ -12,11 +12,24 @@ namespace atk4\dsql;
  */
 class Query_Oracle extends Query_Oracle_Abstract
 {
-    // [limit] not supported. TODO - add rownum implementation instead
+    /**
+     * SELECT template.
+     *
+     * Default [limit] syntax not supported. Add rownum implementation instead.
+     *
+     * @var string
+     */
     protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order]';
-
     protected $template_select_limit = 'select [field] [from] (select[option] rownum "__dsql_rownum", [field_noalias] [from] [table][join][where][group][having][order]) where "__dsql_rownum">[limit_start][and_limit_end]';
 
+    /**
+     * Limit how many rows will be returned.
+     *
+     * @param int $cnt   Number of rows to return
+     * @param int $shift Offset, how many rows to skip
+     *
+     * @return $this
+     */
     public function limit($cnt, $shift = null)
     {
         // This is for pre- 12c version
@@ -25,11 +38,21 @@ class Query_Oracle extends Query_Oracle_Abstract
         return parent::limit($cnt, $shift);
     }
 
+    /**
+     * Renders [limit_start].
+     *
+     * @return string rendered SQL chunk
+     */
     public function _render_limit_start()
     {
         return (int) $this->args['limit']['shift'];
     }
 
+    /**
+     * Renders [and_limit_end].
+     *
+     * @return string rendered SQL chunk
+     */
     public function _render_and_limit_end()
     {
         if (!$this->args['limit']['cnt']) {
