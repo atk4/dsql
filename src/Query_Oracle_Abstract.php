@@ -12,30 +12,4 @@ namespace atk4\dsql;
  */
 abstract class Query_Oracle_Abstract extends Query
 {
-    protected function _render_field_noalias()
-    {
-        // will be joined for output
-        $ret = [];
-
-        // If no fields were defined, use defaultField
-        if (empty($this->args['field'])) {
-            if ($this->defaultField instanceof Expression) {
-                return $this->_consume($this->defaultField);
-            }
-
-            return (string) $this->defaultField;
-        }
-
-        // process each defined field
-        foreach ($this->args['field'] as $alias => $field) {
-            // Do not use alias
-
-            // Will parameterize the value and backtick if necessary
-            $field = $this->_consume($field, 'soft-escape');
-
-            $ret[] = $field;
-        }
-
-        return implode(',', $ret);
-    }
 }
