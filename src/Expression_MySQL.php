@@ -10,7 +10,7 @@ namespace atk4\dsql;
  * @license MIT
  * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
-class Query_MySQL extends Query
+class Expression_MySQL extends Expression
 {
     /**
      * Field, table and alias name escaping symbol.
@@ -19,11 +19,4 @@ class Query_MySQL extends Query
      * @var string
      */
     protected $escape_char = '`';
-
-    /**
-     * UPDATE template.
-     *
-     * @var string
-     */
-    protected $template_update = 'update [table][join] set [set] [where]';
 }
