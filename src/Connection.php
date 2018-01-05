@@ -52,11 +52,8 @@ class Connection
         list($driver, $rest) = explode(':', $dsn, 2);
 
         // Try to dissect DSN into parts
-        if (is_array($dsn)) {
-            $parts = $dsn;
-        } else {
-            $parts = parse_url($dsn);
-        }
+        $parts = is_array($dsn) ? $dsn : parse_url($dsn);
+
         // If parts are usable, convert DSN format
         if ($parts !== false && isset($parts['host']) && isset($parts['path']) && $user === null && $password === null) {
             // DSN is using URL-like format, so we need to convert it
@@ -75,13 +72,11 @@ class Connection
             case 'sqlite':
                 return new self(array_merge([
                     'connection'       => new \PDO($dsn, $user, $password),
-                    'expression_class' => 'atk4\dsql\Expression',
                     'query_class'      => 'atk4\dsql\Query_SQLite',
                 ], $args));
             case 'oci':
                 return new self(array_merge([
                     'connection'       => new \PDO($dsn, $user, $password),
-                    'expression_class' => 'atk4\dsql\Expression',
                     'query_class'      => 'atk4\dsql\Query_Oracle',
                 ], $args));
             case 'dumper':
