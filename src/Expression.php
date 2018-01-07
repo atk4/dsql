@@ -204,7 +204,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
             return $e;
         }
-        if ($this instanceof Expression) {
+        if ($this instanceof self) {
             $e = new static($properties, $arguments);
             $e->connection = $this->connection;
 
