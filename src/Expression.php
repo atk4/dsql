@@ -189,10 +189,27 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function expr($properties = [], $arguments = null)
     {
-        $e = new self($properties, $arguments);
-        $e->connection = $this->connection;
+        // If we use DSQL Connection, then we should call expr() from there.
+        // Connection->expr() will return correct, connection specific Expression class.
+        if ($this->connection instanceof Connection) {
+            return $this->connection->expr($properties, $arguments);
+        }
 
-        return $e;
+        // Otherwise, connection is probably PDO and we don't know which Expression
+        // class to use, so we make a smart guess :)
+        if ($this instanceof Query) {
+            $e = new self($properties, $arguments);
+            $e->escape_char = $this->escape_char;
+            $e->connection = $this->connection;
+
+            return $e;
+        }
+        if ($this instanceof Expression) {
+            $e = new static($properties, $arguments);
+            $e->connection = $this->connection;
+
+            return $e;
+        }
     }
 
     /**
