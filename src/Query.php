@@ -500,7 +500,7 @@ class Query extends Expression
      *  $q->where('id',1);
      *
      * By default condition implies equality. You can specify a different comparison
-     * operator by eithre including it along with the field or using 3-argument
+     * operator by either including it along with the field or using 3-argument
      * format:
      *  $q->where('id>','1');
      *  $q->where('id','>',1);
@@ -539,7 +539,7 @@ class Query extends Expression
      * @param mixed  $value    Value. Will be quoted unless you pass expression
      * @param string $kind     Do not use directly. Use having()
      * @param string $num_args When $kind is passed, we can't determine number of
-     *                         actual arguments, so this argumen must be specified.
+     *                         actual arguments, so this argument must be specified.
      *
      * @return $this
      */

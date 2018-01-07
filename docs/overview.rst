@@ -12,10 +12,12 @@ a part of other query.
 Goals of DSQL
 =============
 
- - simple and consise syntax
- - consistently scalable (e.g. 5 levels of sub-queries, 10 with joins and 15 parameters? no problem)
+ - simple and concise syntax
+ - consistently scalable (e.g. 5 levels of sub-queries, 10 with joins and 15
+   parameters? no problem)
  - "One Query" paradigm
- - support for PDO vendors as well as NoSQL databases (with query language smilar to SQL)
+ - support for PDO vendors as well as NoSQL databases (with query language
+   similar to SQL)
  - small code footprint (over 50% less than competing frameworks)
  - free, licensed under MIT
  - no dependencies
@@ -53,15 +55,15 @@ grouping, ordering, unions as well as queries on result-set.
 
 DSQL is Part of Agile Toolkit
 =============================
-DSQL is a stand-alone and lightweight library with no dependencies and
-can be used in any PHP project, big or small.
+DSQL is a stand-alone and lightweight library with no dependencies and can be
+used in any PHP project, big or small.
 
 .. figure:: images/agiletoolkit.png
    :alt: Agile Toolkit Stack
 
 DSQL is also a part of `Agile Toolkit`_ framework and works best with
-`Agile Models`_. Your project may benefit from a higher-level data
-abstraction layer, so be sure to look at the rest of the suite.
+`Agile Models`_. Your project may benefit from a higher-level data abstraction
+layer, so be sure to look at the rest of the suite.
 
 .. _Agile Toolkit: http://agiletoolkit.org/
 .. _Agile Models: https://github.com/atk4/models
@@ -103,7 +105,7 @@ After installing, you need to require Composer's autoloader in your PHP file::
 
     require 'vendor/autoload.php';
 
-You can find out more on how to install Composer, configure autoloading, and
+You can find out more on how to install Composer, configure auto-loading, and
 other best-practices for defining dependencies at
 `getcomposer.org <http://getcomposer.org>`_.
 
@@ -111,8 +113,8 @@ other best-practices for defining dependencies at
 Getting Started
 ===============
 
-Continue reading :ref:`quickstart` where you will learn about basics of
-DSQL and how to use it to it's full potential.
+Continue reading :ref:`quickstart` where you will learn about basics of DSQL
+and how to use it to it's full potential.
 
 Contributing
 ============
@@ -126,12 +128,12 @@ Guidelines
 3. All pull requests must include unit tests to ensure the change works as
    expected and to prevent regressions.
 4. All pull requests must include relevant documentation or amend the existing
-   documentaion if necessary.
+   documentation if necessary.
 
 Review and Approval
 -------------------
 
-1. All code must be submitted through pull requests on Github
+1. All code must be submitted through pull requests on GitHub
 2. Any of the project managers may Merge your pull request, but it must not be
    the same person who initiated the pull request.
 
@@ -169,16 +171,16 @@ Look inside these the .xml files for further information and connection details.
 Reporting a security vulnerability
 ==================================
 
-We want to ensure that DSQL is a secure library for everyone. If
-you've discovered a security vulnerability in DSQL, we appreciate your help
-in disclosing it to us in a `responsible manner <http://en.wikipedia.org/wiki/Responsible_disclosure>`_.
+We want to ensure that DSQL is a secure library for everyone. If you've
+discovered a security vulnerability in DSQL, we appreciate your help in
+disclosing it to us in a `responsible manner <http://en.wikipedia.org/wiki/Responsible_disclosure>`_.
 
 Publicly disclosing a vulnerability can put the entire community at risk. If
 you've discovered a security concern, please email us at
-security@agiletoolkit.org. We'll work with you to make sure that we understand the
-scope of the issue, and that we fully address your concern. We consider
-correspondence sent to security@agiletoolkit.org our highest priority, and work to
-address any issues that arise as quickly as possible.
+security@agiletoolkit.org. We'll work with you to make sure that we understand
+the scope of the issue, and that we fully address your concern. We consider
+correspondence sent to security@agiletoolkit.org our highest priority, and work
+to address any issues that arise as quickly as possible.
 
-After a security vulnerability has been corrected, a security hotfix release will
-be deployed as soon as possible.
+After a security vulnerability has been corrected, a security hot-fix release
+will be deployed as soon as possible.

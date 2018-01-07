@@ -39,8 +39,8 @@ not need a database to create a query::
 
     $query = new Query(['connection' => $pdo]);
 
-Once you have a query object, you can add parameters by calling some of
-it's methods::
+Once you have a query object, you can add parameters by calling some of it's
+methods::
 
     $query
         ->table('employees')
@@ -52,22 +52,21 @@ Finally you can get the data::
 
     $count = $query->getOne();
 
-While DSQL is simple to use for basic queries, it also gives a huge
-power and consistency when you are building complex queries. Unlike
-other query builders that sometimes rely on "hacks" (such as
-method whereOr()) and claim to be useful for "most" database operations,
-with DSQL, you can use DSQL to build ALL of your database queries.
+While DSQL is simple to use for basic queries, it also gives a huge power and
+consistency when you are building complex queries. Unlike other query builders
+that sometimes rely on "hacks" (such as method whereOr()) and claim to be useful
+for "most" database operations, with DSQL, you can use DSQL to build ALL of your
+database queries.
 
-This is hugely benificial for frameworks and large applications, where
+This is hugely beneficial for frameworks and large applications, where
 various classes need to interact and inject more clauses/fields/joins into your
 SQL query.
 
-DSQL does not resolve conflicts between similarly named tables, but
-it gives you all the options to use aliases.
+DSQL does not resolve conflicts between similarly named tables, but it gives you
+all the options to use aliases.
 
-The next example might be a bit too complex for you, but still read
-through and try to understand what each section does to your base
-query::
+The next example might be a bit too complex for you, but still read through and
+try to understand what each section does to your base query::
 
     // Establish a query looking for a maximum salary
     $salary = new Query(['connection'=>$pdo]);
@@ -123,16 +122,16 @@ The above query resulting code will look like this:
 
     :a = "1961-05-02"
 
-Using DSQL in higher level ORM libraries and frameworks allows them to
-focus on defining the database logic, while DSQL can perform the heavy-lifting
-of query building and execution.
+Using DSQL in higher level ORM libraries and frameworks allows them to focus on
+defining the database logic, while DSQL can perform the heavy-lifting of query
+building and execution.
 
 Creating Objects and PDO
 ========================
-DSQL classes does not need database connection for most of it's work. Once
-you create new instance of :ref:`Expression <expr>` or :ref:`Query <query>`
-you can perform operation and finally call :php:meth:`Expression::render()`
-to get the final query string::
+DSQL classes does not need database connection for most of it's work. Once you
+create new instance of :ref:`Expression <expr>` or :ref:`Query <query>` you can
+perform operation and finally call :php:meth:`Expression::render()` to get the
+final query string::
 
     use atk4\dsql\Query;
 
@@ -155,20 +154,20 @@ database vendor.
 There are more ways to create connection, see `Advanced Connections`_ section.
 
 The format of the ``$dsn`` is the same as with
-`PDO class <http://php.net/manual/en/ref.pdo-mysql.connection.php>`_. If
-you need to execute query that is not supported by DSQL, you should always
+`PDO class <http://php.net/manual/en/ref.pdo-mysql.connection.php>`_.
+If you need to execute query that is not supported by DSQL, you should always
 use expressions::
 
     $tables = $c -> expr('show tables like []', [$like_str])->get();
 
-DSQL classes are mindful about your SQL vendor and it's quirks,
-so when you're building sub-queries with :php:meth:`Query::dsql`,
-you can avoid some nasty problems::
+DSQL classes are mindful about your SQL vendor and it's quirks, so when you're
+building sub-queries with :php:meth:`Query::dsql`, you can avoid some nasty
+problems::
 
     $sqlite_c ->dsql()->table('user')->truncate();
 
-The above code will work even though SQLite does not support
-truncate. That's because DSQL takes care of this.
+The above code will work even though SQLite does not support truncate. That's
+because DSQL takes care of this.
 
 
 Query Building
@@ -176,27 +175,28 @@ Query Building
 
 Each Query object represents a query to the database in-the-making.
 Calling methods such as :php:meth:`Query::table` or :php:meth:`Query::where`
-affect part of the query you're making. At any time you can either
-execute your query or use it inside another query.
+affect part of the query you're making. At any time you can either execute your
+query or use it inside another query.
 
 :php:class:`Query` supports majority of SQL syntax out of the box.
-Some unusual statements can be easily added by customizing
-template for specific query and we will look into examples in :ref:`extending_query`
+Some unusual statements can be easily added by customizing template for specific
+query and we will look into examples in :ref:`extending_query`
 
 Query Mode
 ==========
 
-When you create a new :php:class:`Query` object, it is going to be a *SELECT* query
-by default. If you wish to execute ``update`` operation instead, you simply call :php:meth:`Query::update`,
-for delete - :php:meth:`Query::delete` (etc). For more information see :ref:`query-modes`.
+When you create a new :php:class:`Query` object, it is going to be a *SELECT*
+query by default. If you wish to execute ``update`` operation instead, you
+simply call :php:meth:`Query::update`, for delete - :php:meth:`Query::delete`
+(etc). For more information see :ref:`query-modes`.
 You can actually perform multiple operations::
 
     $q = $c->dsql()->table('employee')->where('emp_no', 1234);
     $backup_data = $q->get();
     $q->delete();
 
-A good practice is to re-use the same query object before you branch out
-and perform the action::
+A good practice is to re-use the same query object before you branch out and
+perform the action::
 
     $q = $c->dsql()->table('employee')->where('emp_no', 1234);
 
@@ -224,7 +224,5 @@ In most cases, when iterating you'll have PDOStatement, however this may not
 always be the case, so be cautious. Remember that DQSL can support vendors
 that PDO does not support as well or can use :ref:`proxy`.
 In that case you may end up with other Generator/Iterator but regardless,
-`$employee` will always contain associative array representing one row
-of data. (See also `Manual Query Execution`_).
-
-
+`$employee` will always contain associative array representing one row of data.
+(See also `Manual Query Execution`_).

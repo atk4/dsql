@@ -2,8 +2,8 @@
 Transactions
 ============
 
-When you work with the DSQL, you can work with transactions. There are 2 enhancements
-to the standard functionality of transactions in DSQL:
+When you work with the DSQL, you can work with transactions. There are 2
+enhancements to the standard functionality of transactions in DSQL:
 
 1. You can start nested transactions.
 
@@ -35,20 +35,23 @@ It is recommended to always use atomic() in your code.
 
 .. php:method:: commit
 
-    Will commit transaction, however if :php:meth:`Connection::beginTransaction` was
-    executed more than once, will only decrease :php:attr:`Connection::$transaction_depth`.
+    Will commit transaction, however if :php:meth:`Connection::beginTransaction`
+    was executed more than once, will only decrease
+    :php:attr:`Connection::$transaction_depth`.
 
 .. php:method:: inTransaction
 
-    Returns true if transaction is currently active. There is no need for you to ever
-    use this method.
+    Returns true if transaction is currently active. There is no need for you to
+    ever use this method.
 
 .. php:method:: rollBack
 
-    Roll-back the transaction, however if :php:meth:`Connection::beginTransaction` was
-    executed more than once, will only decrease :php:attr:`Connection::$transaction_depth`.
+    Roll-back the transaction, however if :php:meth:`Connection::beginTransaction`
+    was executed more than once, will only decrease
+    :php:attr:`Connection::$transaction_depth`.
 
 
 
-.. warning:: If you roll-back internal transaction and commit external transaction, then
-    result might be unpredictable. Please discuss this https://github.com/atk4/dsql/issues/89
+.. warning:: If you roll-back internal transaction and commit external
+    transaction, then result might be unpredictable.
+    Please discuss this https://github.com/atk4/dsql/issues/89

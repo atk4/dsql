@@ -205,7 +205,7 @@ class Connection
      * Starts new transaction.
      *
      * Database driver supports statements for starting and committing
-     * transactions. Unfortunatelly most of them don't allow to nest
+     * transactions. Unfortunately most of them don't allow to nest
      * transactions and commit gradually.
      * With this method you have some implementation of nested transactions.
      *
@@ -214,7 +214,7 @@ class Connection
      * You will need to call commit() for each execution of beginTransactions()
      * and only the last commit will perform actual commit in database.
      *
-     * So, if you have been working with the database and got unhandled
+     * So, if you have been working with the database and got un-handled
      * exception in the middle of your code, everything will be rolled back.
      *
      * @return mixed Don't rely on any meaningful return
@@ -249,7 +249,7 @@ class Connection
     /**
      * Commits transaction.
      *
-     * Each occurance of beginTransaction() must be matched with commit().
+     * Each occurrence of beginTransaction() must be matched with commit().
      * Only when same amount of commits are executed, the actual commit will be
      * issued to the database.
      *
