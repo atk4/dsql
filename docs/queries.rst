@@ -6,13 +6,14 @@
 Queries
 =======
 
-Query class represents your SQL query in-the-making. Once you create object of the Query
-class, call some of the methods listed below to modify your query. To actually execute
-your query and start retrieving data, see :ref:`fetching-result` section.
+Query class represents your SQL query in-the-making. Once you create object of
+the Query class, call some of the methods listed below to modify your query. To
+actually execute your query and start retrieving data, see :ref:`fetching-result`
+section.
 
-You should use :ref:`connect` if possible to create your query objects. All examples
-below are using `$c->dsql()` method which generates Query linked to your established
-database connection.
+You should use :ref:`connect` if possible to create your query objects. All
+examples below are using `$c->dsql()` method which generates Query linked to
+your established database connection.
 
 Once you have a query object you can execute modifier methods such as
 :php:meth:`field()` or :php:meth:`table()` which will change the way how your
@@ -35,8 +36,8 @@ Quick Example::
 Method invocation principles
 ============================
 
-Methods of Query are designed to be flexible and consise. Most methods
-have a variable number of arguments and some arguments can be skipped::
+Methods of Query are designed to be flexible and concise. Most methods have a
+variable number of arguments and some arguments can be skipped::
 
     $query -> where('id', 123);
     $query -> where('id', '=', 123);  // the same
@@ -50,14 +51,14 @@ There are 2 types of escaping:
  * :php:meth:`Expression::_escape()`. Used for field and table names. Surrounds name with *`*.
  * :php:meth:`Expression::_param()`. Will convert value into parameter and replace with *:a*
 
-In the next example $a is escaped but $b is parametrised::
+In the next example $a is escaped but $b is parametrized::
 
     $query -> where('a', 'b');
 
     // where `a` = "b"
 
-If you want to switch places and execute *where "b" = `a`*, then
-you can resort to Expressions::
+If you want to switch places and execute *where "b" = `a`*, then you can resort
+to Expressions::
 
     $query -> where($c->expr('{} = []', ['b', 'a']));
 
@@ -70,8 +71,8 @@ Query Modes
 ===========
 
 When you create new Query it always start in "select" mode. You can switch
-query to a different mode using :php:meth:`mode`. Normally you shouldn't
-bother calling this method and instead use one of the following methods.
+query to a different mode using :php:meth:`mode`. Normally you shouldn't bother
+calling this method and instead use one of the following methods.
 They will switch the query mode for you and execute query:
 
 .. php:method:: select()
@@ -220,11 +221,11 @@ Setting Table
     :param mixed $alias: alias of table
     :returns: $this
 
-This method can be invoked using different combinations of arguments. Follow
-the principle of specifying the table first, and then
-optionally provide an alias. You can specify multiple tables at the same
-time by using comma or array (although you won't be able to use the
-alias there). Using keys in your array will also specify the aliases.
+This method can be invoked using different combinations of arguments.
+Follow the principle of specifying the table first, and then optionally provide
+an alias. You can specify multiple tables at the same time by using comma or
+array (although you won't be able to use the alias there).
+Using keys in your array will also specify the aliases.
 
 Basic Examples::
 
@@ -248,7 +249,8 @@ Basic Examples::
         // SELECT * from `user` `u`, `salary` `s`
 
 Inside your query table names and aliases will always be surrounded by backticks.
-If you want to use a more complex expression, use :php:class:`Expression` as table::
+If you want to use a more complex expression, use :php:class:`Expression` as
+table::
 
     $c->dsql()->table(
         $c->expr('(SELECT id FROM user UNION select id from document)'),
@@ -276,11 +278,11 @@ Setting Fields
 
 .. php:method:: field($fields, $alias = null)
 
-    Adds additional field that you would like to query. If never called,
-    will default to :php:attr:`defaultField`, which normally is `*`.
+    Adds additional field that you would like to query. If never called, will
+    default to :php:attr:`defaultField`, which normally is `*`.
 
-    This method has several call options. $field can be array of fields
-    and also can be an :php:class:`Expression` or :php:class:`Query`
+    This method has several call options. $field can be array of fields and
+    also can be an :php:class:`Expression` or :php:class:`Query`
 
     :param string|array|object $fields: Specify list of fields to fetch
     :param string $alias: Optionally specify alias of field in resulting query
@@ -342,7 +344,7 @@ Setting where and having clauses
 
 .. php:method:: having($field, $operation, $value)
 
-    Adds HAVING condition to your qurey.
+    Adds HAVING condition to your query.
 
     :param mixed $field: field such as "name"
     :param mixed $operation: comparison operation such as ">" (optional)
@@ -350,20 +352,20 @@ Setting where and having clauses
     :returns: $this
 
 
-Both methods use identical call interface. They support one, two or three argument
-calls.
+Both methods use identical call interface. They support one, two or three
+argument calls.
 
 Pass string (field name), :php:class:`Expression` or even :php:class:`Query` as
-first argument. If you are using string, you may end it with operation, such as "age>"
-or "parent_id is not" DSQL will recognize <, >, =, !=, <>, is, is not.
+first argument. If you are using string, you may end it with operation, such as
+"age>" or "parent_id is not" DSQL will recognize <, >, =, !=, <>, is, is not.
 
-If you havent specified parameter as a part of $field, specify it through a second
-parameter - $operation. If unspecified, will default to '='.
+If you haven't specified parameter as a part of $field, specify it through a
+second parameter - $operation. If unspecified, will default to '='.
 
-Last argument is value. You can specify number, string, array, expression
-or even null (specifying null is not the same as omitting this argument).
-This argument will always be parameterised unless you pass expression.
-If you specify array, all elements will be parametrised individually.
+Last argument is value. You can specify number, string, array, expression or
+even null (specifying null is not the same as omitting this argument).
+This argument will always be parameterized unless you pass expression.
+If you specify array, all elements will be parametrized individually.
 
 Starting with the basic examples::
 
@@ -497,9 +499,9 @@ Joining with other tables
     :param string $join_kind:     'left' (default), 'inner', 'right' etc - which join type to use
     :returns: $this
 
-When joining with a different table, the results will be stacked by the SQL server
-so that fields from both tables are available. The first argument can specify
-the table to join, but may contain more information::
+When joining with a different table, the results will be stacked by the SQL
+server so that fields from both tables are available. The first argument can
+specify the table to join, but may contain more information::
 
     $q->join('address');           // address.id = address_id
         // JOIN `address` ON `address`.`id`=`address_id`
@@ -524,7 +526,7 @@ The above code will join 3 tables using the following query syntax:
         credit_card as c on c.id = u.credit_card_id
         preferences on preferences.id = u.preferences_id
 
-However normally you would have `user_id` field defined in your suplimentary
+However normally you would have `user_id` field defined in your supplementary
 tables so you need a different syntax::
 
     $q->table('user u');
@@ -541,9 +543,9 @@ used in `on` condition::
     $q->join('user boss', 'u.boss_user_id');
         // JOIN `user` `boss` ON `boss`.`id`=`u`.`boss_user_id`
 
-By default the "on" field is defined as `$table."_id"`, as you have seen in the previous
-examples where join was done on "address_id", and "credit_card_id". If you
-have specified field explicitly in the foreign field, then the "on" field
+By default the "on" field is defined as `$table."_id"`, as you have seen in the
+previous examples where join was done on "address_id", and "credit_card_id".
+If you have specified field explicitly in the foreign field, then the "on" field
 is set to "id", like in the example above.
 
 You can specify both fields like this::
@@ -551,16 +553,16 @@ You can specify both fields like this::
     $q->table('employees');
     $q->join('salaries.emp_no', 'emp_no');
 
-If you only specify field like this, then it will be automatically prefixed with the name
-or alias of your main table. If you have specified multiple tables, this won't work
-and you'll have to define name of the table explicitly::
+If you only specify field like this, then it will be automatically prefixed with
+the name or alias of your main table. If you have specified multiple tables,
+this won't work and you'll have to define name of the table explicitly::
 
     $q->table('user u');
     $q->join('user boss', 'u.boss_user_id');
     $q->join('user super_boss', 'boss.boss_user_id');
 
-The third argument specifies type of join and defaults to "left" join. You can specify
-"inner", "straight" or any other join type that your database support.
+The third argument specifies type of join and defaults to "left" join. You can
+specify "inner", "straight" or any other join type that your database support.
 
 Method can be executed several times on the same Query object.
 
@@ -621,10 +623,10 @@ Set value to a field
 
 .. php:method:: set($field, $value)
 
-    Asigns value to the field during insert.
+    Assigns value to the field during insert.
 
     :param string $field: name of the field
-    :param mixed  $vlaue: value or expression
+    :param mixed  $value: value or expression
     :returns: $this
 
 Example::
@@ -661,8 +663,8 @@ Same syntax as for Insert Query.
 Other settings
 --------------
 
-Limit and Order are normally not included to avoid side-effects, but
-you can modify :php:attr:`$template_update` to include those tags.
+Limit and Order are normally not included to avoid side-effects, but you can
+modify :php:attr:`$template_update` to include those tags.
 
 
 Delete Query
@@ -677,8 +679,8 @@ Same syntax as for Select Query.
 Other settings
 --------------
 
-Limit and Order are normally not included to avoid side-effects, but
-you can modify :php:attr:`$template_update` to include those tags.
+Limit and Order are normally not included to avoid side-effects, but you can
+modify :php:attr:`$template_update` to include those tags.
 
 
 Dropping attributes
@@ -708,8 +710,8 @@ Other Methods
 
 .. php:method:: dsql($properties)
 
-    Use this instead of `new Query()` if you want to automatically bind
-    query to the same connection as the parent.
+    Use this instead of `new Query()` if you want to automatically bind query
+    to the same connection as the parent.
 
 .. php:method:: option($option, $mode)
 
