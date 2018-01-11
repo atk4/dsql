@@ -56,12 +56,12 @@ class OracleTest extends \PHPUnit_Framework_TestCase
     {
         $c = $this->connect();
         $this->assertEquals(
-            'select "baz" from (select rownum "__dsql_rownum", "baz" from "foo" where "bar" = :a) where "__dsql_rownum">0 and "__dsql_rownum"<=10',
+            'select * from (select rownum "__dsql_rownum","__t".* from (select "baz" from "foo" where "bar" = :a) "__t") where "__dsql_rownum">0 and "__dsql_rownum"<=10',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10)->render()
         );
 
         $this->assertEquals(
-            'select "baz" "baz_alias" from (select rownum "__dsql_rownum", "baz" from "foo" where "bar" = :a) where "__dsql_rownum">0 and "__dsql_rownum"<=10',
+            'select * from (select rownum "__dsql_rownum","__t".* from (select "baz" "baz_alias" from "foo" where "bar" = :a) "__t") where "__dsql_rownum">0 and "__dsql_rownum"<=10',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz', 'baz_alias')->limit(10)->render()
         );
     }
@@ -79,7 +79,7 @@ class OracleTest extends \PHPUnit_Framework_TestCase
     {
         $c = $this->connect();
         $this->assertEquals(
-            'select "baz" from (select rownum "__dsql_rownum", "baz" from "foo" where "bar" = :a) where "__dsql_rownum">10',
+            'select * from (select rownum "__dsql_rownum","__t".* from (select "baz" from "foo" where "bar" = :a) "__t") where "__dsql_rownum">10',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(null, 10)->render()
         );
     }
@@ -97,7 +97,7 @@ class OracleTest extends \PHPUnit_Framework_TestCase
     {
         $c = $this->connect();
         $this->assertEquals(
-            'select "baz" from (select rownum "__dsql_rownum", "baz" from "foo" where "bar" = :a) where "__dsql_rownum">99 and "__dsql_rownum"<=109',
+            'select * from (select rownum "__dsql_rownum","__t".* from (select "baz" from "foo" where "bar" = :a) "__t") where "__dsql_rownum">99 and "__dsql_rownum"<=109',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10, 99)->render()
         );
     }
