@@ -20,7 +20,7 @@ class Query_Oracle extends Query_Oracle_Abstract
      * @var string
      */
     protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order]';
-    protected $template_select_limit = 'select [field] [from] (select[option] rownum "__dsql_rownum", [field_noalias] [from] [table][join][where][group][having][order]) where "__dsql_rownum">[limit_start][and_limit_end]';
+    protected $template_select_limit = 'select * from (select rownum "__dsql_rownum","__t".* [from] (select[option] [field] [from] [table][join][where][group][having][order]) "__t") where "__dsql_rownum">[limit_start][and_limit_end]';
 
     /**
      * Limit how many rows will be returned.
