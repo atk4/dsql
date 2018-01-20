@@ -295,4 +295,17 @@ class Connection
 
         return false;
     }
+
+    public $override_last_insert_id = null;
+
+    function lastInsertID()
+    {
+        if ($this->override_last_insert_id) {
+            $id = $this->override_last_insert_id;
+            $this->override_last_insert_id = null;
+
+            return $id;
+        }
+        return $this->connection->lastInsertID();
+    }
 }
