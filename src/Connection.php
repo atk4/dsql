@@ -79,6 +79,11 @@ class Connection
                     'connection'       => new \PDO($dsn, $user, $password),
                     'query_class'      => 'atk4\dsql\Query_Oracle',
                 ], $args));
+            case 'pgsql':
+                return new static(array_merge([
+                    'connection'       => new \PDO($dsn, $user, $password),
+                    'query_class'      => 'atk4\dsql\Query_PgSQL',
+                ], $args));
             case 'dumper':
                 return new Connection_Dumper(array_merge([
                     'connection' => static::connect($rest, $user, $password),
