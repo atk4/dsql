@@ -41,5 +41,4 @@ class Query_PgSQL extends Query
                 (int) $this->args['limit']['shift'];
         }
     }
-
 }
