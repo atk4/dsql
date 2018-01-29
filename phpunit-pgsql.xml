@@ -1,0 +1,24 @@
+<phpunit bootstrap="vendor/autoload.php">
+    <php>
+        <var name="DB_DSN" value="pgsql:dbname=atk4-dsql-test;host=localhost" />
+        <var name="DB_USER" value="postgres" />
+        <var name="DB_PASSWD" value="" />
+        <var name="DB_DBNAME" value="atk4-dsql-test" />
+    </php>
+    <testsuites>
+        <testsuite name="dsql">
+            <directory>tests/db</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <blacklist>
+            <directory suffix=".php">./vendor</directory>
+        </blacklist>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover-pgsql.xml"/>
+    </logging>
+</phpunit>
