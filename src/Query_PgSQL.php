@@ -28,6 +28,13 @@ class Query_PgSQL extends Query
     protected $template_update = 'update [table][join] set [set] [where]';
 
     /**
+     * REPLACE template.
+     *
+     * @var string
+     */
+    protected $template_replace = null;
+
+    /**
      * Renders [limit].
      *
      * @return string rendered SQL chunk
