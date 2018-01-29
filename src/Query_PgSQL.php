@@ -27,7 +27,6 @@ class Query_PgSQL extends Query
      */
     protected $template_update = 'update [table][join] set [set] [where]';
 
-
     /**
      * Renders [limit].
      *
