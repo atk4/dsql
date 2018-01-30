@@ -89,10 +89,24 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q()->field(new Expression('2+2'), 'now')->get()
         );
 
-        $this->assertEquals(
-            [['now' => 6]],
-            $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
-        );
+        /*
+         * Postgresql needs to have values cast, to make the query work.
+         * But CAST(.. AS int) does not work in mysql. So we use two different tests..
+         * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
+         */
+        if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+
+            $this->assertEquals(
+                [['now' => 6]],
+                $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
+            );
+        } else {
+            $this->assertEquals(
+                [['now' => 6]],
+                $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
+            );
+
+        }
 
         $this->assertEquals(
             5,
@@ -102,10 +116,15 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testExpression()
     {
-        $this->assertEquals(
-            'foo',
-            $this->e('select []', ['foo'])->getOne()
-        );
+        try {
+            $this->assertEquals(
+                'foo',
+                $this->e('select []', ['foo'])->getOne()
+            );
+        } catch (\atk4\dsql\Exception $e) {
+            var_dump($e->getParams());
+            var_dump($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION));
+        }
     }
 
     /**
@@ -178,7 +197,6 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 
         // replace
         if ('pgsql' !== $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
-
             $this->q('employee')
                 ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->replace();
@@ -187,7 +205,6 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
                 ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->where('id', 1)
                 ->update();
-
         }
 
         // In SQLite replace is just like insert, it just checks if there is
@@ -198,7 +215,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         // but returns [Peter, Jane] - in original order.
         // That's why we add usort here.
         $data = $this->q('employee')->field('id,name')->get();
-               usort($data, function ($a, $b) {
+        usort($data, function ($a, $b) {
             return $a['id'] - $b['id'];
         });
         $this->assertEquals(
