@@ -106,6 +106,7 @@ class Connection
 
             case 'oci12':
                 $dsn = str_replace('oci12:', 'oci', $dsn);
+
                 return new Connection_Oracle12(array_merge([
                     'connection' => new \PDO($dsn, $user, $password),
                 ], $args));
