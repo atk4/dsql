@@ -95,7 +95,6 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
          */
         if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
-
             $this->assertEquals(
                 [['now' => 6]],
                 $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
@@ -105,7 +104,6 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
                 [['now' => 6]],
                 $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
             );
-
         }
 
         $this->assertEquals(
@@ -116,14 +114,22 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testExpression()
     {
-        try {
+        /*
+         * Postgresql, at least versions before 10, needs to have the string cast to the
+         * correct datatype.
+         * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
+         * entire string on mysql. 
+         */
+        if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
             $this->assertEquals(
                 'foo',
-                $this->e('select []', ['foo'])->getOne()
+                $this->e('select CAST([] AS TEXT)', ['foo'])->getOne()
             );
-        } catch (\atk4\dsql\Exception $e) {
-            var_dump($e->getParams());
-            var_dump($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION));
+        } else {
+            $this->assertEquals(
+                'foo',
+                $this->e('select CAST([] AS CHAR)', ['foo'])->getOne()
+            );
         }
     }
 
