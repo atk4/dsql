@@ -159,11 +159,11 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->insert();
         $this->assertEquals(
             [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->get()
+            $this->q('employee')->field('id,name')->order("id")->get()
         );
         $this->assertEquals(
             [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->select()->fetchAll()
+            $this->q('employee')->field('id,name')->order("id")->select()->fetchAll()
         );
 
         // update
@@ -173,7 +173,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->update();
         $this->assertEquals(
             [['id' => 1, 'name' => 'Johnny'], ['id' => 2, 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->get()
+            $this->q('employee')->field('id,name')->order("id")->get()
         );
 
         // replace
