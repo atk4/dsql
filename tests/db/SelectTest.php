@@ -91,12 +91,12 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 
         $this->assertEquals(
             [['now' => 6]],
-            $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
+            $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
         );
 
         $this->assertEquals(
             5,
-            $this->q()->field(new Expression('IFNULL([],5)', [null]), 'null_test')->getOne()
+            $this->q()->field(new Expression('COALESCE([],5)', [null]), 'null_test')->getOne()
         );
     }
 
@@ -177,9 +177,18 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         // replace
-        $this->q('employee')
-            ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
-            ->replace();
+        if ('pgsql' !== $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+
+            $this->q('employee')
+                ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
+                ->replace();
+        } else {
+            $this->q('employee')
+                ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
+                ->where('id', 1)
+                ->update();
+
+        }
 
         // In SQLite replace is just like insert, it just checks if there is
         // duplicate key and if it is it deletes the row, and inserts the new
@@ -189,7 +198,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         // but returns [Peter, Jane] - in original order.
         // That's why we add usort here.
         $data = $this->q('employee')->field('id,name')->get();
-        usort($data, function ($a, $b) {
+               usort($data, function ($a, $b) {
             return $a['id'] - $b['id'];
         });
         $this->assertEquals(
