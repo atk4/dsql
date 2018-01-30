@@ -105,12 +105,18 @@ class Connection
                 $c = new Connection_Oracle(array_merge([
                     'connection' => new \PDO($dsn, $user, $password),
                 ], $args));
-                break;
 
             case 'oci12':
                 $dsn = str_replace('oci12:', 'oci:', $dsn);
                 $c = new Connection_Oracle12(array_merge([
                     'connection' => new \PDO($dsn, $user, $password),
+                ], $args));
+                break;
+
+            case 'pgsql':
+                $c = new static(array_merge([
+                    'connection'       => new \PDO($dsn, $user, $password),
+                    'query_class'      => 'atk4\dsql\Query_PgSQL',
                 ], $args));
                 break;
 
