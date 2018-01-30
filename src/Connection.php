@@ -12,6 +12,8 @@ namespace atk4\dsql;
  */
 class Connection
 {
+    use \atk4\core\DIContainerTrait;
+
     /** @var string Query classname */
     protected $query_class = 'atk4\dsql\Query';
 
@@ -25,17 +27,36 @@ class Connection
     public $transaction_depth = 0;
 
     /**
+     * Specifying $properties to constructors will override default
+     * property values of this class.
+     *
+     * @param array $properties
+     */
+    public function __construct($properties = [])
+    {
+        if (!is_array($properties)) {
+            throw new Exception([
+                'Invalid properties for "new Connection()". Did you mean to call Connection::connect()?',
+                'properties' => $properties,
+            ]);
+        }
+
+        $this->setDefaults($properties);
+    }
+
+    /**
      * Connect database.
      *
-     * @param string $dsn
-     * @param string $user
-     * @param string $password
-     * @param array  $args
+     * @param string|\PDO $dsn
+     * @param null|string $user
+     * @param null|string $password
+     * @param array       $args
      *
      * @return Connection
      */
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
+        // If it's already PDO object, then we simply use it
         if ($dsn instanceof \PDO) {
             return new static(array_merge([
                     'connection'  => $dsn,
@@ -43,6 +64,7 @@ class Connection
                 ], $args));
         }
 
+        // Process DSN string
         if (strpos($dsn, ':') === false) {
             throw new Exception([
                 "Your DSN format is invalid. Must be in 'driver:host:options' format",
@@ -62,67 +84,62 @@ class Connection
             $password = $parts['pass'];
         }
 
+        // Create driver specific connection
         switch (strtolower($driver)) {
             case 'mysql':
-                return new static(array_merge([
+                $c = new static(array_merge([
                     'connection'       => new \PDO($dsn, $user, $password),
                     'expression_class' => 'atk4\dsql\Expression_MySQL',
                     'query_class'      => 'atk4\dsql\Query_MySQL',
                 ], $args));
+                break;
+
             case 'sqlite':
-                return new static(array_merge([
+                $c = new static(array_merge([
                     'connection'       => new \PDO($dsn, $user, $password),
                     'query_class'      => 'atk4\dsql\Query_SQLite',
                 ], $args));
+                break;
+
             case 'oci':
-                return new static(array_merge([
-                    'connection'       => new \PDO($dsn, $user, $password),
-                    'query_class'      => 'atk4\dsql\Query_Oracle',
-                ], $args));
-            case 'pgsql':
-                return new static(array_merge([
-                    'connection'       => new \PDO($dsn, $user, $password),
-                    'query_class'      => 'atk4\dsql\Query_PgSQL',
-                ], $args));
-            case 'dumper':
-                return new Connection_Dumper(array_merge([
-                    'connection' => static::connect($rest, $user, $password),
-                ], $args));
-
-            case 'counter':
-                return new Connection_Counter(array_merge([
-                    'connection' => static::connect($rest, $user, $password),
-                ], $args));
-
-                // let PDO handle the rest
-            default:
-                return new static(array_merge([
+                $c = new Connection_Oracle(array_merge([
                     'connection' => new \PDO($dsn, $user, $password),
                 ], $args));
 
-        }
-    }
+            case 'oci12':
+                $dsn = str_replace('oci12:', 'oci:', $dsn);
+                $c = new Connection_Oracle12(array_merge([
+                    'connection' => new \PDO($dsn, $user, $password),
+                ], $args));
+                break;
 
-    /**
-     * Specifying $attributes to constructors will override default
-     * attribute values of this class.
-     *
-     * @param array $attributes
-     */
-    public function __construct($attributes = null)
-    {
-        if ($attributes !== null) {
-            if (!is_array($attributes)) {
-                throw new Exception([
-                    'Invalid arguments for "new Connection()". Did you mean to call Connection::connect()?',
-                    'attributes' => $attributes,
-                ]);
-            }
+            case 'pgsql':
+                $c = new static(array_merge([
+                    'connection'       => new \PDO($dsn, $user, $password),
+                    'query_class'      => 'atk4\dsql\Query_PgSQL',
+                ], $args));
+                break;
 
-            foreach ($attributes as $key => $val) {
-                $this->$key = $val;
-            }
+            case 'dumper':
+                $c = new Connection_Dumper(array_merge([
+                    'connection' => static::connect($rest, $user, $password),
+                ], $args));
+                break;
+
+            case 'counter':
+                $c = new Connection_Counter(array_merge([
+                    'connection' => static::connect($rest, $user, $password),
+                ], $args));
+                break;
+
+                // let PDO handle the rest
+            default:
+                $c = new static(array_merge([
+                    'connection' => new \PDO($dsn, $user, $password),
+                ], $args));
         }
+
+        return $c;
     }
 
     /**
