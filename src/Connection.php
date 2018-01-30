@@ -87,46 +87,53 @@ class Connection
         // Create driver specific connection
         switch (strtolower($driver)) {
             case 'mysql':
-                return new static(array_merge([
+                $c = new static(array_merge([
                     'connection'       => new \PDO($dsn, $user, $password),
                     'expression_class' => 'atk4\dsql\Expression_MySQL',
                     'query_class'      => 'atk4\dsql\Query_MySQL',
                 ], $args));
+                break;
 
             case 'sqlite':
-                return new static(array_merge([
+                $c = new static(array_merge([
                     'connection'       => new \PDO($dsn, $user, $password),
                     'query_class'      => 'atk4\dsql\Query_SQLite',
                 ], $args));
+                break;
 
             case 'oci':
-                return new Connection_Oracle(array_merge([
+                $c = new Connection_Oracle(array_merge([
                     'connection' => new \PDO($dsn, $user, $password),
                 ], $args));
+                break;
 
             case 'oci12':
-                $dsn = str_replace('oci12:', 'oci', $dsn);
-
-                return new Connection_Oracle12(array_merge([
+                $dsn = str_replace('oci12:', 'oci:', $dsn);
+                $c = new Connection_Oracle12(array_merge([
                     'connection' => new \PDO($dsn, $user, $password),
                 ], $args));
+                break;
 
             case 'dumper':
-                return new Connection_Dumper(array_merge([
+                $c = new Connection_Dumper(array_merge([
                     'connection' => static::connect($rest, $user, $password),
                 ], $args));
+                break;
 
             case 'counter':
-                return new Connection_Counter(array_merge([
+                $c = new Connection_Counter(array_merge([
                     'connection' => static::connect($rest, $user, $password),
                 ], $args));
+                break;
 
                 // let PDO handle the rest
             default:
-                return new static(array_merge([
+                $c = new static(array_merge([
                     'connection' => new \PDO($dsn, $user, $password),
                 ], $args));
         }
+
+        return $c;
     }
 
     /**
