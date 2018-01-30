@@ -118,7 +118,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * Postgresql, at least versions before 10, needs to have the string cast to the
          * correct datatype.
          * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
-         * entire string on mysql. 
+         * entire string on mysql.
          */
         if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
             $this->assertEquals(
