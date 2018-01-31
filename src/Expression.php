@@ -427,7 +427,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         $res = preg_replace_callback(
-            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}/',
+            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}/i',
             function ($matches) use (&$nameless_count) {
                 $identifier = substr($matches[0], 1, -1);
                 $escaping = ($matches[0][0] == '[') ? 'param' : 'escape';

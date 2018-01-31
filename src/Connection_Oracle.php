@@ -25,6 +25,34 @@ class Connection_Oracle extends Connection
         parent::__construct($properties);
 
         // date and datetime format should be like this for Agile Data to correctly pick it up and typecast
-        $this->expr('ALTER SESSION SET NLS_DATE_FORMAT = {format}', ['format'=>'YYYY-MM-DD HH24:MI:SS'])->execute();
+        $this->expr('ALTER SESSION SET NLS_DATE_FORMAT={format} NLS_NUMERIC_CHARACTERS={dec_char}', [
+                'format'   => 'YYYY-MM-DD HH24:MI:SS', // datetime format
+                'dec_char' => '. ', // decimal separator, no thousands separator
+            ])->execute();
+    }
+
+    /**
+     * Return last inserted ID value.
+     *
+     * Few Connection drivers need to receive Model to get ID because PDO doesn't support this method.
+     *
+     * @param \atk4\data\Model Optional data model from which to return last ID
+     *
+     * @return mixed
+     */
+    public function lastInsertID($m = null)
+    {
+        if ($m instanceof \atk4\data\Model) {
+            // if we use sequence, then we can easily get current value
+            if (isset($m->sequence)) {
+                return $this->expr('SELECT {sequence}.CURRVAL FROM dual', ['sequence'=>$m->sequence])->getOne();
+            }
+
+            // otherwise we have to select max(id_field) - this is very bad for performance !!!
+            return $this->expr('SELECT max([field]) FROM [table]', ['field'=>$m->id_field,'table'=>$m->table])->getOne();
+        }
+
+        // fallback
+        return parent::lastInsertID($m);
     }
 }
