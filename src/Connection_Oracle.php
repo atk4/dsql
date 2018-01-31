@@ -49,7 +49,7 @@ class Connection_Oracle extends Connection
             }
 
             // otherwise we have to select max(id_field) - this is very bad for performance !!!
-            return $this->expr('SELECT max([field]) FROM [table]', ['field'=>$m->id_field,'table'=>$m->table])->getOne();
+            return $this->expr('SELECT max([field]) FROM [table]', ['field'=>$m->id_field, 'table'=>$m->table])->getOne();
         }
 
         // fallback
