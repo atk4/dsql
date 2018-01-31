@@ -45,11 +45,13 @@ class Connection_Oracle extends Connection
         if ($m instanceof \atk4\data\Model) {
             // if we use sequence, then we can easily get current value
             if (isset($m->sequence)) {
-                return $this->expr('SELECT {sequence}.CURRVAL FROM dual', ['sequence'=>$m->sequence])->getOne();
+                return $this->dsql()->mode('seq_currval')->sequence($m->sequence)->getOne();
             }
 
-            // otherwise we have to select max(id_field) - this is very bad for performance !!!
-            return $this->expr('SELECT max([field]) FROM [table]', ['field'=>$m->id_field, 'table'=>$m->table])->getOne();
+            // otherwise we have to select max(id_field) - this can be bad for performance !!!
+            // Imants: Disabled for now because otherwise this will work even if database use triggers or any other mechanism
+            // to automatically increment ID and we can't tell this line to not execute.
+            //return $this->expr('SELECT max([field]) FROM [table]', ['field'=>$m->id_field, 'table'=>$m->table])->getOne();
         }
 
         // fallback
