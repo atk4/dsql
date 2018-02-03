@@ -1,3 +1,22 @@
+# 1.2.0
+
+In this verison we are adding support for Oracle and PostgreSQL. 
+
+**Closed issues:**
+
+- where\(\) should throw exception when passed incompatible object. [\#121](https://github.com/atk4/dsql/issues/121)
+
+**Merged pull requests:**
+
+- Feature/oracle support fixes [\#133](https://github.com/atk4/dsql/pull/133) ([DarkSide666](https://github.com/DarkSide666))
+- Feature/connection oracle [\#132](https://github.com/atk4/dsql/pull/132) ([DarkSide666](https://github.com/DarkSide666))
+- Fix: SQL does not guarantee the order of retreived rows unless explic… [\#131](https://github.com/atk4/dsql/pull/131) ([gartner](https://github.com/gartner))
+- Create a driver for postgresql [\#130](https://github.com/atk4/dsql/pull/130) ([gartner](https://github.com/gartner))
+- spellcheck and wrapping :\) [\#125](https://github.com/atk4/dsql/pull/125) ([DarkSide666](https://github.com/DarkSide666))
+- Feature/oracle support [\#124](https://github.com/atk4/dsql/pull/124) ([romaninsh](https://github.com/romaninsh))
+- Add verification for foreign objects inside where\(\) values [\#122](https://github.com/atk4/dsql/pull/122) ([romaninsh](https://github.com/romaninsh))
+- Add support for URI-style DNS: mysql://user:pass@host/db [\#120](https://github.com/atk4/dsql/pull/120) ([romaninsh](https://github.com/romaninsh))
+
 ## 1.1.5
 
 - Migrate to Agile Core 1.3
