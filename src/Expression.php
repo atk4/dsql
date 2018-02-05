@@ -199,13 +199,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // class to use, so we make a smart guess :)
         if ($this instanceof Query) {
             $e = new self($properties, $arguments);
-            $e->escape_char = $this->escape_char;
-            $e->connection = $this->connection;
-
-            return $e;
+        } else {
+            $e = new static($properties, $arguments);
         }
 
-        $e = new static($properties, $arguments);
+        $e->escape_char = $this->escape_char;
         $e->connection = $this->connection;
 
         return $e;
