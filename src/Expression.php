@@ -197,15 +197,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         // Otherwise, connection is probably PDO and we don't know which Expression
         // class to use, so we make a smart guess :)
-        if ($this instanceof Query) {
-            $e = new self($properties, $arguments);
-            $e->escape_char = $this->escape_char;
-            $e->connection = $this->connection;
-
-            return $e;
-        }
         if ($this instanceof self) {
             $e = new static($properties, $arguments);
+            $e->escape_char = $this->escape_char;
             $e->connection = $this->connection;
 
             return $e;
