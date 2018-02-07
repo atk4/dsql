@@ -59,14 +59,16 @@ class Connection
         // If it's already PDO object, then we simply use it
         if ($dsn instanceof \PDO) {
             $driver = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
+            $connectionClass = '\\atk4\\dsql\\Connection';
             $queryClass      = null;
             $expressionClass = null;
             switch ($driver) {
                 case 'pgsql':
+                    $connectionClass = '\\atk4\\dsql\\Connection_PgSQL';
                     $queryClass = 'atk4\dsql\Query_PgSQL';
                     break;
                 case 'oci':
-
+                    $connectionClass = '\\atk4\\dsql\\Connection_Oracle';
                     break;
                 case 'sqlite':
                     $queryClass = 'atk4\dsql\Query_SQLite';
@@ -78,7 +80,7 @@ class Connection
                     break;
 
             }
-            return new static(array_merge([
+            return new $connectionClass(array_merge([
                     'connection'       => $dsn,
                     'query_class'      => $queryClass,
                     'expression_class' => $expressionClass,
