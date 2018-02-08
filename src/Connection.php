@@ -72,6 +72,7 @@ class Connection
                     break;
                 case 'sqlite':
                     $queryClass = 'atk4\dsql\Query_SQLite';
+                    break;
                 case 'mysql':
                     $expressionClass = 'atk4\dsql\Expression_MySQL';
                 default:
