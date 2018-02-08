@@ -1,7 +1,6 @@
 <?php
 namespace atk4\dsql\tests\db;
 
-use atk4\dsql\tests\db\SelectTest;
 use atk4\dsql\Connection;
 
 class PdoSelectTest extends SelectTest

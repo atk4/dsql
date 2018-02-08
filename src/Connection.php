@@ -60,7 +60,7 @@ class Connection
         if ($dsn instanceof \PDO) {
             $driver = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
             $connectionClass = '\\atk4\\dsql\\Connection';
-            $queryClass      = null;
+            $queryClass = null;
             $expressionClass = null;
             switch ($driver) {
                 case 'pgsql':
