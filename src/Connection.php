@@ -81,6 +81,7 @@ class Connection
                     break;
 
             }
+
             return new $connectionClass(array_merge([
                     'connection'       => $dsn,
                     'query_class'      => $queryClass,

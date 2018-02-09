@@ -1,4 +1,5 @@
 <?php
+
 namespace atk4\dsql\tests\db;
 
 use atk4\dsql\Connection;
