@@ -1,6 +1,6 @@
 <?php
 
-namespace atk4\dsql\tests;
+namespace atk4\dsql\tests\db;
 
 use atk4\dsql\Connection;
 use atk4\dsql\Expression;
