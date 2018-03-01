@@ -153,7 +153,7 @@ class Connection
     {
         $c = $this->query_class;
         $q = new $c($properties);
-        $q->connection = $this->connection ?: $this;
+        $q->connection = $this;
 
         return $q;
     }
