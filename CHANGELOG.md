@@ -17,6 +17,28 @@ In this verison we are adding support for Oracle and PostgreSQL.
 - Add verification for foreign objects inside where\(\) values [\#122](https://github.com/atk4/dsql/pull/122) ([romaninsh](https://github.com/romaninsh))
 - Add support for URI-style DNS: mysql://user:pass@host/db [\#120](https://github.com/atk4/dsql/pull/120) ([romaninsh](https://github.com/romaninsh))
 
+## 1.2.1
+
+Resolve minor issues where expression class wasn't set correctly or some minor incompatibilities
+appeared between SQL vendor syntaxes.
+
+**Closed issues:**
+
+- ATK Data, action\('fx'\) not working [\#136](https://github.com/atk4/dsql/issues/136)
+- Passing a \PDO to connect\(\) assumes mysql [\#134](https://github.com/atk4/dsql/issues/134)
+- \[epic\] Add support for PostgreSQL [\#129](https://github.com/atk4/dsql/issues/129)
+- Use PDO::quote\(\) to escape values and identifiers [\#127](https://github.com/atk4/dsql/issues/127)
+- Add PostgreSQL test-scripts [\#27](https://github.com/atk4/dsql/issues/27)
+
+**Merged pull requests:**
+
+- resolve \#136 [\#137](https://github.com/atk4/dsql/pull/137) ([romaninsh](https://github.com/romaninsh))
+- Fix pdo [\#135](https://github.com/atk4/dsql/pull/135) ([gartner](https://github.com/gartner))
+
+
+
+# Older releases
+
 ## 1.1.5
 
 - Migrate to Agile Core 1.3
