@@ -1533,7 +1533,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $s = $this->q()->caseExpr()
                 ->when(['status', 'New'], 't2.expose_new')
                 ->when(['status', 'like', '%Used%'], 't2.expose_used')
-                ->else(null)
+                ->otherwise(null)
                 ->render();
         $this->assertEquals('case when "status" = :a then :b when "status" like :c then :d else :e end', $s);
 
@@ -1543,7 +1543,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $s = $this->q()->caseExpr()
                 ->when(['age', '>', $q], 'Older')
-                ->else('Younger')
+                ->otherwise('Younger')
                 ->render();
         $this->assertEquals('case when "age" > (select year(now()) - year(birth_date) "calc_age" from "user") then :a else :b end', $s);
     }
@@ -1561,7 +1561,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $s = $this->q()->caseExpr('status')
                 ->when('New', 't2.expose_new')
                 ->when('Used', 't2.expose_used')
-                ->else(null)
+                ->otherwise(null)
                 ->render();
         $this->assertEquals('case "status" when :a then :b when :c then :d else :e end', $s);
 
@@ -1571,7 +1571,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $s = $this->q()->caseExpr($q)
                 ->when(100, 'Very old')
-                ->else('Younger')
+                ->otherwise('Younger')
                 ->render();
         $this->assertEquals('case (select year(now()) - year(birth_date) "calc_age" from "user") when :a then :b else :c end', $s);
     }

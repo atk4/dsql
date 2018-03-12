@@ -1334,7 +1334,8 @@ class Query extends Expression
      *
      * @return $this
      */
-    public function else($else)
+    //public function else($else) // PHP 5.6 restricts to use such method name. PHP 7 is fine with it
+    public function otherwise($else)
     {
         $this->args['case_else'] = $else;
 
