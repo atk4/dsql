@@ -728,6 +728,7 @@ class Query extends Expression
         if (is_array($value)) {
             $value = '('.implode(',', $this->_param($value)).')';
             $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
+
             return $field.' '.$cond.' '.$value;
         }
 
@@ -1390,7 +1391,7 @@ class Query extends Expression
             $ret .= ' else '.$this->_consume($this->args['case_else'], 'param');
         }
 
-        return ' case' . $ret . ' end';
+        return ' case'.$ret.' end';
     }
 
     /**

@@ -1531,7 +1531,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         // Test normal form
         $s = $this->q()->caseExpr()
-                ->when(['status','New'], 't2.expose_new')
+                ->when(['status', 'New'], 't2.expose_new')
                 ->when(['status', 'like', '%Used%'], 't2.expose_used')
                 ->else(null)
                 ->render();
