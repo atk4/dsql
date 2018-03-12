@@ -1518,4 +1518,73 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $q->mode('update')->render()
         );
     }
+
+    /**
+     * Test caseExpr (normal).
+     *
+     * @covers ::caseExpr
+     * @covers ::when
+     * @covers ::else
+     * @covers ::_render_case
+     */
+    public function testCaseExprNormal()
+    {
+        // Test normal form
+        $s = $this->q()->caseExpr()
+                ->when(['status','New'], 't2.expose_new')
+                ->when(['status', 'like', '%Used%'], 't2.expose_used')
+                ->else(null)
+                ->render();
+        $this->assertEquals('case when "status" = :a then :b when "status" like :c then :d else :e end', $s);
+    }
+
+    /**
+     * Test caseExpr (short form).
+     *
+     * @covers ::caseExpr
+     * @covers ::when
+     * @covers ::else
+     * @covers ::_render_case
+     */
+    public function testCaseExprShortForm()
+    {
+        $s = $this->q()->caseExpr('status')
+                ->when('New', 't2.expose_new')
+                ->when('Used', 't2.expose_used')
+                ->else(null)
+                ->render();
+        $this->assertEquals('case "status" when :a then :b when :c then :d else :e end', $s);
+
+        // with subqueries
+        $age = new Expression('year(now()) - year(birth_date)');
+        $q = $this->q()->table('user')->field($age, 'calc_age');
+
+        $s = $this->q()->caseExpr()
+                ->when(['age', '>', $q], 'Older')
+                ->else('Younger')
+                ->render();
+        $this->assertEquals('case when "age" > (select year(now()) - year(birth_date) "calc_age" from "user") then :a else :b end', $s);
+    }
+
+    /**
+     * Incorrect use of "when" method parameters.
+     *
+     * @expected Exception Exception
+     */
+    public function testCaseExprException1()
+    {
+        $this->q()->caseExpr()
+            ->when(['status'], 't2.expose_new');
+    }
+
+    /**
+     * When using short form CASE statement, then you should not set array as when() method 1st parameter.
+     *
+     * @expected Exception Exception
+     */
+    public function testCaseExprException2()
+    {
+        $this->q()->caseExpr('status')
+            ->when(['status', 'New'], 't2.expose_new');
+    }
 }
