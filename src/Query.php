@@ -661,70 +661,82 @@ class Query extends Expression
         // where() might have been called multiple times. Collect all conditions,
         // then join them with AND keyword
         foreach ($this->args[$kind] as $row) {
-            if (count($row) === 3) {
-                list($field, $cond, $value) = $row;
-            } elseif (count($row) === 2) {
-                list($field, $cond) = $row;
-            } elseif (count($row) === 1) {
-                list($field) = $row;
-            }
-
-            $field = $this->_consume($field, 'soft-escape');
-
-            if (count($row) == 1) {
-                // Only a single parameter was passed, so we simply include all
-                $ret[] = $field;
-                continue;
-            }
-
-            // below are only cases when 2 or 3 arguments are passed
-
-            // if no condition defined - set default condition
-            if (count($row) == 2) {
-                $value = $cond;
-
-                if (is_array($value)) {
-                    $cond = 'in';
-                } elseif ($value instanceof self && $value->mode === 'select') {
-                    $cond = 'in';
-                } else {
-                    $cond = '=';
-                }
-            } else {
-                $cond = trim(strtolower($cond));
-            }
-
-            // below we can be sure that all 3 arguments has been passed
-
-            // special conditions (IS | IS NOT) if value is null
-            if ($value === null) {
-                if ($cond === '=') {
-                    $cond = 'is';
-                } elseif (in_array($cond, ['!=', '<>', 'not'])) {
-                    $cond = 'is not';
-                }
-            }
-
-            // value should be array for such conditions
-            if (in_array($cond, ['in', 'not in', 'not']) && is_string($value)) {
-                $value = array_map('trim', explode(',', $value));
-            }
-
-            // special conditions (IN | NOT IN) if value is array
-            if (is_array($value)) {
-                $value = '('.implode(',', $this->_param($value)).')';
-                $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
-                $ret[] = $field.' '.$cond.' '.$value;
-                continue;
-            }
-
-            // if value is object, then it should be Expression or Query itself
-            // otherwise just escape value
-            $value = $this->_consume($value, 'param');
-            $ret[] = $field.' '.$cond.' '.$value;
+            $ret[] = $this->__render_condition($row);
         }
 
         return $ret;
+    }
+
+    /**
+     * Renders one condition.
+     *
+     * @param array $row Condition
+     *
+     * @return string
+     */
+    protected function __render_condition($row)
+    {
+        if (count($row) === 3) {
+            list($field, $cond, $value) = $row;
+        } elseif (count($row) === 2) {
+            list($field, $cond) = $row;
+        } elseif (count($row) === 1) {
+            list($field) = $row;
+        }
+
+        $field = $this->_consume($field, 'soft-escape');
+
+        if (count($row) == 1) {
+            // Only a single parameter was passed, so we simply include all
+            return $field;
+        }
+
+        // below are only cases when 2 or 3 arguments are passed
+
+        // if no condition defined - set default condition
+        if (count($row) == 2) {
+            $value = $cond;
+
+            if (is_array($value)) {
+                $cond = 'in';
+            } elseif ($value instanceof self && $value->mode === 'select') {
+                $cond = 'in';
+            } else {
+                $cond = '=';
+            }
+        } else {
+            $cond = trim(strtolower($cond));
+        }
+
+        // below we can be sure that all 3 arguments has been passed
+
+        // special conditions (IS | IS NOT) if value is null
+        if ($value === null) {
+            if ($cond === '=') {
+                $cond = 'is';
+            } elseif (in_array($cond, ['!=', '<>', 'not'])) {
+                $cond = 'is not';
+            }
+        }
+
+        // value should be array for such conditions
+        if (in_array($cond, ['in', 'not in', 'not']) && is_string($value)) {
+            $value = array_map('trim', explode(',', $value));
+        }
+
+        // special conditions (IN | NOT IN) if value is array
+        if (is_array($value)) {
+            $value = '('.implode(',', $this->_param($value)).')';
+            $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
+
+            return $field.' '.$cond.' '.$value;
+        }
+
+        // if value is object, then it should be Expression or Query itself
+        // otherwise just escape value
+        $value = $this->_consume($value, 'param');
+
+        return $field.' '.$cond.' '.$value;
     }
 
     /**
@@ -1280,6 +1292,107 @@ class Query extends Expression
     public function andExpr()
     {
         return $this->dsql(['template' => '[andwhere]']);
+    }
+
+    /**
+     * Returns Query object of [case] expression.
+     *
+     * @param mixed $operand Optional operand for case expression.
+     *
+     * @return Query
+     */
+    public function caseExpr($operand = null)
+    {
+        $q = $this->dsql(['template' => '[case]']);
+
+        if ($operand !== null) {
+            $q->args['case_operand'] = $operand;
+        }
+
+        return $q;
+    }
+
+    /**
+     * Add when/then condition for [case] expression.
+     *
+     * @param mixed $when Condition as array for normal form [case] statement or just value in case of short form [case] statement
+     * @param mixed $then Then expression or value
+     *
+     * @return $this
+     */
+    public function when($when, $then)
+    {
+        $this->args['case_when'][] = [$when, $then];
+
+        return $this;
+    }
+
+    /**
+     * Add else condition for [case] expression.
+     *
+     * @param mixed $else Else expression or value
+     *
+     * @return $this
+     */
+    //public function else($else) // PHP 5.6 restricts to use such method name. PHP 7 is fine with it
+    public function otherwise($else)
+    {
+        $this->args['case_else'] = $else;
+
+        return $this;
+    }
+
+    /**
+     * Renders [case].
+     *
+     * @return string rendered SQL chunk
+     */
+    protected function _render_case()
+    {
+        if (!isset($this->args['case_when'])) {
+            return;
+        }
+
+        $ret = '';
+
+        // operand
+        if ($short_form = isset($this->args['case_operand'])) {
+            $ret .= ' '.$this->_consume($this->args['case_operand'], 'soft-escape');
+        }
+
+        // when, then
+        foreach ($this->args['case_when'] as $row) {
+            if (!array_key_exists(0, $row) || !array_key_exists(1, $row)) {
+                throw new Exception([
+                    'Incorrect use of "when" method parameters',
+                    'row'  => $row,
+                ]);
+            }
+
+            $ret .= ' when ';
+            if ($short_form) {
+                // short-form
+                if (is_array($row[0])) {
+                    throw new Exception([
+                        'When using short form CASE statement, then you should not set array as when() method 1st parameter',
+                        'when'  => $row[0],
+                    ]);
+                }
+                $ret .= $this->_consume($row[0], 'param');
+            } else {
+                $ret .= $this->__render_condition($row[0]);
+            }
+
+            // then
+            $ret .= ' then '.$this->_consume($row[1], 'param');
+        }
+
+        // else
+        if (array_key_exists('case_else', $this->args)) {
+            $ret .= ' else '.$this->_consume($this->args['case_else'], 'param');
+        }
+
+        return ' case'.$ret.' end';
     }
 
     /**
