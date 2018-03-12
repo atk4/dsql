@@ -1536,6 +1536,16 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                 ->else(null)
                 ->render();
         $this->assertEquals('case when "status" = :a then :b when "status" like :c then :d else :e end', $s);
+
+        // with subqueries
+        $age = new Expression('year(now()) - year(birth_date)');
+        $q = $this->q()->table('user')->field($age, 'calc_age');
+
+        $s = $this->q()->caseExpr()
+                ->when(['age', '>', $q], 'Older')
+                ->else('Younger')
+                ->render();
+        $this->assertEquals('case when "age" > (select year(now()) - year(birth_date) "calc_age" from "user") then :a else :b end', $s);
     }
 
     /**
@@ -1559,11 +1569,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $age = new Expression('year(now()) - year(birth_date)');
         $q = $this->q()->table('user')->field($age, 'calc_age');
 
-        $s = $this->q()->caseExpr()
-                ->when(['age', '>', $q], 'Older')
+        $s = $this->q()->caseExpr($q)
+                ->when(100, 'Very old')
                 ->else('Younger')
                 ->render();
-        $this->assertEquals('case when "age" > (select year(now()) - year(birth_date) "calc_age" from "user") then :a else :b end', $s);
+        $this->assertEquals('case (select year(now()) - year(birth_date) "calc_age" from "user") when :a then :b else :c end', $s);
     }
 
     /**
