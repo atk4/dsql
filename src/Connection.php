@@ -45,6 +45,43 @@ class Connection
     }
 
     /**
+     * Normalize DSN connection string.
+     *
+     * Returns normalized DSN as array ['dsn', 'user', 'pass', 'driver', 'rest'].
+     *
+     * @param array|string $dsn  DSN string
+     * @param string       $user Optional username
+     * @param string       $pass Optional password
+     *
+     * @return array
+     */
+    public static function normalizeDSN($dsn, $user = null, $pass = null)
+    {
+        // Try to dissect DSN into parts
+        $parts = is_array($dsn) ? $dsn : parse_url($dsn);
+
+        // If parts are usable, convert DSN format
+        if ($parts !== false && isset($parts['host'], $parts['path']) && $user === null && $pass === null) {
+            // DSN is using URL-like format, so we need to convert it
+            $dsn = $parts['scheme'].':host='.$parts['host'].';dbname='.substr($parts['path'], 1);
+            $user = isset($parts['user']) ? $parts['user'] : null;
+            $pass = isset($parts['pass']) ? $parts['pass'] : null;
+        }
+
+        // Find driver
+        if (strpos($dsn, ':') === false) {
+            throw new Exception([
+                "Your DSN format is invalid. Must be in 'driver:host:options' format",
+                'dsn' => $dsn,
+            ]);
+        }
+        list($driver, $rest) = explode(':', $dsn, 2);
+        $driver = strtolower($driver);
+
+        return ['dsn' => $dsn, 'user' => $user, 'pass' => $pass, 'driver' => $driver, 'rest' => $rest];
+    }
+
+    /**
      * Connect database.
      *
      * @param string|\PDO $dsn
@@ -90,30 +127,13 @@ class Connection
         }
 
         // Process DSN string
-        if (strpos($dsn, ':') === false) {
-            throw new Exception([
-                "Your DSN format is invalid. Must be in 'driver:host:options' format",
-                'dsn' => $dsn,
-            ]);
-        }
-        list($driver, $rest) = explode(':', $dsn, 2);
-
-        // Try to dissect DSN into parts
-        $parts = is_array($dsn) ? $dsn : parse_url($dsn);
-
-        // If parts are usable, convert DSN format
-        if ($parts !== false && isset($parts['host']) && isset($parts['path']) && $user === null && $password === null) {
-            // DSN is using URL-like format, so we need to convert it
-            $dsn = $parts['scheme'].':host='.$parts['host'].';dbname='.substr($parts['path'], 1);
-            $user = $parts['user'];
-            $password = $parts['pass'];
-        }
+        $dsn = static::normalizeDSN($dsn, $user, $password);
 
         // Create driver specific connection
-        switch (strtolower($driver)) {
+        switch ($dsn['driver']) {
             case 'mysql':
                 $c = new static(array_merge([
-                    'connection'       => new \PDO($dsn, $user, $password),
+                    'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                     'expression_class' => 'atk4\dsql\Expression_MySQL',
                     'query_class'      => 'atk4\dsql\Query_MySQL',
                 ], $args));
@@ -121,46 +141,46 @@ class Connection
 
             case 'sqlite':
                 $c = new static(array_merge([
-                    'connection'       => new \PDO($dsn, $user, $password),
+                    'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                     'query_class'      => 'atk4\dsql\Query_SQLite',
                 ], $args));
                 break;
 
             case 'oci':
                 $c = new Connection_Oracle(array_merge([
-                    'connection' => new \PDO($dsn, $user, $password),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                 ], $args));
                 break;
 
             case 'oci12':
-                $dsn = str_replace('oci12:', 'oci:', $dsn);
+                $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
                 $c = new Connection_Oracle12(array_merge([
-                    'connection' => new \PDO($dsn, $user, $password),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                 ], $args));
                 break;
 
             case 'pgsql':
                 $c = new Connection_PgSQL(array_merge([
-                    'connection'       => new \PDO($dsn, $user, $password),
+                    'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                 ], $args));
                 break;
 
             case 'dumper':
                 $c = new Connection_Dumper(array_merge([
-                    'connection' => static::connect($rest, $user, $password),
+                    'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
                 ], $args));
                 break;
 
             case 'counter':
                 $c = new Connection_Counter(array_merge([
-                    'connection' => static::connect($rest, $user, $password),
+                    'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
                 ], $args));
                 break;
 
                 // let PDO handle the rest
             default:
                 $c = new static(array_merge([
-                    'connection' => new \PDO($dsn, $user, $password),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                 ], $args));
         }
 
