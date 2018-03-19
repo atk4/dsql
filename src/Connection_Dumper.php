@@ -16,18 +16,27 @@ class Connection_Dumper extends Connection_Proxy
 
     public function execute(Expression $expr)
     {
-        $this->start_time = time() + microtime();
-        $ret = parent::execute($expr);
-        $took = time() + microtime() - $this->start_time;
+        $this->start_time = microtime(true);
 
-        if ($this->callback) {
-            $c = $this->callback;
-            $c($expr, $took);
-        } else {
-            $stderr = fopen($this->output_file, 'w');
-            $Message = sprintf("[%02.6f] %s\n", $took, $expr->getDebugQuery());
-            fwrite($stderr, $Message);
-            fclose($stderr);
+        try {
+            $ret = parent::execute($expr);
+            $took = microtime(true) - $this->start_time;
+            if ($this->callback) {
+                $c = $this->callback;
+                $c($expr, $took);
+            } else {
+                printf("[%02.6f] %s\n", $took, $expr->getDebugQuery());
+            }
+        } catch (\Exception $e) {
+            $took = microtime(true) - $this->start_time;
+            if ($this->callback) {
+                $c = $this->callback;
+                $c($expr, $took, true);
+            } else {
+                printf("[ERROR %02.6f] %s\n", $took, $expr->getDebugQuery());
+            }
+
+            throw $e;
         }
 
         return $ret;

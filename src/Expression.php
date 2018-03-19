@@ -40,6 +40,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     protected $paramBase = 'a';
 
     /**
+     * Field, table and alias name escaping symbol.
+     * By SQL Standard it's double quote, but MySQL uses backtick.
+     *
+     * @var string
+     */
+    protected $escape_char = '"';
+
+    /**
      * Used for Linking.
      *
      * @var string
@@ -57,7 +65,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * When you are willing to execute the query, connection needs to be specified.
      * By default this is PDO object.
      *
-     * @var PDO
+     * @var PDO|Connection
      */
     public $connection = null;
 
@@ -76,7 +84,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         if (is_string($properties)) {
             $properties = ['template' => $properties];
         } elseif (!is_array($properties)) {
-            throw new Exception('Incorect use of Expression constructor');
+            throw new Exception([
+                'Incorrect use of Expression constructor',
+                'properties' => $properties,
+                'arguments'  => $arguments,
+            ]);
         }
 
         // supports passing template as property value without key 'template'
@@ -88,7 +100,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // save arguments
         if ($arguments !== null) {
             if (!is_array($arguments)) {
-                throw new Exception('Expression arguments must be an array');
+                throw new Exception([
+                    'Expression arguments must be an array',
+                    'properties' => $properties,
+                    'arguments'  => $arguments,
+                ]);
             }
             $this->args['custom'] = $arguments;
         }
@@ -173,7 +189,21 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function expr($properties = [], $arguments = null)
     {
-        $e = new self($properties, $arguments);
+        // If we use DSQL Connection, then we should call expr() from there.
+        // Connection->expr() will return correct, connection specific Expression class.
+        if ($this->connection instanceof Connection) {
+            return $this->connection->expr($properties, $arguments);
+        }
+
+        // Otherwise, connection is probably PDO and we don't know which Expression
+        // class to use, so we make a smart guess :)
+        if ($this instanceof Query) {
+            $e = new self($properties, $arguments);
+        } else {
+            $e = new static($properties, $arguments);
+        }
+
+        $e->escape_char = $this->escape_char;
         $e->connection = $this->connection;
 
         return $e;
@@ -196,7 +226,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (!is_string($tag)) {
-            throw new Exception('Tag should be string');
+            throw new Exception([
+                'Tag should be string',
+                'tag' => $tag,
+            ]);
         }
 
         // unset custom/argument or argument if such exists
@@ -230,7 +263,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 case 'none':
                     return $sql_code;
             }
-            throw new Exception(['$escape_mode value is incorrect', 'escape_mode' => $escape_mode]);
+
+            throw new Exception([
+                '$escape_mode value is incorrect',
+                'escape_mode' => $escape_mode,
+            ]);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
@@ -239,7 +276,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (!$sql_code instanceof self) {
-            throw new Exception(['Only Expressions or Expressionable objects may be used in Expression', 'object' => $sql_code]);
+            throw new Exception([
+                'Only Expressions or Expressionable objects may be used in Expression',
+                'object' => $sql_code,
+            ]);
         }
 
         // at this point $sql_code is instance of Expression
@@ -261,8 +301,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Given the string parameter, it will detect some "deal-braker" for our soft escaping, such
-     * as "*" or "(".  Those will typically indicate that expression is passed and shouldn't
+     * Given the string parameter, it will detect some "deal-breaker" for our
+     * soft escaping, such as "*" or "(".
+     * Those will typically indicate that expression is passed and shouldn't
      * be escaped.
      */
     protected function isUnescapablePattern($value)
@@ -270,16 +311,16 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return is_object($value)
             || $value === '*'
             || strpos($value, '(') !== false
-            || strpos($value, '`') !== false;
+            || strpos($value, $this->escape_char) !== false;
     }
 
     /**
      * Soft-escaping SQL identifier. This method will attempt to put
-     * backticks around the identifier, however will not do so if you
-     * are using special characters like ".", "(" or "`".
+     * escaping char around the identifier, however will not do so if you
+     * are using special characters like ".", "(" or escaping char.
      *
      * It will smartly escape table.field type of strings resulting
-     * in `table`.`field`.
+     * in "table"."field".
      *
      * @param mixed $value Any string or array of strings
      *
@@ -301,7 +342,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
-        return '`'.trim($value).'`';
+        return $this->escape_char.trim($value).$this->escape_char;
     }
 
     /**
@@ -337,7 +378,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // in all other cases we should escape
-        return '`'.str_replace('`', '``', $value).'`';
+        return
+            $this->escape_char
+            .str_replace($this->escape_char, $this->escape_char.$this->escape_char, $value)
+            .$this->escape_char;
     }
 
     /**
@@ -380,7 +424,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         $res = preg_replace_callback(
-            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}/',
+            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}/i',
             function ($matches) use (&$nameless_count) {
                 $identifier = substr($matches[0], 1, -1);
                 $escaping = ($matches[0][0] == '[') ? 'param' : 'escape';
@@ -400,7 +444,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (method_exists($this, $fx)) {
                     $value = $this->$fx();
                 } else {
-                    throw new Exception(['Expression could not render tag', 'tag' => $identifier]);
+                    throw new Exception([
+                        'Expression could not render tag',
+                        'tag' => $identifier,
+                    ]);
                 }
 
                 return is_array($value) ? '('.implode(',', $value).')' : $value;
@@ -415,41 +462,49 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Return formatted debug output.
      *
+     * Ignore false positive warnings of PHPMD.
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     *
+     * @param bool $html Show as HTML?
+     *
      * @return string SQL syntax of query
      */
-    public function getDebugQuery($html = false)
+    public function getDebugQuery($html = null)
     {
         $d = $this->render();
-
         $pp = [];
-        $d = preg_replace('/`([^`]*)`/', '`<span style="color:black">\1</span>`', $d);
         foreach (array_reverse($this->params) as $key => $val) {
-            if (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', '\'<span style="color:green">'.
-                    htmlspecialchars(addslashes($val)).'</span>\'\1', $d);
+            if (is_numeric($val)) {
+                $d = preg_replace(
+                    '/'.$key.'([^_]|$)/',
+                    $val.'\1',
+                    $d
+                );
+            } elseif (is_string($val)) {
+                $d = preg_replace('/'.$key.'([^_]|$)/', "'".addslashes($val)."'\\1", $d);
             } elseif ($val === null) {
                 $d = preg_replace(
                     '/'.$key.'([^_]|$)/',
-                    '<span style="color:black">NULL</span>\1',
-                    $d
-                );
-            } elseif (is_numeric($val)) {
-                $d = preg_replace(
-                    '/'.$key.'([^_]|$)/',
-                    '<span style="color:red">'.$val.'</span>\1',
+                    'NULL\1',
                     $d
                 );
             } else {
-                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\1', $d);
+                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\\1', $d);
             }
-
             $pp[] = $key;
         }
-
-        $result = $d.' <span style="color:gray">['.implode(', ', $pp).']</span>';
-
+        if (class_exists('SqlFormatter')) {
+            if ($html) {
+                $result = \SqlFormatter::format($d);
+            } else {
+                $result = \SqlFormatter::format($d, false);
+            }
+        } else {
+            $result = $d;  // output as-is
+        }
         if (!$html) {
-            return strip_tags($result);
+            return str_replace('#lte#', '<=', strip_tags(str_replace('<=', '#lte#', $result), '<>'));
         }
 
         return $result;
@@ -477,7 +532,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Execute expression.
      *
-     * @param PDO $connection
+     * @param PDO|Connection $connection
      *
      * @return PDOStatement
      */
@@ -497,23 +552,45 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 if (is_int($val)) {
                     $type = \PDO::PARAM_INT;
                 } elseif (is_bool($val)) {
-                    $type = \PDO::PARAM_BOOL;
+                    // SQL does not like booleans at all, so convert them INT
+                    $type = \PDO::PARAM_INT;
+                    $val = (int) $val;
                 } elseif ($val === null) {
                     $type = \PDO::PARAM_NULL;
                 } elseif (is_string($val) || is_float($val)) {
                     $type = \PDO::PARAM_STR;
                 } else {
-                    throw new Exception('Incorrect param type in');
+                    throw new Exception([
+                        'Incorrect param type',
+                        'key'   => $key,
+                        'value' => $val,
+                    ]);
                 }
 
                 if (!$statement->bindValue($key, $val, $type)) {
-                    throw new Exception(['Unable to bind parameter', 'param' => $key,
-                        'value' => $val, 'type' => $type, ]);
+                    throw new Exception([
+                        'Unable to bind parameter',
+                        'param' => $key,
+                        'value' => $val,
+                        'type'  => $type,
+                    ]);
                 }
             }
 
             $statement->setFetchMode(\PDO::FETCH_ASSOC);
-            $statement->execute();
+
+            try {
+                $statement->execute();
+            } catch (\Exception $e) {
+                $new = new Exception([
+                    'DSQL got Exception when executing this query',
+                    'error' => $e->getMessage(),
+                    'query' => $this->getDebugQuery(),
+                ]);
+                $new->by_exception = $e;
+
+                throw $new;
+            }
 
             return $statement;
         } else {

@@ -1,3 +1,107 @@
+# 1.2.0
+
+In this verison we are adding support for Oracle and PostgreSQL. 
+
+**Closed issues:**
+
+- where\(\) should throw exception when passed incompatible object. [\#121](https://github.com/atk4/dsql/issues/121)
+
+**Merged pull requests:**
+
+- Feature/oracle support fixes [\#133](https://github.com/atk4/dsql/pull/133) ([DarkSide666](https://github.com/DarkSide666))
+- Feature/connection oracle [\#132](https://github.com/atk4/dsql/pull/132) ([DarkSide666](https://github.com/DarkSide666))
+- Fix: SQL does not guarantee the order of retreived rows unless explic… [\#131](https://github.com/atk4/dsql/pull/131) ([gartner](https://github.com/gartner))
+- Create a driver for postgresql [\#130](https://github.com/atk4/dsql/pull/130) ([gartner](https://github.com/gartner))
+- spellcheck and wrapping :\) [\#125](https://github.com/atk4/dsql/pull/125) ([DarkSide666](https://github.com/DarkSide666))
+- Feature/oracle support [\#124](https://github.com/atk4/dsql/pull/124) ([romaninsh](https://github.com/romaninsh))
+- Add verification for foreign objects inside where\(\) values [\#122](https://github.com/atk4/dsql/pull/122) ([romaninsh](https://github.com/romaninsh))
+- Add support for URI-style DNS: mysql://user:pass@host/db [\#120](https://github.com/atk4/dsql/pull/120) ([romaninsh](https://github.com/romaninsh))
+
+## 1.2.1
+
+Resolve minor issues where expression class wasn't set correctly or some minor incompatibilities
+appeared between SQL vendor syntaxes.
+
+**Closed issues:**
+
+- ATK Data, action\('fx'\) not working [\#136](https://github.com/atk4/dsql/issues/136)
+- Passing a \PDO to connect\(\) assumes mysql [\#134](https://github.com/atk4/dsql/issues/134)
+- \[epic\] Add support for PostgreSQL [\#129](https://github.com/atk4/dsql/issues/129)
+- Use PDO::quote\(\) to escape values and identifiers [\#127](https://github.com/atk4/dsql/issues/127)
+- Add PostgreSQL test-scripts [\#27](https://github.com/atk4/dsql/issues/27)
+
+**Merged pull requests:**
+
+- resolve \#136 [\#137](https://github.com/atk4/dsql/pull/137) ([romaninsh](https://github.com/romaninsh))
+- Fix pdo [\#135](https://github.com/atk4/dsql/pull/135) ([gartner](https://github.com/gartner))
+
+
+
+# Older releases
+
+## 1.1.5
+
+- Migrate to Agile Core 1.3
+
+## 1.1.4
+
+- Migrate to Agile Core 1.2
+
+## 1.1.3
+
+- Added release script
+
+## 1.1.2
+
+ - Fix how getDebugQuery() works without sql-formatter
+ - Fix Query::dsql will return instance of same class if you extend. #116
+
+## 1.1.1
+
+Bugfix and README.md update.
+
+## 1.1.0
+
+This version now officially supports PHP 7.1, as well as adding
+optional dependency for SQL formatter (credit to
+[https://github.com/jdorn/sql-formatter](jdorn)). When running
+getDebugQuery(true) you'll be getting a well formatted and
+justified SQL query.
+
+If after upgrading to 1.1.* branch your application complains
+about missing class "SqlFormatter", then your autoloader is
+not configured correctly and as a work-around you would need to:
+
+ > composer require jdorn/sql-formatter
+
+## 1.0.10
+
+Clean code, instead of relying on error suppression.
+
+## 1.0.9
+
+Exception class has been having the same functionality as the one
+from atk4/core, so we have finally added dependency for atk4/core
+and exndended their exception.
+
+To celebrate this fact, we have added additional infromation
+through params to all the places where we use Exceptions.
+
+
+## 1.0.8
+
+Calling `$dsql->set('foo', 4)->set('foo', 10);` now works differently.
+It used to record "foo=10" in insert/update record, but now it will
+simply add both statement. With MySQL at least the first value is
+used.
+
+Calling set() multiple times should behave similarly how adding
+multiple conditions on the same field. It's not up to DSQL to
+select which value to use.
+
+* Field in set() can now be an expression
+* Improved formatting a bit
+
 ## 1.0.7
 
 * Fix test-suite bugs introduced in 1.0.6

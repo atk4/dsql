@@ -1,28 +1,37 @@
 language: php
 
 php:
-    - '5.5'
     - '5.6'
     - '7.0'
+    - '7.1'
+    - '7.2'
 
 cache:
   directories:
     - $HOME/.composer/cache
 
+addons:
+  postgresql: "9.3"
 
 services:
     - mysql
+    - postgresql
 
 before_script:
-    - composer install
+    - composer self-update
+    - composer install --no-ansi
     - mysql -e 'create database dsql_test;'
-
-after_script:
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.6" ]]; then vendor/bin/test-reporter; fi
+    - psql -c 'create database "atk4-dsql-test";' -U postgres
+    - mkdir -p build/logs
 
 script:
-    - phpunit
-    - phpunit --configuration phpunit-mysql.xml
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then CM=""; NC=""; else CM=""; NC="--no-coverage"; fi
+    - $CM ./vendor/bin/phpunit $NC
+    - $CM ./vendor/bin/phpunit --configuration phpunit-mysql.xml $NC
+    - $CM ./vendor/bin/phpunit --configuration phpunit-pgsql.xml $NC
+
+after_script:
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then vendor/bin/phpcov merge build/logs/ --clover cc.xml; vendor/bin/test-reporter --coverage-report cc.xml; fi
 
 notifications:
     urls:

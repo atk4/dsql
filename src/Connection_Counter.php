@@ -41,7 +41,9 @@ class Connection_Counter extends Connection_Proxy
             $this->expressions++;
         }
 
-        return parent::execute($expr);
+        $ret = parent::execute($expr);
+
+        return $this->iterate($ret);
     }
 
     public function __destruct()

@@ -12,6 +12,8 @@ namespace atk4\dsql;
  */
 class Connection
 {
+    use \atk4\core\DIContainerTrait;
+
     /** @var string Query classname */
     protected $query_class = 'atk4\dsql\Query';
 
@@ -25,69 +27,164 @@ class Connection
     public $transaction_depth = 0;
 
     /**
+     * Specifying $properties to constructors will override default
+     * property values of this class.
+     *
+     * @param array $properties
+     */
+    public function __construct($properties = [])
+    {
+        if (!is_array($properties)) {
+            throw new Exception([
+                'Invalid properties for "new Connection()". Did you mean to call Connection::connect()?',
+                'properties' => $properties,
+            ]);
+        }
+
+        $this->setDefaults($properties);
+    }
+
+    /**
+     * Normalize DSN connection string.
+     *
+     * Returns normalized DSN as array ['dsn', 'user', 'pass', 'driver', 'rest'].
+     *
+     * @param array|string $dsn  DSN string
+     * @param string       $user Optional username
+     * @param string       $pass Optional password
+     *
+     * @return array
+     */
+    public static function normalizeDSN($dsn, $user = null, $pass = null)
+    {
+        // Try to dissect DSN into parts
+        $parts = is_array($dsn) ? $dsn : parse_url($dsn);
+
+        // If parts are usable, convert DSN format
+        if ($parts !== false && isset($parts['host'], $parts['path']) && $user === null && $pass === null) {
+            // DSN is using URL-like format, so we need to convert it
+            $dsn = $parts['scheme'].':host='.$parts['host'].';dbname='.substr($parts['path'], 1);
+            $user = isset($parts['user']) ? $parts['user'] : null;
+            $pass = isset($parts['pass']) ? $parts['pass'] : null;
+        }
+
+        // Find driver
+        if (strpos($dsn, ':') === false) {
+            throw new Exception([
+                "Your DSN format is invalid. Must be in 'driver:host:options' format",
+                'dsn' => $dsn,
+            ]);
+        }
+        list($driver, $rest) = explode(':', $dsn, 2);
+        $driver = strtolower($driver);
+
+        return ['dsn' => $dsn, 'user' => $user, 'pass' => $pass, 'driver' => $driver, 'rest' => $rest];
+    }
+
+    /**
      * Connect database.
      *
-     * @param string $dsn
-     * @param string $user
-     * @param string $password
-     * @param array  $args
+     * @param string|\PDO $dsn
+     * @param null|string $user
+     * @param null|string $password
+     * @param array       $args
      *
      * @return Connection
      */
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
-        if (strpos($dsn, ':') === false) {
-            throw new Exception(["Your DSN format is invalid. Must be in 'driver:host:options' format", 'dsn' => $dsn]);
-        }
-        list($driver, $rest) = explode(':', $dsn, 2);
+        // If it's already PDO object, then we simply use it
+        if ($dsn instanceof \PDO) {
+            $driver = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
+            $connectionClass = '\\atk4\\dsql\\Connection';
+            $queryClass = null;
+            $expressionClass = null;
+            switch ($driver) {
+                case 'pgsql':
+                    $connectionClass = '\\atk4\\dsql\\Connection_PgSQL';
+                    $queryClass = 'atk4\dsql\Query_PgSQL';
+                    break;
+                case 'oci':
+                    $connectionClass = '\\atk4\\dsql\\Connection_Oracle';
+                    break;
+                case 'sqlite':
+                    $queryClass = 'atk4\dsql\Query_SQLite';
+                    break;
+                case 'mysql':
+                    $expressionClass = 'atk4\dsql\Expression_MySQL';
+                default:
+                    // Default, for backwards compatibility
+                    $queryClass = 'atk4\dsql\Query_MySQL';
+                    break;
 
-        switch (strtolower($driver)) {
+            }
+
+            return new $connectionClass(array_merge([
+                    'connection'       => $dsn,
+                    'query_class'      => $queryClass,
+                    'expression_class' => $expressionClass,
+                ], $args));
+        }
+
+        // Process DSN string
+        $dsn = static::normalizeDSN($dsn, $user, $password);
+
+        // Create driver specific connection
+        switch ($dsn['driver']) {
             case 'mysql':
-                return new self(array_merge([
-                    'connection'  => new \PDO($dsn, $user, $password),
-                    'query_class' => 'atk4\dsql\Query_MySQL',
+                $c = new static(array_merge([
+                    'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'expression_class' => 'atk4\dsql\Expression_MySQL',
+                    'query_class'      => 'atk4\dsql\Query_MySQL',
                 ], $args));
+                break;
+
             case 'sqlite':
-                return new self(array_merge([
-                    'connection'  => new \PDO($dsn, $user, $password),
-                    'query_class' => 'atk4\dsql\Query_SQLite',
+                $c = new static(array_merge([
+                    'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'query_class'      => 'atk4\dsql\Query_SQLite',
                 ], $args));
+                break;
+
+            case 'oci':
+                $c = new Connection_Oracle(array_merge([
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                ], $args));
+                break;
+
+            case 'oci12':
+                $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
+                $c = new Connection_Oracle12(array_merge([
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                ], $args));
+                break;
+
+            case 'pgsql':
+                $c = new Connection_PgSQL(array_merge([
+                    'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                ], $args));
+                break;
+
             case 'dumper':
-                return new Connection_Dumper(array_merge([
-                    'connection' => self::connect($rest, $user, $password),
+                $c = new Connection_Dumper(array_merge([
+                    'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
                 ], $args));
+                break;
 
             case 'counter':
-                return new Connection_Counter(array_merge([
-                    'connection' => self::connect($rest, $user, $password),
+                $c = new Connection_Counter(array_merge([
+                    'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
                 ], $args));
+                break;
 
                 // let PDO handle the rest
             default:
-                return new self(array_merge([
-                    'connection' => new \PDO($dsn, $user, $password),
+                $c = new static(array_merge([
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                 ], $args));
-
         }
-    }
 
-    /**
-     * Specifying $attributes to constructors will override default
-     * attribute values of this class.
-     *
-     * @param array $attributes
-     */
-    public function __construct($attributes = null)
-    {
-        if ($attributes !== null) {
-            if (!is_array($attributes)) {
-                throw new Exception('Invalid arguments for "new Connection()". Did you mean to call Connection::connect()?');
-            }
-
-            foreach ($attributes as $key => $val) {
-                $this->$key = $val;
-            }
-        }
+        return $c;
     }
 
     /**
@@ -101,7 +198,7 @@ class Connection
     {
         $c = $this->query_class;
         $q = new $c($properties);
-        $q->connection = $this->connection ?: $this;
+        $q->connection = $this;
 
         return $q;
     }
@@ -158,6 +255,7 @@ class Connection
     public function atomic($f)
     {
         $this->beginTransaction();
+
         try {
             $res = call_user_func($f);
             $this->commit();
@@ -165,6 +263,7 @@ class Connection
             return $res;
         } catch (\Exception $e) {
             $this->rollBack();
+
             throw $e;
         }
     }
@@ -173,7 +272,7 @@ class Connection
      * Starts new transaction.
      *
      * Database driver supports statements for starting and committing
-     * transactions. Unfortunatelly most of them don't allow to nest
+     * transactions. Unfortunately most of them don't allow to nest
      * transactions and commit gradually.
      * With this method you have some implementation of nested transactions.
      *
@@ -182,7 +281,7 @@ class Connection
      * You will need to call commit() for each execution of beginTransactions()
      * and only the last commit will perform actual commit in database.
      *
-     * So, if you have been working with the database and got unhandled
+     * So, if you have been working with the database and got un-handled
      * exception in the middle of your code, everything will be rolled back.
      *
      * @return mixed Don't rely on any meaningful return
@@ -194,7 +293,7 @@ class Connection
             ? false
             : $this->connection->beginTransaction();
 
-        ++$this->transaction_depth;
+        $this->transaction_depth++;
 
         return $r;
     }
@@ -217,7 +316,7 @@ class Connection
     /**
      * Commits transaction.
      *
-     * Each occurance of beginTransaction() must be matched with commit().
+     * Each occurrence of beginTransaction() must be matched with commit().
      * Only when same amount of commits are executed, the actual commit will be
      * issued to the database.
      *
@@ -232,7 +331,7 @@ class Connection
             throw new Exception('Using commit() when no transaction has started');
         }
 
-        --$this->transaction_depth;
+        $this->transaction_depth--;
 
         if ($this->transaction_depth == 0) {
             return $this->connection->commit();
@@ -255,12 +354,26 @@ class Connection
             throw new Exception('Using rollBack() when no transaction has started');
         }
 
-        --$this->transaction_depth;
+        $this->transaction_depth--;
 
         if ($this->transaction_depth == 0) {
             return $this->connection->rollBack();
         }
 
         return false;
+    }
+
+    /**
+     * Return last inserted ID value.
+     *
+     * Few Connection drivers need to receive Model to get ID because PDO doesn't support this method.
+     *
+     * @param \atk4\data\Model Optional data model from which to return last ID
+     *
+     * @return mixed
+     */
+    public function lastInsertID($m = null)
+    {
+        return $this->connection()->lastInsertID();
     }
 }

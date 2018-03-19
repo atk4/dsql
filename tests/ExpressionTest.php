@@ -29,7 +29,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::__construct
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Incorect use of Expression constructor
      */
     public function testConstructorException_1st_1()
     {
@@ -41,7 +40,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::__construct
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Incorect use of Expression constructor
      */
     public function testConstructorException_1st_2()
     {
@@ -52,7 +50,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Test constructor exception - wrong 2nd parameter.
      *
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Expression arguments must be an array
      */
     public function testConstructorException_2nd_1()
     {
@@ -63,7 +60,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Test constructor exception - wrong 2nd parameter.
      *
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Expression arguments must be an array
      */
     public function testConstructorException_2nd_2()
     {
@@ -74,10 +70,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      * Test constructor exception - no arguments.
      *
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Template is not defined for Expression
      */
     public function testConstructorException_0arg()
     {
+        // Template is not defined for Expression
         $this->e()->render();
     }
 
@@ -142,7 +138,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('world', $e->params[':a']);
 
         $e = $this->e('hello, {who}', ['who' => 'world']);
-        $this->assertEquals('hello, `world`', $e->render());
+        $this->assertEquals('hello, "world"', $e->render());
         $this->assertEquals([], $e->params);
     }
 
@@ -214,19 +210,19 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals(
-            '++1 and --2 [:b, :a]',
+            '++1 and --2',
             strip_tags($e1->getDebugQuery())
         );
 
         $e2 = $this->e('=== [foo] ===', ['foo' => $e1]);
 
         $this->assertEquals(
-            '=== ++1 and --2 === [:b, :a]',
+            '=== ++1 and --2 ===',
             strip_tags($e2->getDebugQuery())
         );
 
         $this->assertEquals(
-            '++1 and --2 [:b, :a]',
+            '++1 and --2',
             strip_tags($e1->getDebugQuery())
         );
     }
@@ -289,16 +285,16 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     {
         // escaping expressions
         $this->assertEquals(
-            '`first_name`',
+            '"first_name"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['first_name'])
         );
         $this->assertEquals(
-            '`123`',
+            '"123"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [123])
         );
         $this->assertEquals(
-            '`he``llo`',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['he`llo'])
+            '"he""llo"',
+            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['he"llo'])
         );
 
         // should not escape expressions
@@ -307,7 +303,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['*'])
         );
         $this->assertEquals(
-            '`*`',
+            '"*"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['*'])
         );
         $this->assertEquals(
@@ -315,15 +311,15 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['(2+2) age'])
         );
         $this->assertEquals(
-            '`(2+2) age`',
+            '"(2+2) age"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['(2+2) age'])
         );
         $this->assertEquals(
-            '`users`.`first_name`',
+            '"users"."first_name"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['users.first_name'])
         );
         $this->assertEquals(
-            '`users`.*',
+            '"users".*',
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['users.*'])
         );
         $this->assertEquals(
@@ -333,27 +329,27 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
         // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
-            ['`first_name`', '*', '`last_name`'],
+            ['"first_name"', '*', '"last_name"'],
             PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [['first_name', '*', 'last_name']])
         );
 
         // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
-            ['`first_name`', '`*`', '`last_name`'],
+            ['"first_name"', '"*"', '"last_name"'],
             PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [['first_name', '*', 'last_name']])
         );
 
         $this->assertEquals(
-            '`first_name`',
+            '"first_name"',
             $this->e()->escape('first_name')->render()
         );
         $this->assertEquals(
-            '`first``_name`',
-            $this->e()->escape('first`_name')->render()
+            '"first""_name"',
+            $this->e()->escape('first"_name')->render()
         );
         $this->assertEquals(
-            '`first``_name {}`',
-            $this->e()->escape('first`_name {}')->render()
+            '"first""_name {}"',
+            $this->e()->escape('first"_name {}')->render()
         );
     }
 
@@ -395,7 +391,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     {
         // few brief tests on _consume
         $this->assertEquals(
-            '`123`',
+            '"123"',
             PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'escape'])
         );
         $this->assertEquals(
@@ -412,15 +408,16 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            'hello, `myfield`',
+            'hello, "myfield"',
             $this->e('hello, []', [new MyField()])->render()
         );
     }
 
     /**
+     * $escape_mode value is incorrect.
+     *
      * @covers ::_consume
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage $escape_mode value is incorrect
      */
     public function testConsumeException1()
     {
@@ -428,9 +425,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Only Expressions or Expressionable objects may be used in Expression.
+     *
      * @covers ::_consume
      * @expectedException atk4\dsql\Exception
-     * @expectedExceptionMessage Only Expressions or Expressionable objects may be used in Expression
      */
     public function testConsumeException2()
     {
@@ -466,7 +464,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $e = $this->e('[], []');
         $e[] = 'Hello';
         $e[] = 'World';
-        $this->assertEquals("'Hello', 'World' [:b, :a]", strip_tags($e->getDebugQuery()));
+        $this->assertEquals("'Hello', 'World'", strip_tags($e->getDebugQuery()));
 
         // real-life example
         $age = $this->e('coalesce([age], [default_age])');
@@ -554,7 +552,6 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-
 // @codingStandardsIgnoreStart
 class JsonExpression extends Expression
 {
@@ -567,7 +564,7 @@ class MyField implements Expressionable
 {
     public function getDSQLExpression($e)
     {
-        return $e->expr('`myfield`');
+        return $e->expr('"myfield"');
     }
 }
 /*

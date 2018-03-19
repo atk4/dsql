@@ -1,6 +1,6 @@
 <?php
 
-namespace atk4\dsql\tests;
+namespace atk4\dsql\tests\db;
 
 use atk4\dsql\Connection;
 use atk4\dsql\Expression;
@@ -89,23 +89,48 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             $this->q()->field(new Expression('2+2'), 'now')->get()
         );
 
-        $this->assertEquals(
-            [['now' => 6]],
-            $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
-        );
+        /*
+         * Postgresql needs to have values cast, to make the query work.
+         * But CAST(.. AS int) does not work in mysql. So we use two different tests..
+         * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
+         */
+        if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+            $this->assertEquals(
+                [['now' => 6]],
+                $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
+            );
+        } else {
+            $this->assertEquals(
+                [['now' => 6]],
+                $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
+            );
+        }
 
         $this->assertEquals(
             5,
-            $this->q()->field(new Expression('IFNULL([],5)', [null]), 'null_test')->getOne()
+            $this->q()->field(new Expression('COALESCE([],5)', [null]), 'null_test')->getOne()
         );
     }
 
     public function testExpression()
     {
-        $this->assertEquals(
-            'foo',
-            $this->e('select []', ['foo'])->getOne()
-        );
+        /*
+         * Postgresql, at least versions before 10, needs to have the string cast to the
+         * correct datatype.
+         * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
+         * entire string on mysql.
+         */
+        if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+            $this->assertEquals(
+                'foo',
+                $this->e('select CAST([] AS TEXT)', ['foo'])->getOne()
+            );
+        } else {
+            $this->assertEquals(
+                'foo',
+                $this->e('select CAST([] AS CHAR)', ['foo'])->getOne()
+            );
+        }
     }
 
     /**
@@ -159,11 +184,11 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->insert();
         $this->assertEquals(
             [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->get()
+            $this->q('employee')->field('id,name')->order('id')->get()
         );
         $this->assertEquals(
             [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->select()->fetchAll()
+            $this->q('employee')->field('id,name')->order('id')->select()->fetchAll()
         );
 
         // update
@@ -173,13 +198,20 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->update();
         $this->assertEquals(
             [['id' => 1, 'name' => 'Johnny'], ['id' => 2, 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->get()
+            $this->q('employee')->field('id,name')->order('id')->get()
         );
 
         // replace
-        $this->q('employee')
-            ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
-            ->replace();
+        if ('pgsql' !== $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+            $this->q('employee')
+                ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
+                ->replace();
+        } else {
+            $this->q('employee')
+                ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
+                ->where('id', 1)
+                ->update();
+        }
 
         // In SQLite replace is just like insert, it just checks if there is
         // duplicate key and if it is it deletes the row, and inserts the new
