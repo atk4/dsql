@@ -36,6 +36,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $dsn = Connection::normalizeDSN('mysql:host=localhost;dbname=db', 'root', 'pass');
         $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db', 'user'=>'root', 'pass'=>'pass', 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db'], $dsn);
 
+        // username and password should take precedence
+        $dsn = Connection::normalizeDSN('mysql://root:pass@localhost/db', 'foo', 'bar');
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db', 'user'=>'foo', 'pass'=>'bar', 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db'], $dsn);
+
         // more options
         $dsn = Connection::normalizeDSN('mysql://root:pass@localhost/db;foo=bar');
         $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db;foo=bar', 'user'=>'root', 'pass'=>'pass', 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db;foo=bar'], $dsn);

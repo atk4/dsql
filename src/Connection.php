@@ -50,8 +50,8 @@ class Connection
      * Returns normalized DSN as array ['dsn', 'user', 'pass', 'driver', 'rest'].
      *
      * @param array|string $dsn  DSN string
-     * @param string       $user Optional username
-     * @param string       $pass Optional password
+     * @param string       $user Optional username, this takes precedence over dsn string
+     * @param string       $pass Optional password, this takes precedence over dsn string
      *
      * @return array
      */
@@ -61,11 +61,11 @@ class Connection
         $parts = is_array($dsn) ? $dsn : parse_url($dsn);
 
         // If parts are usable, convert DSN format
-        if ($parts !== false && isset($parts['host'], $parts['path']) && $user === null && $pass === null) {
+        if ($parts !== false && isset($parts['host'], $parts['path'])) {
             // DSN is using URL-like format, so we need to convert it
             $dsn = $parts['scheme'].':host='.$parts['host'].';dbname='.substr($parts['path'], 1);
-            $user = isset($parts['user']) ? $parts['user'] : null;
-            $pass = isset($parts['pass']) ? $parts['pass'] : null;
+            $user = $user !== null ? $user : (isset($parts['user']) ? $parts['user'] : null);
+            $pass = $pass !== null ? $pass : (isset($parts['pass']) ? $parts['pass'] : null);
         }
 
         // Find driver
