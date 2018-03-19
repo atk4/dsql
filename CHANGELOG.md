@@ -35,7 +35,17 @@ appeared between SQL vendor syntaxes.
 - resolve \#136 [\#137](https://github.com/atk4/dsql/pull/137) ([romaninsh](https://github.com/romaninsh))
 - Fix pdo [\#135](https://github.com/atk4/dsql/pull/135) ([gartner](https://github.com/gartner))
 
+## 1.2.2
 
+**Implemented enhancements:**
+
+- Add support for CASE expression [\#74](https://github.com/atk4/dsql/issues/74)
+- We should properly support tables and fields with spaces e.g. `my table`. [\#60](https://github.com/atk4/dsql/issues/60)
+
+**Merged pull requests:**
+
+- Implement normalizeDSN\(\) [\#139](https://github.com/atk4/dsql/pull/139) ([DarkSide666](https://github.com/DarkSide666))
+- Implement CASE WHEN/THEN [\#138](https://github.com/atk4/dsql/pull/138) ([DarkSide666](https://github.com/DarkSide666))
 
 # Older releases
 
