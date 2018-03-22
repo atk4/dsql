@@ -7,7 +7,7 @@ use atk4\dsql\Connection;
 /**
  * @coversDefaultClass \atk4\dsql\ConnectionTest
  */
-class OracleTest extends \PHPUnit_Framework_TestCase
+class OracleTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     /**
      * Test constructor.

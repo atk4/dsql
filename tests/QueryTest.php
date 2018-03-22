@@ -8,7 +8,7 @@ use atk4\dsql\Query;
 /**
  * @coversDefaultClass \atk4\dsql\Query
  */
-class QueryTest extends \PHPUnit_Framework_TestCase
+class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     public function q()
     {
@@ -33,7 +33,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         // passing properties in constructor
         $this->assertEquals(
             '"q"',
-            PHPUnitUtil::callProtectedMethod($this->q(), '_escape', ['q'])
+            $this->callProtected($this->q(), '_escape', ['q'])
         );
     }
 
@@ -69,55 +69,55 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             '"first_name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name'), '_render_field')
+            $this->callProtected($this->q()->field('first_name'), '_render_field')
         );
         $this->assertEquals(
             '"first_name","last_name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name,last_name'), '_render_field')
+            $this->callProtected($this->q()->field('first_name,last_name'), '_render_field')
         );
         $this->assertEquals(
             '"first_name","last_name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name')->field('last_name'), '_render_field')
+            $this->callProtected($this->q()->field('first_name')->field('last_name'), '_render_field')
         );
         $this->assertEquals(
             '"last_name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name')->reset('field')->field('last_name'), '_render_field')
+            $this->callProtected($this->q()->field('first_name')->reset('field')->field('last_name'), '_render_field')
         );
         $this->assertEquals(
             '*',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name')->reset('field'), '_render_field')
+            $this->callProtected($this->q()->field('first_name')->reset('field'), '_render_field')
         );
         $this->assertEquals(
             '*',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name')->reset(), '_render_field')
+            $this->callProtected($this->q()->field('first_name')->reset(), '_render_field')
         );
         $this->assertEquals(
             '"employee"."first_name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('employee.first_name'), '_render_field')
+            $this->callProtected($this->q()->field('employee.first_name'), '_render_field')
         );
         $this->assertEquals(
             '"first_name" "name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('first_name', 'name'), '_render_field')
+            $this->callProtected($this->q()->field('first_name', 'name'), '_render_field')
         );
         $this->assertEquals(
             '"first_name" "name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field(['name' => 'first_name']), '_render_field')
+            $this->callProtected($this->q()->field(['name' => 'first_name']), '_render_field')
         );
         $this->assertEquals(
             '"name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field(['name' => 'name']), '_render_field')
+            $this->callProtected($this->q()->field(['name' => 'name']), '_render_field')
         );
         $this->assertEquals(
             '"employee"."first_name" "name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field(['name' => 'employee.first_name']), '_render_field')
+            $this->callProtected($this->q()->field(['name' => 'employee.first_name']), '_render_field')
         );
         $this->assertEquals(
             '*',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('*'), '_render_field')
+            $this->callProtected($this->q()->field('*'), '_render_field')
         );
         $this->assertEquals(
             '"employee"."first_name"',
-            PHPUnitUtil::callProtectedMethod($this->q()->field('employee.first_name'), '_render_field')
+            $this->callProtected($this->q()->field('employee.first_name'), '_render_field')
         );
     }
 
@@ -132,22 +132,22 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         // default defaultField
         $this->assertEquals(
             '*',
-            PHPUnitUtil::callProtectedMethod($this->q(), '_render_field')
+            $this->callProtected($this->q(), '_render_field')
         );
         // defaultField as custom string - not escaped
         $this->assertEquals(
             'id',
-            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => 'id']), '_render_field')
+            $this->callProtected($this->q(['defaultField' => 'id']), '_render_field')
         );
         // defaultField as custom string with dot - not escaped
         $this->assertEquals(
             'all.values',
-            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => 'all.values']), '_render_field')
+            $this->callProtected($this->q(['defaultField' => 'all.values']), '_render_field')
         );
         // defaultField as Expression object - not escaped
         $this->assertEquals(
             'values()',
-            PHPUnitUtil::callProtectedMethod($this->q(['defaultField' => new Expression('values()')]), '_render_field')
+            $this->callProtected($this->q(['defaultField' => new Expression('values()')]), '_render_field')
         );
     }
 

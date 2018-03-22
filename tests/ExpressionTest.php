@@ -9,7 +9,7 @@ use atk4\dsql\Query;
 /**
  * @coversDefaultClass \atk4\dsql\Expression
  */
-class ExpressionTest extends \PHPUnit_Framework_TestCase
+class ExpressionTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     public function e()
     {
@@ -286,57 +286,57 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         // escaping expressions
         $this->assertEquals(
             '"first_name"',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['first_name'])
+            $this->callProtected($this->e(), '_escape', ['first_name'])
         );
         $this->assertEquals(
             '"123"',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [123])
+            $this->callProtected($this->e(), '_escape', [123])
         );
         $this->assertEquals(
             '"he""llo"',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['he"llo'])
+            $this->callProtected($this->e(), '_escape', ['he"llo'])
         );
 
         // should not escape expressions
         $this->assertEquals(
             '*',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['*'])
+            $this->callProtected($this->e(), '_escapeSoft', ['*'])
         );
         $this->assertEquals(
             '"*"',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['*'])
+            $this->callProtected($this->e(), '_escape', ['*'])
         );
         $this->assertEquals(
             '(2+2) age',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['(2+2) age'])
+            $this->callProtected($this->e(), '_escapeSoft', ['(2+2) age'])
         );
         $this->assertEquals(
             '"(2+2) age"',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', ['(2+2) age'])
+            $this->callProtected($this->e(), '_escape', ['(2+2) age'])
         );
         $this->assertEquals(
             '"users"."first_name"',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['users.first_name'])
+            $this->callProtected($this->e(), '_escapeSoft', ['users.first_name'])
         );
         $this->assertEquals(
             '"users".*',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', ['users.*'])
+            $this->callProtected($this->e(), '_escapeSoft', ['users.*'])
         );
         $this->assertEquals(
             true,
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [new \stdClass()]) instanceof \stdClass
+            $this->callProtected($this->e(), '_escapeSoft', [new \stdClass()]) instanceof \stdClass
         );
 
         // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
             ['"first_name"', '*', '"last_name"'],
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escapeSoft', [['first_name', '*', 'last_name']])
+            $this->callProtected($this->e(), '_escapeSoft', [['first_name', '*', 'last_name']])
         );
 
         // escaping array - escapes each of its elements using hard escape
         $this->assertEquals(
             ['"first_name"', '"*"', '"last_name"'],
-            PHPUnitUtil::callProtectedMethod($this->e(), '_escape', [['first_name', '*', 'last_name']])
+            $this->callProtected($this->e(), '_escape', [['first_name', '*', 'last_name']])
         );
 
         $this->assertEquals(
@@ -392,19 +392,19 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         // few brief tests on _consume
         $this->assertEquals(
             '"123"',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'escape'])
+            $this->callProtected($this->e(), '_consume', [123, 'escape'])
         );
         $this->assertEquals(
             ':x',
-            PHPUnitUtil::callProtectedMethod($this->e(['_paramBase' => 'x']), '_consume', [123, 'param'])
+            $this->callProtected($this->e(['_paramBase' => 'x']), '_consume', [123, 'param'])
         );
         $this->assertEquals(
             123,
-            PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'none'])
+            $this->callProtected($this->e(), '_consume', [123, 'none'])
         );
         $this->assertEquals(
             '(select *)',
-            PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [new Query()])
+            $this->callProtected($this->e(), '_consume', [new Query()])
         );
 
         $this->assertEquals(
@@ -421,7 +421,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      */
     public function testConsumeException1()
     {
-        PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [123, 'blahblah']);
+        $this->callProtected($this->e(), '_consume', [123, 'blahblah']);
     }
 
     /**
@@ -432,7 +432,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
      */
     public function testConsumeException2()
     {
-        PHPUnitUtil::callProtectedMethod($this->e(), '_consume', [new \StdClass()]);
+        $this->callProtected($this->e(), '_consume', [new \StdClass()]);
     }
 
     /**

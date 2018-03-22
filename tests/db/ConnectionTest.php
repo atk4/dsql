@@ -8,7 +8,7 @@ use atk4\dsql\Expression;
 /**
  * @ coversDefaultClass \atk4\dsql\Query
  */
-class dbConnectionTest extends \PHPUnit_Framework_TestCase
+class dbConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     public function testSQLite()
     {

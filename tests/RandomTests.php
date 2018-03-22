@@ -7,7 +7,7 @@ use atk4\dsql\Query;
 /**
  * @coversDefaultClass \atk4\dsql\Query
  */
-class RandomTests extends \PHPUnit_Framework_TestCase
+class RandomTests extends \atk4\core\PHPUnit_AgileTestCase
 {
     public function q()
     {

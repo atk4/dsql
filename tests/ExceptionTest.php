@@ -7,7 +7,7 @@ use atk4\dsql\Expression;
 /**
  * @coversDefaultClass \atk4\dsql\Exception
  */
-class ExceptionTest extends \PHPUnit_Framework_TestCase
+class ExceptionTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     /**
      * Test constructor.
