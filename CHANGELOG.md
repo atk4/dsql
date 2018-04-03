@@ -1,4 +1,4 @@
-# 1.2.0
+# 1.2
 
 In this verison we are adding support for Oracle and PostgreSQL. 
 
@@ -46,6 +46,13 @@ appeared between SQL vendor syntaxes.
 
 - Implement normalizeDSN\(\) [\#139](https://github.com/atk4/dsql/pull/139) ([DarkSide666](https://github.com/DarkSide666))
 - Implement CASE WHEN/THEN [\#138](https://github.com/atk4/dsql/pull/138) ([DarkSide666](https://github.com/DarkSide666))
+## 1.2.3
+
+Refactored, code cleanup
+
+**Closed issues:**
+
+- Put together a basic website or Release Notes [\#24](https://github.com/atk4/dsql/issues/24)
 
 # Older releases
 
