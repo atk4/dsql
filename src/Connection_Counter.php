@@ -52,7 +52,7 @@ class Connection_Counter extends Connection_Proxy
             $c = $this->callback;
             $c($this->queries, $this->selects, $this->rows, $this->expressions);
         } else {
-            $Message = sprintf(
+            $message = sprintf(
                 "Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
                 $this->queries,
                 $this->selects,
@@ -60,7 +60,7 @@ class Connection_Counter extends Connection_Proxy
                 $this->expressions
             );
             $stderr = fopen($this->output_file, 'w');
-            fwrite($stderr, $Message);
+            fwrite($stderr, $message);
             fclose($stderr);
         }
     }
