@@ -559,6 +559,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     $type = \PDO::PARAM_NULL;
                 } elseif (is_string($val) || is_float($val)) {
                     $type = \PDO::PARAM_STR;
+                } elseif (is_resource($val)) {
+                    $type = \PDO::PARAM_LOB;
                 } else {
                     throw new Exception([
                         'Incorrect param type',
