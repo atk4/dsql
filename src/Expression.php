@@ -566,6 +566,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                         'Incorrect param type',
                         'key'   => $key,
                         'value' => $val,
+                        'type'  => gettype($val),
                     ]);
                 }
 
