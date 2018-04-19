@@ -70,6 +70,15 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     public $connection = null;
 
     /**
+     * Holds references to bound parameter values.
+     *
+     * This is needed to use bindParam instead of bindValue and to be able to use 4th parameter of bindParam.
+     *
+     * @var array
+     */
+    private $boundValues = array();
+
+    /**
      * Specifying options to constructors will override default
      * attribute values of this class.
      *
@@ -559,15 +568,26 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     $type = \PDO::PARAM_NULL;
                 } elseif (is_string($val) || is_float($val)) {
                     $type = \PDO::PARAM_STR;
+                } elseif (is_resource($val)) {
+                    $type = \PDO::PARAM_LOB;
                 } else {
                     throw new Exception([
                         'Incorrect param type',
                         'key'   => $key,
                         'value' => $val,
+                        'type'  => gettype($val),
                     ]);
                 }
 
-                if (!$statement->bindValue($key, $val, $type)) {
+                // Workaround to support LOB data type. See https://github.com/doctrine/dbal/pull/2434
+                $this->boundValues[$key] = $val;
+                if ($type === \PDO::PARAM_STR) {
+                    $bind = $statement->bindParam($key, $this->boundValues[$key], $type, strlen($val));
+                } else {
+                    $bind = $statement->bindParam($key, $this->boundValues[$key], $type);
+                }
+
+                if (!$bind) {
                     throw new Exception([
                         'Unable to bind parameter',
                         'param' => $key,
