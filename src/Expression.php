@@ -76,7 +76,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @var array
      */
-    private $boundValues = array();
+    private $boundValues = [];
 
     /**
      * Specifying options to constructors will override default
