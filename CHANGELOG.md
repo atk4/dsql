@@ -46,6 +46,7 @@ appeared between SQL vendor syntaxes.
 
 - Implement normalizeDSN\(\) [\#139](https://github.com/atk4/dsql/pull/139) ([DarkSide666](https://github.com/DarkSide666))
 - Implement CASE WHEN/THEN [\#138](https://github.com/atk4/dsql/pull/138) ([DarkSide666](https://github.com/DarkSide666))
+
 ## 1.2.3
 
 Refactored, code cleanup
@@ -53,6 +54,20 @@ Refactored, code cleanup
 **Closed issues:**
 
 - Put together a basic website or Release Notes [\#24](https://github.com/atk4/dsql/issues/24)
+
+## 1.2.4
+
+**Closed issues:**
+
+- Model with properties: when iterating over several loaded Items, changes to property are done on all Items [\#318](https://github.com/atk4/data/issues/318)
+
+**Merged pull requests:**
+
+- validate if methods exist in persistence before calling them [\#324](https://github.com/atk4/data/pull/324) ([DarkSide666](https://github.com/DarkSide666))
+- validate if persistence have action\(\) method [\#323](https://github.com/atk4/data/pull/323) ([DarkSide666](https://github.com/DarkSide666))
+- if it's array then it's treated as defaults. [\#322](https://github.com/atk4/data/pull/322) ([DarkSide666](https://github.com/DarkSide666))
+- Support LOB fields loading [\#321](https://github.com/atk4/data/pull/321) ([DarkSide666](https://github.com/DarkSide666))
+- fix newInstance\(\) [\#320](https://github.com/atk4/data/pull/320) ([DarkSide666](https://github.com/DarkSide666))
 
 # Older releases
 
