@@ -1066,6 +1066,15 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
             'order by "* desc {}"',
             $this->q('[order]')->order($this->q()->escape('* desc {}'))->render()
         );
+        // custom sort order
+        $this->assertEquals(
+            'order by "name" desc nulls last',
+            $this->q('[order]')->order('name', 'desc nulls last')->render()
+        );
+        $this->assertEquals(
+            'order by "name" nulls last',
+            $this->q('[order]')->order('name', 'nulls last')->render()
+        );
     }
 
     /**
@@ -1077,17 +1086,6 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
     public function testOrderException1()
     {
         $this->q('[order]')->order(['name', 'surname'], 'desc');
-    }
-
-    /**
-     * Incorrect ordering keyword.
-     *
-     * @covers ::order
-     * @expectedException Exception
-     */
-    public function testOrderException2()
-    {
-        $this->q('[order]')->order('name', 'random_order');
     }
 
     /**

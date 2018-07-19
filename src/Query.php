@@ -1159,12 +1159,8 @@ class Query extends Expression
             $desc = $desc ? 'desc' : '';
         } elseif (strtolower($desc) === 'asc') {
             $desc = '';
-        } elseif ($desc && strtolower($desc) != 'desc') {
-            throw new Exception([
-                'Incorrect ordering keyword',
-                'order by' => $order,
-                'desc'     => $desc,
-            ]);
+        } else {
+            // allows custom order like "order by name desc nulls last" for Oracle
         }
 
         $this->args['order'][] = [$order, $desc];
