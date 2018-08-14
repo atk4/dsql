@@ -67,8 +67,8 @@ class Connection
                 $parts['scheme'].
                 ':host='.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '').
                 ';dbname='.substr($parts['path'], 1);
-            $user = $user !== null ? $user : ($parts['user'] ?? null);
-            $pass = $pass !== null ? $pass : ($parts['pass'] ?? null);
+            $user = $user !== null ? $user : (isset($parts['user']) ? $parts['user'] : null);
+            $pass = $pass !== null ? $pass : (isset($parts['pass']) ? $parts['pass'] : null);
         }
 
         // If it's still array, then simply use it
