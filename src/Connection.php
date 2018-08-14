@@ -67,19 +67,29 @@ class Connection
                 $parts['scheme'].
                 ':host='.$parts['host'] . (isset($parts['port']) ? ':'.$parts['port'] : '').
                 ';dbname='.substr($parts['path'], 1);
-            $user = $user !== null ? $user : (isset($parts['user']) ? $parts['user'] : null);
-            $pass = $pass !== null ? $pass : (isset($parts['pass']) ? $parts['pass'] : null);
+            $user = $user !== null ? $user : ($parts['user'] ?? null);
+            $pass = $pass !== null ? $pass : ($parts['pass'] ?? null);
         }
 
-        // Find driver
-        if (strpos($dsn, ':') === false) {
-            throw new Exception([
-                "Your DSN format is invalid. Must be in 'driver:host:options' format",
-                'dsn' => $dsn,
-            ]);
+        // If it's still array, then simply use it
+        if (is_array($dsn)) {
+            return $dsn;
         }
-        list($driver, $rest) = explode(':', $dsn, 2);
-        $driver = strtolower($driver);
+
+        // If it's string, then find driver
+        if (is_string($dsn)) {
+            if (strpos($dsn, ':') === false) {
+                throw new Exception([
+                    "Your DSN format is invalid. Must be in 'driver:host;options' format",
+                    'dsn' => $dsn,
+                ]);
+            }
+            list($driver, $rest) = explode(':', $dsn, 2);
+            $driver = strtolower($driver);
+        } else {
+            // currently impossible to be like this, but we don't want ugly exceptions here
+            $driver = $rest = null;
+        }
 
         return ['dsn' => $dsn, 'user' => $user, 'pass' => $pass, 'driver' => $driver, 'rest' => $rest];
     }
@@ -129,6 +139,13 @@ class Connection
                 ], $args));
         }
 
+        // If it's some other object, then we simply use it trough proxy connection
+        if (is_object($dsn)) {
+            return new Connection_Proxy(array_merge([
+                    'connection'       => $dsn,
+                ], $args));
+        }
+
         // Process DSN string
         $dsn = static::normalizeDSN($dsn, $user, $password);
 
@@ -164,7 +181,7 @@ class Connection
 
             case 'pgsql':
                 $c = new Connection_PgSQL(array_merge([
-                    'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                 ], $args));
                 break;
 
