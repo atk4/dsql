@@ -28,9 +28,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * $args['custom'] is used to store hash of custom template replacements.
      *
+     * This property is made public to ease customization and make it accessible
+     * from Connection class for example.
+     *
      * @var array
      */
-    protected $args = ['custom' => []];
+    public $args = ['custom' => []];
 
     /**
      * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc.
