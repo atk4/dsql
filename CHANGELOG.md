@@ -69,6 +69,15 @@ Refactored, code cleanup
 - Support LOB fields loading [\#321](https://github.com/atk4/data/pull/321) ([DarkSide666](https://github.com/DarkSide666))
 - fix newInstance\(\) [\#320](https://github.com/atk4/data/pull/320) ([DarkSide666](https://github.com/DarkSide666))
 
+## 1.2.5
+
+Improving compatibility with third party SQL tweaks.
+
+ - DSN may be specified as object to connection
+ - Allow to specify port number for DSN
+ - Oracle connection will set compatible date format
+ - Allow more flexible order() arguments (e.g. order by name desc nulls last)
+
 # Older releases
 
 ## 1.1.5
