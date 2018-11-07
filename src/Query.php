@@ -1012,7 +1012,7 @@ class Query extends Expression
     /**
      * Execute select statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function select()
     {
@@ -1022,7 +1022,7 @@ class Query extends Expression
     /**
      * Execute insert statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function insert()
     {
@@ -1032,7 +1032,7 @@ class Query extends Expression
     /**
      * Execute update statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function update()
     {
@@ -1042,7 +1042,7 @@ class Query extends Expression
     /**
      * Execute replace statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function replace()
     {
@@ -1052,7 +1052,7 @@ class Query extends Expression
     /**
      * Execute delete statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function delete()
     {
@@ -1062,7 +1062,7 @@ class Query extends Expression
     /**
      * Execute truncate statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function truncate()
     {

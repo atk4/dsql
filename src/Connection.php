@@ -255,7 +255,7 @@ class Connection
      *
      * @param Expression $expr
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function execute(Expression $expr)
     {
