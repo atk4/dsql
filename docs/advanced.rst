@@ -100,23 +100,23 @@ a proxy connection object that will collect the necessary statistics and
 If you would like to do something else with these statistics, you can set
 a callback. For Dumper::
 
-    $c->callback = function($expression, $time) {
+    $c->callback = function($expression, $time, $fail = false) {
         ...
     }
 
 and for Counter::
 
-    $c->callback = function($queries, $selects, $rows, $expressions) {
+    $c->callback = function($queries, $selects, $rows, $expressions, $fail = false) {
         ...
     }
 
 If you have used "dumper:counter:", then use this::
 
-    $c->callback = function($expression, $time) {
+    $c->callback = function($expression, $time, $fail = false) {
         ...
     }
 
-    $c->connection()->callback = function($queries, $selects, $rows, $expressions) {
+    $c->connection()->callback = function($queries, $selects, $rows, $expressions, $fail = false) {
         ...
     }
 
