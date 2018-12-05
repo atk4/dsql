@@ -31,7 +31,8 @@ script:
     - $CM ./vendor/bin/phpunit --configuration phpunit-pgsql.xml $NC
 
 after_script:
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then vendor/bin/phpcov merge build/logs/ --clover cc.xml; vendor/bin/test-reporter --coverage-report cc.xml; fi
+  - ls -l build/logs
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then vendor/bin/phpcov merge build/logs/ --clover cc.xml; ls -l cc.xml; vendor/bin/test-reporter --coverage-report cc.xml; fi
   - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then echo "Sending codecov report"; TRAVIS_CMD="" bash <(curl -s https://codecov.io/bash) -f cc.xml; fi
 
 notifications:
