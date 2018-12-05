@@ -70,7 +70,7 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
         $c = Connection::connect('dumper:sqlite::memory:');
 
         $result = false;
-        $c->callback = function ($expr, $time) use (&$result) {
+        $c->callback = function ($expr, $time, $fail) use (&$result) {
             $result = $expr->render();
         };
 
@@ -107,7 +107,7 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
             $c->expr('select (2+2)')->getOne()
         );
 
-        $this->expectOutputRegex("/.*select \(2\+2\).*/");
+        $this->expectOutputRegex("/select \(2\+2\)/");
     }
 
     public function testCounter()
@@ -115,7 +115,7 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
         $c = Connection::connect('counter:sqlite::memory:');
 
         $result = false;
-        $c->callback = function ($a, $b, $c, $d) use (&$result) {
+        $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
             $result = [$a, $b, $c, $d];
         };
 
@@ -150,7 +150,7 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
         $c = Connection::connect('counter:sqlite::memory:');
 
         $result = false;
-        $c->callback = function ($a, $b, $c, $d) use (&$result) {
+        $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
             $result = [$a, $b, $c, $d];
         };
 
@@ -175,7 +175,7 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
         $c = Connection::connect('counter:sqlite::memory:');
 
         $result = false;
-        $c->callback = function ($a, $b, $c, $d) use (&$result) {
+        $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
             $result = [$a, $b, $c, $d];
         };
 
