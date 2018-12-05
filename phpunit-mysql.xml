@@ -19,6 +19,6 @@
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-clover" target="build/logs/clover-mysql.xml"/>
+        <log type="coverage-php" target="build/logs/clover-mysql.cov"/>
     </logging>
 </phpunit>
