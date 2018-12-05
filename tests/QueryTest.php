@@ -1522,7 +1522,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      *
      * @covers ::caseExpr
      * @covers ::when
-     * @covers ::else
+     * @covers ::otherwise
      * @covers ::_render_case
      */
     public function testCaseExprNormal()
@@ -1551,7 +1551,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      *
      * @covers ::caseExpr
      * @covers ::when
-     * @covers ::else
+     * @covers ::otherwise
      * @covers ::_render_case
      */
     public function testCaseExprShortForm()
