@@ -26,20 +26,19 @@ before_script:
 
 script:
     - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then CM=""; NC=""; else CM=""; NC="--no-coverage"; fi
-    - echo $NC
-    - $CM ./vendor/bin/phpunit $NC
+    - $CM ./vendor/bin/phpunit --configuration phpunit.xml $NC
     - $CM ./vendor/bin/phpunit --configuration phpunit-mysql.xml $NC
     - $CM ./vendor/bin/phpunit --configuration phpunit-pgsql.xml $NC
 
 after_script:
   - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then
-    echo "Merging coverage reports - DO NOT WORK";
-    vendor/bin/phpcov merge build/logs/ --clover build/logs/cc.xml;
-    ls -l build/logs;
-    echo "Sending codeclimate report";
-    vendor/bin/test-reporter --coverage-report cc.xml;
-    echo "Sending codecov report";
-    TRAVIS_CMD="" bash <(curl -s https://codecov.io/bash) -f cc.xml;
+      echo "Merging coverage reports - DO NOT WORK";
+      vendor/bin/phpcov merge build/logs/ --clover build/logs/cc.xml;
+      ls -l build/logs;
+      echo "Sending codeclimate report";
+      vendor/bin/test-reporter --coverage-report build/logs/cc.xml;
+      echo "Sending codecov report";
+      TRAVIS_CMD="" bash <(curl -s https://codecov.io/bash) -f build/logs/cc.xml;
     fi
 
 notifications:
