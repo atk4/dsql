@@ -33,9 +33,6 @@ DSQL has been in production since 2006, initially included in [AModules2](https:
 [![GitHub release](https://img.shields.io/github/release/atk4/dsql.svg?maxAge=2592000)](CHANGELOG.md)
 
 
-
-[![GitHub release](https://img.shields.io/github/release/atk4/dsql.svg)](CHANGELOG.md)
-
 ## DSQL Is Simple and Powerful
 
 ``` php
