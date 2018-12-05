@@ -40,7 +40,7 @@ after_script:
       echo "Sending codeclimate report:";
       vendor/bin/test-reporter --coverage-report build/logs/cc.xml;
       echo "Sending codecov report:";
-      bash <(curl -s https://codecov.io/bash) -f build/logs/cc.xml;
+      TRAVIS_CMD="" bash <(curl -s https://codecov.io/bash) -f build/logs/cc.xml;
     fi
 
 notifications:
