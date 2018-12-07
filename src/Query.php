@@ -1275,7 +1275,7 @@ class Query extends Expression
 
     /**
      * Returns Expression object for the corresponding Query
-     * sub-class (e.g. Query_MySQL will return Expression_MySQL)
+     * sub-class (e.g. Query_MySQL will return Expression_MySQL).
      *
      * Connection is not mandatory, but if set, will be preserved. This
      * method should be used for building parts of the query internally.
@@ -1293,6 +1293,7 @@ class Query extends Expression
 
         return $e;
     }
+
     /**
      * Returns new Query object of [or] expression.
      *
@@ -1341,7 +1342,7 @@ class Query extends Expression
      */
     public function groupConcat($field, $delimeter = ',')
     {
-        throw new Exception("groupConcat() is SQL-dependent, so use a correct class");
+        throw new Exception('groupConcat() is SQL-dependent, so use a correct class');
     }
 
     /**
