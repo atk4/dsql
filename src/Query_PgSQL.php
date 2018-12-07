@@ -48,4 +48,9 @@ class Query_PgSQL extends Query
                 (int) $this->args['limit']['shift'];
         }
     }
+
+    public function groupConcat($field, $delimeter = ',')
+    {
+        return $this->expr('string_agg({}, [])', [$field, $delimeter]);
+    }
 }

@@ -51,4 +51,9 @@ abstract class Query_Oracle_Abstract extends Query
     {
         return $this->args['sequence'];
     }
+
+    public function groupConcat($field, $delimeter = ',')
+    {
+        return $this->expr('listagg({}, [])', [$field, $delimeter]);
+    }
 }

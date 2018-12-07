@@ -28,6 +28,9 @@ class Query extends Expression
      */
     public $defaultField = '*';
 
+    /** @var string Expression classname */
+    protected $expression_class = 'atk4\dsql\Expression';
+
     /**
      * SELECT template.
      *
@@ -1271,6 +1274,26 @@ class Query extends Expression
     }
 
     /**
+     * Returns Expression object for the corresponding Query
+     * sub-class (e.g. Query_MySQL will return Expression_MySQL)
+     *
+     * Connection is not mandatory, but if set, will be preserved. This
+     * method should be used for building parts of the query internally.
+     *
+     * @param array $properties
+     * @param array $arguments
+     *
+     * @return Expression
+     */
+    public function expr($properties = [], $arguments = null)
+    {
+        $c = $this->expression_class;
+        $e = new $c($properties, $arguments);
+        $e->connection = $this->connection;
+
+        return $e;
+    }
+    /**
      * Returns new Query object of [or] expression.
      *
      * @return Query
@@ -1306,6 +1329,19 @@ class Query extends Expression
         }
 
         return $q;
+    }
+
+    /**
+     * Returns a query for a function, which can be used as part of the GROUP
+     * query which would concatinate all matching fields.
+     *
+     * MySQL, SQLite - group_concat
+     * PostgreSQL - string_agg
+     * Oracle - listagg
+     */
+    public function groupConcat($field, $delimeter = ',')
+    {
+        throw new Exception("groupConcat() is SQL-dependent, so use a correct class");
     }
 
     /**

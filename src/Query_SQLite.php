@@ -18,4 +18,9 @@ class Query_SQLite extends Query
      * @var string
      */
     protected $template_truncate = 'delete [from] [table_noalias]';
+
+    public function groupConcat($field, $delimeter = ',')
+    {
+        return $this->expr('group_concat({}, [])', [$field, $delimeter]);
+    }
 }
