@@ -505,6 +505,11 @@ That's why we have this method which will take care of this.
     $q->groupConcat('phone', ';');
         // group_concat('phone', ';')
 
+If you need to add more parameters for this method, then you can extend this class
+and overwrite this simple method to support expressions like this, for example:
+
+    group_concat('phone' order by 'date' desc seprator ';')
+
 
 Joining with other tables
 -------------------------
