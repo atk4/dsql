@@ -1184,6 +1184,19 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
     }
 
     /**
+     * Test expr().
+     *
+     * @covers ::expr
+     */
+    public function testExpr()
+    {
+        $this->assertEquals('atk4\\dsql\\Expression', get_class($this->q()->expr('foo')));
+
+        $q = new Query_MySQL();
+        $this->assertEquals('atk4\\dsql\\Expression_MySQL', get_class($q->expr('foo')));
+    }
+
+    /**
      * Test Join.
      *
      * @covers ::join
