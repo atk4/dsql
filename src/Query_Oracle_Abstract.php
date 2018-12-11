@@ -51,4 +51,25 @@ abstract class Query_Oracle_Abstract extends Query
     {
         return $this->args['sequence'];
     }
+
+    /**
+     * Returns a query for a function, which can be used as part of the GROUP
+     * query which would concatenate all matching fields.
+     *
+     * MySQL, SQLite - group_concat
+     * PostgreSQL - string_agg
+     * Oracle - listagg
+     *
+     * NOTE: LISTAGG() is only supported starting from Oracle 11g and up
+     * https://stackoverflow.com/a/16771200/1466341
+     *
+     * @param mixed  $field
+     * @param string $delimiter
+     *
+     * @return Expression
+     */
+    public function groupConcat($field, $delimeter = ',')
+    {
+        return $this->expr('listagg({}, [])', [$field, $delimeter]);
+    }
 }

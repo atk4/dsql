@@ -4,6 +4,11 @@ namespace atk4\dsql\tests;
 
 use atk4\dsql\Expression;
 use atk4\dsql\Query;
+use atk4\dsql\Query_MySQL;
+use atk4\dsql\Query_Oracle;
+use atk4\dsql\Query_Oracle12c;
+use atk4\dsql\Query_PgSQL;
+use atk4\dsql\Query_SQLite;
 
 /**
  * @coversDefaultClass \atk4\dsql\Query
@@ -1142,6 +1147,53 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
             'group by date_format(dat, "%Y")',
             $this->q('[group]')->group('date_format(dat, "%Y")')->render()
         );
+    }
+
+    /**
+     * Test groupConcat.
+     *
+     * @expectedException Exception
+     */
+    public function testGroupConcatException()
+    {
+        // doesn't support groupConcat by default
+        $this->q()->groupConcat('foo');
+    }
+
+    /**
+     * Test groupConcat.
+     *
+     * @covers ::groupConcat
+     */
+    public function testGroupConcat()
+    {
+        $q = new Query_MySQL();
+        $this->assertEquals('group_concat(`foo` separator :a)', $q->groupConcat('foo', '-')->render());
+
+        $q = new Query_Oracle();
+        $this->assertEquals('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
+
+        $q = new Query_Oracle12c();
+        $this->assertEquals('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
+
+        $q = new Query_PgSQL();
+        $this->assertEquals('string_agg("foo", :a)', $q->groupConcat('foo', '-')->render());
+
+        $q = new Query_SQLite();
+        $this->assertEquals('group_concat("foo", :a)', $q->groupConcat('foo', '-')->render());
+    }
+
+    /**
+     * Test expr().
+     *
+     * @covers ::expr
+     */
+    public function testExpr()
+    {
+        $this->assertEquals('atk4\\dsql\\Expression', get_class($this->q()->expr('foo')));
+
+        $q = new Query_MySQL();
+        $this->assertEquals('atk4\\dsql\\Expression_MySQL', get_class($q->expr('foo')));
     }
 
     /**
