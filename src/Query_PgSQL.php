@@ -49,6 +49,19 @@ class Query_PgSQL extends Query
         }
     }
 
+    /**
+     * Returns a query for a function, which can be used as part of the GROUP
+     * query which would concatenate all matching fields.
+     *
+     * MySQL, SQLite - group_concat
+     * PostgreSQL - string_agg
+     * Oracle - listagg
+     *
+     * @param mixed  $field
+     * @param string $delimiter
+     *
+     * @return Expression
+     */
     public function groupConcat($field, $delimeter = ',')
     {
         return $this->expr('string_agg({}, [])', [$field, $delimeter]);
