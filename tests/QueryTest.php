@@ -1168,19 +1168,19 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
     public function testGroupConcat()
     {
         $q = new Query_MySQL();
-        $this->assertEquals('group_concat(`foo` separator :a)', $q->groupConcat('foo','-')->render());
+        $this->assertEquals('group_concat(`foo` separator :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Query_Oracle();
-        $this->assertEquals('listagg("foo", :a)', $q->groupConcat('foo','-')->render());
+        $this->assertEquals('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Query_Oracle12c();
-        $this->assertEquals('listagg("foo", :a)', $q->groupConcat('foo','-')->render());
+        $this->assertEquals('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Query_PgSQL();
-        $this->assertEquals('string_agg("foo", :a)', $q->groupConcat('foo','-')->render());
+        $this->assertEquals('string_agg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Query_SQLite();
-        $this->assertEquals('group_concat("foo", :a)', $q->groupConcat('foo','-')->render());
+        $this->assertEquals('group_concat("foo", :a)', $q->groupConcat('foo', '-')->render());
     }
 
     /**
