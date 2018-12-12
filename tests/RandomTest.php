@@ -2,13 +2,10 @@
 
 namespace atk4\dsql;
 
-use atk4\dsql\Query;
-use atk4\dsql\Query_MySQL;
-
 /**
  * @coversDefaultClass \atk4\dsql\Query
  */
-class RandomTests extends \atk4\core\PHPUnit_AgileTestCase
+class RandomTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     public function q()
     {
@@ -69,9 +66,9 @@ class RandomTests extends \atk4\core\PHPUnit_AgileTestCase
     }
 
     /**
-     * confirms that group concat works for all the SQL vendors we support
+     * confirms that group concat works for all the SQL vendors we support.
      */
-    function _groupConcatTest($q, $query)
+    public function _groupConcatTest($q, $query)
     {
         $q->table('people');
         $q->group('age');
@@ -81,11 +78,10 @@ class RandomTests extends \atk4\core\PHPUnit_AgileTestCase
 
         $q->groupConcat('name', ',');
 
-
         $this->assertEquals($query, $q->render());
     }
 
-    function testGroupConcat()
+    public function testGroupConcat()
     {
         $this->_groupConcatTest(
             new Query_MySQL(),
