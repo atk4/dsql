@@ -737,6 +737,11 @@ Other Methods
     Use this instead of `new Query()` if you want to automatically bind query
     to the same connection as the parent.
 
+.. php:method:: expr($template, $args)
+
+    Method very similar to :php:method:`Connection::expr` but will return a
+    corresponding Expression class for this query.
+
 .. php:method:: option($option, $mode)
 
     Use this to set additional options for particular query mode.
