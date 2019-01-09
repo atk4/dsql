@@ -2,13 +2,10 @@
 
 namespace atk4\dsql;
 
-use atk4\dsql\Query;
-use atk4\dsql\Query_MySQL;
-
 /**
  * @coversDefaultClass \atk4\dsql\Query
  */
-class RandomTests extends \atk4\core\PHPUnit_AgileTestCase
+class RandomTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     public function q()
     {
