@@ -57,10 +57,11 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
         $dsn = Connection::normalizeDSN('sqlite::memory');
         $this->assertEquals(['dsn'=>'sqlite::memory', 'user'=>null, 'pass'=>null, 'driver'=>'sqlite', 'rest'=>':memory'], $dsn); // rest is unusable anyway in this context
 
-        // with port number
+        // with port number as URL, normalize port to ;port=1234
         $dsn = Connection::normalizeDSN('mysql://root:pass@localhost:1234/db');
-        $this->assertEquals(['dsn'=>'mysql:host=localhost:1234;dbname=db', 'user'=>'root', 'pass'=>'pass', 'driver'=>'mysql', 'rest'=>'host=localhost:1234;dbname=db'], $dsn);
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;port=1234;dbname=db', 'user'=>'root', 'pass'=>'pass', 'driver'=>'mysql', 'rest'=>'host=localhost;port=1234;dbname=db'], $dsn);
 
+        // with port number as DSN, leave port as :port
         $dsn = Connection::normalizeDSN('mysql:host=localhost:1234;dbname=db');
         $this->assertEquals(['dsn'=>'mysql:host=localhost:1234;dbname=db', 'user'=>null, 'pass'=>null, 'driver'=>'mysql', 'rest'=>'host=localhost:1234;dbname=db'], $dsn);
     }
