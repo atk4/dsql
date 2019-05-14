@@ -66,6 +66,24 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
         $this->assertEquals(['dsn'=>'mysql:host=localhost:1234;dbname=db', 'user'=>null, 'pass'=>null, 'driver'=>'mysql', 'rest'=>'host=localhost:1234;dbname=db'], $dsn);
     }
 
+    /**
+     * Test driver property.
+     */
+    public function testDriver()
+    {
+        $c = Connection::connect('sqlite::memory:');
+        $this->assertEquals('sqlite', $c->driver);
+
+        $c = Connection::connect('dumper:sqlite::memory:');
+        $this->assertEquals('sqlite', $c->driver);
+
+        $c = Connection::connect('counter:sqlite::memory:');
+        $this->assertEquals('sqlite', $c->driver);
+    }
+
+    /**
+     * Test Dumper connection.
+     */
     public function testDumper()
     {
         $c = Connection::connect('dumper:sqlite::memory:');
