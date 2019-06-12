@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=5.6.0",
-        "atk4/core": "dev-develop"
+        "atk4/core": "dev-legacy/v1"
     },
     "suggest": {
          "jdorn/sql-formatter": "*"
