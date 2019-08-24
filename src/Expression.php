@@ -606,7 +606,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                 $statement->execute();
             } catch (\Exception $e) {
                 $new = new Exception([
-                    'DSQL got Exception when executing this query',
+                    'DSQL got Exception when executing this query: '.$e->getMessage(),
                     'error' => $e->getMessage(),
                     'query' => $this->getDebugQuery(),
                 ]);
