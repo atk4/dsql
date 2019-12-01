@@ -1,8 +1,8 @@
 <phpunit colors="true" bootstrap="vendor/autoload.php" printerClass="atk4\core\PHPUnit_AgileResultPrinter">
     <php>
-        <var name="DB_DSN" value="pgsql:dbname=atk4-dsql-test;host=localhost" />
+        <var name="DB_DSN" value="pgsql:dbname=atk4-dsql-test;host=postgres" />
         <var name="DB_USER" value="postgres" />
-        <var name="DB_PASSWD" value="" />
+        <var name="DB_PASSWD" value="password" />
         <var name="DB_DBNAME" value="atk4-dsql-test" />
     </php>
     <testsuites>
