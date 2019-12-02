@@ -1,34 +1,43 @@
 {
-    "name": "atk4/dsql",
-    "type": "library",
-    "description": "Dynamic SQL Builder in PHP",
-    "keywords": ["framework", "sql", "builder", "orm"],
-    "homepage": "http://agiletoolkit.org/",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Romans Malinovskis",
-            "email": "romans@agiletoolkit.org",
-            "homepage": "https://nearly.guru/"
-        }
-    ],
-    "require": {
-        "php": ">=5.6.0",
-        "atk4/core": "dev-develop"
-    },
-    "suggest": {
-         "jdorn/sql-formatter": "*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "<6",
-        "phpunit/dbunit": ">=1.2",
-        "phpunit/phpcov": "*",
-        "codeclimate/php-test-reporter": "*"
-    },
-    "autoload": {
-        "psr-4": {"atk4\\dsql\\":"src/"}
-    },
-    "autoload-dev": {
-        "psr-4": {"atk4\\dsql\\tests\\":"tests/"}
+  "name": "atk4/dsql",
+  "type": "library",
+  "description": "Dynamic SQL Builder in PHP",
+  "keywords": [
+    "framework",
+    "sql",
+    "builder",
+    "orm"
+  ],
+  "homepage": "http://agiletoolkit.org/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Romans Malinovskis",
+      "email": "romans@agiletoolkit.org",
+      "homepage": "https://nearly.guru/"
     }
+  ],
+  "require": {
+    "php": ">=5.6.0",
+    "atk4/core": "^2.0"
+  },
+  "suggest": {
+    "jdorn/sql-formatter": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "<6",
+    "phpunit/dbunit": ">=1.2",
+    "phpunit/phpcov": "*",
+    "codeclimate/php-test-reporter": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "atk4\\dsql\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "atk4\\dsql\\tests\\": "tests/"
+    }
+  }
 }
