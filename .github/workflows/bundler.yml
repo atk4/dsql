@@ -11,7 +11,7 @@ jobs:
       image: atk4/image:latest # https://github.com/atk4/image
     steps:
       - uses: actions/checkout@master
-      - run: echo {{ github.ref }}
+      - run: echo ${{ github.ref }}
       - name: Update to stable dependencies
         run: |
           jq 'del(.require["atk4/core"])' < composer.json > tmp && mv tmp composer.json
