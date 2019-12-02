@@ -12,11 +12,8 @@ jobs:
       - uses: actions/checkout@master
       - run: echo {{ github.ref }}
       - run: |
-          sed -i -e '/atk4\/schema/s/dev-develop/\*/' composer.json
-          sed -i -e '/atk4\/dsql/d' composer.json
-          sed -i -e '/atk4\/core/d' composer.json
-          cat composer.json
-          composer require atk4/core atk4/dsql
+          jq 'del(.require["atk4/core"])' < composer.json > tmp
+          composer require atk4/core
           composer update
 
       - uses: teaminkling/autocommit@master
