@@ -1,9 +1,6 @@
 name: Bundler
 
-on:
-  create:
-    branches:
-      - 'release/*'
+on: create
 
 jobs:
   autocommit:
