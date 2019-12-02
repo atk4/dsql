@@ -4,6 +4,7 @@ on: create
 
 jobs:
   autocommit:
+    name: Update to stable dependencies
     if: startsWith(github.ref, 'refs/heads/release/')
     runs-on: ubuntu-latest
     container:
@@ -11,8 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - run: echo {{ github.ref }}
-      - run: |
-          jq 'del(.require["atk4/core"])' < composer.json > tmp
+      - name: Update to stable dependencies
+        run: |
+          jq 'del(.require["atk4/core"])' < composer.json > tmp && mv tmp composer.json
           composer require atk4/core
           composer update
 
