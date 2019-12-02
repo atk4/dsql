@@ -50,7 +50,7 @@ jobs:
         run: |
           mkdir -p build/logs
           mysql -uroot -ppassword -h mysql -e 'CREATE DATABASE dsql_test;'
-          PGPASSWORD=password psql -c 'create database "atk4-dsql-test";' -U postgres
+          PGPASSWORD=password psql -h postgres -c 'create database "atk4-dsql-test";' -U postgres
       - name: SQLite Testing
         run: vendor/bin/phpunit --configuration phpunit.xml --coverage-text --exclude-group dns
 
