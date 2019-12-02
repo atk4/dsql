@@ -594,6 +594,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      */
     public function testVarDump()
     {
+        ini_set('xdebug.overload_var_dump', 'off');
         $this->expectOutputRegex('/.*select \* from "user".*/');
         var_dump($this->q()->table('user'));
     }
@@ -604,6 +605,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      */
     public function testVarDump2()
     {
+        ini_set('xdebug.overload_var_dump', 'off');
         $this->expectOutputRegex('/.*Expression could not render tag.*/');
         var_dump(new Expression('Hello [world]'));
     }
@@ -614,6 +616,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      */
     public function testVarDump3()
     {
+        ini_set('xdebug.overload_var_dump', 'off');
         $this->expectOutputRegex('/.*Hello \'php\'.*/');
         var_dump(new Expression('Hello [world]', ['world' => 'php']));
     }
@@ -624,6 +627,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      */
     public function testVarDump4()
     {
+        ini_set('xdebug.overload_var_dump', 'off');
         $this->expectOutputRegex('/.*Table cannot be Query.*/');
         // should throw exception "Table cannot be Query in UPDATE, INSERT etc. query modes"
         var_dump(
