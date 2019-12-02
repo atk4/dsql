@@ -28,6 +28,9 @@ class Query extends Expression
      */
     public $defaultField = '*';
 
+    /** @var string Expression classname */
+    protected $expression_class = 'atk4\dsql\Expression';
+
     /**
      * SELECT template.
      *
@@ -151,9 +154,11 @@ class Query extends Expression
     /**
      * Returns template component for [field].
      *
+     * @param bool $add_alias Should we add aliases, see _render_field_noalias()
+     *
      * @return string Parsed template chunk
      */
-    protected function _render_field()
+    protected function _render_field($add_alias = true)
     {
         // will be joined for output
         $ret = [];
@@ -169,20 +174,23 @@ class Query extends Expression
 
         // process each defined field
         foreach ($this->args['field'] as $alias => $field) {
-            // Do not use alias, if it's same as field
-            if ($alias === $field) {
+            // Do not add alias, if:
+            //  - we don't want aliases OR
+            //  - alias is the same as field OR
+            //  - alias is numeric
+            if (
+                $add_alias === false
+                || (is_string($field) && $alias === $field)
+                || is_numeric($alias)
+            ) {
                 $alias = null;
             }
 
-            if (is_numeric($alias)) {
-                $alias = null;
-            }
-
-            // Will parameterize the value and backtick if necessary
+            // Will parameterize the value and escape if necessary
             $field = $this->_consume($field, 'soft-escape');
 
             if ($alias) {
-                // field alias cannot be expression, so only backtick
+                // field alias cannot be expression, so simply escape it
                 $field .= ' '.$this->_escape($alias);
             }
 
@@ -190,6 +198,17 @@ class Query extends Expression
         }
 
         return implode(',', $ret);
+    }
+
+    /**
+     * Renders part of the template: [field_noalias]
+     * Do not call directly.
+     *
+     * @return string Parsed template chunk
+     */
+    protected function _render_field_noalias()
+    {
+        return $this->_render_field(false);
     }
 
     // }}}
@@ -276,12 +295,15 @@ class Query extends Expression
                 throw new Exception('Table cannot be Query in UPDATE, INSERT etc. query modes');
             }
 
-            // don't add alias if it's the same as table name
-            if ($add_alias === false || (is_string($table) && $alias === $table)) {
-                $alias = '';
-            }
-
-            if (is_numeric($alias)) {
+            // Do not add alias, if:
+            //  - we don't want aliases OR
+            //  - alias is the same as table name OR
+            //  - alias is numeric
+            if (
+                $add_alias === false
+                || (is_string($table) && $alias === $table)
+                || is_numeric($alias)
+            ) {
                 $alias = null;
             }
 
@@ -439,7 +461,7 @@ class Query extends Expression
     public function _render_join()
     {
         if (!isset($this->args['join'])) {
-            return'';
+            return '';
         }
         $joins = [];
         foreach ($this->args['join'] as $j) {
@@ -481,7 +503,7 @@ class Query extends Expression
      *  $q->where('id',1);
      *
      * By default condition implies equality. You can specify a different comparison
-     * operator by eithre including it along with the field or using 3-argument
+     * operator by either including it along with the field or using 3-argument
      * format:
      *  $q->where('id>','1');
      *  $q->where('id','>',1);
@@ -520,7 +542,7 @@ class Query extends Expression
      * @param mixed  $value    Value. Will be quoted unless you pass expression
      * @param string $kind     Do not use directly. Use having()
      * @param string $num_args When $kind is passed, we can't determine number of
-     *                         actual arguments, so this argumen must be specified.
+     *                         actual arguments, so this argument must be specified.
      *
      * @return $this
      */
@@ -584,9 +606,26 @@ class Query extends Expression
                 $this->args[$kind][] = [$field];
                 break;
             case 2:
+                if (is_object($cond) && !$cond instanceof Expressionable && !$cond instanceof Expression) {
+                    throw new Exception([
+                        'Value cannot be converted to SQL-compatible expression',
+                        'field'=> $field,
+                        'value'=> $cond,
+                    ]);
+                }
+
                 $this->args[$kind][] = [$field, $cond];
                 break;
             case 3:
+                if (is_object($value) && !$value instanceof Expressionable && !$value instanceof Expression) {
+                    throw new Exception([
+                        'Value cannot be converted to SQL-compatible expression',
+                        'field'=> $field,
+                        'cond' => $cond,
+                        'value'=> $value,
+                    ]);
+                }
+
                 $this->args[$kind][] = [$field, $cond, $value];
                 break;
         }
@@ -625,70 +664,82 @@ class Query extends Expression
         // where() might have been called multiple times. Collect all conditions,
         // then join them with AND keyword
         foreach ($this->args[$kind] as $row) {
-            if (count($row) === 3) {
-                list($field, $cond, $value) = $row;
-            } elseif (count($row) === 2) {
-                list($field, $cond) = $row;
-            } elseif (count($row) === 1) {
-                list($field) = $row;
-            }
-
-            $field = $this->_consume($field, 'soft-escape');
-
-            if (count($row) == 1) {
-                // Only a single parameter was passed, so we simply include all
-                $ret[] = $field;
-                continue;
-            }
-
-            // below are only cases when 2 or 3 arguments are passed
-
-            // if no condition defined - set default condition
-            if (count($row) == 2) {
-                $value = $cond;
-
-                if (is_array($value)) {
-                    $cond = 'in';
-                } elseif ($value instanceof self && $value->mode === 'select') {
-                    $cond = 'in';
-                } else {
-                    $cond = '=';
-                }
-            } else {
-                $cond = trim(strtolower($cond));
-            }
-
-            // below we can be sure that all 3 arguments has been passed
-
-            // special conditions (IS | IS NOT) if value is null
-            if ($value === null) {
-                if ($cond === '=') {
-                    $cond = 'is';
-                } elseif (in_array($cond, ['!=', '<>', 'not'])) {
-                    $cond = 'is not';
-                }
-            }
-
-            // value should be array for such conditions
-            if (in_array($cond, ['in', 'not in', 'not']) && is_string($value)) {
-                $value = array_map('trim', explode(',', $value));
-            }
-
-            // special conditions (IN | NOT IN) if value is array
-            if (is_array($value)) {
-                $value = '('.implode(',', $this->_param($value)).')';
-                $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
-                $ret[] = $field.' '.$cond.' '.$value;
-                continue;
-            }
-
-            // if value is object, then it should be Expression or Query itself
-            // otherwise just escape value
-            $value = $this->_consume($value, 'param');
-            $ret[] = $field.' '.$cond.' '.$value;
+            $ret[] = $this->__render_condition($row);
         }
 
         return $ret;
+    }
+
+    /**
+     * Renders one condition.
+     *
+     * @param array $row Condition
+     *
+     * @return string
+     */
+    protected function __render_condition($row)
+    {
+        if (count($row) === 3) {
+            list($field, $cond, $value) = $row;
+        } elseif (count($row) === 2) {
+            list($field, $cond) = $row;
+        } elseif (count($row) === 1) {
+            list($field) = $row;
+        }
+
+        $field = $this->_consume($field, 'soft-escape');
+
+        if (count($row) == 1) {
+            // Only a single parameter was passed, so we simply include all
+            return $field;
+        }
+
+        // below are only cases when 2 or 3 arguments are passed
+
+        // if no condition defined - set default condition
+        if (count($row) == 2) {
+            $value = $cond;
+
+            if (is_array($value)) {
+                $cond = 'in';
+            } elseif ($value instanceof self && $value->mode === 'select') {
+                $cond = 'in';
+            } else {
+                $cond = '=';
+            }
+        } else {
+            $cond = trim(strtolower($cond));
+        }
+
+        // below we can be sure that all 3 arguments has been passed
+
+        // special conditions (IS | IS NOT) if value is null
+        if ($value === null) {
+            if ($cond === '=') {
+                $cond = 'is';
+            } elseif (in_array($cond, ['!=', '<>', 'not'])) {
+                $cond = 'is not';
+            }
+        }
+
+        // value should be array for such conditions
+        if (in_array($cond, ['in', 'not in', 'not']) && is_string($value)) {
+            $value = array_map('trim', explode(',', $value));
+        }
+
+        // special conditions (IN | NOT IN) if value is array
+        if (is_array($value)) {
+            $value = '('.implode(',', $this->_param($value)).')';
+            $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
+
+            return $field.' '.$cond.' '.$value;
+        }
+
+        // if value is object, then it should be Expression or Query itself
+        // otherwise just escape value
+        $value = $this->_consume($value, 'param');
+
+        return $field.' '.$cond.' '.$value;
     }
 
     /**
@@ -964,7 +1015,7 @@ class Query extends Expression
     /**
      * Execute select statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function select()
     {
@@ -974,7 +1025,7 @@ class Query extends Expression
     /**
      * Execute insert statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function insert()
     {
@@ -984,7 +1035,7 @@ class Query extends Expression
     /**
      * Execute update statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function update()
     {
@@ -994,7 +1045,7 @@ class Query extends Expression
     /**
      * Execute replace statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function replace()
     {
@@ -1004,7 +1055,7 @@ class Query extends Expression
     /**
      * Execute delete statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function delete()
     {
@@ -1014,7 +1065,7 @@ class Query extends Expression
     /**
      * Execute truncate statement.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function truncate()
     {
@@ -1111,12 +1162,8 @@ class Query extends Expression
             $desc = $desc ? 'desc' : '';
         } elseif (strtolower($desc) === 'asc') {
             $desc = '';
-        } elseif ($desc && strtolower($desc) != 'desc') {
-            throw new Exception([
-                'Incorrect ordering keyword',
-                'order by' => $order,
-                'desc'     => $desc,
-            ]);
+        } else {
+            // allows custom order like "order by name desc nulls last" for Oracle
         }
 
         $this->args['order'][] = [$order, $desc];
@@ -1227,6 +1274,27 @@ class Query extends Expression
     }
 
     /**
+     * Returns Expression object for the corresponding Query
+     * sub-class (e.g. Query_MySQL will return Expression_MySQL).
+     *
+     * Connection is not mandatory, but if set, will be preserved. This
+     * method should be used for building parts of the query internally.
+     *
+     * @param array $properties
+     * @param array $arguments
+     *
+     * @return Expression
+     */
+    public function expr($properties = [], $arguments = null)
+    {
+        $c = $this->expression_class;
+        $e = new $c($properties, $arguments);
+        $e->connection = $this->connection;
+
+        return $e;
+    }
+
+    /**
      * Returns new Query object of [or] expression.
      *
      * @return Query
@@ -1244,6 +1312,125 @@ class Query extends Expression
     public function andExpr()
     {
         return $this->dsql(['template' => '[andwhere]']);
+    }
+
+    /**
+     * Returns Query object of [case] expression.
+     *
+     * @param mixed $operand Optional operand for case expression.
+     *
+     * @return Query
+     */
+    public function caseExpr($operand = null)
+    {
+        $q = $this->dsql(['template' => '[case]']);
+
+        if ($operand !== null) {
+            $q->args['case_operand'] = $operand;
+        }
+
+        return $q;
+    }
+
+    /**
+     * Returns a query for a function, which can be used as part of the GROUP
+     * query which would concatenate all matching fields.
+     *
+     * MySQL, SQLite - group_concat
+     * PostgreSQL - string_agg
+     * Oracle - listagg
+     *
+     * @param mixed  $field
+     * @param string $delimiter
+     *
+     * @return Expression
+     */
+    public function groupConcat($field, $delimeter = ',')
+    {
+        throw new Exception('groupConcat() is SQL-dependent, so use a correct class');
+    }
+
+    /**
+     * Add when/then condition for [case] expression.
+     *
+     * @param mixed $when Condition as array for normal form [case] statement or just value in case of short form [case] statement
+     * @param mixed $then Then expression or value
+     *
+     * @return $this
+     */
+    public function when($when, $then)
+    {
+        $this->args['case_when'][] = [$when, $then];
+
+        return $this;
+    }
+
+    /**
+     * Add else condition for [case] expression.
+     *
+     * @param mixed $else Else expression or value
+     *
+     * @return $this
+     */
+    //public function else($else) // PHP 5.6 restricts to use such method name. PHP 7 is fine with it
+    public function otherwise($else)
+    {
+        $this->args['case_else'] = $else;
+
+        return $this;
+    }
+
+    /**
+     * Renders [case].
+     *
+     * @return string rendered SQL chunk
+     */
+    protected function _render_case()
+    {
+        if (!isset($this->args['case_when'])) {
+            return;
+        }
+
+        $ret = '';
+
+        // operand
+        if ($short_form = isset($this->args['case_operand'])) {
+            $ret .= ' '.$this->_consume($this->args['case_operand'], 'soft-escape');
+        }
+
+        // when, then
+        foreach ($this->args['case_when'] as $row) {
+            if (!array_key_exists(0, $row) || !array_key_exists(1, $row)) {
+                throw new Exception([
+                    'Incorrect use of "when" method parameters',
+                    'row'  => $row,
+                ]);
+            }
+
+            $ret .= ' when ';
+            if ($short_form) {
+                // short-form
+                if (is_array($row[0])) {
+                    throw new Exception([
+                        'When using short form CASE statement, then you should not set array as when() method 1st parameter',
+                        'when'  => $row[0],
+                    ]);
+                }
+                $ret .= $this->_consume($row[0], 'param');
+            } else {
+                $ret .= $this->__render_condition($row[0]);
+            }
+
+            // then
+            $ret .= ' then '.$this->_consume($row[1], 'param');
+        }
+
+        // else
+        if (array_key_exists('case_else', $this->args)) {
+            $ret .= ' else '.$this->_consume($this->args['case_else'], 'param');
+        }
+
+        return ' case'.$ret.' end';
     }
 
     /**

@@ -5,12 +5,12 @@
 namespace atk4\dsql;
 
 /**
- * Perform query operation on MySQL server.
+ * Perform query operation on PostgreSQL server.
  *
  * @license MIT
  * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
-class Query_MySQL extends Query
+class Query_PgSQL extends Query
 {
     /**
      * Field, table and alias name escaping symbol.
@@ -18,10 +18,7 @@ class Query_MySQL extends Query
      *
      * @var string
      */
-    protected $escape_char = '`';
-
-    /** @var string Expression classname */
-    protected $expression_class = 'atk4\dsql\Expression_MySQL';
+    protected $escape_char = '"';
 
     /**
      * UPDATE template.
@@ -29,6 +26,28 @@ class Query_MySQL extends Query
      * @var string
      */
     protected $template_update = 'update [table][join] set [set] [where]';
+
+    /**
+     * REPLACE template.
+     *
+     * @var string
+     */
+    protected $template_replace = null;
+
+    /**
+     * Renders [limit].
+     *
+     * @return string rendered SQL chunk
+     */
+    public function _render_limit()
+    {
+        if (isset($this->args['limit'])) {
+            return ' limit '.
+                (int) $this->args['limit']['cnt'].
+                ' offset '.
+                (int) $this->args['limit']['shift'];
+        }
+    }
 
     /**
      * Returns a query for a function, which can be used as part of the GROUP
@@ -45,6 +64,6 @@ class Query_MySQL extends Query
      */
     public function groupConcat($field, $delimeter = ',')
     {
-        return $this->expr('group_concat({} separator [])', [$field, $delimeter]);
+        return $this->expr('string_agg({}, [])', [$field, $delimeter]);
     }
 }

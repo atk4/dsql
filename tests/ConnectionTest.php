@@ -7,7 +7,7 @@ use atk4\dsql\Connection;
 /**
  * @coversDefaultClass \atk4\dsql\ConnectionTest
  */
-class ConnectionTest extends \PHPUnit_Framework_TestCase
+class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     /**
      * Test constructor.
@@ -21,12 +21,75 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Test DSN normalize.
+     */
+    public function testDSNNormalize()
+    {
+        // standard
+        $dsn = Connection::normalizeDSN('mysql://root:pass@localhost/db');
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db', 'user'=>'root', 'pass'=>'pass', 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db'], $dsn);
+
+        $dsn = Connection::normalizeDSN('mysql:host=localhost;dbname=db');
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db', 'user'=>null, 'pass'=>null, 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db'], $dsn);
+
+        $dsn = Connection::normalizeDSN('mysql:host=localhost;dbname=db', 'root', 'pass');
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db', 'user'=>'root', 'pass'=>'pass', 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db'], $dsn);
+
+        // username and password should take precedence
+        $dsn = Connection::normalizeDSN('mysql://root:pass@localhost/db', 'foo', 'bar');
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db', 'user'=>'foo', 'pass'=>'bar', 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db'], $dsn);
+
+        // more options
+        $dsn = Connection::normalizeDSN('mysql://root:pass@localhost/db;foo=bar');
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db;foo=bar', 'user'=>'root', 'pass'=>'pass', 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db;foo=bar'], $dsn);
+
+        // no password
+        $dsn = Connection::normalizeDSN('mysql://root@localhost/db');
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db', 'user'=>'root', 'pass'=>null, 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db'], $dsn);
+        $dsn = Connection::normalizeDSN('mysql://root:@localhost/db'); // see : after root
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;dbname=db', 'user'=>'root', 'pass'=>null, 'driver'=>'mysql', 'rest'=>'host=localhost;dbname=db'], $dsn);
+
+        // specific DSNs
+        $dsn = Connection::normalizeDSN('dumper:sqlite::memory');
+        $this->assertEquals(['dsn'=>'dumper:sqlite::memory', 'user'=>null, 'pass'=>null, 'driver'=>'dumper', 'rest'=>'sqlite::memory'], $dsn);
+
+        $dsn = Connection::normalizeDSN('sqlite::memory');
+        $this->assertEquals(['dsn'=>'sqlite::memory', 'user'=>null, 'pass'=>null, 'driver'=>'sqlite', 'rest'=>':memory'], $dsn); // rest is unusable anyway in this context
+
+        // with port number as URL, normalize port to ;port=1234
+        $dsn = Connection::normalizeDSN('mysql://root:pass@localhost:1234/db');
+        $this->assertEquals(['dsn'=>'mysql:host=localhost;port=1234;dbname=db', 'user'=>'root', 'pass'=>'pass', 'driver'=>'mysql', 'rest'=>'host=localhost;port=1234;dbname=db'], $dsn);
+
+        // with port number as DSN, leave port as :port
+        $dsn = Connection::normalizeDSN('mysql:host=localhost:1234;dbname=db');
+        $this->assertEquals(['dsn'=>'mysql:host=localhost:1234;dbname=db', 'user'=>null, 'pass'=>null, 'driver'=>'mysql', 'rest'=>'host=localhost:1234;dbname=db'], $dsn);
+    }
+
+    /**
+     * Test driver property.
+     */
+    public function testDriver()
+    {
+        $c = Connection::connect('sqlite::memory:');
+        $this->assertEquals('sqlite', $c->driver);
+
+        $c = Connection::connect('dumper:sqlite::memory:');
+        $this->assertEquals('sqlite', $c->driver);
+
+        $c = Connection::connect('counter:sqlite::memory:');
+        $this->assertEquals('sqlite', $c->driver);
+    }
+
+    /**
+     * Test Dumper connection.
+     */
     public function testDumper()
     {
         $c = Connection::connect('dumper:sqlite::memory:');
 
         $result = false;
-        $c->callback = function ($expr, $time) use (&$result) {
+        $c->callback = function ($expr, $time, $fail) use (&$result) {
             $result = $expr->render();
         };
 
@@ -63,7 +126,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $c->expr('select (2+2)')->getOne()
         );
 
-        $this->expectOutputRegex("/.*select \(2\+2\).*/");
+        $this->expectOutputRegex("/select \(2\+2\)/");
     }
 
     public function testCounter()
@@ -71,7 +134,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $c = Connection::connect('counter:sqlite::memory:');
 
         $result = false;
-        $c->callback = function ($a, $b, $c, $d) use (&$result) {
+        $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
             $result = [$a, $b, $c, $d];
         };
 
@@ -106,7 +169,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $c = Connection::connect('counter:sqlite::memory:');
 
         $result = false;
-        $c->callback = function ($a, $b, $c, $d) use (&$result) {
+        $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
             $result = [$a, $b, $c, $d];
         };
 
@@ -131,7 +194,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $c = Connection::connect('counter:sqlite::memory:');
 
         $result = false;
-        $c->callback = function ($a, $b, $c, $d) use (&$result) {
+        $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
             $result = [$a, $b, $c, $d];
         };
 

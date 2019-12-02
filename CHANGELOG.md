@@ -1,3 +1,110 @@
+# Change Log
+
+# 1.2
+
+In this verison we are adding support for Oracle and PostgreSQL also:
+
+- Feature/oracle support fixes [\#133](https://github.com/atk4/dsql/pull/133) ([DarkSide666](https://github.com/DarkSide666))
+- Feature/connection oracle [\#132](https://github.com/atk4/dsql/pull/132) ([DarkSide666](https://github.com/DarkSide666))
+- Fix: SQL does not guarantee the order of retreived rows unless explic… [\#131](https://github.com/atk4/dsql/pull/131) ([gartner](https://github.com/gartner))
+- Create a driver for postgresql [\#130](https://github.com/atk4/dsql/pull/130) ([gartner](https://github.com/gartner))
+- spellcheck and wrapping :\) [\#125](https://github.com/atk4/dsql/pull/125) ([DarkSide666](https://github.com/DarkSide666))
+- Feature/oracle support [\#124](https://github.com/atk4/dsql/pull/124) ([romaninsh](https://github.com/romaninsh))
+- Add verification for foreign objects inside where\(\) values [\#122](https://github.com/atk4/dsql/pull/122) ([romaninsh](https://github.com/romaninsh))
+- Add support for URI-style DNS: mysql://user:pass@host/db [\#120](https://github.com/atk4/dsql/pull/120) ([romaninsh](https://github.com/romaninsh))
+
+And throughout minor releases:
+- added support for CASE WHEN/THEN
+- added support for groupConcat()
+
+## 1.2.1
+
+Resolve minor issues where expression class wasn't set correctly or some minor incompatibilities
+appeared between SQL vendor syntaxes.
+
+**Closed issues:**
+
+- ATK Data, action\('fx'\) not working [\#136](https://github.com/atk4/dsql/issues/136)
+- Passing a \PDO to connect\(\) assumes mysql [\#134](https://github.com/atk4/dsql/issues/134)
+- \[epic\] Add support for PostgreSQL [\#129](https://github.com/atk4/dsql/issues/129)
+- Use PDO::quote\(\) to escape values and identifiers [\#127](https://github.com/atk4/dsql/issues/127)
+- Add PostgreSQL test-scripts [\#27](https://github.com/atk4/dsql/issues/27)
+
+**Merged pull requests:**
+
+- resolve \#136 [\#137](https://github.com/atk4/dsql/pull/137) ([romaninsh](https://github.com/romaninsh))
+- Fix pdo [\#135](https://github.com/atk4/dsql/pull/135) ([gartner](https://github.com/gartner))
+
+## 1.2.2
+
+**Implemented enhancements:**
+
+- Add support for CASE expression [\#74](https://github.com/atk4/dsql/issues/74)
+- We should properly support tables and fields with spaces e.g. `my table`. [\#60](https://github.com/atk4/dsql/issues/60)
+
+**Merged pull requests:**
+
+- Implement normalizeDSN\(\) [\#139](https://github.com/atk4/dsql/pull/139) ([DarkSide666](https://github.com/DarkSide666))
+- Implement CASE WHEN/THEN [\#138](https://github.com/atk4/dsql/pull/138) ([DarkSide666](https://github.com/DarkSide666))
+
+## 1.2.3
+
+Refactored, code cleanup
+
+**Closed issues:**
+
+- Put together a basic website or Release Notes [\#24](https://github.com/atk4/dsql/issues/24)
+
+## 1.2.4
+
+**Closed issues:**
+
+- Model with properties: when iterating over several loaded Items, changes to property are done on all Items [\#318](https://github.com/atk4/data/issues/318)
+
+**Merged pull requests:**
+
+- validate if methods exist in persistence before calling them [\#324](https://github.com/atk4/data/pull/324) ([DarkSide666](https://github.com/DarkSide666))
+- validate if persistence have action\(\) method [\#323](https://github.com/atk4/data/pull/323) ([DarkSide666](https://github.com/DarkSide666))
+- if it's array then it's treated as defaults. [\#322](https://github.com/atk4/data/pull/322) ([DarkSide666](https://github.com/DarkSide666))
+- Support LOB fields loading [\#321](https://github.com/atk4/data/pull/321) ([DarkSide666](https://github.com/DarkSide666))
+- fix newInstance\(\) [\#320](https://github.com/atk4/data/pull/320) ([DarkSide666](https://github.com/DarkSide666))
+
+## 1.2.5
+
+Improving compatibility with third party SQL tweaks.
+
+ - DSN may be specified as object to connection
+ - Allow to specify port number for DSN
+ - Oracle connection will set compatible date format
+ - Allow more flexible order() arguments (e.g. order by name desc nulls last)
+
+## 1.2.6
+
+**Closed issues:**
+
+- no coverage of 'distinct' in the documentation [\#151](https://github.com/atk4/dsql/issues/151)
+- Not referring to PDO correctly in PHPDoc [\#148](https://github.com/atk4/dsql/issues/148)
+
+**Merged pull requests:**
+
+- add documentation for $q-\>options\(\) [\#153](https://github.com/atk4/dsql/pull/153) (@romaninsh)
+- re-add tests \(Random\) which I renamed [\#150](https://github.com/atk4/dsql/pull/150) (@romaninsh)
+- Add support for groupConcat\(\) [\#149](https://github.com/atk4/dsql/pull/149) (@romaninsh)
+
+# Older releases
+
+## 1.1.5
+
+- Migrate to Agile Core 1.3
+
+## 1.1.4
+
+- Migrate to Agile Core 1.2
+
+## 1.1.3
+
+- Added release script
+
 ## 1.1.2
 
  - Fix how getDebugQuery() works without sql-formatter
@@ -130,3 +237,6 @@ extensive test-suite consisting of almost 100 tests.
 
 * Initial Release
 * Bootstraped Documentation (sphinx-doc)
+
+
+\* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*

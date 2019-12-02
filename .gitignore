@@ -3,3 +3,4 @@ docs/build
 /composer.lock
 /vendor
 .DS_Store
+.idea
