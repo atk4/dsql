@@ -26,7 +26,6 @@ DSQL has been in production since 2006, initially included in [AModules2](https:
 [![Code Climate](https://codeclimate.com/github/atk4/dsql/badges/gpa.svg)](https://codeclimate.com/github/atk4/dsql)
 [![StyleCI](https://styleci.io/repos/50448904/shield)](https://styleci.io/repos/50448904)
 [![CodeCov](https://codecov.io/gh/atk4/dsql/branch/develop/graph/badge.svg)](https://codecov.io/gh/atk4/dsql)
-[![Test Coverage](https://codeclimate.com/github/atk4/dsql/badges/coverage.svg)](https://codeclimate.com/github/atk4/dsql/coverage)
 [![Issue Count](https://codeclimate.com/github/atk4/dsql/badges/issue_count.svg)](https://codeclimate.com/github/atk4/dsql)
 
 [![License](https://poser.pugx.org/atk4/dsql/license)](https://packagist.org/packages/atk4/dsql)
