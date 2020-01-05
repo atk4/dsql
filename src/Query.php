@@ -729,6 +729,8 @@ class Query extends Expression
 
         // special conditions (IN | NOT IN) if value is array
         if (is_array($value)) {
+            if (! $value) return 'false';
+            
             $value = '('.implode(',', $this->_param($value)).')';
             $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
 
