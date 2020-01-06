@@ -881,6 +881,15 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id', '!=', [1, 2])->render()
         );
+        // speacial treatment for empty array values
+        $this->assertEquals(
+            'where "id"<>"id"',
+            $this->q('[where]')->where('id', '=', [])->render()
+        );
+        $this->assertEquals(
+            'where ("id"="id" or "id" is null)',
+            $this->q('[where]')->where('id', '<>', [])->render()
+        );
         // pass array as CSV
         $this->assertEquals(
             'where "id" in (:a,:b)',

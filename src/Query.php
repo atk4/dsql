@@ -729,11 +729,20 @@ class Query extends Expression
 
         // special conditions (IN | NOT IN) if value is array
         if (is_array($value)) {
-            $value = '('.implode(',', $this->_param($value)).')';
             $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
+            
+            // special treatment of empty array condition
+            if (empty($value)) {
+                if ($cond == 'in') {
+                    return $field.'<>'.$field; // never true
+                }
+                return '('.$field.'='.$field.' or '.$field.' is null)'; // always true
+            }
 
+            $value = '('.implode(',', $this->_param($value)).')';
             return $field.' '.$cond.' '.$value;
         }
+
 
         // if value is object, then it should be Expression or Query itself
         // otherwise just escape value
