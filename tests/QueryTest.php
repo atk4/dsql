@@ -1664,10 +1664,9 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
     /**
      * Tests exprNow() method.
      *
-     * @covers ::nowExpr
-     * @covers ::_render_nowexpr
+     * @covers ::exprNow
      */
-    public function testNow()
+    public function testExprNow()
     {
         $this->assertEquals(
             'update "employee" set "hired"=current_timestamp()',
