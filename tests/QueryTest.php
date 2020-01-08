@@ -1660,4 +1660,29 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
         $this->q()->caseExpr('status')
             ->when(['status', 'New'], 't2.expose_new');
     }
+    
+    /**
+     * Tests exprNow() method.
+     *
+     * @covers ::nowExpr
+     * @covers ::_render_nowexpr
+     */
+    public function testNow()
+    {
+        $this->assertEquals(
+            'update "employee" set "hired"=current_timestamp()',
+            $this->q()
+                ->field('hired')->table('employee')->set('hired', $this->q()->exprNow())
+                ->mode('update')
+                ->render()
+        );
+    
+        $this->assertEquals(
+            'update "employee" set "hired"=current_timestamp(:a)',
+            $this->q()
+                ->field('hired')->table('employee')->set('hired', $this->q()->exprNow(2))
+                ->mode('update')
+                ->render()
+        );
+    }
 }

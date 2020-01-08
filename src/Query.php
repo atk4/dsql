@@ -1303,6 +1303,22 @@ class Query extends Expression
 
         return $e;
     }
+    
+    /**
+     * Returns Expression object for NOW() or CURRENT_TIMESTAMP() method.
+     *
+     * @param int $precision
+     *
+     * @return Expression
+     */
+    public function exprNow($precision = null)
+    {
+        if ($precision !== null) {
+            return $this->expr('current_timestamp([])', [$precision]);
+        }
+
+        return $this->expr('current_timestamp()');
+    }
 
     /**
      * Returns new Query object of [or] expression.
