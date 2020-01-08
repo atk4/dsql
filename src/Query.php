@@ -656,7 +656,7 @@ class Query extends Expression
      *
      * @return array Parsed chunks of query
      */
-    protected function __render_where($kind)
+    protected function _sub_render_where($kind)
     {
         // will be joined for output
         $ret = [];
@@ -664,7 +664,7 @@ class Query extends Expression
         // where() might have been called multiple times. Collect all conditions,
         // then join them with AND keyword
         foreach ($this->args[$kind] as $row) {
-            $ret[] = $this->__render_condition($row);
+            $ret[] = $this->_sub_render_condition($row);
         }
 
         return $ret;
@@ -677,7 +677,7 @@ class Query extends Expression
      *
      * @return string
      */
-    protected function __render_condition($row)
+    protected function _sub_render_condition($row)
     {
         if (count($row) === 3) {
             list($field, $cond, $value) = $row;
@@ -763,7 +763,7 @@ class Query extends Expression
             return;
         }
 
-        return ' where '.implode(' and ', $this->__render_where('where'));
+        return ' where '.implode(' and ', $this->_sub_render_where('where'));
     }
 
     /**
@@ -777,7 +777,7 @@ class Query extends Expression
             return;
         }
 
-        return implode(' or ', $this->__render_where('where'));
+        return implode(' or ', $this->_sub_render_where('where'));
     }
 
     /**
@@ -791,7 +791,7 @@ class Query extends Expression
             return;
         }
 
-        return implode(' and ', $this->__render_where('where'));
+        return implode(' and ', $this->_sub_render_where('where'));
     }
 
     /**
@@ -805,7 +805,7 @@ class Query extends Expression
             return;
         }
 
-        return ' having '.implode(' and ', $this->__render_where('having'));
+        return ' having '.implode(' and ', $this->_sub_render_where('having'));
     }
 
     // }}}
@@ -1428,7 +1428,7 @@ class Query extends Expression
                 }
                 $ret .= $this->_consume($row[0], 'param');
             } else {
-                $ret .= $this->__render_condition($row[0]);
+                $ret .= $this->_sub_render_condition($row[0]);
             }
 
             // then

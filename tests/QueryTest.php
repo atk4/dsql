@@ -719,7 +719,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      *
      * @covers ::where
      * @covers ::_render_where
-     * @covers ::__render_where
+     * @covers ::_sub_render_where
      */
     public function testWhereBasic()
     {
@@ -852,7 +852,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      *
      * @covers ::where
      * @covers ::_render_where
-     * @covers ::__render_where
+     * @covers ::_sub_render_where
      */
     public function testWhereSpecialValues()
     {
