@@ -1303,7 +1303,7 @@ class Query extends Expression
 
         return $e;
     }
-    
+
     /**
      * Returns Expression object for NOW() or CURRENT_TIMESTAMP() method.
      *
