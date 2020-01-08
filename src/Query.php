@@ -656,7 +656,7 @@ class Query extends Expression
      *
      * @return array Parsed chunks of query
      */
-    protected function __render_where($kind)
+    protected function _sub_render_where($kind)
     {
         // will be joined for output
         $ret = [];
@@ -664,7 +664,7 @@ class Query extends Expression
         // where() might have been called multiple times. Collect all conditions,
         // then join them with AND keyword
         foreach ($this->args[$kind] as $row) {
-            $ret[] = $this->__render_condition($row);
+            $ret[] = $this->_sub_render_condition($row);
         }
 
         return $ret;
@@ -677,7 +677,7 @@ class Query extends Expression
      *
      * @return string
      */
-    protected function __render_condition($row)
+    protected function _sub_render_condition($row)
     {
         if (count($row) === 3) {
             list($field, $cond, $value) = $row;
@@ -729,8 +729,18 @@ class Query extends Expression
 
         // special conditions (IN | NOT IN) if value is array
         if (is_array($value)) {
-            $value = '('.implode(',', $this->_param($value)).')';
             $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
+
+            // special treatment of empty array condition
+            if (empty($value)) {
+                if ($cond == 'in') {
+                    return $field.'<>'.$field; // never true
+                }
+
+                return '('.$field.'='.$field.' or '.$field.' is null)'; // always true
+            }
+
+            $value = '('.implode(',', $this->_param($value)).')';
 
             return $field.' '.$cond.' '.$value;
         }
@@ -753,7 +763,7 @@ class Query extends Expression
             return;
         }
 
-        return ' where '.implode(' and ', $this->__render_where('where'));
+        return ' where '.implode(' and ', $this->_sub_render_where('where'));
     }
 
     /**
@@ -767,7 +777,7 @@ class Query extends Expression
             return;
         }
 
-        return implode(' or ', $this->__render_where('where'));
+        return implode(' or ', $this->_sub_render_where('where'));
     }
 
     /**
@@ -781,7 +791,7 @@ class Query extends Expression
             return;
         }
 
-        return implode(' and ', $this->__render_where('where'));
+        return implode(' and ', $this->_sub_render_where('where'));
     }
 
     /**
@@ -795,7 +805,7 @@ class Query extends Expression
             return;
         }
 
-        return ' having '.implode(' and ', $this->__render_where('having'));
+        return ' having '.implode(' and ', $this->_sub_render_where('having'));
     }
 
     // }}}
@@ -1295,6 +1305,22 @@ class Query extends Expression
     }
 
     /**
+     * Returns Expression object for NOW() or CURRENT_TIMESTAMP() method.
+     *
+     * @param int $precision
+     *
+     * @return Expression
+     */
+    public function exprNow($precision = null)
+    {
+        if ($precision !== null) {
+            return $this->expr('current_timestamp([])', [$precision]);
+        }
+
+        return $this->expr('current_timestamp()');
+    }
+
+    /**
      * Returns new Query object of [or] expression.
      *
      * @return Query
@@ -1418,7 +1444,7 @@ class Query extends Expression
                 }
                 $ret .= $this->_consume($row[0], 'param');
             } else {
-                $ret .= $this->__render_condition($row[0]);
+                $ret .= $this->_sub_render_condition($row[0]);
             }
 
             // then
