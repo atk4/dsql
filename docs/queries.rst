@@ -756,6 +756,10 @@ Other Methods
     Method very similar to :php:method:`Connection::expr` but will return a
     corresponding Expression class for this query.
 
+.. php:method:: exprNow($precision)
+
+    Method will return current_timestamp(precision) sub-query.
+
 .. php:method:: option($option, $mode)
 
     Use this to set additional options for particular query mode.
