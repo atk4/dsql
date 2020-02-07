@@ -72,10 +72,10 @@ class Connection
         if ($parts !== false && isset($parts['host'], $parts['path'])) {
             // DSN is using URL-like format, so we need to convert it
             $dsn =
-                $parts['scheme'].
-                ':host='.$parts['host'].
-                (isset($parts['port']) ? ';port='.$parts['port'] : '').
-                ';dbname='.substr($parts['path'], 1);
+                $parts['scheme'] .
+                ':host=' . $parts['host'] .
+                (isset($parts['port']) ? ';port=' . $parts['port'] : '') .
+                ';dbname=' . substr($parts['path'], 1);
             $user = $user !== null ? $user : (isset($parts['user']) ? $parts['user'] : null);
             $pass = $pass !== null ? $pass : (isset($parts['pass']) ? $parts['pass'] : null);
         }

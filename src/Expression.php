@@ -301,7 +301,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
         // Queries should be wrapped in parentheses in most cases
         if ($sql_code instanceof Query) {
-            $ret = '('.$ret.')';
+            $ret = '(' . $ret . ')';
         }
 
         // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
@@ -354,7 +354,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
-        return $this->escape_char.trim($value).$this->escape_char;
+        return $this->escape_char . trim($value) . $this->escape_char;
     }
 
     /**
@@ -392,8 +392,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
         // in all other cases we should escape
         return
             $this->escape_char
-            .str_replace($this->escape_char, $this->escape_char.$this->escape_char, $value)
-            .$this->escape_char;
+            . str_replace($this->escape_char, $this->escape_char . $this->escape_char, $value)
+            . $this->escape_char;
     }
 
     /**
@@ -412,7 +412,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             return array_map(__METHOD__, $value);
         }
 
-        $name = ':'.$this->_paramBase;
+        $name = ':' . $this->_paramBase;
         $this->_paramBase++;
         $this->params[$name] = $value;
 
@@ -447,7 +447,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
                     // use rendering only with named tags
                 }
-                $fx = '_render_'.$identifier;
+                $fx = '_render_' . $identifier;
 
                 // [foo] will attempt to call $this->_render_foo()
 
@@ -462,7 +462,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                     ]);
                 }
 
-                return is_array($value) ? '('.implode(',', $value).')' : $value;
+                return is_array($value) ? '(' . implode(',', $value) . ')' : $value;
             },
             $this->template
         );
@@ -489,20 +489,20 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_numeric($val)) {
                 $d = preg_replace(
-                    '/'.$key.'([^_]|$)/',
-                    $val.'\1',
+                    '/' . $key . '([^_]|$)/',
+                    $val . '\1',
                     $d
                 );
             } elseif (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', "'".addslashes($val)."'\\1", $d);
+                $d = preg_replace('/' . $key . '([^_]|$)/', "'" . addslashes($val) . "'\\1", $d);
             } elseif ($val === null) {
                 $d = preg_replace(
-                    '/'.$key.'([^_]|$)/',
+                    '/' . $key . '([^_]|$)/',
                     'NULL\1',
                     $d
                 );
             } else {
-                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\\1', $d);
+                $d = preg_replace('/' . $key . '([^_]|$)/', $val . '\\1', $d);
             }
             $pp[] = $key;
         }

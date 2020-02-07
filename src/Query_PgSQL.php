@@ -42,9 +42,9 @@ class Query_PgSQL extends Query
     public function _render_limit()
     {
         if (isset($this->args['limit'])) {
-            return ' limit '.
-                (int) $this->args['limit']['cnt'].
-                ' offset '.
+            return ' limit ' .
+                (int) $this->args['limit']['cnt'] .
+                ' offset ' .
                 (int) $this->args['limit']['shift'];
         }
     }

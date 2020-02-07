@@ -652,7 +652,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
             ->field('date')
             ->field('amount', 'debit')
             ->field($this->q()->expr('0'), 'credit') // simply 0
-;
+        ;
         $this->assertEquals(
             'select "date","amount" "debit",0 "credit" from "sales"',
             $q1->render()
@@ -1242,20 +1242,20 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
             $this->q('[join]')->table('user', 'u')->join('address.user_id a')->render()
         );
         $this->assertEquals(
-            'left join "address" as "a" on "a"."user_id" = "u"."id" '.
+            'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
             'left join "bank" as "b" on "b"."id" = "u"."bank_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a' => 'address.user_id', 'b' => 'bank'])->render()
         );
         $this->assertEquals(
-            'left join "address" on "address"."user_id" = "u"."id" '.
+            'left join "address" on "address"."user_id" = "u"."id" ' .
             'left join "bank" on "bank"."id" = "u"."bank_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['address.user_id', 'bank'])->render()
         );
         $this->assertEquals(
-            'left join "address" as "a" on "a"."user_id" = "u"."id" '.
-            'left join "bank" as "b" on "b"."id" = "u"."bank_id" '.
+            'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
+            'left join "bank" as "b" on "b"."id" = "u"."bank_id" ' .
             'left join "bank_details" on "bank_details"."id" = "bank"."details_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a' => 'address.user_id', 'b' => 'bank'])
@@ -1566,7 +1566,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
                 ->set('name', 1)
                 ->option('calc_found_rows', 'select') // for default select mode
                 ->option('ignore', 'insert') // for insert mode
-;
+        ;
 
         $this->assertEquals(
             'select calc_found_rows "name" from "test"',
