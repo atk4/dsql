@@ -122,7 +122,7 @@ Contributing
 Guidelines
 ----------
 
-1. DSQL utilizes PSR-1, PSR-2, PSR-4, and PSR-7.
+1. DSQL utilizes PSR-12, PSR-4, and PSR-7.
 2. DSQL is meant to be lean and fast with very few dependencies. This means
    that not every feature request will be accepted.
 3. All pull requests must include unit tests to ensure the change works as
