@@ -719,7 +719,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      *
      * @covers ::where
      * @covers ::_render_where
-     * @covers ::__render_where
+     * @covers ::_sub_render_where
      */
     public function testWhereBasic()
     {
@@ -852,7 +852,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
      *
      * @covers ::where
      * @covers ::_render_where
-     * @covers ::__render_where
+     * @covers ::_sub_render_where
      */
     public function testWhereSpecialValues()
     {
@@ -880,6 +880,15 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
         $this->assertEquals(
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id', '!=', [1, 2])->render()
+        );
+        // speacial treatment for empty array values
+        $this->assertEquals(
+            'where "id"<>"id"',
+            $this->q('[where]')->where('id', '=', [])->render()
+        );
+        $this->assertEquals(
+            'where ("id"="id" or "id" is null)',
+            $this->q('[where]')->where('id', '<>', [])->render()
         );
         // pass array as CSV
         $this->assertEquals(
@@ -1650,5 +1659,29 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
     {
         $this->q()->caseExpr('status')
             ->when(['status', 'New'], 't2.expose_new');
+    }
+
+    /**
+     * Tests exprNow() method.
+     *
+     * @covers ::exprNow
+     */
+    public function testExprNow()
+    {
+        $this->assertEquals(
+            'update "employee" set "hired"=current_timestamp()',
+            $this->q()
+                ->field('hired')->table('employee')->set('hired', $this->q()->exprNow())
+                ->mode('update')
+                ->render()
+        );
+
+        $this->assertEquals(
+            'update "employee" set "hired"=current_timestamp(:a)',
+            $this->q()
+                ->field('hired')->table('employee')->set('hired', $this->q()->exprNow(2))
+                ->mode('update')
+                ->render()
+        );
     }
 }
