@@ -1684,7 +1684,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
                 ->render()
         );
     }
-    
+
     /**
      * Test table name with dots in it - Select.
      */
