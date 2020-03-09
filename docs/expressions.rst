@@ -335,10 +335,10 @@ parts of the query. You must not call them in normal circumstances.
 
   Will do nothing if it finds "*", "`" or "(" character in `$sql_code`::
 
-      $query->_escape('first_name');  // `first_name`
-      $query->_escape('first.name');  // `first`.`name`
-      $query->_escape('(2+2)');       // (2+2)
-      $query->_escape('*');           // *
+      $query->_escapeSoft('first_name');  // `first_name`
+      $query->_escapeSoft('first.name');  // `first`.`name`
+      $query->_escapeSoft('(2+2)');       // (2+2)
+      $query->_escapeSoft('*');           // *
 
 .. php:method:: _param($value)
 
