@@ -365,7 +365,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @param string $value
      *
-     * @return string
+     * @return Expression
      */
     public function escape($value)
     {
@@ -390,10 +390,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
         }
 
         // in all other cases we should escape
-        return
-            $this->escape_char
-            .str_replace($this->escape_char, $this->escape_char.$this->escape_char, $value)
-            .$this->escape_char;
+        $c = $this->escape_char;
+
+        return $c.str_replace($c, $c.$c, $value).$c;
     }
 
     /**
@@ -436,10 +435,21 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
         }
 
         $res = preg_replace_callback(
-            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}/i',
+            //     param     |  escape   |  escapeSoft
+            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}|{{[a-z0-9_]*}}/i',
             function ($matches) use (&$nameless_count) {
                 $identifier = substr($matches[0], 1, -1);
-                $escaping = ($matches[0][0] == '[') ? 'param' : 'escape';
+
+                if ($matches[0][0] == '[') {
+                    $escaping = 'param';
+                } elseif ($matches[0][0] == '{') {
+                    if ($matches[0][1] == '{') {
+                        $escaping = 'soft-escape';
+                        $identifier = substr($identifier, 1, -1);
+                    } else {
+                        $escaping = 'escape';
+                    }
+                }
 
                 // Allow template to contain []
                 if ($identifier === '') {

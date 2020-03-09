@@ -403,12 +403,13 @@ class Query extends Expression
         }
         $j = [];
 
-        // try to find alias in foreign table definition
+        // try to find alias in foreign table definition. this behaviour should be deprecated
         if ($_foreign_alias === null) {
             list($foreign_table, $_foreign_alias) = array_pad(explode(' ', $foreign_table, 2), 2, null);
         }
 
         // Split and deduce fields
+        // NOTE that this will not allow table names with dots in there !!!
         list($f1, $f2) = array_pad(explode('.', $foreign_table, 2), 2, null);
 
         if (is_object($master_field)) {
@@ -469,7 +470,7 @@ class Query extends Expression
 
             $jj .= $j['t'].' join ';
 
-            $jj .= $this->_escape($j['f1']);
+            $jj .= $this->_escapeSoft($j['f1']);
 
             if ($j['fa'] !== null) {
                 $jj .= ' as '.$this->_escape($j['fa']);
