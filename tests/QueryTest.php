@@ -1684,4 +1684,36 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
                 ->render()
         );
     }
+
+    /**
+     * Test table name with dots in it - Select.
+     */
+    public function testTableNameDot1()
+    {
+        // render table
+        $this->assertEquals(
+            '"foo"."bar"',
+            $this->callProtected($this->q()->table('foo.bar'), '_render_table')
+        );
+
+        $this->assertEquals(
+            '"foo"."bar" "a"',
+            $this->callProtected($this->q()->table('foo.bar', 'a'), '_render_table')
+        );
+
+        // where clause
+        $this->assertEquals(
+            'select "name" from "db1"."employee" where "a" = :a',
+            $this->q()
+                ->field('name')->table('db1.employee')->where('a', 1)
+                ->render()
+        );
+
+        $this->assertEquals(
+            'select "name" from "db1"."employee" where "db1"."employee"."a" = :a',
+            $this->q()
+                ->field('name')->table('db1.employee')->where('db1.employee.a', 1)
+                ->render()
+        );
+    }
 }
