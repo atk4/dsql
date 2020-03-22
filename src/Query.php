@@ -354,29 +354,28 @@ class Query extends Expression
      *
      * @return $this
      */
-    public function with(Query $cursor, string $alias, ?array $fields = null, bool $recursive = false)
+    public function with(self $cursor, string $alias, ?array $fields = null, bool $recursive = false)
     {
         // save cursor in args
         $this->_set_args('with', $alias, [
-            'cursor' => $cursor,
-            'fields' => $fields,
+            'cursor'    => $cursor,
+            'fields'    => $fields,
             'recursive' => $recursive,
         ]);
 
-
         return $this;
     }
-    
+
     /**
      * Recursive WITH query.
      *
-     * @param Query|array $cursor    Specifies cursor query or array [alias=>query] for adding multiple
-     * @param string      $alias     Specify alias for this cursor
-     * @param array  $fields    Optional array of field names used in cursor
+     * @param Query|array $cursor Specifies cursor query or array [alias=>query] for adding multiple
+     * @param string      $alias  Specify alias for this cursor
+     * @param array       $fields Optional array of field names used in cursor
      *
      * @return $this
      */
-    public function withRecursive(Query $cursor, string $alias, ?array $fields = null)
+    public function withRecursive(self $cursor, string $alias, ?array $fields = null)
     {
         return $this->with($cursor, $alias, $fields, true);
     }
@@ -391,7 +390,7 @@ class Query extends Expression
     {
         // will be joined for output
         $ret = [];
-        
+
         if (empty($this->args['with'])) {
             return '';
         }
@@ -400,15 +399,15 @@ class Query extends Expression
         $isRecursive = false;
         foreach ($this->args['with'] as $alias => ['cursor'=>$cursor, 'fields'=>$fields, 'recursive'=>$recursive]) {
             // cursor alias cannot be expression, so simply escape it
-            $s = $this->_escape($alias) . ' ';
-            
+            $s = $this->_escape($alias).' ';
+
             // set cursor fields
             if ($fields) {
-                $s .= '(' . implode(',', array_map([$this, '_escape'], $fields)) . ') ';
+                $s .= '('.implode(',', array_map([$this, '_escape'], $fields)).') ';
             }
 
             // will parameterize the value and escape if necessary
-            $s .= 'as ' . $this->_consume($cursor, 'soft-escape');
+            $s .= 'as '.$this->_consume($cursor, 'soft-escape');
 
             // is at least one recursive ?
             $isRecursive = $isRecursive || $recursive;
@@ -416,9 +415,8 @@ class Query extends Expression
             $ret[] = $s;
         }
 
-        return 'with ' . ($isRecursive ? 'recursive ' : '') . implode(',', $ret) . ' ';
+        return 'with '.($isRecursive ? 'recursive ' : '').implode(',', $ret).' ';
     }
-
 
     /// }}}
 

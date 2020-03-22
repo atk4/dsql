@@ -1716,7 +1716,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
                 ->render()
         );
     }
-    
+
     /**
      * Test WITH.
      */
@@ -1731,39 +1731,34 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
 
         $q2 = $this->q()
             ->with($q1, 'q1', null, true)
-            ->table('q1')
-            ;
+            ->table('q1');
         $this->assertEquals('with recursive "q1" as (select "salary" from "salaries") select * from "q1"', $q2->render());
 
         $q2 = $this->q()
-            ->with($q1, 'q11', ['foo','qwe"ry'])
-            ->with($q1, 'q12', ['bar','baz'], true) // this one is recursive
+            ->with($q1, 'q11', ['foo', 'qwe"ry'])
+            ->with($q1, 'q12', ['bar', 'baz'], true) // this one is recursive
             ->table('q11')
-            ->table('q12')
-            ;
+            ->table('q12');
         $this->assertEquals('with recursive "q11" ("foo","qwe""ry") as (select "salary" from "salaries"),"q12" ("bar","baz") as (select "salary" from "salaries") select * from "q11","q12"', $q2->render());
-        
+
         // now test some more useful reql life query
         $quotes = $this->q()
             ->table('quotes')
             ->field('emp_id')
             ->field($this->q()->expr('sum([])', ['total_net']))
-            ->group('emp_id')
-            ;
+            ->group('emp_id');
         $invoices = $this->q()
             ->table('invoices')
             ->field('emp_id')
             ->field($this->q()->expr('sum([])', ['total_net']))
-            ->group('emp_id')
-            ;
+            ->group('emp_id');
         $q = $this->q()
-            ->with($quotes, 'q', ['emp','quoted'])
-            ->with($invoices, 'i', ['emp','invoiced'])
+            ->with($quotes, 'q', ['emp', 'quoted'])
+            ->with($invoices, 'i', ['emp', 'invoiced'])
             ->table('employees')
             ->join('q.emp')
             ->join('i.emp')
-            ->field(['name', 'salary', 'q.quoted', 'i.invoiced'])
-            ;
+            ->field(['name', 'salary', 'q.quoted', 'i.invoiced']);
         $this->assertEquals(
             'with '.
                 '"q" ("emp","quoted") as (select "emp_id",sum(:a) from "quotes" group by "emp_id"),'.
@@ -1772,6 +1767,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
             'from "employees" '.
                 'left join "q" on "q"."emp" = "employees"."id" '.
                 'left join "i" on "i"."emp" = "employees"."id"',
-            $q->render());
+            $q->render()
+        );
     }
 }
