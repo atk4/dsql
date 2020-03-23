@@ -402,7 +402,7 @@ class Query extends Expression
             $s = $this->_escape($alias).' ';
 
             // set cursor fields
-            if ($fields) {
+            if ($fields !== null) {
                 $s .= '('.implode(',', array_map([$this, '_escape'], $fields)).') ';
             }
 
