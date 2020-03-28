@@ -308,6 +308,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
         // if we unset() first, we’re safe.
         unset($sql_code->params);
         $sql_code->params = [];
+        unset($sql_code->_paramBase);
+        $sql_code->_paramBase = [];
 
         return $ret;
     }
