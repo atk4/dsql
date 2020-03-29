@@ -23,7 +23,7 @@ class RandomTest extends \atk4\core\PHPUnit_AgileTestCase
     public function testMiscInsert()
     {
         return $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+            'This test has not been implemented yet.'
         );
         $data = [
             'id'                    => null,
