@@ -36,7 +36,7 @@ class Query extends Expression
      *
      * @var string
      */
-    protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order][limit]';
+    protected $template_select = '[with]select[option] [field] [from] [table][join][where][group][having][order][limit]';
 
     /**
      * INSERT template.
@@ -57,14 +57,14 @@ class Query extends Expression
      *
      * @var string
      */
-    protected $template_delete = 'delete [from] [table_noalias][where][having]';
+    protected $template_delete = '[with]delete [from] [table_noalias][where][having]';
 
     /**
      * UPDATE template.
      *
      * @var string
      */
-    protected $template_update = 'update [table_noalias] set [set] [where]';
+    protected $template_update = '[with]update [table_noalias] set [set] [where]';
 
     /**
      * TRUNCATE template.
@@ -136,10 +136,7 @@ class Query extends Expression
             }
 
             foreach ($field as $alias => $f) {
-                if (is_numeric($alias)) {
-                    $alias = null;
-                }
-                $this->field($f, $alias);
+                $this->field($f, is_numeric($alias) ? null : $alias);
             }
 
             return $this;
@@ -341,6 +338,84 @@ class Query extends Expression
     protected function _render_from()
     {
         return empty($this->args['table']) ? '' : 'from';
+    }
+
+    /// }}}
+
+    // {{{ with()
+
+    /**
+     * Specify WITH query to be used.
+     *
+     * @param Query  $cursor    Specifies cursor query or array [alias=>query] for adding multiple
+     * @param string $alias     Specify alias for this cursor
+     * @param array  $fields    Optional array of field names used in cursor
+     * @param bool   $recursive Is it recursive?
+     *
+     * @return $this
+     */
+    public function with(self $cursor, string $alias, ?array $fields = null, bool $recursive = false)
+    {
+        // save cursor in args
+        $this->_set_args('with', $alias, [
+            'cursor'    => $cursor,
+            'fields'    => $fields,
+            'recursive' => $recursive,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Recursive WITH query.
+     *
+     * @param Query|array $cursor Specifies cursor query or array [alias=>query] for adding multiple
+     * @param string      $alias  Specify alias for this cursor
+     * @param array       $fields Optional array of field names used in cursor
+     *
+     * @return $this
+     */
+    public function withRecursive(self $cursor, string $alias, ?array $fields = null)
+    {
+        return $this->with($cursor, $alias, $fields, true);
+    }
+
+    /**
+     * Renders part of the template: [with]
+     * Do not call directly.
+     *
+     * @return string Parsed template chunk
+     */
+    protected function _render_with()
+    {
+        // will be joined for output
+        $ret = [];
+
+        if (empty($this->args['with'])) {
+            return '';
+        }
+
+        // process each defined cursor
+        $isRecursive = false;
+        foreach ($this->args['with'] as $alias => ['cursor'=>$cursor, 'fields'=>$fields, 'recursive'=>$recursive]) {
+            // cursor alias cannot be expression, so simply escape it
+            $s = $this->_escape($alias).' ';
+
+            // set cursor fields
+            if ($fields !== null) {
+                $s .= '('.implode(',', array_map([$this, '_escape'], $fields)).') ';
+            }
+
+            // will parameterize the value and escape if necessary
+            $s .= 'as '.$this->_consume($cursor, 'soft-escape');
+
+            // is at least one recursive ?
+            $isRecursive = $isRecursive || $recursive;
+
+            $ret[] = $s;
+        }
+
+        return 'with '.($isRecursive ? 'recursive ' : '').implode(',', $ret).' ';
     }
 
     /// }}}
