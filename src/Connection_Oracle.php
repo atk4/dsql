@@ -26,10 +26,10 @@ class Connection_Oracle extends Connection
 
         // date and datetime format should be like this for Agile Data to correctly pick it up and typecast
         $this->expr('ALTER SESSION SET NLS_TIMESTAMP_FORMAT={datetime_format} NLS_DATE_FORMAT={date_format} NLS_NUMERIC_CHARACTERS={dec_char}', [
-                'datetime_format' => 'YYYY-MM-DD HH24:MI:SS', // datetime format
-                'date_format'     => 'YYYY-MM-DD', // date format
-                'dec_char'        => '. ', // decimal separator, no thousands separator
-            ])->execute();
+            'datetime_format' => 'YYYY-MM-DD HH24:MI:SS', // datetime format
+            'date_format'     => 'YYYY-MM-DD', // date format
+            'dec_char'        => '. ', // decimal separator, no thousands separator
+        ])->execute();
     }
 
     /**

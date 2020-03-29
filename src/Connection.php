@@ -141,18 +141,18 @@ class Connection
             }
 
             return new $connectionClass(array_merge([
-                    'connection'       => $dsn,
-                    'query_class'      => $queryClass,
-                    'expression_class' => $expressionClass,
-                    'driver'           => $driver,
-                ], $args));
+                'connection'       => $dsn,
+                'query_class'      => $queryClass,
+                'expression_class' => $expressionClass,
+                'driver'           => $driver,
+            ], $args));
         }
 
         // If it's some other object, then we simply use it trough proxy connection
         if (is_object($dsn)) {
             return new Connection_Proxy(array_merge([
-                    'connection'       => $dsn,
-                ], $args));
+                'connection'       => $dsn,
+            ], $args));
         }
 
         // Process DSN string

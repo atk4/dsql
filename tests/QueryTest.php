@@ -1648,7 +1648,6 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
             ->when(['status', 'New'], 't2.expose_new');
     }
 
-
     /**
      * Test WITH.
      */
