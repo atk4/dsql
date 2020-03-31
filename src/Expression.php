@@ -614,20 +614,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
             try {
                 $statement->execute();
-            } catch (\Exception $e) {
-                $msg = 'DSQL got Exception when executing this query';
-                if ($e instanceof \PDOException) {
-                    $new = new Exception_SQL([
-                        $msg,
-                        'error' => $e->errorInfo[2],
-                        'query' => $this->getDebugQuery(),
-                    ], $e->errorInfo[1]);
-                } else { // code should never get here with PDO driver
-                    $new = new Exception_SQL([
-                        $msg,
-                        'query' => $this->getDebugQuery(),
-                    ], null, $e);
-                }
+            } catch (\PDOException $e) {
+                $new = new ExecuteException([
+                    'DSQL got Exception when executing this query',
+                    'error' => $e->errorInfo[2],
+                    'query' => $this->getDebugQuery(),
+                ], $e->errorInfo[1]);
 
                 throw $new;
             }

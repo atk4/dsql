@@ -2,7 +2,7 @@
 
 namespace atk4\dsql;
 
-class Exception_SQL extends Exception
+class ExecuteException extends Exception
 {
     public function getErrorMessage(): string
     {
