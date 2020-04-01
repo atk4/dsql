@@ -15,10 +15,10 @@ class Connection
     use \atk4\core\DIContainerTrait;
 
     /** @var string Query classname */
-    protected $query_class = 'atk4\dsql\Query';
+    protected $query_class = Query::class;
 
     /** @var string Expression classname */
-    protected $expression_class = 'atk4\dsql\Expression';
+    protected $expression_class = Expression::class;
 
     /** @var Connection|\PDO Connection or PDO object */
     protected $connection = null;
@@ -118,25 +118,25 @@ class Connection
         // If it's already PDO object, then we simply use it
         if ($dsn instanceof \PDO) {
             $driver = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-            $connectionClass = '\\atk4\\dsql\\Connection';
+            $connectionClass = self::class;
             $queryClass = null;
             $expressionClass = null;
             switch ($driver) {
                 case 'pgsql':
-                    $connectionClass = '\\atk4\\dsql\\Connection_PgSQL';
-                    $queryClass = 'atk4\dsql\Query_PgSQL';
+                    $connectionClass = Connection_PgSQL::class;
+                    $queryClass = Query_PgSQL::class;
                     break;
                 case 'oci':
-                    $connectionClass = '\\atk4\\dsql\\Connection_Oracle';
+                    $connectionClass = Connection_Oracle::class;
                     break;
                 case 'sqlite':
-                    $queryClass = 'atk4\dsql\Query_SQLite';
+                    $queryClass = Query_SQLite::class;
                     break;
                 case 'mysql':
-                    $expressionClass = 'atk4\dsql\Expression_MySQL';
+                    $expressionClass = Expression_MySQL::class;
                 default:
                     // Default, for backwards compatibility
-                    $queryClass = 'atk4\dsql\Query_MySQL';
+                    $queryClass = Query_MySQL::class;
                     break;
             }
 
@@ -163,8 +163,8 @@ class Connection
             case 'mysql':
                 $c = new static(array_merge([
                     'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
-                    'expression_class' => 'atk4\dsql\Expression_MySQL',
-                    'query_class'      => 'atk4\dsql\Query_MySQL',
+                    'expression_class' => Expression_MySQL::class,
+                    'query_class'      => Query_MySQL::class,
                     'driver'           => $dsn['driver'],
                 ], $args));
                 break;
@@ -172,7 +172,7 @@ class Connection
             case 'sqlite':
                 $c = new static(array_merge([
                     'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
-                    'query_class'      => 'atk4\dsql\Query_SQLite',
+                    'query_class'      => Query_SQLite::class,
                     'driver'           => $dsn['driver'],
                 ], $args));
                 break;
