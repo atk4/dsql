@@ -53,7 +53,7 @@ jobs:
           PGPASSWORD=password psql -h postgres -c 'create database "atk4-dsql-test";' -U postgres
 
       - name: SQLite Testing
-        run: vendor/bin/phpunit --configuration phpunit.xml --coverage-text --exclude-group dns
+        run: vendor/bin/phpunit -d zend.enable_gc=0 --configuration phpunit.xml --coverage-text --exclude-group dns # remove " -d zend.enable_gc=0" once PHP segfault in GH Actions is fixed, see https://github.com/atk4/dsql/issues/176
 
       - name: MySQL Testing
         run: vendor/bin/phpunit --configuration phpunit-mysql-workflow.xml --exclude-group dns
