@@ -13,7 +13,7 @@ namespace atk4\dsql;
 class Connection_PgSQL extends Connection
 {
     /** @var string Query classname */
-    protected $query_class = 'atk4\dsql\Query_PgSQL';
+    protected $query_class = Query_PgSQL::class;
 
     /**
      * Return last inserted ID value.

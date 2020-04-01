@@ -29,7 +29,7 @@ class Query extends Expression
     public $defaultField = '*';
 
     /** @var string Expression classname */
-    protected $expression_class = 'atk4\dsql\Expression';
+    protected $expression_class = Expression::class;
 
     /**
      * SELECT template.

@@ -21,7 +21,7 @@ class Query_MySQL extends Query
     protected $escape_char = '`';
 
     /** @var string Expression classname */
-    protected $expression_class = 'atk4\dsql\Expression_MySQL';
+    protected $expression_class = Expression_MySQL::class;
 
     /**
      * UPDATE template.

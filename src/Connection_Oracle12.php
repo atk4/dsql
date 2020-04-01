@@ -13,5 +13,5 @@ namespace atk4\dsql;
 class Connection_Oracle12 extends Connection_Oracle
 {
     /** @var string Query classname */
-    protected $query_class = 'atk4\dsql\Query_Oracle12c';
+    protected $query_class = Query_Oracle12c::class;
 }
