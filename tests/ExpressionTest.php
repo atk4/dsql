@@ -13,15 +13,7 @@ class ExpressionTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     public function e()
     {
-        $args = func_get_args();
-        switch (count($args)) {
-            case 1:
-                return new Expression($args[0]);
-            case 2:
-                return new Expression($args[0], $args[1]);
-        }
-
-        return new Expression();
+        return new Expression(...func_get_args());
     }
 
     /**

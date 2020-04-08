@@ -17,15 +17,7 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
 {
     public function q()
     {
-        $args = func_get_args();
-        switch (count($args)) {
-            case 1:
-                return new Query($args[0]);
-            case 2:
-                return new Query($args[0], $args[1]);
-        }
-
-        return new Query();
+        return new Query(...func_get_args());
     }
 
     /**
