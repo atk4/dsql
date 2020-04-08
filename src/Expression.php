@@ -614,13 +614,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
             try {
                 $statement->execute();
-            } catch (\Exception $e) {
-                $new = new Exception([
+            } catch (\PDOException $e) {
+                $new = new ExecuteException([
                     'DSQL got Exception when executing this query',
-                    'error' => $e->getMessage(),
+                    'error' => $e->errorInfo[2],
                     'query' => $this->getDebugQuery(),
-                ]);
-                $new->by_exception = $e;
+                ], $e->errorInfo[1]);
 
                 throw $new;
             }
