@@ -326,25 +326,31 @@ parts of the query. You must not call them in normal circumstances.
 .. php:method:: _escape($sql_code)
 
   Always surrounds `$sql code` with back-ticks.
+  
+  This escaping method is automatically used for `{...}` expression template tags .
 
 .. php:method:: _escapeSoft($sql_code)
 
   Surrounds `$sql code` with back-ticks.
 
+  This escaping method is automatically used for `{{...}}` expression template tags .
+
   It will smartly escape table.field type of strings resulting in `table`.`field`.
 
   Will do nothing if it finds "*", "`" or "(" character in `$sql_code`::
 
-      $query->_escape('first_name');  // `first_name`
-      $query->_escape('first.name');  // `first`.`name`
-      $query->_escape('(2+2)');       // (2+2)
-      $query->_escape('*');           // *
+      $query->_escapeSoft('first_name');  // `first_name`
+      $query->_escapeSoft('first.name');  // `first`.`name`
+      $query->_escapeSoft('(2+2)');       // (2+2)
+      $query->_escapeSoft('*');           // *
 
 .. php:method:: _param($value)
 
     Converts value into parameter and returns reference. Used only during query
     rendering. Consider using :php:meth:`_consume()` instead, which will also
     handle nested expressions properly.
+
+    This escaping method is automatically used for `[...]` expression template tags .
 
 
 .. _properties:

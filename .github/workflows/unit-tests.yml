@@ -19,10 +19,10 @@ jobs:
         php: ['7.2', '7.3', 'latest']
     services:
       mysql:
-        image: mysql:5.7
+        image: mariadb:10.4.12
         env:
           MYSQL_ROOT_PASSWORD: password
-          DB_DATABASE: dsql_test
+          MYSQL_DATABASE: dsql_test
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
       postgres:
         image: postgres:10-alpine
@@ -31,7 +31,7 @@ jobs:
           POSTGRES_USER: postgres
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - run: php --version
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -49,10 +49,11 @@ jobs:
       - name: Run Tests
         run: |
           mkdir -p build/logs
-          mysql -uroot -ppassword -h mysql -e 'CREATE DATABASE dsql_test;'
+          # mysql -uroot -ppassword -h mysql -e 'CREATE DATABASE dsql_test;'
           PGPASSWORD=password psql -h postgres -c 'create database "atk4-dsql-test";' -U postgres
+
       - name: SQLite Testing
-        run: vendor/bin/phpunit --configuration phpunit.xml --coverage-text --exclude-group dns
+        run: vendor/bin/phpunit -d zend.enable_gc=0 --configuration phpunit.xml --coverage-text --exclude-group dns # remove " -d zend.enable_gc=0" once PHP segfault in GH Actions is fixed, see https://github.com/atk4/dsql/issues/176
 
       - name: MySQL Testing
         run: vendor/bin/phpunit --configuration phpunit-mysql-workflow.xml --exclude-group dns

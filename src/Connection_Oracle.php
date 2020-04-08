@@ -13,7 +13,7 @@ namespace atk4\dsql;
 class Connection_Oracle extends Connection
 {
     /** @var string Query classname */
-    protected $query_class = 'atk4\dsql\Query_Oracle';
+    protected $query_class = Query_Oracle::class;
 
     /**
      * Add some configuration for current connection session.

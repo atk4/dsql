@@ -1684,4 +1684,90 @@ class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
                 ->render()
         );
     }
+
+    /**
+     * Test table name with dots in it - Select.
+     */
+    public function testTableNameDot1()
+    {
+        // render table
+        $this->assertEquals(
+            '"foo"."bar"',
+            $this->callProtected($this->q()->table('foo.bar'), '_render_table')
+        );
+
+        $this->assertEquals(
+            '"foo"."bar" "a"',
+            $this->callProtected($this->q()->table('foo.bar', 'a'), '_render_table')
+        );
+
+        // where clause
+        $this->assertEquals(
+            'select "name" from "db1"."employee" where "a" = :a',
+            $this->q()
+                ->field('name')->table('db1.employee')->where('a', 1)
+                ->render()
+        );
+
+        $this->assertEquals(
+            'select "name" from "db1"."employee" where "db1"."employee"."a" = :a',
+            $this->q()
+                ->field('name')->table('db1.employee')->where('db1.employee.a', 1)
+                ->render()
+        );
+    }
+
+    /**
+     * Test WITH.
+     */
+    public function testWith()
+    {
+        $q1 = $this->q()->table('salaries')->field('salary');
+
+        $q2 = $this->q()
+            ->with($q1, 'q1')
+            ->table('q1');
+        $this->assertEquals('with "q1" as (select "salary" from "salaries") select * from "q1"', $q2->render());
+
+        $q2 = $this->q()
+            ->with($q1, 'q1', null, true)
+            ->table('q1');
+        $this->assertEquals('with recursive "q1" as (select "salary" from "salaries") select * from "q1"', $q2->render());
+
+        $q2 = $this->q()
+            ->with($q1, 'q11', ['foo', 'qwe"ry'])
+            ->with($q1, 'q12', ['bar', 'baz'], true) // this one is recursive
+            ->table('q11')
+            ->table('q12');
+        $this->assertEquals('with recursive "q11" ("foo","qwe""ry") as (select "salary" from "salaries"),"q12" ("bar","baz") as (select "salary" from "salaries") select * from "q11","q12"', $q2->render());
+
+        // now test some more useful reql life query
+        $quotes = $this->q()
+            ->table('quotes')
+            ->field('emp_id')
+            ->field($this->q()->expr('sum([])', ['total_net']))
+            ->group('emp_id');
+        $invoices = $this->q()
+            ->table('invoices')
+            ->field('emp_id')
+            ->field($this->q()->expr('sum([])', ['total_net']))
+            ->group('emp_id');
+        $q = $this->q()
+            ->with($quotes, 'q', ['emp', 'quoted'])
+            ->with($invoices, 'i', ['emp', 'invoiced'])
+            ->table('employees')
+            ->join('q.emp')
+            ->join('i.emp')
+            ->field(['name', 'salary', 'q.quoted', 'i.invoiced']);
+        $this->assertEquals(
+            'with '.
+                '"q" ("emp","quoted") as (select "emp_id",sum(:a) from "quotes" group by "emp_id"),'.
+                '"i" ("emp","invoiced") as (select "emp_id",sum(:b) from "invoices" group by "emp_id") '.
+            'select "name","salary","q"."quoted","i"."invoiced" '.
+            'from "employees" '.
+                'left join "q" on "q"."emp" = "employees"."id" '.
+                'left join "i" on "i"."emp" = "employees"."id"',
+            $q->render()
+        );
+    }
 }
