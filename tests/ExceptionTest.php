@@ -52,7 +52,7 @@ class ExceptionTest extends \atk4\core\PHPUnit_AgileTestCase
             );
         }
     }
-    
+
     public function testNonexistantFieldException()
     {
         $c = Connection::connect('sqlite::memory:');
