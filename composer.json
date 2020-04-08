@@ -19,10 +19,6 @@
   ],
   "require": {
     "php": ">=7.2.0",
-    "atk4/core": "dev-develop"
-  },
-  "require-release": {
-    "php": ">=7.2.0",
     "atk4/core": "^2.0"
   },
   "suggest": {
