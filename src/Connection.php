@@ -71,13 +71,11 @@ class Connection
         // If parts are usable, convert DSN format
         if ($parts !== false && isset($parts['host'], $parts['path'])) {
             // DSN is using URL-like format, so we need to convert it
-            $dsn =
-                $parts['scheme'].
-                ':host='.$parts['host'].
-                (isset($parts['port']) ? ';port='.$parts['port'] : '').
-                ';dbname='.substr($parts['path'], 1);
-            $user = $user !== null ? $user : (isset($parts['user']) ? $parts['user'] : null);
-            $pass = $pass !== null ? $pass : (isset($parts['pass']) ? $parts['pass'] : null);
+            $dsn = $parts['scheme'].':host='.$parts['host']
+                .(isset($parts['port']) ? ';port='.$parts['port'] : '')
+                .';dbname='.substr($parts['path'], 1);
+            $user = $user ?? ($parts['user'] ?? null);
+            $pass = $pass ?? ($parts['pass'] ?? null);
         }
 
         // If it's still array, then simply use it
