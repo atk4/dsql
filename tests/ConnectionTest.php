@@ -228,13 +228,13 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
 
     public function testException2()
     {
-        $this->setExpectedException('atk4\dsql\Exception');
+        $this->setExpectedException(\atk4\dsql\Exception::class);
         $c = Connection::connect('');
     }
 
     public function testException3()
     {
-        $this->setExpectedException('atk4\dsql\Exception');
+        $this->setExpectedException(\atk4\dsql\Exception::class);
         $c = new Connection('sqlite::memory');
     }
 
@@ -248,7 +248,7 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
             $q->render()
         );
 
-        $this->setExpectedException('atk4\dsql\Exception');
+        $this->setExpectedException(\atk4\dsql\Exception::class);
         $q->execute();
     }
 }

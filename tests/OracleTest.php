@@ -33,8 +33,8 @@ class OracleTest extends \atk4\core\PHPUnit_AgileTestCase
     {
         return new \atk4\dsql\Connection(array_merge([
             'connection'       => new \PDO('sqlite::memory:'),
-            'query_class'      => 'atk4\dsql\Query_Oracle'.$ver,
-            'expression_class' => 'atk4\dsql\Expression_Oracle',
+            'query_class'      => \atk4\dsql\Query_Oracle::class.$ver,
+            'expression_class' => \atk4\dsql\Expression::class,
         ]));
     }
 
