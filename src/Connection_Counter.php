@@ -54,8 +54,6 @@ class Connection_Counter extends Connection_Proxy
     /**
      * Execute expression.
      *
-     * @param Expression $expr
-     *
      * @return mixed
      */
     public function execute(Expression $expr)
