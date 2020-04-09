@@ -13,9 +13,9 @@ interface ResultSet
 {
     //public function where($field, $value);
     //public function count();
-    public function get();
+    public function get(string $classname);
 
-    public function getRow();
+    public function getRow(string $classname);
 
-    public function getOne();
+    public function getOne(string $classname);
 }
