@@ -648,7 +648,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @return array
      */
-    public function get()
+    public function get(string $classname = 'stdClass')
     {
         $stmt = $this->execute();
 
@@ -656,7 +656,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             return iterator_to_array($stmt);
         }
 
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(\PDO::FETCH_CLASS, $classname);
     }
 
     /**
@@ -664,9 +664,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @return string
      */
-    public function getOne()
+    public function getOne(string $classname = 'stdClass')
     {
-        $data = $this->getRow();
+        $data = $this->getRow($classname);
         if (!$data) {
             throw new Exception([
                 'Unable to fetch single cell of data for getOne from this query',
@@ -684,7 +684,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @return array
      */
-    public function getRow()
+    public function getRow(string $classname = 'stdClass')
     {
         $stmt = $this->execute();
 
@@ -692,7 +692,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             return $stmt->current();
         }
 
-        return $stmt->fetch();
+        return $stmt->fetchObject($classname);
     }
 
     // }}}
