@@ -5,7 +5,7 @@ namespace atk4\dsql\tests;
 use atk4\dsql\Connection;
 
 /**
- * @coversDefaultClass \atk4\dsql\ConnectionTest
+ * @coversDefaultClass \atk4\dsql\Connection
  */
 class OracleTest extends \atk4\core\PHPUnit_AgileTestCase
 {

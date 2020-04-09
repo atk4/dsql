@@ -1,16 +1,16 @@
 <?php
 
-namespace atk4\dsql\tests;
+namespace atk4\dsql\tests\WithDb;
 
 use atk4\dsql\Connection;
 use atk4\dsql\Expression;
 
 /**
- * @ coversDefaultClass \atk4\dsql\Query
+ * @coversDefaultClass \atk4\dsql\Query
  */
-class dbConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
+class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
 {
-    public function testSQLite()
+    public function testServerConnection()
     {
         $c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
 
