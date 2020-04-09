@@ -7,9 +7,9 @@ namespace atk4\dsql;
  */
 class RandomTest extends \atk4\core\PHPUnit_AgileTestCase
 {
-    public function q()
+    public function q(...$args)
     {
-        return new Query(...func_get_args());
+        return new Query(...$args);
     }
 
     public function testMiscInsert()

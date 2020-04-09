@@ -11,9 +11,9 @@ use atk4\dsql\Query;
  */
 class ExpressionTest extends \atk4\core\PHPUnit_AgileTestCase
 {
-    public function e()
+    public function e(...$args)
     {
-        return new Expression(...func_get_args());
+        return new Expression(...$args);
     }
 
     /**

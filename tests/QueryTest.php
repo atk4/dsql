@@ -15,9 +15,9 @@ use atk4\dsql\Query_SQLite;
  */
 class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
 {
-    public function q()
+    public function q(...$args)
     {
-        return new Query(...func_get_args());
+        return new Query(...$args);
     }
 
     /**

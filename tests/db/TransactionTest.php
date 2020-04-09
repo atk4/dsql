@@ -8,7 +8,11 @@ use atk4\dsql\Query;
 
 class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
 {
+    /** @var \PDO */
     protected $pdo;
+
+    /** @var Connection */
+    protected $c;
 
     public function __construct()
     {
