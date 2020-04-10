@@ -2,20 +2,13 @@
 
 namespace atk4\dsql\tests;
 
-use atk4\dsql\Connection;
 use atk4\dsql\Expression;
-use atk4\dsql\Query;
 
 /**
  * @coversDefaultClass \atk4\dsql\Exception
  */
 class ExceptionTest extends \atk4\core\PHPUnit_AgileTestCase
 {
-    public function q()
-    {
-        return new Query(...func_get_args());
-    }
-
     /**
      * Test constructor.
      *
@@ -23,14 +16,14 @@ class ExceptionTest extends \atk4\core\PHPUnit_AgileTestCase
      */
     public function testException1()
     {
-        $this->setExpectedException('atk4\dsql\Exception');
+        $this->setExpectedException(\atk4\dsql\Exception::class);
 
         throw new \atk4\dsql\Exception();
     }
 
     public function testException2()
     {
-        $this->setExpectedException('atk4\dsql\Exception');
+        $this->setExpectedException(\atk4\dsql\Exception::class);
         $e = new Expression('hello, [world]');
         $e->render();
     }
@@ -51,15 +44,5 @@ class ExceptionTest extends \atk4\core\PHPUnit_AgileTestCase
                 $e->getParams()['tag']
             );
         }
-    }
-
-    public function testNonexistantFieldException()
-    {
-        $c = Connection::connect('sqlite::memory:');
-        $q = $c->dsql();
-        $q->table('foo')->field('do_not_exist');
-
-        $this->setExpectedException('atk4\dsql\ExecuteException');
-        $q->execute(); // PDOException: SQLSTATE[HY000]: General error: 1 no such table: foo
     }
 }

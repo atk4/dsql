@@ -30,8 +30,6 @@ class Connection_Dumper extends Connection_Proxy
     /**
      * Execute expression.
      *
-     * @param Expression $expr
-     *
      * @return \PDOStatement
      */
     public function execute(Expression $expr)

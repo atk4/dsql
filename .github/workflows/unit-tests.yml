@@ -58,8 +58,8 @@ jobs:
       - name: MySQL Testing
         run: vendor/bin/phpunit --configuration phpunit-mysql-workflow.xml --exclude-group dns
 
-      - name: PgSQL Testing (expected errors)
-        run: vendor/bin/phpunit --configuration phpunit-pgsql-workflow.xml --exclude-group dns  || echo 'ignoring errors..'
+      - name: PgSQL Testing
+        run: vendor/bin/phpunit --configuration phpunit-pgsql-workflow.xml --exclude-group dns
 
       - name: Merge coverage logs
         run: vendor/bin/phpcov merge build/logs/ --clover build/logs/cc.xml;

@@ -6,11 +6,11 @@ class ExecuteException extends Exception
 {
     public function getErrorMessage(): string
     {
-        return $this->getParams('error');
+        return $this->getParams()['error'];
     }
 
     public function getDebugQuery(): string
     {
-        return $this->getParams('query');
+        return $this->getParams()['query'];
     }
 }

@@ -223,10 +223,8 @@ class Connection
      * Returns new Query object with connection already set.
      *
      * @param array $properties
-     *
-     * @return Query
      */
-    public function dsql($properties = [])
+    public function dsql($properties = []): Query
     {
         $c = $this->query_class;
         $q = new $c($properties);
@@ -240,10 +238,8 @@ class Connection
      *
      * @param array $properties
      * @param array $arguments
-     *
-     * @return Expression
      */
-    public function expr($properties = [], $arguments = null)
+    public function expr($properties = [], $arguments = null): Expression
     {
         $c = $this->expression_class;
         $e = new $c($properties, $arguments);
@@ -265,8 +261,6 @@ class Connection
     /**
      * Execute Expression by using this connection.
      *
-     * @param Expression $expr
-     *
      * @return \PDOStatement
      */
     public function execute(Expression $expr)
@@ -284,12 +278,12 @@ class Connection
      * the code inside callback will fail, then all of the transaction
      * will be also rolled back.
      */
-    public function atomic($f)
+    public function atomic(callable $fx, ...$args)
     {
         $this->beginTransaction();
 
         try {
-            $res = call_user_func($f);
+            $res = call_user_func_array($fx, $args);
             $this->commit();
 
             return $res;

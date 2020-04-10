@@ -30,7 +30,7 @@ class Connection_Proxy extends Connection
         return $this->connection->connection();
     }
 
-    public function dsql($properties = [])
+    public function dsql($properties = []): Query
     {
         $dsql = $this->connection->dsql($properties);
         $dsql->connection = $this;
@@ -38,7 +38,7 @@ class Connection_Proxy extends Connection
         return $dsql;
     }
 
-    public function expr($properties = [], $arguments = null)
+    public function expr($properties = [], $arguments = null): Expression
     {
         $expr = $this->connection->expr($properties, $arguments);
         $expr->connection = $this;

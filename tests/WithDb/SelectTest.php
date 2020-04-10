@@ -1,14 +1,17 @@
 <?php
 
-namespace atk4\dsql\tests\db;
+namespace atk4\dsql\tests\WithDb;
 
 use atk4\dsql\Connection;
 use atk4\dsql\Expression;
-use atk4\dsql\Query;
 
 class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 {
+    /** @var \PDO */
     protected $pdo;
+
+    /** @var Connection */
+    protected $c;
 
     public function __construct()
     {
@@ -31,7 +34,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
      */
     protected function getDataSet()
     {
-        return $this->createFlatXMLDataSet(dirname(__FILE__).'/SelectTest.xml');
+        return $this->createFlatXMLDataSet(dirname(__FILE__).'/dataset.xml');
     }
 
     private function q($table = null, $alias = null)
@@ -247,5 +250,33 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         // truncate table
         $this->q('employee')->truncate();
         $this->q('employee')->field('name')->getOne();
+    }
+
+    public function testExecuteException()
+    {
+        $this->setExpectedException(\atk4\dsql\ExecuteException::class);
+
+        try {
+            $this->q('non_existing_table')->field('non_existing_field')->getOne();
+        } catch (\atk4\dsql\ExecuteException $e) {
+            $driverType = Connection::normalizeDSN($GLOBALS['DB_DSN'])['driver'];
+
+            // test error code
+            $unknownFieldErrorCode = [
+                'sqlite' => 1,    // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
+                'mysql'  => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
+                'pgsql'  => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
+            ][$driverType];
+            $this->assertSame($unknownFieldErrorCode, $e->getCode());
+
+            // test debug query
+            if ($driverType === 'mysql') {
+                $this->assertSame('select `non_existing_field` from `non_existing_table`', $e->getDebugQuery());
+            } else {
+                $this->assertSame('select "non_existing_field" from "non_existing_table"', $e->getDebugQuery());
+            }
+
+            throw $e;
+        }
     }
 }

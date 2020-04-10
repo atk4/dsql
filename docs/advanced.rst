@@ -70,7 +70,7 @@ results too.
 If you are creating :php:class:`Connection` through constructor, you may have
 to explicitly specify property :php:attr:`Connection::query_class`::
 
-    $c = new Connection(['connection'=>$pdo, 'query_class'=>'atk4\dsql\Query_SQLite']);
+    $c = new Connection(['connection'=>$pdo, 'query_class'=>atk4\dsql\Query_SQLite::class]);
 
 This is also useful, if you have created your own Query class in a different
 namespace and wish to use it.

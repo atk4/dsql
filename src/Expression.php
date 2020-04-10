@@ -73,15 +73,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
     public $connection = null;
 
     /**
-     * Holds references to bound parameter values.
-     *
-     * This is needed to use bindParam instead of bindValue and to be able to use 4th parameter of bindParam.
-     *
-     * @var array
-     */
-    private $boundValues = [];
-
-    /**
      * Specifying options to constructors will override default
      * attribute values of this class.
      *
@@ -558,7 +549,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @return \PDOStatement
      */
-    public function execute($connection = null)
+    public function execute(object $connection = null)
     {
         if ($connection === null) {
             $connection = $this->connection;
@@ -567,52 +558,56 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
         // If it's a PDO connection, we're cool
         if ($connection instanceof \PDO) {
             $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            // We support PDO
+
             $query = $this->render();
-            $statement = $connection->prepare($query);
-            foreach ($this->params as $key => $val) {
-                if (is_int($val)) {
-                    $type = \PDO::PARAM_INT;
-                } elseif (is_bool($val)) {
-                    // SQL does not like booleans at all, so convert them INT
-                    $type = \PDO::PARAM_INT;
-                    $val = (int) $val;
-                } elseif ($val === null) {
-                    $type = \PDO::PARAM_NULL;
-                } elseif (is_string($val) || is_float($val)) {
-                    $type = \PDO::PARAM_STR;
-                } elseif (is_resource($val)) {
-                    $type = \PDO::PARAM_LOB;
-                } else {
-                    throw new Exception([
-                        'Incorrect param type',
-                        'key'   => $key,
-                        'value' => $val,
-                        'type'  => gettype($val),
-                    ]);
-                }
-
-                // Workaround to support LOB data type. See https://github.com/doctrine/dbal/pull/2434
-                $this->boundValues[$key] = $val;
-                if ($type === \PDO::PARAM_STR) {
-                    $bind = $statement->bindParam($key, $this->boundValues[$key], $type, strlen($val));
-                } else {
-                    $bind = $statement->bindParam($key, $this->boundValues[$key], $type);
-                }
-
-                if (!$bind) {
-                    throw new Exception([
-                        'Unable to bind parameter',
-                        'param' => $key,
-                        'value' => $val,
-                        'type'  => $type,
-                    ]);
-                }
-            }
-
-            $statement->setFetchMode(\PDO::FETCH_ASSOC);
 
             try {
+                $statement = $connection->prepare($query);
+
+                // workaround to support LOB data type 1/2, see https://github.com/doctrine/dbal/pull/2434
+                $statement->boundValues = [];
+
+                foreach ($this->params as $key => $val) {
+                    if (is_int($val)) {
+                        $type = \PDO::PARAM_INT;
+                    } elseif (is_bool($val)) {
+                        // SQL does not like booleans at all, so convert them INT
+                        $type = \PDO::PARAM_INT;
+                        $val = (int) $val;
+                    } elseif ($val === null) {
+                        $type = \PDO::PARAM_NULL;
+                    } elseif (is_string($val) || is_float($val)) {
+                        $type = \PDO::PARAM_STR;
+                    } elseif (is_resource($val)) {
+                        $type = \PDO::PARAM_LOB;
+                    } else {
+                        throw new Exception([
+                            'Incorrect param type',
+                            'key'   => $key,
+                            'value' => $val,
+                            'type'  => gettype($val),
+                        ]);
+                    }
+
+                    // workaround to support LOB data type 2/2, see https://github.com/doctrine/dbal/pull/2434
+                    $statement->boundValues[$key] = $val;
+                    if ($type === \PDO::PARAM_STR) {
+                        $bind = $statement->bindParam($key, $statement->boundValues[$key], $type, strlen($val));
+                    } else {
+                        $bind = $statement->bindParam($key, $statement->boundValues[$key], $type);
+                    }
+
+                    if (!$bind) {
+                        throw new Exception([
+                            'Unable to bind parameter',
+                            'param' => $key,
+                            'value' => $val,
+                            'type'  => $type,
+                        ]);
+                    }
+                }
+
+                $statement->setFetchMode(\PDO::FETCH_ASSOC);
                 $statement->execute();
             } catch (\PDOException $e) {
                 $new = new ExecuteException([
@@ -626,6 +621,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
             return $statement;
         } else {
+            /* @var $connection Connection */
             return $connection->execute($this);
         }
     }

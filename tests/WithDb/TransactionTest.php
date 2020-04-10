@@ -1,14 +1,17 @@
 <?php
 
-namespace atk4\dsql\tests;
+namespace atk4\dsql\tests\WithDb;
 
 use atk4\dsql\Connection;
 use atk4\dsql\Expression;
-use atk4\dsql\Query;
 
 class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
 {
+    /** @var \PDO */
     protected $pdo;
+
+    /** @var Connection */
+    protected $c;
 
     public function __construct()
     {
@@ -31,7 +34,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
      */
     protected function getDataSet()
     {
-        return $this->createFlatXMLDataSet(dirname(__FILE__).'/SelectTest.xml');
+        return $this->createFlatXMLDataSet(dirname(__FILE__).'/dataset.xml');
     }
 
     private function q($table = null, $alias = null)
