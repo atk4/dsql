@@ -72,13 +72,13 @@ class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
     public function testDriver()
     {
         $c = Connection::connect('sqlite::memory:');
-        $this->assertEquals('sqlite', $c->driver);
+        $this->assertEquals('sqlite', $c->driverType);
 
         $c = Connection::connect('dumper:sqlite::memory:');
-        $this->assertEquals('sqlite', $c->driver);
+        $this->assertEquals('sqlite', $c->driverType);
 
         $c = Connection::connect('counter:sqlite::memory:');
-        $this->assertEquals('sqlite', $c->driver);
+        $this->assertEquals('sqlite', $c->driverType);
     }
 
     /**
