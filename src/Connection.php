@@ -32,7 +32,7 @@ class Connection
      *
      * @var string
      */
-    public $driver;
+    public $driverType;
 
     /**
      * Specifying $properties to constructors will override default
@@ -55,7 +55,7 @@ class Connection
     /**
      * Normalize DSN connection string.
      *
-     * Returns normalized DSN as array ['dsn', 'user', 'pass', 'driver', 'rest'].
+     * Returns normalized DSN as array ['dsn', 'user', 'pass', 'driverType', 'rest'].
      *
      * @param array|string $dsn  DSN string
      * @param string       $user Optional username, this takes precedence over dsn string
@@ -87,18 +87,18 @@ class Connection
         if (is_string($dsn)) {
             if (strpos($dsn, ':') === false) {
                 throw new Exception([
-                    "Your DSN format is invalid. Must be in 'driver:host;options' format",
+                    "Your DSN format is invalid. Must be in 'driverType:host;options' format",
                     'dsn' => $dsn,
                 ]);
             }
-            list($driver, $rest) = explode(':', $dsn, 2);
-            $driver = strtolower($driver);
+            list($driverType, $rest) = explode(':', $dsn, 2);
+            $driverType = strtolower($driverType);
         } else {
             // currently impossible to be like this, but we don't want ugly exceptions here
-            $driver = $rest = null;
+            $driverType = $rest = null;
         }
 
-        return ['dsn' => $dsn, 'user' => $user, 'pass' => $pass, 'driver' => $driver, 'rest' => $rest];
+        return ['dsn' => $dsn, 'user' => $user, 'pass' => $pass, 'driverType' => $driverType, 'rest' => $rest];
     }
 
     /**
@@ -115,11 +115,11 @@ class Connection
     {
         // If it's already PDO object, then we simply use it
         if ($dsn instanceof \PDO) {
-            $driver = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
+            $driverType = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
             $connectionClass = self::class;
             $queryClass = null;
             $expressionClass = null;
-            switch ($driver) {
+            switch ($driverType) {
                 case 'pgsql':
                     $connectionClass = Connection_PgSQL::class;
                     $queryClass = Query_PgSQL::class;
@@ -142,7 +142,7 @@ class Connection
                 'connection'       => $dsn,
                 'query_class'      => $queryClass,
                 'expression_class' => $expressionClass,
-                'driver'           => $driver,
+                'driverType'       => $driverType,
             ], $args));
         }
 
@@ -156,14 +156,14 @@ class Connection
         // Process DSN string
         $dsn = static::normalizeDSN($dsn, $user, $password);
 
-        // Create driver specific connection
-        switch ($dsn['driver']) {
+        // Create driverType specific connection
+        switch ($dsn['driverType']) {
             case 'mysql':
                 $c = new static(array_merge([
                     'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                     'expression_class' => Expression_MySQL::class,
                     'query_class'      => Query_MySQL::class,
-                    'driver'           => $dsn['driver'],
+                    'driverType'       => $dsn['driverType'],
                 ], $args));
                 break;
 
@@ -171,14 +171,14 @@ class Connection
                 $c = new static(array_merge([
                     'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                     'query_class'      => Query_SQLite::class,
-                    'driver'           => $dsn['driver'],
+                    'driverType'       => $dsn['driverType'],
                 ], $args));
                 break;
 
             case 'oci':
                 $c = new Connection_Oracle(array_merge([
                     'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
-                    'driver'     => $dsn['driver'],
+                    'driverType' => $dsn['driverType'],
                 ], $args));
                 break;
 
@@ -186,14 +186,14 @@ class Connection
                 $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
                 $c = new Connection_Oracle12(array_merge([
                     'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
-                    'driver'     => $dsn['driver'],
+                    'driverType' => $dsn['driverType'],
                 ], $args));
                 break;
 
             case 'pgsql':
                 $c = new Connection_PgSQL(array_merge([
                     'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
-                    'driver'     => $dsn['driver'],
+                    'driverType' => $dsn['driverType'],
                 ], $args));
                 break;
 
