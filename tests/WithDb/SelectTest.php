@@ -259,7 +259,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         try {
             $this->q('non_existing_table')->field('non_existing_field')->getOne();
         } catch (\atk4\dsql\ExecuteException $e) {
-            $driverType = Connection::normalizeDSN($GLOBALS['DB_DSN'])['driver'];
+            $driverType = Connection::normalizeDSN($GLOBALS['DB_DSN'])['driverType'];
 
             // test error code
             $unknownFieldErrorCode = [

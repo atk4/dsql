@@ -20,8 +20,8 @@ class Connection_Proxy extends Connection
     {
         parent::__construct($properties);
 
-        if ($this->connection instanceof \atk4\dsql\Connection && $this->connection->driver) {
-            $this->driver = $this->connection->driver;
+        if ($this->connection instanceof \atk4\dsql\Connection && $this->connection->driverType) {
+            $this->driverType = $this->connection->driverType;
         }
     }
 
