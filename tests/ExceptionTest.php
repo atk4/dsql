@@ -17,14 +17,14 @@ class ExceptionTest extends AtkPhpunit\TestCase
      */
     public function testException1()
     {
-        $this->setExpectedException(\atk4\dsql\Exception::class);
+        $this->expectException(\atk4\dsql\Exception::class);
 
         throw new \atk4\dsql\Exception();
     }
 
     public function testException2()
     {
-        $this->setExpectedException(\atk4\dsql\Exception::class);
+        $this->expectException(\atk4\dsql\Exception::class);
         $e = new Expression('hello, [world]');
         $e->render();
     }

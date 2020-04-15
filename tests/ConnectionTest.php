@@ -223,19 +223,19 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testException1()
     {
-        $this->setExpectedException('PDOException');
+        $this->expectException(\PDOException::class);
         $c = Connection::connect(':');
     }
 
     public function testException2()
     {
-        $this->setExpectedException(\atk4\dsql\Exception::class);
+        $this->expectException(\atk4\dsql\Exception::class);
         $c = Connection::connect('');
     }
 
     public function testException3()
     {
-        $this->setExpectedException(\atk4\dsql\Exception::class);
+        $this->expectException(\atk4\dsql\Exception::class);
         $c = new Connection('sqlite::memory');
     }
 
@@ -249,7 +249,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
             $q->render()
         );
 
-        $this->setExpectedException(\atk4\dsql\Exception::class);
+        $this->expectException(\atk4\dsql\Exception::class);
         $q->execute();
     }
 }
