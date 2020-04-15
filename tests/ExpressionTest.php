@@ -2,6 +2,7 @@
 
 namespace atk4\dsql\tests;
 
+use atk4\core\AtkPhpunit;
 use atk4\dsql\Expression;
 use atk4\dsql\Expressionable;
 use atk4\dsql\Query;
@@ -9,7 +10,7 @@ use atk4\dsql\Query;
 /**
  * @coversDefaultClass \atk4\dsql\Expression
  */
-class ExpressionTest extends \atk4\core\PHPUnit_AgileTestCase
+class ExpressionTest extends AtkPhpunit\TestCase
 {
     public function e(...$args)
     {

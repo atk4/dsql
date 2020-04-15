@@ -2,12 +2,13 @@
 
 namespace atk4\dsql\tests;
 
+use atk4\core\AtkPhpunit;
 use atk4\dsql\Expression;
 
 /**
  * @coversDefaultClass \atk4\dsql\Exception
  */
-class ExceptionTest extends \atk4\core\PHPUnit_AgileTestCase
+class ExceptionTest extends AtkPhpunit\TestCase
 {
     /**
      * Test constructor.
@@ -16,14 +17,14 @@ class ExceptionTest extends \atk4\core\PHPUnit_AgileTestCase
      */
     public function testException1()
     {
-        $this->setExpectedException(\atk4\dsql\Exception::class);
+        $this->expectException(\atk4\dsql\Exception::class);
 
         throw new \atk4\dsql\Exception();
     }
 
     public function testException2()
     {
-        $this->setExpectedException(\atk4\dsql\Exception::class);
+        $this->expectException(\atk4\dsql\Exception::class);
         $e = new Expression('hello, [world]');
         $e->render();
     }

@@ -2,6 +2,7 @@
 
 namespace atk4\dsql\tests;
 
+use atk4\core\AtkPhpunit;
 use atk4\dsql\Expression;
 use atk4\dsql\Query;
 use atk4\dsql\Query_MySQL;
@@ -13,7 +14,7 @@ use atk4\dsql\Query_SQLite;
 /**
  * @coversDefaultClass \atk4\dsql\Query
  */
-class QueryTest extends \atk4\core\PHPUnit_AgileTestCase
+class QueryTest extends AtkPhpunit\TestCase
 {
     public function q(...$args)
     {

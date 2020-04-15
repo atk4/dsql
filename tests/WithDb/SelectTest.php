@@ -254,7 +254,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testExecuteException()
     {
-        $this->setExpectedException(\atk4\dsql\ExecuteException::class);
+        $this->expectException(\atk4\dsql\ExecuteException::class);
 
         try {
             $this->q('non_existing_table')->field('non_existing_field')->getOne();

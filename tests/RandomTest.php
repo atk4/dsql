@@ -2,10 +2,12 @@
 
 namespace atk4\dsql;
 
+use atk4\core\AtkPhpunit;
+
 /**
  * @coversDefaultClass \atk4\dsql\Query
  */
-class RandomTest extends \atk4\core\PHPUnit_AgileTestCase
+class RandomTest extends AtkPhpunit\TestCase
 {
     public function q(...$args)
     {
