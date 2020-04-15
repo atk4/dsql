@@ -2,12 +2,13 @@
 
 namespace atk4\dsql\tests;
 
+use atk4\core\AtkPhpunit;
 use atk4\dsql\Expression;
 
 /**
  * @coversDefaultClass \atk4\dsql\Exception
  */
-class ExceptionTest extends \atk4\core\PHPUnit_AgileTestCase
+class ExceptionTest extends AtkPhpunit\TestCase
 {
     /**
      * Test constructor.

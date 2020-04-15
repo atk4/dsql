@@ -2,13 +2,14 @@
 
 namespace atk4\dsql\tests\WithDb;
 
+use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
 use atk4\dsql\Expression;
 
 /**
  * @coversDefaultClass \atk4\dsql\Query
  */
-class ConnectionTest extends \atk4\core\PHPUnit_AgileTestCase
+class ConnectionTest extends AtkPhpunit\TestCase
 {
     public function testServerConnection()
     {
