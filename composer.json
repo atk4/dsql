@@ -27,7 +27,6 @@
     "atk4/core": "^2.0"
   },
   "require-dev": {
-    "codeclimate/php-test-reporter": "*",
     "friendsofphp/php-cs-fixer": "^2.16",
     "phpunit/dbunit": ">=1.2",
     "phpunit/phpcov": "*",
