@@ -12,6 +12,7 @@
   "license": "MIT",
   "authors": [
     {"name": "Romans Malinovskis", "email": "romans@agiletoolkit.org", "homepage": "https://nearly.guru/" },
+    {"name": "Imants Horsts", "homepage": "https://darkside.lv/"},
     {"name": "Michael Voříšek", "homepage": "https://mvorisek.cz/"}
   ],
   "config": {
