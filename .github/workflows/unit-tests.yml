@@ -28,14 +28,17 @@ jobs:
       mysql:
         image: mariadb:10.5.1
         env:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: dsql_test
+          MYSQL_ROOT_PASSWORD: atk4_pass
+          MYSQL_USER: atk4_test
+          MYSQL_PASSWORD: atk4_pass
+          MYSQL_DATABASE: atk4_test__dsql
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
       postgres:
-        image: postgres:10-alpine
+        image: postgres:12-alpine
         env:
-          POSTGRES_PASSWORD: password
-          POSTGRES_USER: postgres
+          POSTGRES_USER: atk4_test
+          POSTGRES_PASSWORD: atk4_pass
+          POSTGRES_DB: atk4_test__dsql
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout
@@ -68,8 +71,6 @@ jobs:
       - name: Init
         run: |
           mkdir -p build/logs
-          # mysql -uroot -ppassword -h mysql -e 'CREATE DATABASE dsql_test;'
-          PGPASSWORD=password psql -h postgres -c 'create database "atk4-dsql-test";' -U postgres
 
       - name: "Run tests: SQLite (only for Phpunit)"
         if: matrix.type == 'Phpunit'
@@ -77,11 +78,11 @@ jobs:
 
       - name: "Run tests: MySQL (only for Phpunit)"
         if: matrix.type == 'Phpunit'
-        run: "vendor/bin/phpunit --configuration phpunit-mysql-workflow.xml \"$(if [ -n \"$LOG_COVERAGE\" ]; then echo '--coverage-text'; else echo '--no-coverage'; fi)\""
+        run: "vendor/bin/phpunit --configuration phpunit-mysql.xml \"$(if [ -n \"$LOG_COVERAGE\" ]; then echo '--coverage-text'; else echo '--no-coverage'; fi)\""
 
       - name: "Run tests: PostgreSQL (only for Phpunit)"
         if: matrix.type == 'Phpunit'
-        run: "vendor/bin/phpunit --configuration phpunit-pgsql-workflow.xml \"$(if [ -n \"$LOG_COVERAGE\" ]; then echo '--coverage-text'; else echo '--no-coverage'; fi)\""
+        run: "vendor/bin/phpunit --configuration phpunit-pgsql.xml \"$(if [ -n \"$LOG_COVERAGE\" ]; then echo '--coverage-text'; else echo '--no-coverage'; fi)\""
 
       - name: Lint / check syntax (only for CodingStyle)
         if: matrix.type == 'CodingStyle'
