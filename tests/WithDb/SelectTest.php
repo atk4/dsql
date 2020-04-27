@@ -243,7 +243,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testEmptyGetOne()
     {

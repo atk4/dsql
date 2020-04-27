@@ -111,7 +111,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testMysqlFail()
     {

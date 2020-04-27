@@ -618,10 +618,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             }
 
             return $statement;
-        } else {
-            // @var $connection Connection
-            return $connection->execute($this);
         }
+
+        /** @var Connection Connection */
+        return $connection->execute($this);
     }
 
     /**

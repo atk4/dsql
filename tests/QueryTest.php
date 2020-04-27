@@ -197,7 +197,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::field
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testFieldException1()
     {
@@ -208,7 +208,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * There shouldn't be alias when passing fields as array.
      *
      * @covers ::field
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testFieldException2()
     {
@@ -219,7 +219,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * There shouldn't be alias when passing multiple tables.
      *
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException1()
     {
@@ -230,7 +230,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * There shouldn't be alias when passing multiple tables.
      *
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException2()
     {
@@ -251,7 +251,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * Alias is IS mandatory when pass table as Query.
      *
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException4()
     {
@@ -263,7 +263,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException5()
     {
@@ -277,7 +277,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException6()
     {
@@ -291,7 +291,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException7()
     {
@@ -305,7 +305,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException8()
     {
@@ -319,7 +319,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException9()
     {
@@ -332,7 +332,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * Table can't be set as sub-Query in Update query mode.
      *
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException10()
     {
@@ -347,7 +347,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * Table can't be set as sub-Query in Insert query mode.
      *
      * @covers ::table
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException11()
     {
@@ -362,7 +362,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * Requesting non-existant query mode should throw exception.
      *
      * @covers ::mode
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testModeException1()
     {
@@ -563,7 +563,7 @@ class QueryTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * @covers atk4\dsql\Expression::getDebugQuery
+     * @covers \atk4\dsql\Expression::getDebugQuery
      */
     public function testTestgetDebugQuery()
     {
@@ -811,7 +811,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * Verify that passing garbage to where throw exception.
      *
      * @covers ::order
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testWhereIncompatibleObject1()
     {
@@ -822,7 +822,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * Verify that passing garbage to where throw exception.
      *
      * @covers ::order
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testWhereIncompatibleObject2()
     {
@@ -833,7 +833,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * Verify that passing garbage to where throw exception.
      *
      * @covers ::order
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testWhereIncompatibleObject3()
     {
@@ -1092,7 +1092,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * If first argument is array, second argument must not be used.
      *
      * @covers ::order
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testOrderException1()
     {
@@ -1158,7 +1158,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test groupConcat.
      *
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testGroupConcatException()
     {
@@ -1447,7 +1447,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * Value [false] is not supported by SQL.
      *
      * @covers ::set
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testSetException1()
     {

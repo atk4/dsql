@@ -21,7 +21,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Test constructor exception - wrong 1st parameter.
      *
      * @covers ::__construct
-     * @expectedException atk4\dsql\Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException1st1()
     {
@@ -32,7 +32,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Test constructor exception - wrong 1st parameter.
      *
      * @covers ::__construct
-     * @expectedException atk4\dsql\Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException1st2()
     {
@@ -42,7 +42,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * Test constructor exception - wrong 2nd parameter.
      *
-     * @expectedException atk4\dsql\Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException2nd1()
     {
@@ -52,7 +52,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * Test constructor exception - wrong 2nd parameter.
      *
-     * @expectedException atk4\dsql\Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException2nd2()
     {
@@ -62,7 +62,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * Test constructor exception - no arguments.
      *
-     * @expectedException atk4\dsql\Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException0arg()
     {
@@ -409,7 +409,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * $escape_mode value is incorrect.
      *
      * @covers ::_consume
-     * @expectedException atk4\dsql\Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testConsumeException1()
     {
@@ -420,7 +420,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Only Expressions or Expressionable objects may be used in Expression.
      *
      * @covers ::_consume
-     * @expectedException atk4\dsql\Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testConsumeException2()
     {
@@ -498,7 +498,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * Test reset exception if tag is not a string.
      *
-     * @expectedException atk4\dsql\Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testResetException()
     {

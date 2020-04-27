@@ -614,8 +614,8 @@ class Query extends Expression
      * @param mixed  $cond     Condition such as '=', '>' or 'is not'
      * @param mixed  $value    Value. Will be quoted unless you pass expression
      * @param string $kind     Do not use directly. Use having()
-     * @param string $num_args When $kind is passed, we can't determine number of
-     *                         actual arguments, so this argument must be specified.
+     * @param string $num_args when $kind is passed, we can't determine number of
+     *                         actual arguments, so this argument must be specified
      *
      * @return $this
      */
@@ -1248,9 +1248,8 @@ class Query extends Expression
             $desc = $desc ? 'desc' : '';
         } elseif (strtolower($desc) === 'asc') {
             $desc = '';
-        } else {
-            // allows custom order like "order by name desc nulls last" for Oracle
         }
+        // no else - allow custom order like "order by name desc nulls last" for Oracle
 
         $this->args['order'][] = [$order, $desc];
 
@@ -1419,7 +1418,7 @@ class Query extends Expression
     /**
      * Returns Query object of [case] expression.
      *
-     * @param mixed $operand Optional operand for case expression.
+     * @param mixed $operand optional operand for case expression
      *
      * @return Query
      */

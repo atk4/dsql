@@ -55,7 +55,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testCommitException1()
     {
@@ -64,7 +64,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testCommitException2()
     {
@@ -75,7 +75,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testRollbackException1()
     {
@@ -84,7 +84,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testRollbackException2()
     {
