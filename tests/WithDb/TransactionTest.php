@@ -34,7 +34,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
      */
     protected function getDataSet()
     {
-        return $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset.xml');
+        return $this->createFlatXMLDataSet(__DIR__ . '/dataset.xml');
     }
 
     private function q($table = null, $alias = null)
@@ -265,27 +265,23 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
     public function testInTransaction()
     {
         // inTransaction tests
-        $this->assertEquals(
-            false,
+        $this->assertFalse(
             $this->c->inTransaction()
         );
 
         $this->c->beginTransaction();
-        $this->assertEquals(
-            true,
+        $this->assertTrue(
             $this->c->inTransaction()
         );
 
         $this->c->rollBack();
-        $this->assertEquals(
-            false,
+        $this->assertFalse(
             $this->c->inTransaction()
         );
 
         $this->c->beginTransaction();
         $this->c->commit();
-        $this->assertEquals(
-            false,
+        $this->assertFalse(
             $this->c->inTransaction()
         );
     }

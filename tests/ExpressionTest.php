@@ -264,7 +264,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testExpr()
     {
         $e = $this->e(['connection' => new \stdClass()]);
-        $this->assertEquals(true, $e->expr()->connection instanceof \stdClass);
+        $this->assertTrue($e->expr()->connection instanceof \stdClass);
     }
 
     /**
@@ -315,8 +315,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
             '"users".*',
             $this->callProtected($this->e(), '_escapeSoft', ['users.*'])
         );
-        $this->assertEquals(
-            true,
+        $this->assertTrue(
             $this->callProtected($this->e(), '_escapeSoft', [new \stdClass()]) instanceof \stdClass
         );
 
@@ -449,9 +448,9 @@ class ExpressionTest extends AtkPhpunit\TestCase
         $this->assertEquals('white', $e['cat']);
 
         // offsetExists, offsetUnset
-        $this->assertEquals(true, isset($e['cat']));
+        $this->assertTrue(isset($e['cat']));
         unset($e['cat']);
-        $this->assertEquals(false, isset($e['cat']));
+        $this->assertFalse(isset($e['cat']));
 
         // testing absence of specific key in asignment
         $e = $this->e('[], []');

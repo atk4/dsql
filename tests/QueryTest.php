@@ -43,7 +43,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testDsql()
     {
         $q = $this->q(['connection' => new \stdClass()]);
-        $this->assertEquals(true, $q->dsql()->connection instanceof \stdClass);
+        $this->assertTrue($q->dsql()->connection instanceof \stdClass);
     }
 
     /**
@@ -565,7 +565,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * @covers atk4\dsql\Expression::getDebugQuery
      */
-    public function testgetDebugQuery()
+    public function testTestgetDebugQuery()
     {
         $age = new Expression('coalesce([age], [default_age], [foo], [bar])');
         $age['age'] = new Expression('year(now()) - year(birth_date)');
