@@ -19,7 +19,7 @@ class Connection
     protected $expression_class = Expression::class;
 
     /** @var Connection|\PDO Connection or PDO object */
-    protected $connection = null;
+    protected $connection;
 
     /** @var int Current depth of transaction */
     public $transaction_depth = 0;
@@ -69,9 +69,9 @@ class Connection
         // If parts are usable, convert DSN format
         if ($parts !== false && isset($parts['host'], $parts['path'])) {
             // DSN is using URL-like format, so we need to convert it
-            $dsn = $parts['scheme'].':host='.$parts['host']
-                .(isset($parts['port']) ? ';port='.$parts['port'] : '')
-                .';dbname='.substr($parts['path'], 1);
+            $dsn = $parts['scheme'] . ':host=' . $parts['host']
+                . (isset($parts['port']) ? ';port=' . $parts['port'] : '')
+                . ';dbname=' . substr($parts['path'], 1);
             $user = $user ?? ($parts['user'] ?? null);
             $pass = $pass ?? ($parts['pass'] ?? null);
         }
@@ -103,8 +103,8 @@ class Connection
      * Connect database.
      *
      * @param string|\PDO $dsn
-     * @param null|string $user
-     * @param null|string $password
+     * @param string|null $user
+     * @param string|null $password
      * @param array       $args
      *
      * @return Connection
@@ -121,33 +121,38 @@ class Connection
                 case 'pgsql':
                     $connectionClass = Connection_PgSQL::class;
                     $queryClass = Query_PgSQL::class;
+
                     break;
                 case 'oci':
                     $connectionClass = Connection_Oracle::class;
+
                     break;
                 case 'sqlite':
                     $queryClass = Query_SQLite::class;
+
                     break;
                 case 'mysql':
                     $expressionClass = Expression_MySQL::class;
+                    // no break
                 default:
                     // Default, for backwards compatibility
                     $queryClass = Query_MySQL::class;
+
                     break;
             }
 
             return new $connectionClass(array_merge([
-                'connection'       => $dsn,
-                'query_class'      => $queryClass,
+                'connection' => $dsn,
+                'query_class' => $queryClass,
                 'expression_class' => $expressionClass,
-                'driverType'       => $driverType,
+                'driverType' => $driverType,
             ], $args));
         }
 
         // If it's some other object, then we simply use it trough proxy connection
         if (is_object($dsn)) {
             return new Connection_Proxy(array_merge([
-                'connection'       => $dsn,
+                'connection' => $dsn,
             ], $args));
         }
 
@@ -158,55 +163,55 @@ class Connection
         switch ($dsn['driverType']) {
             case 'mysql':
                 $c = new static(array_merge([
-                    'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                     'expression_class' => Expression_MySQL::class,
-                    'query_class'      => Query_MySQL::class,
-                    'driverType'       => $dsn['driverType'],
+                    'query_class' => Query_MySQL::class,
+                    'driverType' => $dsn['driverType'],
                 ], $args));
-                break;
 
+                break;
             case 'sqlite':
                 $c = new static(array_merge([
-                    'connection'       => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
-                    'query_class'      => Query_SQLite::class,
-                    'driverType'       => $dsn['driverType'],
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'query_class' => Query_SQLite::class,
+                    'driverType' => $dsn['driverType'],
                 ], $args));
-                break;
 
+                break;
             case 'oci':
                 $c = new Connection_Oracle(array_merge([
                     'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                     'driverType' => $dsn['driverType'],
                 ], $args));
-                break;
 
+                break;
             case 'oci12':
                 $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
                 $c = new Connection_Oracle12(array_merge([
                     'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                     'driverType' => $dsn['driverType'],
                 ], $args));
-                break;
 
+                break;
             case 'pgsql':
                 $c = new Connection_PgSQL(array_merge([
                     'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
                     'driverType' => $dsn['driverType'],
                 ], $args));
-                break;
 
+                break;
             case 'dumper':
                 $c = new Connection_Dumper(array_merge([
                     'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
                 ], $args));
-                break;
 
+                break;
             case 'counter':
                 $c = new Connection_Counter(array_merge([
                     'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
                 ], $args));
-                break;
 
+                break;
             // let PDO handle the rest
             default:
                 $c = new static(array_merge([
@@ -317,7 +322,7 @@ class Connection
             ? false
             : $this->connection->beginTransaction();
 
-        $this->transaction_depth++;
+        ++$this->transaction_depth;
 
         return $r;
     }
@@ -355,7 +360,7 @@ class Connection
             throw new Exception('Using commit() when no transaction has started');
         }
 
-        $this->transaction_depth--;
+        --$this->transaction_depth;
 
         if ($this->transaction_depth == 0) {
             return $this->connection->commit();
@@ -378,7 +383,7 @@ class Connection
             throw new Exception('Using rollBack() when no transaction has started');
         }
 
-        $this->transaction_depth--;
+        --$this->transaction_depth;
 
         if ($this->transaction_depth == 0) {
             return $this->connection->rollBack();

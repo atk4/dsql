@@ -23,7 +23,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $c = new HelloWorldConnection();
         $test = 0;
         foreach ($c->expr('abrakadabra') as $row) {
-            $test++;
+            ++$test;
         }
         $this->assertEquals(10, $test);
     }
@@ -34,7 +34,7 @@ class HelloWorldConnection extends Connection
 {
     public function execute(Expression $e)
     {
-        for ($x = 0; $x < 10; $x++) {
+        for ($x = 0; $x < 10; ++$x) {
             yield $x => ['greeting' => 'Hello World'];
         }
     }

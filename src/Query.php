@@ -77,9 +77,9 @@ class Query extends Expression
      * This is set by table(). If you are using multiple tables,
      * then $main_table is set to false as it is irrelevant.
      *
-     * @var null|false|string
+     * @var false|string|null
      */
-    protected $main_table = null;
+    protected $main_table;
 
     // {{{ Field specification and rendering
 
@@ -186,7 +186,7 @@ class Query extends Expression
 
             if ($alias) {
                 // field alias cannot be expression, so simply escape it
-                $field .= ' '.$this->_escape($alias);
+                $field .= ' ' . $this->_escape($alias);
             }
 
             $ret[] = $field;
@@ -284,7 +284,6 @@ class Query extends Expression
 
         // process tables one by one
         foreach ($this->args['table'] as $alias => $table) {
-
             // throw exception if we don't want to add alias and table is defined as Expression
             if ($add_alias === false && $table instanceof self) {
                 throw new Exception('Table cannot be Query in UPDATE, INSERT etc. query modes');
@@ -307,7 +306,7 @@ class Query extends Expression
 
             // add alias if needed
             if ($alias) {
-                $table .= ' '.$this->_escape($alias);
+                $table .= ' ' . $this->_escape($alias);
             }
 
             $ret[] = $table;
@@ -352,12 +351,12 @@ class Query extends Expression
      *
      * @return $this
      */
-    public function with(self $cursor, string $alias, ?array $fields = null, bool $recursive = false)
+    public function with(self $cursor, string $alias, array $fields = null, bool $recursive = false)
     {
         // save cursor in args
         $this->_set_args('with', $alias, [
-            'cursor'    => $cursor,
-            'fields'    => $fields,
+            'cursor' => $cursor,
+            'fields' => $fields,
             'recursive' => $recursive,
         ]);
 
@@ -373,7 +372,7 @@ class Query extends Expression
      *
      * @return $this
      */
-    public function withRecursive(self $cursor, string $alias, ?array $fields = null)
+    public function withRecursive(self $cursor, string $alias, array $fields = null)
     {
         return $this->with($cursor, $alias, $fields, true);
     }
@@ -395,17 +394,17 @@ class Query extends Expression
 
         // process each defined cursor
         $isRecursive = false;
-        foreach ($this->args['with'] as $alias => ['cursor'=>$cursor, 'fields'=>$fields, 'recursive'=>$recursive]) {
+        foreach ($this->args['with'] as $alias => ['cursor' => $cursor, 'fields' => $fields, 'recursive' => $recursive]) {
             // cursor alias cannot be expression, so simply escape it
-            $s = $this->_escape($alias).' ';
+            $s = $this->_escape($alias) . ' ';
 
             // set cursor fields
             if ($fields !== null) {
-                $s .= '('.implode(',', array_map([$this, '_escape'], $fields)).') ';
+                $s .= '(' . implode(',', array_map([$this, '_escape'], $fields)) . ') ';
             }
 
             // will parameterize the value and escape if necessary
-            $s .= 'as '.$this->_consume($cursor, 'soft-escape');
+            $s .= 'as ' . $this->_consume($cursor, 'soft-escape');
 
             // is at least one recursive ?
             $isRecursive = $isRecursive || $recursive;
@@ -413,7 +412,7 @@ class Query extends Expression
             $ret[] = $s;
         }
 
-        return 'with '.($isRecursive ? 'recursive ' : '').implode(',', $ret).' ';
+        return 'with ' . ($isRecursive ? 'recursive ' : '') . implode(',', $ret) . ' ';
     }
 
     /// }}}
@@ -504,7 +503,7 @@ class Query extends Expression
 
             // Identify fields we use for joins
             if ($f2 === null && $m2 === null) {
-                $m2 = $f1.'_id';
+                $m2 = $f1 . '_id';
             }
             if ($m2 === null) {
                 $m2 = 'id';
@@ -541,12 +540,12 @@ class Query extends Expression
         foreach ($this->args['join'] as $j) {
             $jj = '';
 
-            $jj .= $j['t'].' join ';
+            $jj .= $j['t'] . ' join ';
 
             $jj .= $this->_escapeSoft($j['f1']);
 
             if ($j['fa'] !== null) {
-                $jj .= ' as '.$this->_escape($j['fa']);
+                $jj .= ' as ' . $this->_escape($j['fa']);
             }
 
             $jj .= ' on ';
@@ -555,15 +554,15 @@ class Query extends Expression
                 $jj .= $this->_consume($j['expr']);
             } else {
                 $jj .=
-                    $this->_escape($j['fa'] ?: $j['f1']).'.'.
-                    $this->_escape($j['f2']).' = '.
-                    ($j['m1'] === null ? '' : $this->_escape($j['m1']).'.').
+                    $this->_escape($j['fa'] ?: $j['f1']) . '.' .
+                    $this->_escape($j['f2']) . ' = ' .
+                    ($j['m1'] === null ? '' : $this->_escape($j['m1']) . '.') .
                     $this->_escape($j['m2']);
             }
             $joins[] = $jj;
         }
 
-        return ' '.implode(' ', $joins);
+        return ' ' . implode(' ', $joins);
     }
 
     // }}}
@@ -669,7 +668,7 @@ class Query extends Expression
 
                 $cond = '=';
             } else {
-                $num_args++;
+                ++$num_args;
             }
 
             $field = $matches[1];
@@ -678,29 +677,32 @@ class Query extends Expression
         switch ($num_args) {
             case 1:
                 $this->args[$kind][] = [$field];
+
                 break;
             case 2:
                 if (is_object($cond) && !$cond instanceof Expressionable && !$cond instanceof Expression) {
                     throw new Exception([
                         'Value cannot be converted to SQL-compatible expression',
-                        'field'=> $field,
-                        'value'=> $cond,
+                        'field' => $field,
+                        'value' => $cond,
                     ]);
                 }
 
                 $this->args[$kind][] = [$field, $cond];
+
                 break;
             case 3:
                 if (is_object($value) && !$value instanceof Expressionable && !$value instanceof Expression) {
                     throw new Exception([
                         'Value cannot be converted to SQL-compatible expression',
-                        'field'=> $field,
+                        'field' => $field,
                         'cond' => $cond,
-                        'value'=> $value,
+                        'value' => $value,
                     ]);
                 }
 
                 $this->args[$kind][] = [$field, $cond, $value];
+
                 break;
         }
 
@@ -808,22 +810,22 @@ class Query extends Expression
             // special treatment of empty array condition
             if (empty($value)) {
                 if ($cond == 'in') {
-                    return $field.'<>'.$field; // never true
+                    return $field . '<>' . $field; // never true
                 }
 
-                return '('.$field.'='.$field.' or '.$field.' is null)'; // always true
+                return '(' . $field . '=' . $field . ' or ' . $field . ' is null)'; // always true
             }
 
-            $value = '('.implode(',', $this->_param($value)).')';
+            $value = '(' . implode(',', $this->_param($value)) . ')';
 
-            return $field.' '.$cond.' '.$value;
+            return $field . ' ' . $cond . ' ' . $value;
         }
 
         // if value is object, then it should be Expression or Query itself
         // otherwise just escape value
         $value = $this->_consume($value, 'param');
 
-        return $field.' '.$cond.' '.$value;
+        return $field . ' ' . $cond . ' ' . $value;
     }
 
     /**
@@ -837,7 +839,7 @@ class Query extends Expression
             return;
         }
 
-        return ' where '.implode(' and ', $this->_sub_render_where('where'));
+        return ' where ' . implode(' and ', $this->_sub_render_where('where'));
     }
 
     /**
@@ -879,7 +881,7 @@ class Query extends Expression
             return;
         }
 
-        return ' having '.implode(' and ', $this->_sub_render_where('having'));
+        return ' having ' . implode(' and ', $this->_sub_render_where('having'));
     }
 
     // }}}
@@ -929,7 +931,7 @@ class Query extends Expression
             return $this->_consume($a, 'soft-escape');
         }, $this->args['group']);
 
-        return ' group by '.implode(', ', $g);
+        return ' group by ' . implode(', ', $g);
     }
 
     // }}}
@@ -997,7 +999,7 @@ class Query extends Expression
                 $field = $this->_consume($field, 'escape');
                 $value = $this->_consume($value, 'param');
 
-                $ret[] = $field.'='.$value;
+                $ret[] = $field . '=' . $value;
             }
         }
 
@@ -1089,7 +1091,7 @@ class Query extends Expression
             return '';
         }
 
-        return ' '.implode(' ', $this->args['option'][$this->mode]);
+        return ' ' . implode(' ', $this->args['option'][$this->mode]);
     }
 
     // }}}
@@ -1171,7 +1173,7 @@ class Query extends Expression
     public function limit($cnt, $shift = null)
     {
         $this->args['limit'] = [
-            'cnt'   => $cnt,
+            'cnt' => $cnt,
             'shift' => $shift,
         ];
 
@@ -1186,9 +1188,9 @@ class Query extends Expression
     public function _render_limit()
     {
         if (isset($this->args['limit'])) {
-            return ' limit '.
-                (int) $this->args['limit']['shift'].
-                ', '.
+            return ' limit ' .
+                (int) $this->args['limit']['shift'] .
+                ', ' .
                 (int) $this->args['limit']['cnt'];
         }
     }
@@ -1269,10 +1271,10 @@ class Query extends Expression
         $x = [];
         foreach ($this->args['order'] as $tmp) {
             list($arg, $desc) = $tmp;
-            $x[] = $this->_consume($arg, 'soft-escape').($desc ? (' '.$desc) : '');
+            $x[] = $this->_consume($arg, 'soft-escape') . ($desc ? (' ' . $desc) : '');
         }
 
-        return ' order by '.implode(', ', array_reverse($x));
+        return ' order by ' . implode(', ', array_reverse($x));
     }
 
     // }}}
@@ -1280,8 +1282,8 @@ class Query extends Expression
     public function __debugInfo()
     {
         $arr = [
-            'R'          => false,
-            'mode'       => $this->mode,
+            'R' => false,
+            'mode' => $this->mode,
             //'template'   => $this->template,
             //'params'     => $this->params,
             //'connection' => $this->connection,
@@ -1326,7 +1328,7 @@ class Query extends Expression
      */
     public function mode($mode)
     {
-        $prop = 'template_'.$mode;
+        $prop = 'template_' . $mode;
 
         if (isset($this->{$prop})) {
             $this->mode = $mode;
@@ -1495,7 +1497,7 @@ class Query extends Expression
 
         // operand
         if ($short_form = isset($this->args['case_operand'])) {
-            $ret .= ' '.$this->_consume($this->args['case_operand'], 'soft-escape');
+            $ret .= ' ' . $this->_consume($this->args['case_operand'], 'soft-escape');
         }
 
         // when, then
@@ -1503,7 +1505,7 @@ class Query extends Expression
             if (!array_key_exists(0, $row) || !array_key_exists(1, $row)) {
                 throw new Exception([
                     'Incorrect use of "when" method parameters',
-                    'row'  => $row,
+                    'row' => $row,
                 ]);
             }
 
@@ -1513,7 +1515,7 @@ class Query extends Expression
                 if (is_array($row[0])) {
                     throw new Exception([
                         'When using short form CASE statement, then you should not set array as when() method 1st parameter',
-                        'when'  => $row[0],
+                        'when' => $row[0],
                     ]);
                 }
                 $ret .= $this->_consume($row[0], 'param');
@@ -1522,15 +1524,15 @@ class Query extends Expression
             }
 
             // then
-            $ret .= ' then '.$this->_consume($row[1], 'param');
+            $ret .= ' then ' . $this->_consume($row[1], 'param');
         }
 
         // else
         if (array_key_exists('case_else', $this->args)) {
-            $ret .= ' else '.$this->_consume($this->args['case_else'], 'param');
+            $ret .= ' else ' . $this->_consume($this->args['case_else'], 'param');
         }
 
-        return ' case'.$ret.' end';
+        return ' case' . $ret . ' end';
     }
 
     /**
@@ -1546,12 +1548,11 @@ class Query extends Expression
         if ($alias === null) {
             $this->args[$what][] = $value;
         } else {
-
             // don't allow multiple values with same alias
             if (isset($this->args[$what][$alias])) {
                 throw new Exception([
                     'Alias should be unique',
-                    'what'  => $what,
+                    'what' => $what,
                     'alias' => $alias,
                 ]);
             }

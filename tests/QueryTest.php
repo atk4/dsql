@@ -60,8 +60,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Testing field - basic cases.
      *
-     * @covers ::field
      * @covers ::_render_field
+     * @covers ::field
      */
     public function testFieldBasic()
     {
@@ -122,8 +122,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Testing field - defaultField.
      *
-     * @covers ::field
      * @covers ::_render_field
+     * @covers ::field
      */
     public function testFieldDefaultField()
     {
@@ -152,8 +152,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Testing field - basic cases.
      *
-     * @covers ::field
      * @covers ::_render_field
+     * @covers ::field
      */
     public function testFieldExpression()
     {
@@ -195,8 +195,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Duplicate alias of field.
      *
-     * @covers ::field
      * @covers ::_set_args
+     * @covers ::field
      * @expectedException Exception
      */
     public function testFieldException1()
@@ -261,8 +261,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Table aliases should be unique.
      *
-     * @covers ::table
      * @covers ::_set_args
+     * @covers ::table
      * @expectedException Exception
      */
     public function testTableException5()
@@ -275,8 +275,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Table aliases should be unique.
      *
-     * @covers ::table
      * @covers ::_set_args
+     * @covers ::table
      * @expectedException Exception
      */
     public function testTableException6()
@@ -289,8 +289,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Table aliases should be unique.
      *
-     * @covers ::table
      * @covers ::_set_args
+     * @covers ::table
      * @expectedException Exception
      */
     public function testTableException7()
@@ -303,8 +303,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Table aliases should be unique.
      *
-     * @covers ::table
      * @covers ::_set_args
+     * @covers ::table
      * @expectedException Exception
      */
     public function testTableException8()
@@ -317,8 +317,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Table aliases should be unique.
      *
-     * @covers ::table
      * @covers ::_set_args
+     * @covers ::table
      * @expectedException Exception
      */
     public function testTableException9()
@@ -381,9 +381,9 @@ class QueryTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * @covers ::table
      * @covers ::_render_table
      * @covers ::_render_table_noalias
+     * @covers ::table
      */
     public function testTableRender1()
     {
@@ -504,8 +504,8 @@ class QueryTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * @covers ::table
      * @covers ::_render_table
+     * @covers ::table
      */
     public function testTableRender2()
     {
@@ -631,11 +631,11 @@ class QueryTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * @covers ::field
      * @covers ::_render_field
-     * @covers ::table
      * @covers ::_render_table
+     * @covers ::field
      * @covers ::render
+     * @covers ::table
      */
     public function testUnionQuery()
     {
@@ -710,9 +710,9 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Basic where() tests.
      *
-     * @covers ::where
      * @covers ::_render_where
      * @covers ::_sub_render_where
+     * @covers ::where
      */
     public function testWhereBasic()
     {
@@ -843,9 +843,9 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Testing where() with special values - null, array, like.
      *
-     * @covers ::where
      * @covers ::_render_where
      * @covers ::_sub_render_where
+     * @covers ::where
      */
     public function testWhereSpecialValues()
     {
@@ -966,8 +966,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Having basically is the same as where, so we can relax and trouhly test where() instead.
      *
-     * @covers ::having
      * @covers ::_render_having
+     * @covers ::having
      */
     public function testBasicHaving()
     {
@@ -988,8 +988,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test Limit.
      *
-     * @covers ::limit
      * @covers ::_render_limit
+     * @covers ::limit
      */
     public function testLimit()
     {
@@ -1006,8 +1006,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test Order.
      *
-     * @covers ::order
      * @covers ::_render_order
+     * @covers ::order
      */
     public function testOrder()
     {
@@ -1102,8 +1102,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test Group.
      *
-     * @covers ::group
      * @covers ::_render_group
+     * @covers ::group
      */
     public function testGroup()
     {
@@ -1205,8 +1205,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test Join.
      *
-     * @covers ::join
      * @covers ::_render_join
+     * @covers ::join
      */
     public function testJoin()
     {
@@ -1235,20 +1235,20 @@ class QueryTest extends AtkPhpunit\TestCase
             $this->q('[join]')->table('user', 'u')->join('address.user_id a')->render()
         );
         $this->assertEquals(
-            'left join "address" as "a" on "a"."user_id" = "u"."id" '.
+            'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
             'left join "bank" as "b" on "b"."id" = "u"."bank_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a' => 'address.user_id', 'b' => 'bank'])->render()
         );
         $this->assertEquals(
-            'left join "address" on "address"."user_id" = "u"."id" '.
+            'left join "address" on "address"."user_id" = "u"."id" ' .
             'left join "bank" on "bank"."id" = "u"."bank_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['address.user_id', 'bank'])->render()
         );
         $this->assertEquals(
-            'left join "address" as "a" on "a"."user_id" = "u"."id" '.
-            'left join "bank" as "b" on "b"."id" = "u"."bank_id" '.
+            'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
+            'left join "bank" as "b" on "b"."id" = "u"."bank_id" ' .
             'left join "bank_details" on "bank_details"."id" = "bank"."details_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a' => 'address.user_id', 'b' => 'bank'])
@@ -1265,9 +1265,9 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Combined execution of where() clauses.
      *
-     * @covers ::where
      * @covers ::_render_where
      * @covers ::mode
+     * @covers ::where
      */
     public function testCombinedWhere()
     {
@@ -1318,10 +1318,10 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test where() when $field is passed as array. Should create OR conditions.
      *
-     * @covers ::where
-     * @covers ::orExpr
-     * @covers ::_render_where
      * @covers ::_render_orwhere
+     * @covers ::_render_where
+     * @covers ::orExpr
+     * @covers ::where
      */
     public function testOrWhere()
     {
@@ -1343,12 +1343,12 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test OrWhere and AndWhere without where condition. Should ignore them.
      *
-     * @covers ::where
-     * @covers ::orExpr
-     * @covers ::andExpr
-     * @covers ::_render_where
-     * @covers ::_render_orwhere
      * @covers ::_render_andwhere
+     * @covers ::_render_orwhere
+     * @covers ::_render_where
+     * @covers ::andExpr
+     * @covers ::orExpr
+     * @covers ::where
      */
     public function testEmptyOrAndWhere()
     {
@@ -1366,12 +1366,12 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test insert, update and delete templates.
      *
-     * @covers ::mode
-     * @covers ::where
-     * @covers ::set
      * @covers ::_render_set
      * @covers ::_render_set_fields
      * @covers ::_render_set_values
+     * @covers ::mode
+     * @covers ::set
+     * @covers ::where
      */
     public function testInsertDeleteUpdate()
     {
@@ -1467,11 +1467,11 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test nested OR and AND expressions.
      *
-     * @covers ::where
-     * @covers ::orExpr
-     * @covers ::andExpr
-     * @covers ::_render_orwhere
      * @covers ::_render_andwhere
+     * @covers ::_render_orwhere
+     * @covers ::andExpr
+     * @covers ::orExpr
+     * @covers ::where
      */
     public function testNestedOrAnd()
     {
@@ -1533,8 +1533,8 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test [option].
      *
-     * @covers ::option
      * @covers ::_render_option
+     * @covers ::option
      */
     public function testOption()
     {
@@ -1554,11 +1554,11 @@ class QueryTest extends AtkPhpunit\TestCase
         );
         // options for specific modes
         $q = $this->q()
-                ->table('test')
-                ->field('name')
-                ->set('name', 1)
-                ->option('calc_found_rows', 'select') // for default select mode
-                ->option('ignore', 'insert') // for insert mode
+            ->table('test')
+            ->field('name')
+            ->set('name', 1)
+            ->option('calc_found_rows', 'select') // for default select mode
+            ->option('ignore', 'insert') // for insert mode
 ;
 
         $this->assertEquals(
@@ -1578,19 +1578,19 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test caseExpr (normal).
      *
-     * @covers ::caseExpr
-     * @covers ::when
-     * @covers ::otherwise
      * @covers ::_render_case
+     * @covers ::caseExpr
+     * @covers ::otherwise
+     * @covers ::when
      */
     public function testCaseExprNormal()
     {
         // Test normal form
         $s = $this->q()->caseExpr()
-                ->when(['status', 'New'], 't2.expose_new')
-                ->when(['status', 'like', '%Used%'], 't2.expose_used')
-                ->otherwise(null)
-                ->render();
+            ->when(['status', 'New'], 't2.expose_new')
+            ->when(['status', 'like', '%Used%'], 't2.expose_used')
+            ->otherwise(null)
+            ->render();
         $this->assertEquals('case when "status" = :a then :b when "status" like :c then :d else :e end', $s);
 
         // with subqueries
@@ -1598,27 +1598,27 @@ class QueryTest extends AtkPhpunit\TestCase
         $q = $this->q()->table('user')->field($age, 'calc_age');
 
         $s = $this->q()->caseExpr()
-                ->when(['age', '>', $q], 'Older')
-                ->otherwise('Younger')
-                ->render();
+            ->when(['age', '>', $q], 'Older')
+            ->otherwise('Younger')
+            ->render();
         $this->assertEquals('case when "age" > (select year(now()) - year(birth_date) "calc_age" from "user") then :a else :b end', $s);
     }
 
     /**
      * Test caseExpr (short form).
      *
-     * @covers ::caseExpr
-     * @covers ::when
-     * @covers ::otherwise
      * @covers ::_render_case
+     * @covers ::caseExpr
+     * @covers ::otherwise
+     * @covers ::when
      */
     public function testCaseExprShortForm()
     {
         $s = $this->q()->caseExpr('status')
-                ->when('New', 't2.expose_new')
-                ->when('Used', 't2.expose_used')
-                ->otherwise(null)
-                ->render();
+            ->when('New', 't2.expose_new')
+            ->when('Used', 't2.expose_used')
+            ->otherwise(null)
+            ->render();
         $this->assertEquals('case "status" when :a then :b when :c then :d else :e end', $s);
 
         // with subqueries
@@ -1626,9 +1626,9 @@ class QueryTest extends AtkPhpunit\TestCase
         $q = $this->q()->table('user')->field($age, 'calc_age');
 
         $s = $this->q()->caseExpr($q)
-                ->when(100, 'Very old')
-                ->otherwise('Younger')
-                ->render();
+            ->when(100, 'Very old')
+            ->otherwise('Younger')
+            ->render();
         $this->assertEquals('case (select year(now()) - year(birth_date) "calc_age" from "user") when :a then :b else :c end', $s);
     }
 
@@ -1753,12 +1753,12 @@ class QueryTest extends AtkPhpunit\TestCase
             ->join('i.emp')
             ->field(['name', 'salary', 'q.quoted', 'i.invoiced']);
         $this->assertEquals(
-            'with '.
-                '"q" ("emp","quoted") as (select "emp_id",sum(:a) from "quotes" group by "emp_id"),'.
-                '"i" ("emp","invoiced") as (select "emp_id",sum(:b) from "invoices" group by "emp_id") '.
-            'select "name","salary","q"."quoted","i"."invoiced" '.
-            'from "employees" '.
-                'left join "q" on "q"."emp" = "employees"."id" '.
+            'with ' .
+                '"q" ("emp","quoted") as (select "emp_id",sum(:a) from "quotes" group by "emp_id"),' .
+                '"i" ("emp","invoiced") as (select "emp_id",sum(:b) from "invoices" group by "emp_id") ' .
+            'select "name","salary","q"."quoted","i"."invoiced" ' .
+            'from "employees" ' .
+                'left join "q" on "q"."emp" = "employees"."id" ' .
                 'left join "i" on "i"."emp" = "employees"."id"',
             $q->render()
         );

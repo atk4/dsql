@@ -34,7 +34,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
      */
     protected function getDataSet()
     {
-        return $this->createFlatXMLDataSet(dirname(__FILE__).'/dataset.xml');
+        return $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset.xml');
     }
 
     private function q($table = null, $alias = null)
@@ -97,7 +97,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * But CAST(.. AS int) does not work in mysql. So we use two different tests..
          * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
          */
-        if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+        if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
             $this->assertEquals(
                 [['now' => 6]],
                 $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
@@ -123,7 +123,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
          * entire string on mysql.
          */
-        if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+        if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
             $this->assertEquals(
                 'foo',
                 $this->e('select CAST([] AS TEXT)', ['foo'])->getOne()
@@ -205,7 +205,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         // replace
-        if ('pgsql' !== $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+        if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) !== 'pgsql') {
             $this->q('employee')
                 ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->replace();
@@ -264,8 +264,8 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             // test error code
             $unknownFieldErrorCode = [
                 'sqlite' => 1,    // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
-                'mysql'  => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
-                'pgsql'  => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
+                'mysql' => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
+                'pgsql' => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
             ][$driverType];
             $this->assertSame($unknownFieldErrorCode, $e->getCode());
 

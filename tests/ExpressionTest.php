@@ -23,7 +23,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * @covers ::__construct
      * @expectedException atk4\dsql\Exception
      */
-    public function testConstructorException_1st_1()
+    public function testConstructorException1st1()
     {
         $this->e(null);
     }
@@ -34,7 +34,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * @covers ::__construct
      * @expectedException atk4\dsql\Exception
      */
-    public function testConstructorException_1st_2()
+    public function testConstructorException1st2()
     {
         $this->e(false);
     }
@@ -44,7 +44,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @expectedException atk4\dsql\Exception
      */
-    public function testConstructorException_2nd_1()
+    public function testConstructorException2nd1()
     {
         $this->e('hello, []', false);
     }
@@ -54,7 +54,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @expectedException atk4\dsql\Exception
      */
-    public function testConstructorException_2nd_2()
+    public function testConstructorException2nd2()
     {
         $this->e('hello, []', 'hello');
     }
@@ -64,7 +64,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @expectedException atk4\dsql\Exception
      */
-    public function testConstructorException_0arg()
+    public function testConstructorException0arg()
     {
         // Template is not defined for Expression
         $this->e()->render();
@@ -75,7 +75,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testConstructor_1()
+    public function testConstructor1()
     {
         $this->assertEquals(
             '',
@@ -90,7 +90,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * @covers ::__construct
      * @covers ::_escape
      */
-    public function testConstructor_2()
+    public function testConstructor2()
     {
         // pass as string
         $this->assertEquals(
@@ -124,7 +124,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testConstructor_3()
+    public function testConstructor3()
     {
         $e = $this->e('hello, [who]', ['who' => 'world']);
         $this->assertEquals('hello, :a', $e->render());
@@ -140,7 +140,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testConstructor_4()
+    public function testConstructor4()
     {
         // argument = Expression
         $this->assertEquals(
@@ -155,7 +155,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
                 '[what], [who]',
                 [
                     'what' => $this->e('hello'),
-                    'who'  => $this->e('world'),
+                    'who' => $this->e('world'),
                 ]
             )->render()
         );
@@ -170,7 +170,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
                         '[what], [who]',
                         [
                             'what' => $this->e('hello'),
-                            'who'  => $this->e('world'),
+                            'who' => $this->e('world'),
                         ]
                     ),
                 ]
@@ -429,10 +429,10 @@ class ExpressionTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * @covers ::offsetSet
      * @covers ::offsetExists
-     * @covers ::offsetUnset
      * @covers ::offsetGet
+     * @covers ::offsetSet
+     * @covers ::offsetUnset
      */
     public function testArrayAccess()
     {

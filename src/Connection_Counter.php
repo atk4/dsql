@@ -20,7 +20,7 @@ class Connection_Counter extends Connection_Proxy
      *
      * @var callable
      */
-    public $callback = null;
+    public $callback;
 
     /** @var int Count of executed selects */
     protected $selects = 0;
@@ -44,7 +44,7 @@ class Connection_Counter extends Connection_Proxy
     public function iterate($ret)
     {
         foreach ($ret as $key => $row) {
-            $this->rows++;
+            ++$this->rows;
             yield $key => $row;
         }
     }
@@ -57,12 +57,12 @@ class Connection_Counter extends Connection_Proxy
     public function execute(Expression $expr)
     {
         if ($expr instanceof Query) {
-            $this->queries++;
+            ++$this->queries;
             if ($expr->mode === 'select' || $expr->mode === null) {
-                $this->selects++;
+                ++$this->selects;
             }
         } else {
-            $this->expressions++;
+            ++$this->expressions;
         }
 
         try {

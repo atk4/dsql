@@ -18,7 +18,7 @@ class Connection_Dumper extends Connection_Proxy
      *
      * @var callable
      */
-    public $callback = null;
+    public $callback;
 
     /**
      * @var float

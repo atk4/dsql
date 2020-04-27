@@ -18,7 +18,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @var string
      */
-    protected $template = null;
+    protected $template;
 
     /**
      * Hash containing configuration accumulated by calling methods
@@ -53,7 +53,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @var string
      */
-    public $_paramBase = null;
+    public $_paramBase;
 
     /**
      * Will be populated with actual values by _param().
@@ -68,7 +68,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @var \PDO|Connection
      */
-    public $connection = null;
+    public $connection;
 
     /**
      * Specifying options to constructors will override default
@@ -88,7 +88,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             throw new Exception([
                 'Incorrect use of Expression constructor',
                 'properties' => $properties,
-                'arguments'  => $arguments,
+                'arguments' => $arguments,
             ]);
         }
 
@@ -104,7 +104,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                 throw new Exception([
                     'Expression arguments must be an array',
                     'properties' => $properties,
-                    'arguments'  => $arguments,
+                    'arguments' => $arguments,
                 ]);
             }
             $this->args['custom'] = $arguments;
@@ -112,7 +112,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
         // deal with remaining properties
         foreach ($properties as $key => $val) {
-            $this->$key = $val;
+            $this->{$key} = $val;
         }
     }
 
@@ -290,7 +290,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
         // Queries should be wrapped in parentheses in most cases
         if ($sql_code instanceof Query) {
-            $ret = '('.$ret.')';
+            $ret = '(' . $ret . ')';
         }
 
         // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
@@ -343,7 +343,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
-        return $this->escape_char.trim($value).$this->escape_char;
+        return $this->escape_char . trim($value) . $this->escape_char;
     }
 
     /**
@@ -381,7 +381,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
         // in all other cases we should escape
         $c = $this->escape_char;
 
-        return $c.str_replace($c, $c.$c, $value).$c;
+        return $c . str_replace($c, $c . $c, $value) . $c;
     }
 
     /**
@@ -400,8 +400,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             return array_map(__METHOD__, $value);
         }
 
-        $name = ':'.$this->_paramBase;
-        $this->_paramBase++;
+        $name = ':' . $this->_paramBase;
+        ++$this->_paramBase;
         $this->params[$name] = $value;
 
         return $name;
@@ -446,14 +446,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
                     // use rendering only with named tags
                 }
-                $fx = '_render_'.$identifier;
+                $fx = '_render_' . $identifier;
 
                 // [foo] will attempt to call $this->_render_foo()
 
                 if (array_key_exists($identifier, $this->args['custom'])) {
                     $value = $this->_consume($this->args['custom'][$identifier], $escaping);
                 } elseif (method_exists($this, $fx)) {
-                    $value = $this->$fx();
+                    $value = $this->{$fx}();
                 } else {
                     throw new Exception([
                         'Expression could not render tag',
@@ -461,7 +461,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                     ]);
                 }
 
-                return is_array($value) ? '('.implode(',', $value).')' : $value;
+                return is_array($value) ? '(' . implode(',', $value) . ')' : $value;
             },
             $this->template
         );
@@ -488,20 +488,20 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_numeric($val)) {
                 $d = preg_replace(
-                    '/'.$key.'([^_]|$)/',
-                    $val.'\1',
+                    '/' . $key . '([^_]|$)/',
+                    $val . '\1',
                     $d
                 );
             } elseif (is_string($val)) {
-                $d = preg_replace('/'.$key.'([^_]|$)/', "'".addslashes($val)."'\\1", $d);
+                $d = preg_replace('/' . $key . '([^_]|$)/', "'" . addslashes($val) . "'\\1", $d);
             } elseif ($val === null) {
                 $d = preg_replace(
-                    '/'.$key.'([^_]|$)/',
+                    '/' . $key . '([^_]|$)/',
                     'NULL\1',
                     $d
                 );
             } else {
-                $d = preg_replace('/'.$key.'([^_]|$)/', $val.'\\1', $d);
+                $d = preg_replace('/' . $key . '([^_]|$)/', $val . '\\1', $d);
             }
             $pp[] = $key;
         }
@@ -524,11 +524,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
     public function __debugInfo()
     {
         $arr = [
-            'R'          => false,
-            'template'   => $this->template,
-            'params'     => $this->params,
+            'R' => false,
+            'template' => $this->template,
+            'params' => $this->params,
             //            'connection' => $this->connection,
-            'args'       => $this->args,
+            'args' => $this->args,
         ];
 
         try {
@@ -581,9 +581,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                     } else {
                         throw new Exception([
                             'Incorrect param type',
-                            'key'   => $key,
+                            'key' => $key,
                             'value' => $val,
-                            'type'  => gettype($val),
+                            'type' => gettype($val),
                         ]);
                     }
 
@@ -600,7 +600,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                             'Unable to bind parameter',
                             'param' => $key,
                             'value' => $val,
-                            'type'  => $type,
+                            'type' => $type,
                         ]);
                     }
                 }
@@ -619,7 +619,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
             return $statement;
         } else {
-            /* @var $connection Connection */
+            // @var $connection Connection
             return $connection->execute($this);
         }
     }
@@ -665,7 +665,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             throw new Exception([
                 'Unable to fetch single cell of data for getOne from this query',
                 'result' => $data,
-                'query'  => $this->getDebugQuery(),
+                'query' => $this->getDebugQuery(),
             ]);
         }
         $one = array_shift($data);
