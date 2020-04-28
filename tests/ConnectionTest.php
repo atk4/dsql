@@ -110,11 +110,9 @@ class ConnectionTest extends AtkPhpunit\TestCase
         );
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testMysqlFail()
     {
+        $this->expectException(\Exception::class);
         $c = Connection::connect('mysql:host=localhost;dbname=nosuchdb');
     }
 

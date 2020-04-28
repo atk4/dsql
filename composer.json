@@ -28,9 +28,8 @@
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.16",
-    "phpunit/dbunit": ">=1.2",
     "phpunit/phpcov": "*",
-    "phpunit/phpunit": "<6"
+    "phpunit/phpunit": "*"
   },
   "suggest": {
     "jdorn/sql-formatter": "*"

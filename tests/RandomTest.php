@@ -14,11 +14,12 @@ class RandomTest extends AtkPhpunit\TestCase
         return new Query(...$args);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testMiscInsert()
     {
-        return $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        return; // not been implemented yet
         $data = [
             'id' => null,
             'system_id' => '3576',

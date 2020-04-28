@@ -3,6 +3,7 @@
 namespace atk4\dsql\tests;
 
 use atk4\core\AtkPhpunit;
+use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 use atk4\dsql\Query;
 use atk4\dsql\Query_MySQL;
@@ -197,10 +198,10 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::field
-     * @expectedException \atk4\dsql\Exception
      */
     public function testFieldException1()
     {
+        $this->expectException(Exception::class);
         $this->q()->field('name', 'a')->field('surname', 'a');
     }
 
@@ -208,10 +209,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * There shouldn't be alias when passing fields as array.
      *
      * @covers ::field
-     * @expectedException \atk4\dsql\Exception
      */
     public function testFieldException2()
     {
+        $this->expectException(Exception::class);
         $this->q()->field(['name', 'surname'], 'a');
     }
 
@@ -219,10 +220,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * There shouldn't be alias when passing multiple tables.
      *
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException1()
     {
+        $this->expectException(Exception::class);
         $this->q()->table('employee,jobs', 'u');
     }
 
@@ -230,10 +231,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * There shouldn't be alias when passing multiple tables.
      *
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException2()
     {
+        $this->expectException(Exception::class);
         $this->q()->table(['employee', 'jobs'], 'u');
     }
 
@@ -241,9 +242,12 @@ class QueryTest extends AtkPhpunit\TestCase
      * Alias is NOT mandatory when pass table as Expression.
      *
      * @covers ::table
+     *
+     * @doesNotPerformAssertions
      */
     public function testTableException3()
     {
+        //$this->expectException(Exception::class); // no more
         $this->q()->table($this->q()->expr('test'));
     }
 
@@ -251,10 +255,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * Alias is IS mandatory when pass table as Query.
      *
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException4()
     {
+        $this->expectException(Exception::class);
         $this->q()->table($this->q()->table('test'));
     }
 
@@ -263,10 +267,10 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException5()
     {
+        $this->expectException(Exception::class);
         $this->q()
             ->table('foo', 'a')
             ->table('bar', 'a');
@@ -277,10 +281,10 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException6()
     {
+        $this->expectException(Exception::class);
         $this->q()
             ->table('foo', 'bar')
             ->table('bar');
@@ -291,10 +295,10 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException7()
     {
+        $this->expectException(Exception::class);
         $this->q()
             ->table('foo')
             ->table('foo');
@@ -305,10 +309,10 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException8()
     {
+        $this->expectException(Exception::class);
         $this->q()
             ->table($this->q()->table('test'), 'foo')
             ->table('foo');
@@ -319,10 +323,10 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::_set_args
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException9()
     {
+        $this->expectException(Exception::class);
         $this->q()
             ->table('foo')
             ->table($this->q()->table('test'), 'foo');
@@ -332,10 +336,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * Table can't be set as sub-Query in Update query mode.
      *
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException10()
     {
+        $this->expectException(Exception::class);
         $this->q()
             ->mode('update')
             ->table($this->q()->table('test'), 'foo')
@@ -347,10 +351,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * Table can't be set as sub-Query in Insert query mode.
      *
      * @covers ::table
-     * @expectedException \atk4\dsql\Exception
      */
     public function testTableException11()
     {
+        $this->expectException(Exception::class);
         $this->q()
             ->mode('insert')
             ->table($this->q()->table('test'), 'foo')
@@ -362,10 +366,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * Requesting non-existant query mode should throw exception.
      *
      * @covers ::mode
-     * @expectedException \atk4\dsql\Exception
      */
     public function testModeException1()
     {
+        $this->expectException(Exception::class);
         $this->q()->mode('non_existant_mode');
     }
 
@@ -811,10 +815,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * Verify that passing garbage to where throw exception.
      *
      * @covers ::order
-     * @expectedException \atk4\dsql\Exception
      */
     public function testWhereIncompatibleObject1()
     {
+        $this->expectException(Exception::class);
         $this->q('[where]')->where('a', new \DateTime())->render();
     }
 
@@ -822,10 +826,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * Verify that passing garbage to where throw exception.
      *
      * @covers ::order
-     * @expectedException \atk4\dsql\Exception
      */
     public function testWhereIncompatibleObject2()
     {
+        $this->expectException(Exception::class);
         $this->q('[where]')->where('a', new \DateTime());
     }
 
@@ -833,10 +837,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * Verify that passing garbage to where throw exception.
      *
      * @covers ::order
-     * @expectedException \atk4\dsql\Exception
      */
     public function testWhereIncompatibleObject3()
     {
+        $this->expectException(Exception::class);
         $this->q('[where]')->where('a', '<>', new \DateTime());
     }
 
@@ -1092,10 +1096,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * If first argument is array, second argument must not be used.
      *
      * @covers ::order
-     * @expectedException \atk4\dsql\Exception
      */
     public function testOrderException1()
     {
+        $this->expectException(Exception::class);
         $this->q('[order]')->order(['name', 'surname'], 'desc');
     }
 
@@ -1157,12 +1161,11 @@ class QueryTest extends AtkPhpunit\TestCase
 
     /**
      * Test groupConcat.
-     *
-     * @expectedException \atk4\dsql\Exception
      */
     public function testGroupConcatException()
     {
         // doesn't support groupConcat by default
+        $this->expectException(Exception::class);
         $this->q()->groupConcat('foo');
     }
 
@@ -1447,10 +1450,10 @@ class QueryTest extends AtkPhpunit\TestCase
      * Value [false] is not supported by SQL.
      *
      * @covers ::set
-     * @expectedException \atk4\dsql\Exception
      */
     public function testSetException1()
     {
+        $this->expectException(Exception::class);
         $this->q()->set('name', false);
     }
 
@@ -1458,6 +1461,8 @@ class QueryTest extends AtkPhpunit\TestCase
      * Field name can be expression.
      *
      * @covers ::set
+     *
+     * @doesNotPerformAssertions
      */
     public function testSetException2()
     {
@@ -1635,23 +1640,25 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Incorrect use of "when" method parameters.
      *
-     * @expected Exception Exception
+     * @doesNotPerformAssertions
      */
     public function testCaseExprException1()
     {
+        //$this->expectException(Exception::class);
         $this->q()->caseExpr()
-            ->when(['status'], 't2.expose_new');
+            ->when(['status'], 't2.expose_new')
+            ->render();
     }
 
     /**
      * When using short form CASE statement, then you should not set array as when() method 1st parameter.
-     *
-     * @expected Exception Exception
      */
     public function testCaseExprException2()
     {
+        $this->expectException(Exception::class);
         $this->q()->caseExpr('status')
-            ->when(['status', 'New'], 't2.expose_new');
+            ->when(['status', 'New'], 't2.expose_new')
+            ->render();
     }
 
     /**
