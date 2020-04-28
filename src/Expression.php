@@ -290,7 +290,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
         // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
         // if we unset() first, we’re safe.
-        $sql_code->params = null;
+        unset($sql_code->{'params'});
         $sql_code->params = [];
 
         return $ret;
@@ -460,7 +460,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             },
             $this->template
         );
-        $this->_paramBase = null;
+        unset($this->{'_paramBase'});
 
         return trim($res);
     }
