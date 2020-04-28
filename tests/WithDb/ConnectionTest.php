@@ -17,8 +17,6 @@ class ConnectionTest extends AtkPhpunit\TestCase
     public function testServerConnection()
     {
         $c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
-        $pdo = $c->connection();
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         return (string) $c->expr("SELECT date('now')")->getOne();
     }

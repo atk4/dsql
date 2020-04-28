@@ -160,7 +160,7 @@ class Connection
         switch ($dsn['driverType']) {
             case 'mysql':
                 $c = new static(array_merge([
-                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]),
                     'expression_class' => Expression_MySQL::class,
                     'query_class' => Query_MySQL::class,
                     'driverType' => $dsn['driverType'],
@@ -169,7 +169,7 @@ class Connection
                 break;
             case 'sqlite':
                 $c = new static(array_merge([
-                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]),
                     'query_class' => Query_SQLite::class,
                     'driverType' => $dsn['driverType'],
                 ], $args));
@@ -177,7 +177,7 @@ class Connection
                 break;
             case 'oci':
                 $c = new Connection_Oracle(array_merge([
-                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]),
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
@@ -185,14 +185,14 @@ class Connection
             case 'oci12':
                 $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
                 $c = new Connection_Oracle12(array_merge([
-                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]),
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
                 break;
             case 'pgsql':
                 $c = new Connection_PgSQL(array_merge([
-                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']),
+                    'connection' => new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]),
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
@@ -212,7 +212,7 @@ class Connection
             // let PDO handle the rest
             default:
                 $c = new static(array_merge([
-                    'connection' => static::connect(new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'])),
+                    'connection' => static::connect(new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION])),
                 ], $args));
         }
 
