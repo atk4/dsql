@@ -4,9 +4,6 @@ namespace atk4\dsql;
 
 /**
  * Perform query operation on Oracle server.
- *
- * @license MIT
- * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Query_Oracle extends Query_Oracle_Abstract
 {

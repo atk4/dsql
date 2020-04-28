@@ -4,9 +4,6 @@ namespace atk4\dsql;
 
 /**
  * Perform query operation on PostgreSQL server.
- *
- * @license MIT
- * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Query_PgSQL extends Query
 {

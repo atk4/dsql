@@ -4,9 +4,6 @@ namespace atk4\dsql;
 
 /**
  * Class for establishing and maintaining connection with your database.
- *
- * @license MIT
- * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Connection
 {

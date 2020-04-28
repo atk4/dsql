@@ -2,10 +2,6 @@
 
 namespace atk4\dsql;
 
-/**
- * @license MIT
- * @copyright Agile Toolkit (c) http://agiletoolkit.org/
- */
 class Connection_Counter extends Connection_Proxy
 {
     /**

@@ -5,11 +5,6 @@ namespace atk4\dsql;
 /**
  * Creates new expression. Optionally specify a string - a piece
  * of SQL code that will become expression template and arguments.
- *
- * See below for call patterns
- *
- * @license MIT
- * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 {
