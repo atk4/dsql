@@ -29,7 +29,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testConstruct()
     {
         // passing properties in constructor
-        $this->assertEquals(
+        $this->assertSame(
             '"q"',
             $this->callProtected($this->q(), '_escape', ['q'])
         );
@@ -54,7 +54,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testFieldReturnValue()
     {
         $q = $this->q();
-        $this->assertEquals($q, $q->field('first_name'));
+        $this->assertSame($q, $q->field('first_name'));
     }
 
     /**
@@ -65,55 +65,55 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testFieldBasic()
     {
-        $this->assertEquals(
+        $this->assertSame(
             '"first_name"',
             $this->callProtected($this->q()->field('first_name'), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"first_name","last_name"',
             $this->callProtected($this->q()->field('first_name,last_name'), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"first_name","last_name"',
             $this->callProtected($this->q()->field('first_name')->field('last_name'), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"last_name"',
             $this->callProtected($this->q()->field('first_name')->reset('field')->field('last_name'), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '*',
             $this->callProtected($this->q()->field('first_name')->reset('field'), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '*',
             $this->callProtected($this->q()->field('first_name')->reset(), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"employee"."first_name"',
             $this->callProtected($this->q()->field('employee.first_name'), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"first_name" "name"',
             $this->callProtected($this->q()->field('first_name', 'name'), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"first_name" "name"',
             $this->callProtected($this->q()->field(['name' => 'first_name']), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"name"',
             $this->callProtected($this->q()->field(['name' => 'name']), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"employee"."first_name" "name"',
             $this->callProtected($this->q()->field(['name' => 'employee.first_name']), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '*',
             $this->callProtected($this->q()->field('*'), '_render_field')
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"employee"."first_name"',
             $this->callProtected($this->q()->field('employee.first_name'), '_render_field')
         );
@@ -128,22 +128,22 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testFieldDefaultField()
     {
         // default defaultField
-        $this->assertEquals(
+        $this->assertSame(
             '*',
             $this->callProtected($this->q(), '_render_field')
         );
         // defaultField as custom string - not escaped
-        $this->assertEquals(
+        $this->assertSame(
             'id',
             $this->callProtected($this->q(['defaultField' => 'id']), '_render_field')
         );
         // defaultField as custom string with dot - not escaped
-        $this->assertEquals(
+        $this->assertSame(
             'all.values',
             $this->callProtected($this->q(['defaultField' => 'all.values']), '_render_field')
         );
         // defaultField as Expression object - not escaped
-        $this->assertEquals(
+        $this->assertSame(
             'values()',
             $this->callProtected($this->q(['defaultField' => new Expression('values()')]), '_render_field')
         );
@@ -157,36 +157,36 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testFieldExpression()
     {
-        $this->assertEquals(
+        $this->assertSame(
             '"name"',
             $this->q('[field]')->field('name')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"first name"',
             $this->q('[field]')->field('first name')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"first"."name"',
             $this->q('[field]')->field('first.name')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'now()',
             $this->q('[field]')->field('now()')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'now()',
             $this->q('[field]')->field(new Expression('now()'))->render()
         );
         // Usage of field aliases
-        $this->assertEquals(
+        $this->assertSame(
             'now() "time"',
             $this->q('[field]')->field('now()', 'time')->render()
         );
-        $this->assertEquals(// alias can be passed as 2nd argument
+        $this->assertSame(// alias can be passed as 2nd argument
             'now() "time"',
             $this->q('[field]')->field(new Expression('now()'), 'time')->render()
         );
-        $this->assertEquals(// alias can be passed as 3nd argument
+        $this->assertSame(// alias can be passed as 3nd argument
             'now() "time"',
             $this->q('[field]')->field(['time' => new Expression('now()')])->render()
         );
@@ -377,7 +377,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testTableReturnValue()
     {
         $q = $this->q();
-        $this->assertEquals($q, $q->table('employee'));
+        $this->assertSame($q, $q->table('employee'));
     }
 
     /**
@@ -388,7 +388,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testTableRender1()
     {
         // no table defined
-        $this->assertEquals(
+        $this->assertSame(
             'select now()',
             $this->q()
                 ->field(new Expression('now()'))
@@ -396,45 +396,45 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         // one table
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee"',
             $this->q()
                 ->field('name')->table('employee')
                 ->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'select "na#me" from "employee"',
             $this->q()
                 ->field('"na#me"')->table('employee')
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "na""me" from "employee"',
             $this->q()
                 ->field(new Expression('{}', ['na"me']))->table('employee')
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "жук" from "employee"',
             $this->q()
                 ->field(new Expression('{}', ['жук']))->table('employee')
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "this is 💩" from "employee"',
             $this->q()
                 ->field(new Expression('{}', ['this is 💩']))->table('employee')
                 ->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee" "e"',
             $this->q()
                 ->field('name')->table('employee', 'e')
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select * from "employee" "e"',
             $this->q()
                 ->table('employee', 'e')
@@ -442,31 +442,31 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         // multiple tables
-        $this->assertEquals(
+        $this->assertSame(
             'select "employee"."name" from "employee","jobs"',
             $this->q()
                 ->field('employee.name')->table('employee')->table('jobs')
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee","jobs"',
             $this->q()
                 ->field('name')->table('employee,jobs')
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee","jobs"',
             $this->q()
                 ->field('name')->table('  employee ,   jobs  ')
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee","jobs"',
             $this->q()
                 ->field('name')->table(['employee', 'jobs'])
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee","jobs"',
             $this->q()
                 ->field('name')->table(['employee  ', '  jobs'])
@@ -474,27 +474,27 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         // multiple tables with aliases
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee","jobs" "j"',
             $this->q()
                 ->field('name')->table(['employee', 'j' => 'jobs'])
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee" "e","jobs" "j"',
             $this->q()
                 ->field('name')->table(['e' => 'employee', 'j' => 'jobs'])
                 ->render()
         );
         // testing _render_table_noalias, shouldn't render table alias 'emp'
-        $this->assertEquals(
+        $this->assertSame(
             'insert into "employee" ("name") values (:a)',
             $this->q()
                 ->field('name')->table('employee', 'emp')->set('name', 1)
                 ->mode('insert')
                 ->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'update "employee" set "name"=:a',
             $this->q()
                 ->field('name')->table('employee', 'emp')->set('name', 1)
@@ -512,14 +512,14 @@ class QueryTest extends AtkPhpunit\TestCase
         // pass table as expression or query
         $q = $this->q()->table('employee');
 
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from (select * from "employee") "e"',
             $this->q()
                 ->field('name')->table($q, 'e')
                 ->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "myt""able"',
             $this->q()
                 ->field('name')->table(new Expression('{}', ['myt"able']))
@@ -530,7 +530,7 @@ class QueryTest extends AtkPhpunit\TestCase
         $q1 = $this->q()->table('employee');
         $q2 = $this->q()->table('customer');
 
-        $this->assertEquals(
+        $this->assertSame(
             //this way it would be more correct: 'select "e"."name","c"."name" from (select * from "employee") "e",(select * from "customer") "c" where "e"."last_name" = "c"."last_name"',
             'select "e"."name","c"."name" from (select * from "employee") "e",(select * from "customer") "c" where "e"."last_name" = c.last_name',
             $this->q()
@@ -556,7 +556,7 @@ class QueryTest extends AtkPhpunit\TestCase
 
         $q = $this->q()->table('user')->field($age, 'calculated_age');
 
-        $this->assertEquals(
+        $this->assertSame(
             'select coalesce(year(now()) - year(birth_date), :a) "calculated_age" from "user"',
             $q->render()
         );
@@ -575,7 +575,7 @@ class QueryTest extends AtkPhpunit\TestCase
 
         $q = $this->q()->table('user')->field($age, 'calculated_age');
 
-        $this->assertEquals(
+        $this->assertSame(
             "select coalesce(year(now()) - year(birth_date), 18, 'foo', NULL) \"calculated_age\" from \"user\"",
             strip_tags($q->getDebugQuery())
         );
@@ -646,7 +646,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->field('amount', 'debit')
             ->field($this->q()->expr('0'), 'credit') // simply 0
 ;
-        $this->assertEquals(
+        $this->assertSame(
             'select "date","amount" "debit",0 "credit" from "sales"',
             $q1->render()
         );
@@ -657,14 +657,14 @@ class QueryTest extends AtkPhpunit\TestCase
             ->field('date')
             ->field($this->q()->expr('0'), 'debit') // simply 0
             ->field('amount', 'credit');
-        $this->assertEquals(
+        $this->assertSame(
             'select "date",0 "debit","amount" "credit" from "purchases"',
             $q2->render()
         );
 
         // $q1 union $q2
         $u = new Expression('[] union []', [$q1, $q2]);
-        $this->assertEquals(
+        $this->assertSame(
             '(select "date","amount" "debit",0 "credit" from "sales") union (select "date",0 "debit","amount" "credit" from "purchases")',
             $u->render()
         );
@@ -693,7 +693,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testWhereReturnValue()
     {
         $q = $this->q();
-        $this->assertEquals($q, $q->where('id', 1));
+        $this->assertSame($q, $q->where('id', 1));
     }
 
     /**
@@ -704,7 +704,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testHavingReturnValue()
     {
         $q = $this->q();
-        $this->assertEquals($q, $q->having('id', 1));
+        $this->assertSame($q, $q->having('id', 1));
     }
 
     /**
@@ -717,91 +717,91 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testWhereBasic()
     {
         // one parameter as a string - treat as expression
-        $this->assertEquals(
+        $this->assertSame(
             'where now()',
             $this->q('[where]')->where('now()')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where foo >=    bar',
             $this->q('[where]')->where('foo >=    bar')->render()
         );
 
         // two parameters - field, value
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" = :a',
             $this->q('[where]')->where('id', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "user"."id" = :a',
             $this->q('[where]')->where('user.id', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "db"."user"."id" = :a',
             $this->q('[where]')->where('db.user.id', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is :a',
             $this->q('[where]')->where('id', null)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is :a',
             $this->q('[where]')->where('id', null)->render()
         );
 
         // three parameters - field, condition, value
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" > :a',
             $this->q('[where]')->where('id', '>', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" < :a',
             $this->q('[where]')->where('id', '<', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" = :a',
             $this->q('[where]')->where('id', '=', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" in (:a,:b)',
             $this->q('[where]')->where('id', '=', [1, 2])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" in (:a,:b)',
             $this->q('[where]')->where('id', [1, 2])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" in (select * from "user")',
             $this->q('[where]')->where('id', $this->q()->table('user'))->render()
         );
 
         // two parameters - more_than_just_a_field, value
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" = :a',
             $this->q('[where]')->where('id=', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" != :a',
             $this->q('[where]')->where('id!=', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" <> :a',
             $this->q('[where]')->where('id<>', 1)->render()
         );
 
         // field name with special symbols - not escape
-        $this->assertEquals(
+        $this->assertSame(
             'where now() = :a',
             $this->q('[where]')->where('now()', 1)->render()
         );
 
         // field name as expression
-        $this->assertEquals(
+        $this->assertSame(
             'where now = :a',
             $this->q('[where]')->where(new Expression('now'), 1)->render()
         );
 
         // more than one where condition - join with AND keyword
-        $this->assertEquals(
+        $this->assertSame(
             'where "a" = :a and "b" is :b',
             $this->q('[where]')->where('a', 1)->where('b', null)->render()
         );
@@ -850,114 +850,114 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testWhereSpecialValues()
     {
         // in | not in
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" in (:a,:b)',
             $this->q('[where]')->where('id', 'in', [1, 2])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id', 'not in', [1, 2])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id', 'not', [1, 2])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" in (:a,:b)',
             $this->q('[where]')->where('id', '=', [1, 2])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id', '<>', [1, 2])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id', '!=', [1, 2])->render()
         );
         // speacial treatment for empty array values
-        $this->assertEquals(
+        $this->assertSame(
             'where "id"<>"id"',
             $this->q('[where]')->where('id', '=', [])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where ("id"="id" or "id" is null)',
             $this->q('[where]')->where('id', '<>', [])->render()
         );
         // pass array as CSV
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" in (:a,:b)',
             $this->q('[where]')->where('id', 'in', '1,2')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id', 'not in', '1,    2')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id', 'not', '1,2')->render()
         );
 
         // is | is not
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is :a',
             $this->q('[where]')->where('id', 'is', null)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is not :a',
             $this->q('[where]')->where('id', 'is not', null)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is not :a',
             $this->q('[where]')->where('id', 'not', null)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is :a',
             $this->q('[where]')->where('id', '=', null)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is not :a',
             $this->q('[where]')->where('id', '<>', null)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is not :a',
             $this->q('[where]')->where('id', '!=', null)->render()
         );
 
         // like | not like
-        $this->assertEquals(
+        $this->assertSame(
             'where "name" like :a',
             $this->q('[where]')->where('name', 'like', 'foo')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "name" not like :a',
             $this->q('[where]')->where('name', 'not like', 'foo')->render()
         );
 
         // two parameters - more_than_just_a_field, value
         // is | is not
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is :a',
             $this->q('[where]')->where('id=', null)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is not :a',
             $this->q('[where]')->where('id!=', null)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" is not :a',
             $this->q('[where]')->where('id<>', null)->render()
         );
 
         // in | not in
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" in (:a,:b)',
             $this->q('[where]')->where('id=', [1, 2])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id!=', [1, 2])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" not in (:a,:b)',
             $this->q('[where]')->where('id<>', [1, 2])->render()
         );
@@ -971,15 +971,15 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testBasicHaving()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'having "id" = :a',
             $this->q('[having]')->having('id', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'having "id" > :a',
             $this->q('[having]')->having('id', '>', 1)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'where "id" = :a having "id" > :b',
             $this->q('[where][having]')->where('id', 1)->having('id>', 1)->render()
         );
@@ -993,11 +993,11 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testLimit()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'limit 0, 100',
             $this->q('[limit]')->limit(100)->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'limit 200, 100',
             $this->q('[limit]')->limit(100, 200)->render()
         );
@@ -1011,78 +1011,78 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testOrder()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'order by "name"',
             $this->q('[order]')->order('name')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "name", "surname"',
             $this->q('[order]')->order('name,surname')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "name" desc, "surname" desc',
             $this->q('[order]')->order('name desc,surname desc')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "name" desc, "surname"',
             $this->q('[order]')->order(['name desc', 'surname'])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "name" desc, "surname"',
             $this->q('[order]')->order('surname')->order('name desc')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "name" desc, "surname"',
             $this->q('[order]')->order('surname', false)->order('name', true)->render()
         );
         // table name|alias included
-        $this->assertEquals(
+        $this->assertSame(
             'order by "users"."name"',
             $this->q('[order]')->order('users.name')->render()
         );
         // strange field names
-        $this->assertEquals(
+        $this->assertSame(
             'order by "my name" desc',
             $this->q('[order]')->order('"my name" desc')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "жук"',
             $this->q('[order]')->order('жук asc')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "this is 💩"',
             $this->q('[order]')->order('this is 💩')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "this is жук" desc',
             $this->q('[order]')->order('this is жук desc')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by * desc',
             $this->q('[order]')->order(['* desc'])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "{}" desc',
             $this->q('[order]')->order(['{} desc'])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "* desc"',
             $this->q('[order]')->order(new Expression('"* desc"'))->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "* desc"',
             $this->q('[order]')->order($this->q()->escape('* desc'))->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "* desc {}"',
             $this->q('[order]')->order($this->q()->escape('* desc {}'))->render()
         );
         // custom sort order
-        $this->assertEquals(
+        $this->assertSame(
             'order by "name" desc nulls last',
             $this->q('[order]')->order('name', 'desc nulls last')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'order by "name" nulls last',
             $this->q('[order]')->order('name', 'nulls last')->render()
         );
@@ -1107,49 +1107,49 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testGroup()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'group by "gender"',
             $this->q('[group]')->group('gender')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'group by "gender", "age"',
             $this->q('[group]')->group('gender,age')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'group by "gender", "age"',
             $this->q('[group]')->group(['gender', 'age'])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'group by "gender", "age"',
             $this->q('[group]')->group('gender')->group('age')->render()
         );
         // table name|alias included
-        $this->assertEquals(
+        $this->assertSame(
             'group by "users"."gender"',
             $this->q('[group]')->group('users.gender')->render()
         );
         // strange field names
-        $this->assertEquals(
+        $this->assertSame(
             'group by "my name"',
             $this->q('[group]')->group('"my name"')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'group by "жук"',
             $this->q('[group]')->group('жук')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'group by "this is 💩"',
             $this->q('[group]')->group('this is 💩')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'group by "this is жук"',
             $this->q('[group]')->group('this is жук')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'group by date_format(dat, "%Y")',
             $this->q('[group]')->group(new Expression('date_format(dat, "%Y")'))->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'group by date_format(dat, "%Y")',
             $this->q('[group]')->group('date_format(dat, "%Y")')->render()
         );
@@ -1174,19 +1174,19 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testGroupConcat()
     {
         $q = new Query_MySQL();
-        $this->assertEquals('group_concat(`foo` separator :a)', $q->groupConcat('foo', '-')->render());
+        $this->assertSame('group_concat(`foo` separator :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Query_Oracle();
-        $this->assertEquals('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
+        $this->assertSame('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Query_Oracle12c();
-        $this->assertEquals('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
+        $this->assertSame('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Query_PgSQL();
-        $this->assertEquals('string_agg("foo", :a)', $q->groupConcat('foo', '-')->render());
+        $this->assertSame('string_agg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Query_SQLite();
-        $this->assertEquals('group_concat("foo", :a)', $q->groupConcat('foo', '-')->render());
+        $this->assertSame('group_concat("foo", :a)', $q->groupConcat('foo', '-')->render());
     }
 
     /**
@@ -1196,10 +1196,10 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testExpr()
     {
-        $this->assertEquals(Expression::class, get_class($this->q()->expr('foo')));
+        $this->assertSame(Expression::class, get_class($this->q()->expr('foo')));
 
         $q = new Query_MySQL();
-        $this->assertEquals(\atk4\dsql\Expression_MySQL::class, get_class($q->expr('foo')));
+        $this->assertSame(\atk4\dsql\Expression_MySQL::class, get_class($q->expr('foo')));
     }
 
     /**
@@ -1210,43 +1210,43 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testJoin()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" on "address"."id" = "address_id"',
             $this->q('[join]')->join('address')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" as "a" on "a"."id" = "address_id"',
             $this->q('[join]')->join('address a')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" as "a" on "a"."id" = "user"."address_id"',
             $this->q('[join]')->table('user')->join('address a')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" as "a" on "a"."id" = "user"."my_address_id"',
             $this->q('[join]')->table('user')->join('address a', 'my_address_id')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" as "a" on "a"."id" = "u"."address_id"',
             $this->q('[join]')->table('user', 'u')->join('address a')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" as "a" on "a"."user_id" = "u"."id"',
             $this->q('[join]')->table('user', 'u')->join('address.user_id a')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
             'left join "bank" as "b" on "b"."id" = "u"."bank_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a' => 'address.user_id', 'b' => 'bank'])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" on "address"."user_id" = "u"."id" ' .
             'left join "bank" on "bank"."id" = "u"."bank_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['address.user_id', 'bank'])->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
             'left join "bank" as "b" on "b"."id" = "u"."bank_id" ' .
             'left join "bank_details" on "bank_details"."id" = "bank"."details_id"',
@@ -1255,7 +1255,7 @@ class QueryTest extends AtkPhpunit\TestCase
                 ->join('bank_details', 'bank.details_id')->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'left join "address" as "a" on a.name like u.pattern',
             $this->q('[join]')->table('user', 'u')
                 ->join('address a', new Expression('a.name like u.pattern'))->render()
@@ -1271,14 +1271,14 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testCombinedWhere()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee" where "a" = :a',
             $this->q()
                 ->field('name')->table('employee')->where('a', 1)
                 ->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee" where "employee"."a" = :a',
             $this->q()
                 ->field('name')->table('employee')->where('employee.a', 1)
@@ -1294,7 +1294,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
          */
 
-        $this->assertEquals(
+        $this->assertSame(
             'delete from "employee" where "employee"."a" = :a',
             $this->q()
                 ->mode('delete')
@@ -1304,7 +1304,7 @@ class QueryTest extends AtkPhpunit\TestCase
 
         $user_ids = $this->q()->table('expired_users')->field('user_id');
 
-        $this->assertEquals(
+        $this->assertSame(
             'update "user" set "active"=:a  where "id" in (select "user_id" from "expired_users")',
             $this->q()
                 ->table('user')
@@ -1325,14 +1325,14 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testOrWhere()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee" where ("a" = :a or "b" = :b)',
             $this->q()
                 ->field('name')->table('employee')->where([['a', 1], ['b', 1]])
                 ->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee" where ("a" = :a or a=b)',
             $this->q()
                 ->field('name')->table('employee')->where([['a', 1], 'a=b'])
@@ -1352,12 +1352,12 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testEmptyOrAndWhere()
     {
-        $this->assertEquals(
+        $this->assertSame(
             '',
             $this->q()->orExpr()->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '',
             $this->q()->andExpr()->render()
         );
@@ -1376,7 +1376,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testInsertDeleteUpdate()
     {
         // delete template
-        $this->assertEquals(
+        $this->assertSame(
             'delete from "employee" where "name" = :a',
             $this->q()
                 ->field('name')->table('employee')->where('name', 1)
@@ -1385,7 +1385,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         // update template
-        $this->assertEquals(
+        $this->assertSame(
             'update "employee" set "name"=:a',
             $this->q()
                 ->field('name')->table('employee')->set('name', 1)
@@ -1393,7 +1393,7 @@ class QueryTest extends AtkPhpunit\TestCase
                 ->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'update "employee" set "name"="name"+1',
             $this->q()
                 ->field('name')->table('employee')->set('name', new Expression('"name"+1'))
@@ -1402,7 +1402,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         // insert template
-        $this->assertEquals(
+        $this->assertSame(
             'insert into "employee" ("name") values (:a)',
             $this->q()
                 ->field('name')->table('employee')->set('name', 1)
@@ -1411,7 +1411,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         // set multiple fields
-        $this->assertEquals(
+        $this->assertSame(
             'insert into "employee" ("time","name") values (now(),:a)',
             $this->q()
                 ->field('time')->field('name')->table('employee')
@@ -1422,7 +1422,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         // set as array
-        $this->assertEquals(
+        $this->assertSame(
             'insert into "employee" ("time","name") values (now(),:a)',
             $this->q()
                 ->field('time')->field('name')->table('employee')
@@ -1440,7 +1440,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testSetReturnValue()
     {
         $q = $this->q();
-        $this->assertEquals($q, $q->set('id', 1));
+        $this->assertSame($q, $q->set('id', 1));
     }
 
     /**
@@ -1484,7 +1484,7 @@ class QueryTest extends AtkPhpunit\TestCase
                 ->where('a', 1)
                 ->where('b', 1)
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee" where ("a" = :a or "b" = :b)',
             $q->render()
         );
@@ -1503,7 +1503,7 @@ class QueryTest extends AtkPhpunit\TestCase
                         ->where('false')
                 )
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "employee" where ("a" = :a or "b" = :b or (true and false))',
             $q->render()
         );
@@ -1519,7 +1519,7 @@ class QueryTest extends AtkPhpunit\TestCase
         // reset everything
         $q = $this->q()->table('user')->where('name', 'John');
         $q->reset();
-        $this->assertEquals('select *', $q->render());
+        $this->assertSame('select *', $q->render());
 
         // reset particular tag
         $q = $this->q()
@@ -1527,7 +1527,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->where('name', 'John')
             ->reset('where')
             ->where('surname', 'Doe');
-        $this->assertEquals('select * from "user" where "surname" = :a', $q->render());
+        $this->assertSame('select * from "user" where "surname" = :a', $q->render());
     }
 
     /**
@@ -1539,16 +1539,16 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testOption()
     {
         // single option
-        $this->assertEquals(
+        $this->assertSame(
             'select calc_found_rows * from "test"',
             $this->q()->table('test')->option('calc_found_rows')->render()
         );
         // multiple options
-        $this->assertEquals(
+        $this->assertSame(
             'select calc_found_rows ignore * from "test"',
             $this->q()->table('test')->option('calc_found_rows,ignore')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'select calc_found_rows ignore * from "test"',
             $this->q()->table('test')->option(['calc_found_rows', 'ignore'])->render()
         );
@@ -1561,15 +1561,15 @@ class QueryTest extends AtkPhpunit\TestCase
             ->option('ignore', 'insert') // for insert mode
 ;
 
-        $this->assertEquals(
+        $this->assertSame(
             'select calc_found_rows "name" from "test"',
             $q->mode('select')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'insert ignore into "test" ("name") values (:a)',
             $q->mode('insert')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             'update "test" set "name"=:a',
             $q->mode('update')->render()
         );
@@ -1591,7 +1591,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->when(['status', 'like', '%Used%'], 't2.expose_used')
             ->otherwise(null)
             ->render();
-        $this->assertEquals('case when "status" = :a then :b when "status" like :c then :d else :e end', $s);
+        $this->assertSame('case when "status" = :a then :b when "status" like :c then :d else :e end', $s);
 
         // with subqueries
         $age = new Expression('year(now()) - year(birth_date)');
@@ -1601,7 +1601,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->when(['age', '>', $q], 'Older')
             ->otherwise('Younger')
             ->render();
-        $this->assertEquals('case when "age" > (select year(now()) - year(birth_date) "calc_age" from "user") then :a else :b end', $s);
+        $this->assertSame('case when "age" > (select year(now()) - year(birth_date) "calc_age" from "user") then :a else :b end', $s);
     }
 
     /**
@@ -1619,7 +1619,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->when('Used', 't2.expose_used')
             ->otherwise(null)
             ->render();
-        $this->assertEquals('case "status" when :a then :b when :c then :d else :e end', $s);
+        $this->assertSame('case "status" when :a then :b when :c then :d else :e end', $s);
 
         // with subqueries
         $age = new Expression('year(now()) - year(birth_date)');
@@ -1629,7 +1629,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->when(100, 'Very old')
             ->otherwise('Younger')
             ->render();
-        $this->assertEquals('case (select year(now()) - year(birth_date) "calc_age" from "user") when :a then :b else :c end', $s);
+        $this->assertSame('case (select year(now()) - year(birth_date) "calc_age" from "user") when :a then :b else :c end', $s);
     }
 
     /**
@@ -1661,7 +1661,7 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testExprNow()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'update "employee" set "hired"=current_timestamp()',
             $this->q()
                 ->field('hired')->table('employee')->set('hired', $this->q()->exprNow())
@@ -1669,7 +1669,7 @@ class QueryTest extends AtkPhpunit\TestCase
                 ->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'update "employee" set "hired"=current_timestamp(:a)',
             $this->q()
                 ->field('hired')->table('employee')->set('hired', $this->q()->exprNow(2))
@@ -1684,25 +1684,25 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testTableNameDot1()
     {
         // render table
-        $this->assertEquals(
+        $this->assertSame(
             '"foo"."bar"',
             $this->callProtected($this->q()->table('foo.bar'), '_render_table')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '"foo"."bar" "a"',
             $this->callProtected($this->q()->table('foo.bar', 'a'), '_render_table')
         );
 
         // where clause
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "db1"."employee" where "a" = :a',
             $this->q()
                 ->field('name')->table('db1.employee')->where('a', 1)
                 ->render()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'select "name" from "db1"."employee" where "db1"."employee"."a" = :a',
             $this->q()
                 ->field('name')->table('db1.employee')->where('db1.employee.a', 1)
@@ -1720,19 +1720,19 @@ class QueryTest extends AtkPhpunit\TestCase
         $q2 = $this->q()
             ->with($q1, 'q1')
             ->table('q1');
-        $this->assertEquals('with "q1" as (select "salary" from "salaries") select * from "q1"', $q2->render());
+        $this->assertSame('with "q1" as (select "salary" from "salaries") select * from "q1"', $q2->render());
 
         $q2 = $this->q()
             ->with($q1, 'q1', null, true)
             ->table('q1');
-        $this->assertEquals('with recursive "q1" as (select "salary" from "salaries") select * from "q1"', $q2->render());
+        $this->assertSame('with recursive "q1" as (select "salary" from "salaries") select * from "q1"', $q2->render());
 
         $q2 = $this->q()
             ->with($q1, 'q11', ['foo', 'qwe"ry'])
             ->with($q1, 'q12', ['bar', 'baz'], true) // this one is recursive
             ->table('q11')
             ->table('q12');
-        $this->assertEquals('with recursive "q11" ("foo","qwe""ry") as (select "salary" from "salaries"),"q12" ("bar","baz") as (select "salary" from "salaries") select * from "q11","q12"', $q2->render());
+        $this->assertSame('with recursive "q11" ("foo","qwe""ry") as (select "salary" from "salaries"),"q12" ("bar","baz") as (select "salary" from "salaries") select * from "q11","q12"', $q2->render());
 
         // now test some more useful reql life query
         $quotes = $this->q()
@@ -1752,7 +1752,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->join('q.emp')
             ->join('i.emp')
             ->field(['name', 'salary', 'q.quoted', 'i.invoiced']);
-        $this->assertEquals(
+        $this->assertSame(
             'with ' .
                 '"q" ("emp","quoted") as (select "emp_id",sum(:a) from "quotes" group by "emp_id"),' .
                 '"i" ("emp","invoiced") as (select "emp_id",sum(:b) from "invoices" group by "emp_id") ' .

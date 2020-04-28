@@ -25,7 +25,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
         foreach ($c->expr('abrakadabra') as $row) {
             ++$test;
         }
-        $this->assertEquals(10, $test);
+        $this->assertSame(10, $test);
     }
 }
 

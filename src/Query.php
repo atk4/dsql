@@ -790,19 +790,19 @@ class Query extends Expression
         if ($value === null) {
             if ($cond === '=') {
                 $cond = 'is';
-            } elseif (in_array($cond, ['!=', '<>', 'not'])) {
+            } elseif (in_array($cond, ['!=', '<>', 'not'], true)) {
                 $cond = 'is not';
             }
         }
 
         // value should be array for such conditions
-        if (in_array($cond, ['in', 'not in', 'not']) && is_string($value)) {
+        if (in_array($cond, ['in', 'not in', 'not'], true) && is_string($value)) {
             $value = array_map('trim', explode(',', $value));
         }
 
         // special conditions (IN | NOT IN) if value is array
         if (is_array($value)) {
-            $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
+            $cond = in_array($cond, ['!=', '<>', 'not', 'not in'], true) ? 'not in' : 'in';
 
             // special treatment of empty array condition
             if (empty($value)) {
@@ -1235,7 +1235,7 @@ class Query extends Expression
         if ($desc === null && is_string($order) && strpos($order, ' ') !== false) {
             $_chunks = explode(' ', $order);
             $_desc = strtolower(array_pop($_chunks));
-            if (in_array($_desc, ['desc', 'asc'])) {
+            if (in_array($_desc, ['desc', 'asc'], true)) {
                 $order = implode(' ', $_chunks);
                 $desc = $_desc;
             }

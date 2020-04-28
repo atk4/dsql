@@ -77,7 +77,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      */
     public function testConstructor1()
     {
-        $this->assertEquals(
+        $this->assertSame(
             '',
             $this->e('')->render()
         );
@@ -93,27 +93,27 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testConstructor2()
     {
         // pass as string
-        $this->assertEquals(
+        $this->assertSame(
             'now()',
             $this->e('now()')->render()
         );
         // pass as array without key
-        $this->assertEquals(
+        $this->assertSame(
             'now()',
             $this->e(['now()'])->render()
         );
         // pass as array with template key
-        $this->assertEquals(
+        $this->assertSame(
             'now()',
             $this->e(['template' => 'now()'])->render()
         );
         // pass as array without key
-        $this->assertEquals(
+        $this->assertSame(
             ':a Name',
             $this->e(['[] Name'], ['First'])->render()
         );
         // pass as array with template key
-        $this->assertEquals(
+        $this->assertSame(
             ':a Name',
             $this->e(['template' => '[] Name'], ['Last'])->render()
         );
@@ -127,12 +127,12 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testConstructor3()
     {
         $e = $this->e('hello, [who]', ['who' => 'world']);
-        $this->assertEquals('hello, :a', $e->render());
-        $this->assertEquals('world', $e->params[':a']);
+        $this->assertSame('hello, :a', $e->render());
+        $this->assertSame('world', $e->params[':a']);
 
         $e = $this->e('hello, {who}', ['who' => 'world']);
-        $this->assertEquals('hello, "world"', $e->render());
-        $this->assertEquals([], $e->params);
+        $this->assertSame('hello, "world"', $e->render());
+        $this->assertSame([], $e->params);
     }
 
     /**
@@ -143,13 +143,13 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testConstructor4()
     {
         // argument = Expression
-        $this->assertEquals(
+        $this->assertSame(
             'hello, world',
             $this->e('hello, [who]', ['who' => $this->e('world')])->render()
         );
 
         // multiple arguments = Expression
-        $this->assertEquals(
+        $this->assertSame(
             'hello, world',
             $this->e(
                 '[what], [who]',
@@ -161,7 +161,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
         );
 
         // numeric argument = Expression
-        $this->assertEquals(
+        $this->assertSame(
             'testing "hello, world"',
             $this->e(
                 'testing "[]"',
@@ -178,7 +178,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
         );
 
         // pass template as array
-        $this->assertEquals(
+        $this->assertSame(
             'hello, world',
             $this->e(
                 ['template' => 'hello, [who]'],
@@ -202,19 +202,19 @@ class ExpressionTest extends AtkPhpunit\TestCase
             $this->e('--[]', [2]),
         ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             '++1 and --2',
             strip_tags($e1->getDebugQuery())
         );
 
         $e2 = $this->e('=== [foo] ===', ['foo' => $e1]);
 
-        $this->assertEquals(
+        $this->assertSame(
             '=== ++1 and --2 ===',
             strip_tags($e2->getDebugQuery())
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '++1 and --2',
             strip_tags($e1->getDebugQuery())
         );
@@ -239,9 +239,9 @@ class ExpressionTest extends AtkPhpunit\TestCase
         $e4 = $this->e('[] and good night', [$e1]);
         $s4 = $e4->render(); // Hello :a and good night
 
-        $this->assertEquals('Hello :a! How are you.', $s2);
-        $this->assertEquals('It is me again. Hello :a', $s3);
-        $this->assertEquals('Hello :a and good night', $s4);
+        $this->assertSame('Hello :a! How are you.', $s2);
+        $this->assertSame('It is me again. Hello :a', $s3);
+        $this->assertSame('Hello :a and good night', $s4);
     }
 
     /**
@@ -277,41 +277,41 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testEscape()
     {
         // escaping expressions
-        $this->assertEquals(
+        $this->assertSame(
             '"first_name"',
             $this->callProtected($this->e(), '_escape', ['first_name'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"123"',
             $this->callProtected($this->e(), '_escape', [123])
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"he""llo"',
             $this->callProtected($this->e(), '_escape', ['he"llo'])
         );
 
         // should not escape expressions
-        $this->assertEquals(
+        $this->assertSame(
             '*',
             $this->callProtected($this->e(), '_escapeSoft', ['*'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"*"',
             $this->callProtected($this->e(), '_escape', ['*'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             '(2+2) age',
             $this->callProtected($this->e(), '_escapeSoft', ['(2+2) age'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"(2+2) age"',
             $this->callProtected($this->e(), '_escape', ['(2+2) age'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"users"."first_name"',
             $this->callProtected($this->e(), '_escapeSoft', ['users.first_name'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"users".*',
             $this->callProtected($this->e(), '_escapeSoft', ['users.*'])
         );
@@ -320,26 +320,26 @@ class ExpressionTest extends AtkPhpunit\TestCase
         );
 
         // escaping array - escapes each of its elements using hard escape
-        $this->assertEquals(
+        $this->assertSame(
             ['"first_name"', '*', '"last_name"'],
             $this->callProtected($this->e(), '_escapeSoft', [['first_name', '*', 'last_name']])
         );
 
         // escaping array - escapes each of its elements using hard escape
-        $this->assertEquals(
+        $this->assertSame(
             ['"first_name"', '"*"', '"last_name"'],
             $this->callProtected($this->e(), '_escape', [['first_name', '*', 'last_name']])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '"first_name"',
             $this->e()->escape('first_name')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"first""_name"',
             $this->e()->escape('first"_name')->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             '"first""_name {}"',
             $this->e()->escape('first"_name {}')->render()
         );
@@ -353,11 +353,11 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testParam()
     {
         $e = new Expression('hello, [who]', ['who' => 'world']);
-        $this->assertEquals(
+        $this->assertSame(
             'hello, :a',
             $e->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             [':a' => 'world'],
             $e->params
         );
@@ -366,11 +366,11 @@ class ExpressionTest extends AtkPhpunit\TestCase
         //      See test case in testParam() method.
         //      Maybe we should add implode(' ', array_map(...)) here ?
         $e = new Expression('hello, [who]', ['who' => ['cruel', 'world']]);
-        $this->assertEquals(
+        $this->assertSame(
             'hello, (:a,:b)',
             $e->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             [':a' => 'cruel', ':b' => 'world'],
             $e->params
         );
@@ -382,24 +382,24 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testConsume()
     {
         // few brief tests on _consume
-        $this->assertEquals(
+        $this->assertSame(
             '"123"',
             $this->callProtected($this->e(), '_consume', [123, 'escape'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             ':x',
             $this->callProtected($this->e(['_paramBase' => 'x']), '_consume', [123, 'param'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             123,
             $this->callProtected($this->e(), '_consume', [123, 'none'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             '(select *)',
             $this->callProtected($this->e(), '_consume', [new Query()])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'hello, "myfield"',
             $this->e('hello, []', [new MyField()])->render()
         );
@@ -438,14 +438,14 @@ class ExpressionTest extends AtkPhpunit\TestCase
         $e = $this->e('', ['parrot' => 'red', 'blue']);
 
         // offsetGet
-        $this->assertEquals('red', $e['parrot']);
-        $this->assertEquals('blue', $e[0]);
+        $this->assertSame('red', $e['parrot']);
+        $this->assertSame('blue', $e[0]);
 
         // offsetSet
         $e['cat'] = 'black';
-        $this->assertEquals('black', $e['cat']);
+        $this->assertSame('black', $e['cat']);
         $e['cat'] = 'white';
-        $this->assertEquals('white', $e['cat']);
+        $this->assertSame('white', $e['cat']);
 
         // offsetExists, offsetUnset
         $this->assertTrue(isset($e['cat']));
@@ -456,13 +456,13 @@ class ExpressionTest extends AtkPhpunit\TestCase
         $e = $this->e('[], []');
         $e[] = 'Hello';
         $e[] = 'World';
-        $this->assertEquals("'Hello', 'World'", strip_tags($e->getDebugQuery()));
+        $this->assertSame("'Hello', 'World'", strip_tags($e->getDebugQuery()));
 
         // real-life example
         $age = $this->e('coalesce([age], [default_age])');
         $age['age'] = $this->e('year(now()) - year(birth_date)');
         $age['default_age'] = 18;
-        $this->assertEquals('coalesce(year(now()) - year(birth_date), :a)', $age->render());
+        $this->assertSame('coalesce(year(now()) - year(birth_date), :a)', $age->render());
     }
 
     /**
@@ -485,11 +485,11 @@ class ExpressionTest extends AtkPhpunit\TestCase
     {
         $e = new JsonExpression('hello, [who]', ['who' => 'world']);
 
-        $this->assertEquals(
+        $this->assertSame(
             'hello, "world"',
             $e->render()
         );
-        $this->assertEquals(
+        $this->assertSame(
             [],
             $e->params
         );
@@ -527,7 +527,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
         // reset everything
         $e = $this->e('hello, [name] [surname]', ['name' => 'John', 'surname' => 'Doe']);
         $e->reset();
-        $this->assertAttributeEquals(
+        $this->assertAttributeSame(
             ['custom' => []],
             'args',
             $e
@@ -536,7 +536,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
         // reset particular custom/tag
         $e = $this->e('hello, [name] [surname]', ['name' => 'John', 'surname' => 'Doe']);
         $e->reset('surname');
-        $this->assertAttributeEquals(
+        $this->assertAttributeSame(
             ['custom' => ['name' => 'John']],
             'args',
             $e

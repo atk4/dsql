@@ -56,24 +56,24 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testBasicQueries()
     {
-        $this->assertEquals(4, $this->getConnection()->getRowCount('employee'));
+        $this->assertSame(4, $this->getConnection()->getRowCount('employee'));
 
-        $this->assertEquals(
+        $this->assertSame(
             ['name' => 'Oliver', 'surname' => 'Smith'],
             $this->q('employee')->field('name,surname')->getRow()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['surname' => 'Taylor'],
             $this->q('employee')->field('surname')->where('retired', '1')->getRow()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             4,
             $this->q()->field(new Expression('2+2'))->getOne()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             4,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
@@ -82,12 +82,12 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         foreach ($this->q('employee')->where('retired', false) as $row) {
             $names[] = $row['name'];
         }
-        $this->assertEquals(
+        $this->assertSame(
             ['Oliver', 'Jack', 'Charlie'],
             $names
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [['now' => 4]],
             $this->q()->field(new Expression('2+2'), 'now')->get()
         );
@@ -98,18 +98,18 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
          */
         if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
-            $this->assertEquals(
+            $this->assertSame(
                 [['now' => 6]],
                 $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
             );
         } else {
-            $this->assertEquals(
+            $this->assertSame(
                 [['now' => 6]],
                 $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
             );
         }
 
-        $this->assertEquals(
+        $this->assertSame(
             5,
             $this->q()->field(new Expression('COALESCE([],5)', [null]), 'null_test')->getOne()
         );
@@ -124,12 +124,12 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * entire string on mysql.
          */
         if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
-            $this->assertEquals(
+            $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS TEXT)', ['foo'])->getOne()
             );
         } else {
-            $this->assertEquals(
+            $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS CHAR)', ['foo'])->getOne()
             );
@@ -142,28 +142,28 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
     public function testCastingToString()
     {
         // simple value
-        $this->assertEquals(
+        $this->assertSame(
             'Williams',
             (string) $this->q('employee')->field('surname')->where('name', 'Jack')
         );
         // table as sub-query
-        $this->assertEquals(
+        $this->assertSame(
             'Williams',
             (string) $this->q($this->q('employee'), 'e2')->field('surname')->where('name', 'Jack')
         );
         // field as expression
-        $this->assertEquals(
+        $this->assertSame(
             'Williams',
             (string) $this->q('employee')->field($this->e('surname'))->where('name', 'Jack')
         );
         // cast to string multiple times
         $q = $this->q('employee')->field('surname')->where('name', 'Jack');
-        $this->assertEquals(
+        $this->assertSame(
             ['Williams', 'Williams'],
             [(string) $q, (string) $q]
         );
         // cast custom Expression to string
-        $this->assertEquals(
+        $this->assertSame(
             '7',
             (string) $this->e('select 3+4')
         );
@@ -173,7 +173,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
     {
         // truncate table
         $this->q('employee')->truncate();
-        $this->assertEquals(
+        $this->assertSame(
             0,
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
@@ -185,11 +185,11 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         $this->q('employee')
             ->set(['id' => 2, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
             ->insert();
-        $this->assertEquals(
+        $this->assertSame(
             [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->order('id')->get()
         );
-        $this->assertEquals(
+        $this->assertSame(
             [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->order('id')->select()->fetchAll()
         );
@@ -199,7 +199,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->where('name', 'John')
             ->set('name', 'Johnny')
             ->update();
-        $this->assertEquals(
+        $this->assertSame(
             [['id' => 1, 'name' => 'Johnny'], ['id' => 2, 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->order('id')->get()
         );
@@ -227,7 +227,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         usort($data, function ($a, $b) {
             return $a['id'] - $b['id'];
         });
-        $this->assertEquals(
+        $this->assertSame(
             [['id' => 1, 'name' => 'Peter'], ['id' => 2, 'name' => 'Jane']],
             $data
         );
@@ -236,7 +236,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         $this->q('employee')
             ->where('retired', 1)
             ->delete();
-        $this->assertEquals(
+        $this->assertSame(
             [['id' => 2, 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->get()
         );
