@@ -424,10 +424,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             function ($matches) use (&$nameless_count) {
                 $identifier = substr($matches[0], 1, -1);
 
-                if ($matches[0][0] == '[') {
+                if ($matches[0][0] === '[') {
                     $escaping = 'param';
-                } elseif ($matches[0][0] == '{') {
-                    if ($matches[0][1] == '{') {
+                } elseif ($matches[0][0] === '{') {
+                    if ($matches[0][1] === '{') {
                         $escaping = 'soft-escape';
                         $identifier = substr($identifier, 1, -1);
                     } else {

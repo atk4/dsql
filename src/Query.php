@@ -762,7 +762,7 @@ class Query extends Expression
 
         $field = $this->_consume($field, 'soft-escape');
 
-        if (count($row) == 1) {
+        if (count($row) === 1) {
             // Only a single parameter was passed, so we simply include all
             return $field;
         }
@@ -770,7 +770,7 @@ class Query extends Expression
         // below are only cases when 2 or 3 arguments are passed
 
         // if no condition defined - set default condition
-        if (count($row) == 2) {
+        if (count($row) === 2) {
             $value = $cond;
 
             if (is_array($value)) {
@@ -806,7 +806,7 @@ class Query extends Expression
 
             // special treatment of empty array condition
             if (empty($value)) {
-                if ($cond == 'in') {
+                if ($cond === 'in') {
                     return $field . '<>' . $field; // never true
                 }
 

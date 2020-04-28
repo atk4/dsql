@@ -359,7 +359,7 @@ class Connection
 
         --$this->transaction_depth;
 
-        if ($this->transaction_depth == 0) {
+        if ($this->transaction_depth === 0) {
             return $this->connection->commit();
         }
 
@@ -382,7 +382,7 @@ class Connection
 
         --$this->transaction_depth;
 
-        if ($this->transaction_depth == 0) {
+        if ($this->transaction_depth === 0) {
             return $this->connection->rollBack();
         }
 
