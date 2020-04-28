@@ -17,12 +17,18 @@ class SelectTest extends AtkPhpunit\TestCase
         $this->c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
 
         $pdo = $this->c->connection();
-        $pdo->query('CREATE TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
+        $pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
         $pdo->query('INSERT INTO employee (id, name, surname, retired) VALUES
                 (1, "Oliver", "Smith", 0),
                 (2, "Jack", "Williams", 1),
                 (3, "Harry", "Taylor", 1),
                 (4, "Charlie", "Lee", 0)');
+        
+        $r = $pdo->query('SELECT CURRENT_TIMESTAMP()');
+        var_dump($r);
+        $r = $this->e('SELECT CURRENT_TIMESTAMP()')->getRow();
+        var_dump($r);
+        
     }
 
     private function q($table = null, $alias = null)
