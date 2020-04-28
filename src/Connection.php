@@ -218,7 +218,7 @@ class Connection
 
         return $c;
     }
-    
+
     /**
      * Returns new PDO object.
      */
