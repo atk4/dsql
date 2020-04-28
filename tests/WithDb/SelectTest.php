@@ -25,11 +25,12 @@ class SelectTest extends AtkPhpunit\TestCase
                 (4, "Charlie", "Lee", 0)');
 
         if ($this->c->driverType=='pgsql') {
-            $r = $pdo->query('SELECT CURRENT_TIMESTAMP()');
-            var_dump($r);
-            $r = $this->e('SELECT CURRENT_TIMESTAMP()')->getRow();
+            $r = $pdo->query('SELECT * FROM employee');
+            var_dump($r->fetchAll());
+            $r = $this->e('SELECT * FROM employee')->get();
             var_dump($r);
         }
+
     }
 
     private function q($table = null, $alias = null)
