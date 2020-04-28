@@ -30,7 +30,6 @@ class SelectTest extends AtkPhpunit\TestCase
             $r = $this->e('SELECT CURRENT_TIMESTAMP()')->getRow();
             var_dump($r);
         }
-
     }
 
     private function q($table = null, $alias = null)
