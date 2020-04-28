@@ -222,7 +222,7 @@ class Connection
     /**
      * Returns new Query object with connection already set.
      *
-     * @param array $properties
+     * @param string|array $properties
      */
     public function dsql($properties = []): Query
     {
@@ -236,8 +236,8 @@ class Connection
     /**
      * Returns Expression object with connection already set.
      *
-     * @param array $properties
-     * @param array $arguments
+     * @param string|array $properties
+     * @param array        $arguments
      */
     public function expr($properties = [], $arguments = null): Expression
     {

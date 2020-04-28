@@ -3,6 +3,7 @@
 namespace atk4\dsql\tests;
 
 use atk4\core\AtkPhpunit;
+use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 use atk4\dsql\Expressionable;
 use atk4\dsql\Query;
@@ -21,10 +22,10 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Test constructor exception - wrong 1st parameter.
      *
      * @covers ::__construct
-     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException1st1()
     {
+        $this->expectException(Exception::class);
         $this->e(null);
     }
 
@@ -32,41 +33,38 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Test constructor exception - wrong 1st parameter.
      *
      * @covers ::__construct
-     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException1st2()
     {
+        $this->expectException(Exception::class);
         $this->e(false);
     }
 
     /**
      * Test constructor exception - wrong 2nd parameter.
-     *
-     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException2nd1()
     {
+        $this->expectException(Exception::class);
         $this->e('hello, []', false);
     }
 
     /**
      * Test constructor exception - wrong 2nd parameter.
-     *
-     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException2nd2()
     {
+        $this->expectException(Exception::class);
         $this->e('hello, []', 'hello');
     }
 
     /**
      * Test constructor exception - no arguments.
-     *
-     * @expectedException \atk4\dsql\Exception
      */
     public function testConstructorException0arg()
     {
         // Template is not defined for Expression
+        $this->expectException(Exception::class);
         $this->e()->render();
     }
 
@@ -246,12 +244,12 @@ class ExpressionTest extends AtkPhpunit\TestCase
 
     /**
      * @covers ::__toString
-     * @expectedException \Exception
      */
     /*
     public function testToStringException1()
     {
         $e = new MyBadExpression('Hello');
+        $this->expectException(Exception::class);
         $s = (string)$e;
     }
     */
@@ -409,10 +407,10 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * $escape_mode value is incorrect.
      *
      * @covers ::_consume
-     * @expectedException \atk4\dsql\Exception
      */
     public function testConsumeException1()
     {
+        $this->expectException(Exception::class);
         $this->callProtected($this->e(), '_consume', [123, 'blahblah']);
     }
 
@@ -420,10 +418,10 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Only Expressions or Expressionable objects may be used in Expression.
      *
      * @covers ::_consume
-     * @expectedException \atk4\dsql\Exception
      */
     public function testConsumeException2()
     {
+        $this->expectException(Exception::class);
         $this->callProtected($this->e(), '_consume', [new \StdClass()]);
     }
 
@@ -469,6 +467,8 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Test IteratorAggregate implementation.
      *
      * @covers ::getIterator
+     *
+     * @doesNotPerformAssertions
      */
     public function testIteratorAggregate()
     {
@@ -497,11 +497,10 @@ class ExpressionTest extends AtkPhpunit\TestCase
 
     /**
      * Test reset exception if tag is not a string.
-     *
-     * @expectedException \atk4\dsql\Exception
      */
     public function testResetException()
     {
+        $this->expectException(Exception::class);
         $this->e('test')->reset($this->e());
     }
 
@@ -509,6 +508,8 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Test var-dump code for codecoverage.
      *
      * @covers ::__debugInfo
+     *
+     * @doesNotPerformAssertions
      */
     public function testVarDump()
     {
@@ -527,20 +528,12 @@ class ExpressionTest extends AtkPhpunit\TestCase
         // reset everything
         $e = $this->e('hello, [name] [surname]', ['name' => 'John', 'surname' => 'Doe']);
         $e->reset();
-        $this->assertAttributeSame(
-            ['custom' => []],
-            'args',
-            $e
-        );
+        $this->assertSame(['custom' => []], $this->getProtected($e, 'args'));
 
         // reset particular custom/tag
         $e = $this->e('hello, [name] [surname]', ['name' => 'John', 'surname' => 'Doe']);
         $e->reset('surname');
-        $this->assertAttributeSame(
-            ['custom' => ['name' => 'John']],
-            'args',
-            $e
-        );
+        $this->assertSame(['custom' => ['name' => 'John']], $this->getProtected($e, 'args'));
     }
 }
 

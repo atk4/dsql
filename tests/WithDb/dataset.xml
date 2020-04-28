@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<dataset>
-    <employee id="1" name="Oliver" surname="Smith" retired="0"/>
-    <employee id="2" name="Jack" surname="Williams" retired="0"/>
-    <employee id="3" name="Harry" surname="Taylor" retired="1"/>
-    <employee id="4" name="Charlie" surname="Lee" retired="0"/>
-</dataset>

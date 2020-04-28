@@ -2,39 +2,27 @@
 
 namespace atk4\dsql\tests\WithDb;
 
+use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
+use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 
-class SelectTest extends \PHPUnit_Extensions_Database_TestCase
+class SelectTest extends AtkPhpunit\TestCase
 {
-    /** @var \PDO */
-    protected $pdo;
-
     /** @var Connection */
     protected $c;
 
-    public function __construct()
+    protected function setUp(): void
     {
         $this->c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
-        $this->pdo = $this->c->connection();
 
-        $this->pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
-    }
-
-    /**
-     * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
-     */
-    protected function getConnection()
-    {
-        return $this->createDefaultDBConnection($this->pdo, $GLOBALS['DB_DBNAME']);
-    }
-
-    /**
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
-     */
-    protected function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/dataset.xml');
+        $pdo = $this->c->connection();
+        $pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
+        $pdo->query('INSERT INTO employee (id, name, surname, retired) VALUES
+                (1, "Oliver", "Smith", 0),
+                (2, "Jack", "Williams", 1),
+                (3, "Harry", "Taylor", 1),
+                (4, "Charlie", "Lee", 0)');
     }
 
     private function q($table = null, $alias = null)
@@ -56,7 +44,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testBasicQueries()
     {
-        $this->assertSame(4, $this->getConnection()->getRowCount('employee'));
+        $this->assertSame(4, count($this->q('employee')->get()));
 
         $this->assertSame(
             ['name' => 'Oliver', 'surname' => 'Smith'],
@@ -64,7 +52,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         $this->assertSame(
-            ['surname' => 'Taylor'],
+            ['surname' => 'Williams'],
             $this->q('employee')->field('surname')->where('retired', '1')->getRow()
         );
 
@@ -82,8 +70,9 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         foreach ($this->q('employee')->where('retired', false) as $row) {
             $names[] = $row['name'];
         }
+
         $this->assertSame(
-            ['Oliver', 'Jack', 'Charlie'],
+            ['Oliver', 'Charlie'],
             $names
         );
 
@@ -97,7 +86,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * But CAST(.. AS int) does not work in mysql. So we use two different tests..
          * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
          */
-        if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
+        if ($this->c->driverType === 'pgsql') {
             $this->assertSame(
                 [['now' => '6']],
                 $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
@@ -123,7 +112,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
          * entire string on mysql.
          */
-        if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
+        if ($this->c->driverType === 'pgsql') {
             $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS TEXT)', ['foo'])->getOne()
@@ -201,15 +190,15 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         // replace
-        if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) !== 'pgsql') {
-            $this->q('employee')
-                ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
-                ->replace();
-        } else {
+        if ($this->c->driverType === 'pgsql') {
             $this->q('employee')
                 ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->where('id', 1)
                 ->update();
+        } else {
+            $this->q('employee')
+                ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
+                ->replace();
         }
 
         // In SQLite replace is just like insert, it just checks if there is
@@ -238,13 +227,11 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
     }
 
-    /**
-     * @expectedException \atk4\dsql\Exception
-     */
     public function testEmptyGetOne()
     {
         // truncate table
         $this->q('employee')->truncate();
+        $this->expectException(Exception::class);
         $this->q('employee')->field('name')->getOne();
     }
 
@@ -255,18 +242,16 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         try {
             $this->q('non_existing_table')->field('non_existing_field')->getOne();
         } catch (\atk4\dsql\ExecuteException $e) {
-            $driverType = Connection::normalizeDSN($GLOBALS['DB_DSN'])['driverType'];
-
             // test error code
             $unknownFieldErrorCode = [
                 'sqlite' => 1,    // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
                 'mysql' => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
                 'pgsql' => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
-            ][$driverType];
+            ][$this->c->driverType];
             $this->assertSame($unknownFieldErrorCode, $e->getCode());
 
             // test debug query
-            if ($driverType === 'mysql') {
+            if ($this->c->driverType === 'mysql') {
                 $this->assertSame('select `non_existing_field` from `non_existing_table`', $e->getDebugQuery());
             } else {
                 $this->assertSame('select "non_existing_field" from "non_existing_table"', $e->getDebugQuery());

@@ -2,39 +2,27 @@
 
 namespace atk4\dsql\tests\WithDb;
 
+use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
+use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 
-class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
+class TransactionTest extends AtkPhpunit\TestCase
 {
-    /** @var \PDO */
-    protected $pdo;
-
     /** @var Connection */
     protected $c;
 
-    public function __construct()
+    protected function setUp(): void
     {
         $this->c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
-        $this->pdo = $this->c->connection();
 
-        $this->pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
-    }
-
-    /**
-     * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
-     */
-    protected function getConnection()
-    {
-        return $this->createDefaultDBConnection($this->pdo, $GLOBALS['DB_DBNAME']);
-    }
-
-    /**
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
-     */
-    protected function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/dataset.xml');
+        $pdo = $this->c->connection();
+        $pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
+        $pdo->query('INSERT INTO employee (id, name, surname, retired) VALUES
+                (1, "Oliver", "Smith", 1),
+                (2, "Jack", "Williams", 0),
+                (3, "Harry", "Taylor", 1),
+                (4, "Charlie", "Lee", 0)');
     }
 
     private function q($table = null, $alias = null)
@@ -54,43 +42,35 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         return $this->c->expr($template, $args);
     }
 
-    /**
-     * @expectedException \atk4\dsql\Exception
-     */
     public function testCommitException1()
     {
         // try to commit when not in transaction
+        $this->expectException(Exception::class);
         $this->c->commit();
     }
 
-    /**
-     * @expectedException \atk4\dsql\Exception
-     */
     public function testCommitException2()
     {
         // try to commit when not in transaction anymore
         $this->c->beginTransaction();
         $this->c->commit();
+        $this->expectException(Exception::class);
         $this->c->commit();
     }
 
-    /**
-     * @expectedException \atk4\dsql\Exception
-     */
     public function testRollbackException1()
     {
         // try to rollback when not in transaction
+        $this->expectException(Exception::class);
         $this->c->rollBack();
     }
 
-    /**
-     * @expectedException \atk4\dsql\Exception
-     */
     public function testRollbackException2()
     {
         // try to rollback when not in transaction anymore
         $this->c->beginTransaction();
         $this->c->rollBack();
+        $this->expectException(Exception::class);
         $this->c->rollBack();
     }
 
