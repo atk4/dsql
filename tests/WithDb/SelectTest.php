@@ -34,7 +34,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
      */
     protected function getDataSet()
     {
-        return $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset.xml');
+        return $this->createFlatXMLDataSet(__DIR__ . '/dataset.xml');
     }
 
     private function q($table = null, $alias = null)
@@ -56,25 +56,25 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testBasicQueries()
     {
-        $this->assertEquals(4, $this->getConnection()->getRowCount('employee'));
+        $this->assertSame(4, $this->getConnection()->getRowCount('employee'));
 
-        $this->assertEquals(
+        $this->assertSame(
             ['name' => 'Oliver', 'surname' => 'Smith'],
             $this->q('employee')->field('name,surname')->getRow()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['surname' => 'Taylor'],
             $this->q('employee')->field('surname')->where('retired', '1')->getRow()
         );
 
-        $this->assertEquals(
-            4,
+        $this->assertSame(
+            '4',
             $this->q()->field(new Expression('2+2'))->getOne()
         );
 
-        $this->assertEquals(
-            4,
+        $this->assertSame(
+            '4',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -82,13 +82,13 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         foreach ($this->q('employee')->where('retired', false) as $row) {
             $names[] = $row['name'];
         }
-        $this->assertEquals(
+        $this->assertSame(
             ['Oliver', 'Jack', 'Charlie'],
             $names
         );
 
-        $this->assertEquals(
-            [['now' => 4]],
+        $this->assertSame(
+            [['now' => '4']],
             $this->q()->field(new Expression('2+2'), 'now')->get()
         );
 
@@ -97,20 +97,20 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * But CAST(.. AS int) does not work in mysql. So we use two different tests..
          * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
          */
-        if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
-            $this->assertEquals(
-                [['now' => 6]],
+        if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
+            $this->assertSame(
+                [['now' => '6']],
                 $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
             );
         } else {
-            $this->assertEquals(
-                [['now' => 6]],
+            $this->assertSame(
+                [['now' => '6']],
                 $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
             );
         }
 
-        $this->assertEquals(
-            5,
+        $this->assertSame(
+            '5',
             $this->q()->field(new Expression('COALESCE([],5)', [null]), 'null_test')->getOne()
         );
     }
@@ -123,13 +123,13 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
          * entire string on mysql.
          */
-        if ('pgsql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
-            $this->assertEquals(
+        if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
+            $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS TEXT)', ['foo'])->getOne()
             );
         } else {
-            $this->assertEquals(
+            $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS CHAR)', ['foo'])->getOne()
             );
@@ -142,28 +142,28 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
     public function testCastingToString()
     {
         // simple value
-        $this->assertEquals(
+        $this->assertSame(
             'Williams',
             (string) $this->q('employee')->field('surname')->where('name', 'Jack')
         );
         // table as sub-query
-        $this->assertEquals(
+        $this->assertSame(
             'Williams',
             (string) $this->q($this->q('employee'), 'e2')->field('surname')->where('name', 'Jack')
         );
         // field as expression
-        $this->assertEquals(
+        $this->assertSame(
             'Williams',
             (string) $this->q('employee')->field($this->e('surname'))->where('name', 'Jack')
         );
         // cast to string multiple times
         $q = $this->q('employee')->field('surname')->where('name', 'Jack');
-        $this->assertEquals(
+        $this->assertSame(
             ['Williams', 'Williams'],
             [(string) $q, (string) $q]
         );
         // cast custom Expression to string
-        $this->assertEquals(
+        $this->assertSame(
             '7',
             (string) $this->e('select 3+4')
         );
@@ -173,8 +173,8 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
     {
         // truncate table
         $this->q('employee')->truncate();
-        $this->assertEquals(
-            0,
+        $this->assertSame(
+            '0',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -185,13 +185,9 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         $this->q('employee')
             ->set(['id' => 2, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
             ->insert();
-        $this->assertEquals(
-            [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
+        $this->assertSame(
+            [['id' => '1', 'name' => 'John'], ['id' => '2', 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->order('id')->get()
-        );
-        $this->assertEquals(
-            [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->order('id')->select()->fetchAll()
         );
 
         // update
@@ -199,13 +195,13 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->where('name', 'John')
             ->set('name', 'Johnny')
             ->update();
-        $this->assertEquals(
-            [['id' => 1, 'name' => 'Johnny'], ['id' => 2, 'name' => 'Jane']],
+        $this->assertSame(
+            [['id' => '1', 'name' => 'Johnny'], ['id' => '2', 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->order('id')->get()
         );
 
         // replace
-        if ('pgsql' !== $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+        if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) !== 'pgsql') {
             $this->q('employee')
                 ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->replace();
@@ -227,8 +223,8 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         usort($data, function ($a, $b) {
             return $a['id'] - $b['id'];
         });
-        $this->assertEquals(
-            [['id' => 1, 'name' => 'Peter'], ['id' => 2, 'name' => 'Jane']],
+        $this->assertSame(
+            [['id' => '1', 'name' => 'Peter'], ['id' => '2', 'name' => 'Jane']],
             $data
         );
 
@@ -236,14 +232,14 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         $this->q('employee')
             ->where('retired', 1)
             ->delete();
-        $this->assertEquals(
-            [['id' => 2, 'name' => 'Jane']],
+        $this->assertSame(
+            [['id' => '2', 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->get()
         );
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \atk4\dsql\Exception
      */
     public function testEmptyGetOne()
     {
@@ -264,8 +260,8 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             // test error code
             $unknownFieldErrorCode = [
                 'sqlite' => 1,    // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
-                'mysql'  => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
-                'pgsql'  => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
+                'mysql' => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
+                'pgsql' => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
             ][$driverType];
             $this->assertSame($unknownFieldErrorCode, $e->getCode());
 

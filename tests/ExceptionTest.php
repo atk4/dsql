@@ -35,12 +35,12 @@ class ExceptionTest extends AtkPhpunit\TestCase
             $e = new Expression('hello, [world]');
             $e->render();
         } catch (\atk4\dsql\Exception $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'Expression could not render tag',
                 $e->getMessage()
             );
 
-            $this->assertEquals(
+            $this->assertSame(
                 'world',
                 $e->getParams()['tag']
             );

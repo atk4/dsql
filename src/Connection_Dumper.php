@@ -2,10 +2,6 @@
 
 namespace atk4\dsql;
 
-/**
- * @license MIT
- * @copyright Agile Toolkit (c) http://agiletoolkit.org/
- */
 class Connection_Dumper extends Connection_Proxy
 {
     /**
@@ -18,7 +14,7 @@ class Connection_Dumper extends Connection_Proxy
      *
      * @var callable
      */
-    public $callback = null;
+    public $callback;
 
     /**
      * @var float

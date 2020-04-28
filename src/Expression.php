@@ -5,20 +5,15 @@ namespace atk4\dsql;
 /**
  * Creates new expression. Optionally specify a string - a piece
  * of SQL code that will become expression template and arguments.
- *
- * See below for call patterns
- *
- * @license MIT
- * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
-class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
+class Expression implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * Template string.
      *
      * @var string
      */
-    protected $template = null;
+    protected $template;
 
     /**
      * Hash containing configuration accumulated by calling methods
@@ -53,7 +48,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @var string
      */
-    public $_paramBase = null;
+    public $_paramBase;
 
     /**
      * Will be populated with actual values by _param().
@@ -68,7 +63,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
      *
      * @var \PDO|Connection
      */
-    public $connection = null;
+    public $connection;
 
     /**
      * Specifying options to constructors will override default
@@ -88,7 +83,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             throw new Exception([
                 'Incorrect use of Expression constructor',
                 'properties' => $properties,
-                'arguments'  => $arguments,
+                'arguments' => $arguments,
             ]);
         }
 
@@ -104,7 +99,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                 throw new Exception([
                     'Expression arguments must be an array',
                     'properties' => $properties,
-                    'arguments'  => $arguments,
+                    'arguments' => $arguments,
                 ]);
             }
             $this->args['custom'] = $arguments;
@@ -112,7 +107,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
         // deal with remaining properties
         foreach ($properties as $key => $val) {
-            $this->$key = $val;
+            $this->{$key} = $val;
         }
     }
 
@@ -295,7 +290,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
 
         // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
         // if we unset() first, we’re safe.
-        unset($sql_code->params);
+        unset($sql_code->{'params'});
         $sql_code->params = [];
 
         return $ret;
@@ -401,7 +396,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
         }
 
         $name = ':' . $this->_paramBase;
-        $this->_paramBase++;
+        ++$this->_paramBase;
         $this->params[$name] = $value;
 
         return $name;
@@ -429,10 +424,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             function ($matches) use (&$nameless_count) {
                 $identifier = substr($matches[0], 1, -1);
 
-                if ($matches[0][0] == '[') {
+                if ($matches[0][0] === '[') {
                     $escaping = 'param';
-                } elseif ($matches[0][0] == '{') {
-                    if ($matches[0][1] == '{') {
+                } elseif ($matches[0][0] === '{') {
+                    if ($matches[0][1] === '{') {
                         $escaping = 'soft-escape';
                         $identifier = substr($identifier, 1, -1);
                     } else {
@@ -453,7 +448,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                 if (array_key_exists($identifier, $this->args['custom'])) {
                     $value = $this->_consume($this->args['custom'][$identifier], $escaping);
                 } elseif (method_exists($this, $fx)) {
-                    $value = $this->$fx();
+                    $value = $this->{$fx}();
                 } else {
                     throw new Exception([
                         'Expression could not render tag',
@@ -465,7 +460,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             },
             $this->template
         );
-        unset($this->_paramBase);
+        unset($this->{'_paramBase'});
 
         return trim($res);
     }
@@ -524,11 +519,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
     public function __debugInfo()
     {
         $arr = [
-            'R'          => false,
-            'template'   => $this->template,
-            'params'     => $this->params,
+            'R' => false,
+            'template' => $this->template,
+            'params' => $this->params,
             //            'connection' => $this->connection,
-            'args'       => $this->args,
+            'args' => $this->args,
         ];
 
         try {
@@ -581,9 +576,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                     } else {
                         throw new Exception([
                             'Incorrect param type',
-                            'key'   => $key,
+                            'key' => $key,
                             'value' => $val,
-                            'type'  => gettype($val),
+                            'type' => gettype($val),
                         ]);
                     }
 
@@ -600,7 +595,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
                             'Unable to bind parameter',
                             'param' => $key,
                             'value' => $val,
-                            'type'  => $type,
+                            'type' => $type,
                         ]);
                     }
                 }
@@ -618,10 +613,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             }
 
             return $statement;
-        } else {
-            /* @var $connection Connection */
-            return $connection->execute($this);
         }
+
+        // @var Connection Connection
+        return $connection->execute($this);
     }
 
     /**
@@ -640,53 +635,67 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
     /**
      * Executes expression and return whole result-set in form of array of hashes.
      *
-     * @return array
+     * @return string[][]|null[][]
      */
-    public function get()
+    public function get(): array
     {
         $stmt = $this->execute();
 
         if ($stmt instanceof \Generator) {
-            return iterator_to_array($stmt);
+            $res = iterator_to_array($stmt);
+        } else {
+            $res = $stmt->fetchAll();
         }
 
-        return $stmt->fetchAll();
-    }
-
-    /**
-     * Executes expression and return first value of first row of data from result-set.
-     *
-     * @return string
-     */
-    public function getOne()
-    {
-        $data = $this->getRow();
-        if (!$data) {
-            throw new Exception([
-                'Unable to fetch single cell of data for getOne from this query',
-                'result' => $data,
-                'query'  => $this->getDebugQuery(),
-            ]);
-        }
-        $one = array_shift($data);
-
-        return $one;
+        return array_map(function ($row) {
+            return array_map(function ($v) {
+                return $v !== null ? (string) $v : $v;
+            }, $row);
+        }, $res);
     }
 
     /**
      * Executes expression and returns first row of data from result-set as a hash.
      *
-     * @return array
+     * @return string[]|null[]|null
      */
-    public function getRow()
+    public function getRow(): ?array
     {
         $stmt = $this->execute();
 
         if ($stmt instanceof \Generator) {
-            return $stmt->current();
+            $res = $stmt->current();
+        } else {
+            $res = $stmt->fetch();
+            if ($res === false) {
+                $res = null;
+            }
         }
 
-        return $stmt->fetch();
+        if ($res === null) {
+            return null;
+        }
+
+        return array_map(function ($v) {
+            return $v !== null ? (string) $v : $v;
+        }, $res);
+    }
+
+    /**
+     * Executes expression and return first value of first row of data from result-set.
+     */
+    public function getOne(): ?string
+    {
+        $row = $this->getRow();
+        if ($row === null || count($row) === 0) {
+            throw new Exception([
+                'Unable to fetch single cell of data for getOne from this query',
+                'result' => $row,
+                'query' => $this->getDebugQuery(),
+            ]);
+        }
+
+        return reset($row);
     }
 
     // }}}

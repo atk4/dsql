@@ -4,9 +4,6 @@ namespace atk4\dsql;
 
 /**
  * Perform query operation on SQL server (such as select, insert, delete, etc).
- *
- * @license MIT
- * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Query extends Expression
 {
@@ -77,9 +74,9 @@ class Query extends Expression
      * This is set by table(). If you are using multiple tables,
      * then $main_table is set to false as it is irrelevant.
      *
-     * @var null|false|string
+     * @var false|string|null
      */
-    protected $main_table = null;
+    protected $main_table;
 
     // {{{ Field specification and rendering
 
@@ -284,7 +281,6 @@ class Query extends Expression
 
         // process tables one by one
         foreach ($this->args['table'] as $alias => $table) {
-
             // throw exception if we don't want to add alias and table is defined as Expression
             if ($add_alias === false && $table instanceof self) {
                 throw new Exception('Table cannot be Query in UPDATE, INSERT etc. query modes');
@@ -352,12 +348,12 @@ class Query extends Expression
      *
      * @return $this
      */
-    public function with(self $cursor, string $alias, ?array $fields = null, bool $recursive = false)
+    public function with(self $cursor, string $alias, array $fields = null, bool $recursive = false)
     {
         // save cursor in args
         $this->_set_args('with', $alias, [
-            'cursor'    => $cursor,
-            'fields'    => $fields,
+            'cursor' => $cursor,
+            'fields' => $fields,
             'recursive' => $recursive,
         ]);
 
@@ -373,7 +369,7 @@ class Query extends Expression
      *
      * @return $this
      */
-    public function withRecursive(self $cursor, string $alias, ?array $fields = null)
+    public function withRecursive(self $cursor, string $alias, array $fields = null)
     {
         return $this->with($cursor, $alias, $fields, true);
     }
@@ -395,7 +391,7 @@ class Query extends Expression
 
         // process each defined cursor
         $isRecursive = false;
-        foreach ($this->args['with'] as $alias => ['cursor'=>$cursor, 'fields'=>$fields, 'recursive'=>$recursive]) {
+        foreach ($this->args['with'] as $alias => ['cursor' => $cursor, 'fields' => $fields, 'recursive' => $recursive]) {
             // cursor alias cannot be expression, so simply escape it
             $s = $this->_escape($alias) . ' ';
 
@@ -615,8 +611,8 @@ class Query extends Expression
      * @param mixed  $cond     Condition such as '=', '>' or 'is not'
      * @param mixed  $value    Value. Will be quoted unless you pass expression
      * @param string $kind     Do not use directly. Use having()
-     * @param string $num_args When $kind is passed, we can't determine number of
-     *                         actual arguments, so this argument must be specified.
+     * @param string $num_args when $kind is passed, we can't determine number of
+     *                         actual arguments, so this argument must be specified
      *
      * @return $this
      */
@@ -669,7 +665,7 @@ class Query extends Expression
 
                 $cond = '=';
             } else {
-                $num_args++;
+                ++$num_args;
             }
 
             $field = $matches[1];
@@ -678,29 +674,32 @@ class Query extends Expression
         switch ($num_args) {
             case 1:
                 $this->args[$kind][] = [$field];
+
                 break;
             case 2:
                 if (is_object($cond) && !$cond instanceof Expressionable && !$cond instanceof Expression) {
                     throw new Exception([
                         'Value cannot be converted to SQL-compatible expression',
-                        'field'=> $field,
-                        'value'=> $cond,
+                        'field' => $field,
+                        'value' => $cond,
                     ]);
                 }
 
                 $this->args[$kind][] = [$field, $cond];
+
                 break;
             case 3:
                 if (is_object($value) && !$value instanceof Expressionable && !$value instanceof Expression) {
                     throw new Exception([
                         'Value cannot be converted to SQL-compatible expression',
-                        'field'=> $field,
+                        'field' => $field,
                         'cond' => $cond,
-                        'value'=> $value,
+                        'value' => $value,
                     ]);
                 }
 
                 $this->args[$kind][] = [$field, $cond, $value];
+
                 break;
         }
 
@@ -763,7 +762,7 @@ class Query extends Expression
 
         $field = $this->_consume($field, 'soft-escape');
 
-        if (count($row) == 1) {
+        if (count($row) === 1) {
             // Only a single parameter was passed, so we simply include all
             return $field;
         }
@@ -771,7 +770,7 @@ class Query extends Expression
         // below are only cases when 2 or 3 arguments are passed
 
         // if no condition defined - set default condition
-        if (count($row) == 2) {
+        if (count($row) === 2) {
             $value = $cond;
 
             if (is_array($value)) {
@@ -791,23 +790,23 @@ class Query extends Expression
         if ($value === null) {
             if ($cond === '=') {
                 $cond = 'is';
-            } elseif (in_array($cond, ['!=', '<>', 'not'])) {
+            } elseif (in_array($cond, ['!=', '<>', 'not'], true)) {
                 $cond = 'is not';
             }
         }
 
         // value should be array for such conditions
-        if (in_array($cond, ['in', 'not in', 'not']) && is_string($value)) {
+        if (in_array($cond, ['in', 'not in', 'not'], true) && is_string($value)) {
             $value = array_map('trim', explode(',', $value));
         }
 
         // special conditions (IN | NOT IN) if value is array
         if (is_array($value)) {
-            $cond = in_array($cond, ['!=', '<>', 'not', 'not in']) ? 'not in' : 'in';
+            $cond = in_array($cond, ['!=', '<>', 'not', 'not in'], true) ? 'not in' : 'in';
 
             // special treatment of empty array condition
             if (empty($value)) {
-                if ($cond == 'in') {
+                if ($cond === 'in') {
                     return $field . '<>' . $field; // never true
                 }
 
@@ -1171,7 +1170,7 @@ class Query extends Expression
     public function limit($cnt, $shift = null)
     {
         $this->args['limit'] = [
-            'cnt'   => $cnt,
+            'cnt' => $cnt,
             'shift' => $shift,
         ];
 
@@ -1236,7 +1235,7 @@ class Query extends Expression
         if ($desc === null && is_string($order) && strpos($order, ' ') !== false) {
             $_chunks = explode(' ', $order);
             $_desc = strtolower(array_pop($_chunks));
-            if (in_array($_desc, ['desc', 'asc'])) {
+            if (in_array($_desc, ['desc', 'asc'], true)) {
                 $order = implode(' ', $_chunks);
                 $desc = $_desc;
             }
@@ -1246,9 +1245,8 @@ class Query extends Expression
             $desc = $desc ? 'desc' : '';
         } elseif (strtolower($desc) === 'asc') {
             $desc = '';
-        } else {
-            // allows custom order like "order by name desc nulls last" for Oracle
         }
+        // no else - allow custom order like "order by name desc nulls last" for Oracle
 
         $this->args['order'][] = [$order, $desc];
 
@@ -1280,8 +1278,8 @@ class Query extends Expression
     public function __debugInfo()
     {
         $arr = [
-            'R'          => false,
-            'mode'       => $this->mode,
+            'R' => false,
+            'mode' => $this->mode,
             //'template'   => $this->template,
             //'params'     => $this->params,
             //'connection' => $this->connection,
@@ -1417,7 +1415,7 @@ class Query extends Expression
     /**
      * Returns Query object of [case] expression.
      *
-     * @param mixed $operand Optional operand for case expression.
+     * @param mixed $operand optional operand for case expression
      *
      * @return Query
      */
@@ -1503,7 +1501,7 @@ class Query extends Expression
             if (!array_key_exists(0, $row) || !array_key_exists(1, $row)) {
                 throw new Exception([
                     'Incorrect use of "when" method parameters',
-                    'row'  => $row,
+                    'row' => $row,
                 ]);
             }
 
@@ -1513,7 +1511,7 @@ class Query extends Expression
                 if (is_array($row[0])) {
                     throw new Exception([
                         'When using short form CASE statement, then you should not set array as when() method 1st parameter',
-                        'when'  => $row[0],
+                        'when' => $row[0],
                     ]);
                 }
                 $ret .= $this->_consume($row[0], 'param');
@@ -1546,12 +1544,11 @@ class Query extends Expression
         if ($alias === null) {
             $this->args[$what][] = $value;
         } else {
-
             // don't allow multiple values with same alias
             if (isset($this->args[$what][$alias])) {
                 throw new Exception([
                     'Alias should be unique',
-                    'what'  => $what,
+                    'what' => $what,
                     'alias' => $alias,
                 ]);
             }

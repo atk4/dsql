@@ -4,9 +4,6 @@ namespace atk4\dsql;
 
 /**
  * Perform query operation on MySQL server.
- *
- * @license MIT
- * @copyright Agile Toolkit (c) http://agiletoolkit.org/
  */
 class Expression_MySQL extends Expression
 {
