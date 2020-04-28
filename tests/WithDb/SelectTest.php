@@ -18,7 +18,7 @@ class SelectTest extends AtkPhpunit\TestCase
 
         $pdo = $this->c->connection();
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
+        $pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired int, PRIMARY KEY (id))');
         $pdo->query('INSERT INTO employee (id, name, surname, retired) VALUES
                 (1, \'Oliver\', \'Smith\', 0),
                 (2, \'Jack\', \'Williams\', 1),
