@@ -35,7 +35,6 @@ class SelectTest extends AtkPhpunit\TestCase
             $r = $this->e('SELECT * FROM employee')->get();
             var_dump($r);
         }
-
     }
 
     private function q($table = null, $alias = null)
