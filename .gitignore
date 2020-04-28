@@ -4,4 +4,3 @@ docs/build
 /vendor
 .DS_Store
 .idea
-php.cmd
