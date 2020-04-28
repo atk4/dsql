@@ -24,10 +24,13 @@ class SelectTest extends AtkPhpunit\TestCase
                 (3, "Harry", "Taylor", 1),
                 (4, "Charlie", "Lee", 0)');
 
-        $r = $pdo->query('SELECT CURRENT_TIMESTAMP()');
-        var_dump($r);
-        $r = $this->e('SELECT CURRENT_TIMESTAMP()')->getRow();
-        var_dump($r);
+        if ($this->c->driverType=='pgsql') {
+            $r = $pdo->query('SELECT CURRENT_TIMESTAMP()');
+            var_dump($r);
+            $r = $this->e('SELECT CURRENT_TIMESTAMP()')->getRow();
+            var_dump($r);
+        }
+
     }
 
     private function q($table = null, $alias = null)
