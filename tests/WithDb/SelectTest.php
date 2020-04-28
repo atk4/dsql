@@ -24,16 +24,6 @@ class SelectTest extends AtkPhpunit\TestCase
                 (2, \'Jack\', \'Williams\', 1),
                 (3, \'Harry\', \'Taylor\', 1),
                 (4, \'Charlie\', \'Lee\', 0)');
-
-        if ($this->c->driverType=='pgsql') {
-            var_dump(get_class($pdo));
-            var_dump($pdo->lastInsertId());
-
-            $r = $pdo->query('SELECT * FROM employee');
-            var_dump($r->fetchAll());
-            $r = $this->e('SELECT * FROM employee')->get();
-            var_dump($r);
-        }
     }
 
     private function q($table = null, $alias = null)
