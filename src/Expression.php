@@ -615,7 +615,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
             return $statement;
         }
 
-        /** @var Connection Connection */
+        // @var Connection Connection
         return $connection->execute($this);
     }
 
