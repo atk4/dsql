@@ -6,7 +6,7 @@ namespace atk4\dsql;
  * Creates new expression. Optionally specify a string - a piece
  * of SQL code that will become expression template and arguments.
  */
-class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
+class Expression implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * Template string.
@@ -635,53 +635,67 @@ class Expression implements \ArrayAccess, \IteratorAggregate, ResultSet
     /**
      * Executes expression and return whole result-set in form of array of hashes.
      *
-     * @return array
+     * @return string[][]|null[][]
      */
-    public function get()
+    public function get(): array
     {
         $stmt = $this->execute();
 
         if ($stmt instanceof \Generator) {
-            return iterator_to_array($stmt);
+            $res = iterator_to_array($stmt);
+        } else {
+            $res = $stmt->fetchAll();
         }
 
-        return $stmt->fetchAll();
-    }
-
-    /**
-     * Executes expression and return first value of first row of data from result-set.
-     *
-     * @return string
-     */
-    public function getOne()
-    {
-        $data = $this->getRow();
-        if (!$data) {
-            throw new Exception([
-                'Unable to fetch single cell of data for getOne from this query',
-                'result' => $data,
-                'query' => $this->getDebugQuery(),
-            ]);
-        }
-        $one = array_shift($data);
-
-        return $one;
+        return array_map(function ($row) {
+            return array_map(function ($v) {
+                return $v !== null ? (string) $v : $v;
+            }, $row);
+        }, $res);
     }
 
     /**
      * Executes expression and returns first row of data from result-set as a hash.
      *
-     * @return array
+     * @return string[]|null[]|null
      */
-    public function getRow()
+    public function getRow(): ?array
     {
         $stmt = $this->execute();
 
         if ($stmt instanceof \Generator) {
-            return $stmt->current();
+            $res = $stmt->current();
+        } else {
+            $res = $stmt->fetch();
+            if ($res === false) {
+                $res = null;
+            }
         }
 
-        return $stmt->fetch();
+        if ($res === null) {
+            return null;
+        }
+
+        return array_map(function ($v) {
+            return $v !== null ? (string) $v : $v;
+        }, $res);
+    }
+
+    /**
+     * Executes expression and return first value of first row of data from result-set.
+     */
+    public function getOne(): ?string
+    {
+        $row = $this->getRow();
+        if ($row === null || count($row) === 0) {
+            throw new Exception([
+                'Unable to fetch single cell of data for getOne from this query',
+                'result' => $row,
+                'query' => $this->getDebugQuery(),
+            ]);
+        }
+
+        return reset($row);
     }
 
     // }}}
