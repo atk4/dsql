@@ -102,7 +102,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         // truncate table, prepare
         $this->q('employee')->truncate();
         $this->assertSame(
-            0,
+            '0',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -119,7 +119,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         }
 
         $this->assertSame(
-            1,
+            '1',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -129,13 +129,13 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
             ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
             ->insert();
         $this->assertSame(
-            2,
+            '2',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
         $this->c->rollBack();
         $this->assertSame(
-            1,
+            '1',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -154,7 +154,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         }
 
         $this->assertSame(
-            1,
+            '1',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -184,7 +184,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         }
 
         $this->assertSame(
-            1,
+            '1',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -211,7 +211,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         }
 
         $this->assertSame(
-            1,
+            '1',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -238,7 +238,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         }
 
         $this->assertSame(
-            1,
+            '1',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -254,7 +254,7 @@ class TransactionTest extends \PHPUnit_Extensions_Database_TestCase
         }
 
         $this->assertSame(
-            2,
+            '2',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
     }

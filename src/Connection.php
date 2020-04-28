@@ -93,7 +93,7 @@ class Connection
             $driverType = $rest = null;
         }
 
-        return ['dsn' => $dsn, 'user' => $user, 'pass' => $pass, 'driverType' => $driverType, 'rest' => $rest];
+        return ['dsn' => $dsn, 'user' => $user ?: null, 'pass' => $pass ?: null, 'driverType' => $driverType, 'rest' => $rest];
     }
 
     /**

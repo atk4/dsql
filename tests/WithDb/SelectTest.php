@@ -69,12 +69,12 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         $this->assertSame(
-            4,
+            '4',
             $this->q()->field(new Expression('2+2'))->getOne()
         );
 
         $this->assertSame(
-            4,
+            '4',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -88,7 +88,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         );
 
         $this->assertSame(
-            [['now' => 4]],
+            [['now' => '4']],
             $this->q()->field(new Expression('2+2'), 'now')->get()
         );
 
@@ -99,18 +99,18 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
          */
         if ($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
             $this->assertSame(
-                [['now' => 6]],
+                [['now' => '6']],
                 $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
             );
         } else {
             $this->assertSame(
-                [['now' => 6]],
+                [['now' => '6']],
                 $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
             );
         }
 
         $this->assertSame(
-            5,
+            '5',
             $this->q()->field(new Expression('COALESCE([],5)', [null]), 'null_test')->getOne()
         );
     }
@@ -174,7 +174,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
         // truncate table
         $this->q('employee')->truncate();
         $this->assertSame(
-            0,
+            '0',
             $this->q('employee')->field(new Expression('count(*)'))->getOne()
         );
 
@@ -186,12 +186,8 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->set(['id' => 2, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
             ->insert();
         $this->assertSame(
-            [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
+            [['id' => '1', 'name' => 'John'], ['id' => '2', 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->order('id')->get()
-        );
-        $this->assertSame(
-            [['id' => 1, 'name' => 'John'], ['id' => 2, 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->order('id')->select()->fetchAll()
         );
 
         // update
@@ -200,7 +196,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->set('name', 'Johnny')
             ->update();
         $this->assertSame(
-            [['id' => 1, 'name' => 'Johnny'], ['id' => 2, 'name' => 'Jane']],
+            [['id' => '1', 'name' => 'Johnny'], ['id' => '2', 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->order('id')->get()
         );
 
@@ -228,7 +224,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             return $a['id'] - $b['id'];
         });
         $this->assertSame(
-            [['id' => 1, 'name' => 'Peter'], ['id' => 2, 'name' => 'Jane']],
+            [['id' => '1', 'name' => 'Peter'], ['id' => '2', 'name' => 'Jane']],
             $data
         );
 
@@ -237,7 +233,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
             ->where('retired', 1)
             ->delete();
         $this->assertSame(
-            [['id' => 2, 'name' => 'Jane']],
+            [['id' => '2', 'name' => 'Jane']],
             $this->q('employee')->field('id,name')->get()
         );
     }

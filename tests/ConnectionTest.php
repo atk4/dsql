@@ -17,7 +17,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
     {
         $c = Connection::connect('sqlite::memory:');
         $this->assertSame(
-            4,
+            '4',
             $c->expr('select (2+2)')->getOne()
         );
     }
@@ -100,7 +100,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
         );
 
         $this->assertSame(
-            4,
+            '4',
             $c->expr('select (2+2)')->getOne()
         );
 
@@ -123,7 +123,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $c = Connection::connect('dumper:sqlite::memory:');
 
         $this->assertSame(
-            4,
+            '4',
             $c->expr('select (2+2)')->getOne()
         );
 
@@ -140,7 +140,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
         };
 
         $this->assertSame(
-            4,
+            '4',
             $c->expr('select ([]+[])', [$c->expr('2'), 2])->getOne()
         );
 
@@ -156,7 +156,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $c = Connection::connect('counter:sqlite::memory:');
 
         $this->assertSame(
-            4,
+            '4',
             $c->expr('select ([]+[])', [$c->expr('2'), 2])->getOne()
         );
 
@@ -175,7 +175,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
         };
 
         $this->assertSame(
-            4,
+            '4',
             $c->dsql()->field($c->expr('2+2'))->getOne()
         );
 
