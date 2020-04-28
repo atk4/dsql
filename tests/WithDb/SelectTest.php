@@ -17,6 +17,8 @@ class SelectTest extends AtkPhpunit\TestCase
         $this->c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
 
         $pdo = $this->c->connection();
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
         $pdo->query('CREATE TEMPORARY TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
         $pdo->query('INSERT INTO employee (id, name, surname, retired) VALUES
                 (1, "Oliver", "Smith", 0),
@@ -25,11 +27,15 @@ class SelectTest extends AtkPhpunit\TestCase
                 (4, "Charlie", "Lee", 0)');
 
         if ($this->c->driverType=='pgsql') {
+            var_dump(get_class($pdo));
+            var_dump($pdo->lastInsertId());
+
             $r = $pdo->query('SELECT * FROM employee');
             var_dump($r->fetchAll());
             $r = $this->e('SELECT * FROM employee')->get();
             var_dump($r);
         }
+
     }
 
     private function q($table = null, $alias = null)
