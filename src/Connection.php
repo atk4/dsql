@@ -221,6 +221,8 @@ class Connection
 
     /**
      * Returns new PDO object.
+     *
+     * This does not silence PDO errors.
      */
     protected static function getPDO(array $dsn)
     {
