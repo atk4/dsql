@@ -130,6 +130,9 @@ class SelectTest extends AtkPhpunit\TestCase
      */
     public function testCastingToString()
     {
+var_dump($this->q('employee')->getRow());
+var_dump($this->q('employee')->field('surname')->getRow());
+
         // simple value
         $this->assertSame(
             'Williams',
