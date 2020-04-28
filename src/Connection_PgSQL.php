@@ -25,6 +25,6 @@ class Connection_PgSQL extends Connection
     public function lastInsertID($m = null)
     {
         // PostGRE SQL PDO requires sequence name in lastInertID method as parameter
-        return $this->connection()->lastInsertID($m->sequence ?: $m->table . '_' . $m->id_field . '_seq');
+        return $this->connection()->lastInsertID($m->sequence ?: $m->table.'_'.$m->id_field.'_seq');
     }
 }

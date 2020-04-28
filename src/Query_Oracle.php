@@ -57,7 +57,7 @@ class Query_Oracle extends Query_Oracle_Abstract
             return '';
         }
 
-        return ' and "__dsql_rownum"<=' .
+        return ' and "__dsql_rownum"<='.
             ((int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']));
     }
 }

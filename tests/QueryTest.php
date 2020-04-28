@@ -1235,20 +1235,20 @@ class QueryTest extends AtkPhpunit\TestCase
             $this->q('[join]')->table('user', 'u')->join('address.user_id a')->render()
         );
         $this->assertEquals(
-            'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
+            'left join "address" as "a" on "a"."user_id" = "u"."id" '.
             'left join "bank" as "b" on "b"."id" = "u"."bank_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a' => 'address.user_id', 'b' => 'bank'])->render()
         );
         $this->assertEquals(
-            'left join "address" on "address"."user_id" = "u"."id" ' .
+            'left join "address" on "address"."user_id" = "u"."id" '.
             'left join "bank" on "bank"."id" = "u"."bank_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['address.user_id', 'bank'])->render()
         );
         $this->assertEquals(
-            'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
-            'left join "bank" as "b" on "b"."id" = "u"."bank_id" ' .
+            'left join "address" as "a" on "a"."user_id" = "u"."id" '.
+            'left join "bank" as "b" on "b"."id" = "u"."bank_id" '.
             'left join "bank_details" on "bank_details"."id" = "bank"."details_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a' => 'address.user_id', 'b' => 'bank'])
@@ -1753,12 +1753,12 @@ class QueryTest extends AtkPhpunit\TestCase
             ->join('i.emp')
             ->field(['name', 'salary', 'q.quoted', 'i.invoiced']);
         $this->assertEquals(
-            'with ' .
-                '"q" ("emp","quoted") as (select "emp_id",sum(:a) from "quotes" group by "emp_id"),' .
-                '"i" ("emp","invoiced") as (select "emp_id",sum(:b) from "invoices" group by "emp_id") ' .
-            'select "name","salary","q"."quoted","i"."invoiced" ' .
-            'from "employees" ' .
-                'left join "q" on "q"."emp" = "employees"."id" ' .
+            'with '.
+                '"q" ("emp","quoted") as (select "emp_id",sum(:a) from "quotes" group by "emp_id"),'.
+                '"i" ("emp","invoiced") as (select "emp_id",sum(:b) from "invoices" group by "emp_id") '.
+            'select "name","salary","q"."quoted","i"."invoiced" '.
+            'from "employees" '.
+                'left join "q" on "q"."emp" = "employees"."id" '.
                 'left join "i" on "i"."emp" = "employees"."id"',
             $q->render()
         );
