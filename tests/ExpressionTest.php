@@ -186,18 +186,6 @@ class ExpressionTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * Testing parameter edge cases - empty strings and arrays etc.
-     *
-     * @covers ::__debugInfo
-     *
-     * @doesNotPerformAssertions
-     */
-    public function testVarDump()
-    {
-        var_dump($this->e(''));
-    }
-
-    /**
      * Test nested parameters.
      *
      * @covers ::__construct
