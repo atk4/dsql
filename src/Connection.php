@@ -205,7 +205,7 @@ class Connection
                 if (is_numeric($driverType)) {
                     $driverType = $connectionClass::DEFAULT_DRIVER_TYPE;
                 }
-                
+
                 static::register($driverType, $connectionClass);
             }
         }
