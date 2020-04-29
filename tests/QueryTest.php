@@ -1201,7 +1201,7 @@ class QueryTest extends AtkPhpunit\TestCase
     {
         $this->assertSame(Expression::class, get_class($this->q()->expr('foo')));
 
-        $q = new Query_MySQL();
+        $q = new \atk4\dsql\MySQL\Query();
         $this->assertSame(\atk4\dsql\MySQL\Expression::class, get_class($q->expr('foo')));
     }
 
