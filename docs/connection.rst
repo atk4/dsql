@@ -16,7 +16,7 @@ Connection class is handy to have if you plan on building and executing
 queries in your application. It's more appropriate to store
 connection in a global variable or global class::
 
-    $app->db = atk4\dsql\Connection::connect($dsn, $user, $pass);
+    $app->db = atk4\dsql\Connection::create($dsn, $user, $pass);
 
 
 .. php:staticmethod:: connect($dsn, $user = null, $password = null, $args = [])
@@ -62,7 +62,7 @@ Here is how you can use all of this together::
 
     $dsn = 'mysql:host=localhost;port=3307;dbname=testdb';
 
-    $c = atk4\dsql\Connection::connect($dsn, 'root', 'root');
+    $c = atk4\dsql\Connection::create($dsn, 'root', 'root');
     $expr = $c -> expr("select now()");
 
     echo "Time now is : ". $expr;

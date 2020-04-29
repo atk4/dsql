@@ -24,49 +24,49 @@ class Query extends Expression
     public $defaultField = '*';
 
     /** @var string Expression classname */
-    protected $expression_class = Expression::class;
+    protected $expressionClass = Expression::class;
 
     /**
      * SELECT template.
      *
      * @var string
      */
-    protected $template_select = '[with]select[option] [field] [from] [table][join][where][group][having][order][limit]';
+    protected $templateSelect = '[with]select[option] [field] [from] [table][join][where][group][having][order][limit]';
 
     /**
      * INSERT template.
      *
      * @var string
      */
-    protected $template_insert = 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])';
+    protected $templateInsert = 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])';
 
     /**
      * REPLACE template.
      *
      * @var string
      */
-    protected $template_replace = 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])';
+    protected $templateReplace = 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])';
 
     /**
      * DELETE template.
      *
      * @var string
      */
-    protected $template_delete = '[with]delete [from] [table_noalias][where][having]';
+    protected $templateDelete = '[with]delete [from] [table_noalias][where][having]';
 
     /**
      * UPDATE template.
      *
      * @var string
      */
-    protected $template_update = '[with]update [table_noalias] set [set] [where]';
+    protected $templateUpdate = '[with]update [table_noalias] set [set] [where]';
 
     /**
      * TRUNCATE template.
      *
      * @var string
      */
-    protected $template_truncate = 'truncate table [table_noalias]';
+    protected $templateTruncate = 'truncate table [table_noalias]';
 
     /**
      * Name or alias of base table to use when using default join().
@@ -76,7 +76,7 @@ class Query extends Expression
      *
      * @var false|string|null
      */
-    protected $main_table;
+    protected $mainTable;
 
     // {{{ Field specification and rendering
 
@@ -254,7 +254,7 @@ class Query extends Expression
         // it's used as "default table" when joining with other tables, see join().
         // on multiple calls, main_table will be false and we won't
         // be able to join easily anymore.
-        $this->main_table = ($this->main_table === null && $alias !== null ? $alias : false);
+        $this->mainTable = ($this->mainTable === null && $alias !== null ? $alias : false);
 
         // save table in args
         $this->_set_args('table', $alias, $table);
@@ -495,7 +495,7 @@ class Query extends Expression
                 $m1 = null;
             }
             if ($m1 === null) {
-                $m1 = $this->main_table;
+                $m1 = $this->mainTable;
             }
 
             // Identify fields we use for joins
@@ -1324,7 +1324,7 @@ class Query extends Expression
      */
     public function mode($mode)
     {
-        $prop = 'template_' . $mode;
+        $prop = 'template' . str_replace('_', '', ucwords($mode, '_'));
 
         if (isset($this->{$prop})) {
             $this->mode = $mode;
@@ -1349,10 +1349,10 @@ class Query extends Expression
      */
     public function dsql($properties = [])
     {
-        $q = new static($properties);
-        $q->connection = $this->connection;
+        $query = new static($properties);
+        $query->connection = $this->connection;
 
-        return $q;
+        return $query;
     }
 
     /**
@@ -1367,13 +1367,12 @@ class Query extends Expression
      *
      * @return Expression
      */
-    public function expr($properties = [], $arguments = null)
+    public function expr($properties = [], $args = null)
     {
-        $c = $this->expression_class;
-        $e = new $c($properties, $arguments);
-        $e->connection = $this->connection;
+        $expression = new $this->expressionClass($properties, $args);
+        $expression->connection = $this->connection;
 
-        return $e;
+        return $expression;
     }
 
     /**

@@ -162,7 +162,7 @@ operations::
 Next we need to use this proxy class instead of the normal one. Frankly, that's
 quite simple to do::
 
-    $c = \atk4\dsql\Connection::connect($dsn, $user, $pass);
+    $c = \atk4\dsql\Connection::create($dsn, $user, $pass);
 
     $c = new Connection_DelayInserts(['connection'=>$c]);
 
@@ -198,12 +198,12 @@ Let's say you want to add support for new SQL vendor::
 Now that our custom query class is complete, we would like to use it by default
 on the connection::
 
-    $c = \atk4\dsql\Connection::connect($dsn, $user, $pass, ['query_class'=>'Query_MyVendor']);
+    $c = \atk4\dsql\Connection::create($dsn, $user, $pass, ['query_class'=>'Query_MyVendor']);
 
 .. _new_vendor:
 
 Adding new vendor support through extension
-------------------------------------------
+-------------------------------------------
 If you think that more people can benefit from your custom query class, you can
 create a separate add-on with it's own namespace. Let's say you have created
 `myname/dsql-myvendor`.

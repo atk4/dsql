@@ -143,7 +143,7 @@ When used in application you would typically generate queries with the
 purpose of executing them, which makes it very useful to create a
 :php:class:`Connection` object. The usage changes slightly::
 
-    $c = atk4\dsql\Connection::connect($dsn, $user, $password);
+    $c = atk4\dsql\Connection::create($dsn, $user, $password);
     $q = $c->dsql()->table('user')->where('id', 1)->field('name');
 
     $name = $q->getOne();

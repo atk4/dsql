@@ -41,7 +41,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @var string
      */
-    protected $escape_char = '"';
+    protected $quotedIdentifier = '"';
 
     /**
      * Used for Linking.
@@ -72,9 +72,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * If $properties is passed as string, then it's treated as template.
      *
      * @param string|array $properties
-     * @param array        $arguments
+     * @param array        $args
      */
-    public function __construct($properties = [], $arguments = null)
+    public function __construct($properties = [], $args = null)
     {
         // save template
         if (is_string($properties)) {
@@ -83,7 +83,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             throw new Exception([
                 'Incorrect use of Expression constructor',
                 'properties' => $properties,
-                'arguments' => $arguments,
+                'args' => $args,
             ]);
         }
 
@@ -94,15 +94,15 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // save arguments
-        if ($arguments !== null) {
-            if (!is_array($arguments)) {
+        if ($args !== null) {
+            if (!is_array($args)) {
                 throw new Exception([
                     'Expression arguments must be an array',
                     'properties' => $properties,
-                    'arguments' => $arguments,
+                    'args' => $args,
                 ]);
             }
-            $this->args['custom'] = $arguments;
+            $this->args['custom'] = $args;
         }
 
         // deal with remaining properties
@@ -194,15 +194,15 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // Otherwise, connection is probably PDO and we don't know which Expression
         // class to use, so we make a smart guess :)
         if ($this instanceof Query) {
-            $e = new self($properties, $arguments);
+            $expression = new self($properties, $arguments);
         } else {
-            $e = new static($properties, $arguments);
+            $expression = new static($properties, $arguments);
         }
 
-        $e->escape_char = $this->escape_char;
-        $e->connection = $this->connection;
+        $expression->quotedIdentifier = $this->quotedIdentifier;
+        $expression->connection = $this->connection;
 
-        return $e;
+        return $expression;
     }
 
     /**
@@ -241,57 +241,57 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Recursively renders sub-query or expression, combining parameters.
      *
-     * @param mixed  $sql_code    Expression
-     * @param string $escape_mode Fall-back escaping mode - param|escape|none
+     * @param mixed  $sqlCode    Expression
+     * @param string $escapeMode Fall-back escaping mode - param|escape|none
      *
      * @return string|array Quoted expression or array of param names
      */
-    protected function _consume($sql_code, $escape_mode = 'param')
+    protected function _consume($sqlCode, $escapeMode = 'param')
     {
-        if (!is_object($sql_code)) {
-            switch ($escape_mode) {
+        if (!is_object($sqlCode)) {
+            switch ($escapeMode) {
                 case 'param':
-                    return $this->_param($sql_code);
+                    return $this->_param($sqlCode);
                 case 'escape':
-                    return $this->_escape($sql_code);
+                    return $this->_escape($sqlCode);
                 case 'soft-escape':
-                    return $this->_escapeSoft($sql_code);
+                    return $this->_escapeSoft($sqlCode);
                 case 'none':
-                    return $sql_code;
+                    return $sqlCode;
             }
 
             throw new Exception([
-                '$escape_mode value is incorrect',
-                'escape_mode' => $escape_mode,
+                '$escapeMode value is incorrect',
+                'escapeMmode' => $escapeMode,
             ]);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
-        if ($sql_code instanceof Expressionable) {
-            $sql_code = $sql_code->getDSQLExpression($this);
+        if ($sqlCode instanceof Expressionable) {
+            $sqlCode = $sqlCode->getDSQLExpression($this);
         }
 
-        if (!$sql_code instanceof self) {
+        if (!$sqlCode instanceof self) {
             throw new Exception([
                 'Only Expressions or Expressionable objects may be used in Expression',
-                'object' => $sql_code,
+                'object' => $sqlCode,
             ]);
         }
 
         // at this point $sql_code is instance of Expression
-        $sql_code->params = &$this->params;
-        $sql_code->_paramBase = &$this->_paramBase;
-        $ret = $sql_code->render();
+        $sqlCode->params = &$this->params;
+        $sqlCode->_paramBase = &$this->_paramBase;
+        $ret = $sqlCode->render();
 
         // Queries should be wrapped in parentheses in most cases
-        if ($sql_code instanceof Query) {
+        if ($sqlCode instanceof Query) {
             $ret = '(' . $ret . ')';
         }
 
         // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
         // if we unset() first, we’re safe.
-        unset($sql_code->{'params'});
-        $sql_code->params = [];
+        unset($sqlCode->{'params'});
+        $sqlCode->params = [];
 
         return $ret;
     }
@@ -307,7 +307,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return is_object($value)
             || $value === '*'
             || strpos($value, '(') !== false
-            || strpos($value, $this->escape_char) !== false;
+            || strpos($value, $this->quotedIdentifier) !== false;
     }
 
     /**
@@ -338,7 +338,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
-        return $this->escape_char . trim($value) . $this->escape_char;
+        return $this->quotedIdentifier . trim($value) . $this->quotedIdentifier;
     }
 
     /**
@@ -374,7 +374,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // in all other cases we should escape
-        $c = $this->escape_char;
+        $c = $this->quotedIdentifier;
 
         return $c . str_replace($c, $c . $c, $value) . $c;
     }

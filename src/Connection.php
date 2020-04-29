@@ -9,17 +9,29 @@ class Connection
 {
     use \atk4\core\DIContainerTrait;
 
+    const DEFAULT_DRIVER_TYPE = null;
+    
     /** @var string Query classname */
-    protected $query_class = Query::class;
+    protected $queryClass = Query::class;
 
     /** @var string Expression classname */
-    protected $expression_class = Expression::class;
+    protected $expressionClass = Expression::class;
 
     /** @var Connection|\PDO Connection or PDO object */
+    protected $handler;
+    
+    /**
+     * @deprecated use $handler instead
+     */
     protected $connection;
 
     /** @var int Current depth of transaction */
-    public $transaction_depth = 0;
+    public $transactionDepth = 0;
+    
+    /**
+     * @deprecated use $transactionDepth instead
+     */
+    public $transaction_depth;
 
     /**
      * Database driver abbreviation, for example mysql, sqlite, pgsql, oci etc.
@@ -28,6 +40,15 @@ class Connection
      * @var string
      */
     public $driverType;
+    
+    protected static $registry = [
+            'sqlite' => SQLite\Connection::class,
+            'mysql'  => MySQL\Connection::class,
+            'pgsql'  => PgSQL\Connection::class,
+            'oci'    => Oracle\Connection::class,
+            'dumper' => Dumper\Connection::class,
+            'counter'=> Counter\Connection::class,
+    ];
 
     /**
      * Specifying $properties to constructors will override default
@@ -39,12 +60,18 @@ class Connection
     {
         if (!is_array($properties)) {
             throw new Exception([
-                'Invalid properties for "new Connection()". Did you mean to call Connection::connect()?',
+                'Invalid properties for "new Connection()". Did you mean to call Connection::create()?',
                 'properties' => $properties,
             ]);
         }
+        
+        $this->driverType = static::DEFAULT_DRIVER_TYPE;
 
         $this->setDefaults($properties);
+        
+        // backward compatibility
+        $this->handler = $this->handler ?? $this->connection;        
+        $this->transactionDepth = $this->transactionDepth ?? $this->transaction_depth;
     }
 
     /**
@@ -95,9 +122,17 @@ class Connection
 
         return ['dsn' => $dsn, 'user' => $user ?: null, 'pass' => $pass ?: null, 'driverType' => $driverType, 'rest' => $rest];
     }
+    
+    /**
+     * @deprecated use Connection::create instead
+     */
+    public static function connect($dsn, $user = null, $password = null, $args = [])
+    {
+        return static::create(...func_get_args());
+    }
 
     /**
-     * Connect database.
+     * Connect to database.
      *
      * @param string|\PDO $dsn
      * @param string|null $user
@@ -106,125 +141,89 @@ class Connection
      *
      * @return Connection
      */
-    public static function connect($dsn, $user = null, $password = null, $args = [])
+    public static function create($dsn, $user = null, $password = null, $args = [])
     {
         // If it's already PDO object, then we simply use it
         if ($dsn instanceof \PDO) {
             $driverType = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-            $connectionClass = self::class;
-            $queryClass = null;
-            $expressionClass = null;
-            switch ($driverType) {
-                case 'pgsql':
-                    $connectionClass = Connection_PgSQL::class;
-                    $queryClass = Query_PgSQL::class;
-
-                    break;
-                case 'oci':
-                    $connectionClass = Connection_Oracle::class;
-
-                    break;
-                case 'sqlite':
-                    $queryClass = Query_SQLite::class;
-
-                    break;
-                case 'mysql':
-                    $expressionClass = Expression_MySQL::class;
-                    // no break
-                default:
-                    // Default, for backwards compatibility
-                    $queryClass = Query_MySQL::class;
-
-                    break;
-            }
-
+            
+            /**
+             * @var Connection $connectionClass
+             */
+            $connectionClass = self::resolve($driverType);
+            
             return new $connectionClass(array_merge([
-                'connection' => $dsn,
-                'query_class' => $queryClass,
-                'expression_class' => $expressionClass,
-                'driverType' => $driverType,
+                    'handler' => $dsn,
             ], $args));
         }
 
         // If it's some other object, then we simply use it trough proxy connection
         if (is_object($dsn)) {
-            return new Connection_Proxy(array_merge([
-                'connection' => $dsn,
+            return new ProxyConnection(array_merge([
+                'handler' => $dsn,
             ], $args));
         }
 
         // Process DSN string
         $dsn = static::normalizeDSN($dsn, $user, $password);
+        
+        /**
+         * @var Connection $connectionClass
+         */
+        $connectionClass = self::resolve($dsn['driverType']);
 
-        // Create driverType specific connection
-        switch ($dsn['driverType']) {
-            case 'mysql':
-                $c = new static(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'expression_class' => Expression_MySQL::class,
-                    'query_class' => Query_MySQL::class,
-                    'driverType' => $dsn['driverType'],
-                ], $args));
-
-                break;
-            case 'sqlite':
-                $c = new static(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'query_class' => Query_SQLite::class,
-                    'driverType' => $dsn['driverType'],
-                ], $args));
-
-                break;
-            case 'oci':
-                $c = new Connection_Oracle(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'driverType' => $dsn['driverType'],
-                ], $args));
-
-                break;
-            case 'oci12':
-                $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
-                $c = new Connection_Oracle12(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'driverType' => $dsn['driverType'],
-                ], $args));
-
-                break;
-            case 'pgsql':
-                $c = new Connection_PgSQL(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'driverType' => $dsn['driverType'],
-                ], $args));
-
-                break;
-            case 'dumper':
-                $c = new Connection_Dumper(array_merge([
-                    'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
-                ], $args));
-
-                break;
-            case 'counter':
-                $c = new Connection_Counter(array_merge([
-                    'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
-                ], $args));
-
-                break;
-            // let PDO handle the rest
-            default:
-                $c = new static(array_merge([
-                    'connection' => static::connect(static::getPDO($dsn)),
-                ], $args));
+        return new $connectionClass(array_merge([
+                'handler' => $connectionClass::createHandler($dsn),
+        ], $args));
+    }
+    
+    /**
+     * Adds connection class to the registry for resolving in Connection::resolve method.
+     *
+     * Can be used as:
+     *
+     * Connection::register('mysql', MySQL\Connection::class), or
+     * MySQL\Connection::register()
+     *
+     * CustomDriver\Connection must be descendant of Connection class.
+     *
+     * @param string $driverType
+     * @param string $connectionClass
+     */
+    public static function register($driverType = null, $connectionClass = null)
+    {
+        $driverType = $driverType ?? static::DEFAULT_DRIVER_TYPE;
+        
+        $connectionClass = $connectionClass ?? static::class;
+                
+        if (is_array($driverTypes = $driverType)) {
+            foreach ($driverTypes as $driverType => $connectionClass) {
+                static::register($driverType, $connectionClass);
+            }
         }
-
-        return $c;
+        
+        self::$registry[$driverType] = $connectionClass;
+    }
+    
+    /**
+     * Resolves the connection class to use based on driver type
+     * 
+     * @param string $driverType
+     * 
+     * @return string
+     */
+    public static function resolve($driverType)
+    {
+        return self::$registry[$driverType] ?? static::class;
     }
 
     /**
-     * Returns new PDO object.
+     * Resolves $dsn to a handler
+     * By default the handler is new PDO object which can be overridden in child classes
      *
      * This does not silence PDO errors.
      */
-    protected static function getPDO(array $dsn)
+    public static function createHandler(array $dsn)
     {
         return new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
     }
@@ -236,36 +235,44 @@ class Connection
      */
     public function dsql($properties = []): Query
     {
-        $c = $this->query_class;
-        $q = new $c($properties);
-        $q->connection = $this;
+        $query = new $this->queryClass($properties);
 
-        return $q;
+        $query->connection = $this->handler();
+        
+        return $query;
     }
 
     /**
      * Returns Expression object with connection already set.
      *
      * @param string|array $properties
-     * @param array        $arguments
+     * @param array        $args
      */
-    public function expr($properties = [], $arguments = null): Expression
+    public function expr($properties = [], $args = null): Expression
     {
-        $c = $this->expression_class;
-        $e = new $c($properties, $arguments);
-        $e->connection = $this->connection ?: $this;
+        $expression = new $this->expressionClass($properties, $args);
 
-        return $e;
+        $expression->connection = $this->handler();
+        
+        return $expression;
     }
 
     /**
-     * Returns Connection or PDO object.
-     *
-     * @return Connection|\PDO
+     * @deprecated use Connection::handler instead
      */
     public function connection()
     {
-        return $this->connection;
+        return $this->handler();
+    }
+    
+    /**
+     * Returns the connection handler
+     *
+     * @return Connection|\PDO
+     */
+    public function handler()
+    {
+        return $this->handler ?? $this;
     }
 
     /**
@@ -273,11 +280,11 @@ class Connection
      *
      * @return \PDOStatement
      */
-    public function execute(Expression $expr)
+    public function execute(Expression $expression)
     {
         // If custom connection is set, execute again using that
-        if ($this->connection && $this->connection !== $this) {
-            return $expr->execute($this->connection);
+        if ($this->handler && $this->handler !== $this) {
+            return $expression->execute($this->handler);
         }
 
         throw new Exception('Queries cannot be executed through this connection');
@@ -327,9 +334,9 @@ class Connection
         // transaction starts only if it was not started before
         $r = $this->inTransaction()
             ? false
-            : $this->connection->beginTransaction();
+            : $this->handler->beginTransaction();
 
-        ++$this->transaction_depth;
+        ++$this->transactionDepth;
 
         return $r;
     }
@@ -346,7 +353,7 @@ class Connection
      */
     public function inTransaction()
     {
-        return $this->transaction_depth > 0;
+        return $this->transactionDepth > 0;
     }
 
     /**
@@ -367,10 +374,10 @@ class Connection
             throw new Exception('Using commit() when no transaction has started');
         }
 
-        --$this->transaction_depth;
+        --$this->transactionDepth;
 
-        if ($this->transaction_depth === 0) {
-            return $this->connection->commit();
+        if ($this->transactionDepth === 0) {
+            return $this->handler->commit();
         }
 
         return false;
@@ -390,10 +397,10 @@ class Connection
             throw new Exception('Using rollBack() when no transaction has started');
         }
 
-        --$this->transaction_depth;
+        --$this->transactionDepth;
 
-        if ($this->transaction_depth === 0) {
-            return $this->connection->rollBack();
+        if ($this->transactionDepth === 0) {
+            return $this->handler->rollBack();
         }
 
         return false;
@@ -408,8 +415,8 @@ class Connection
      *
      * @return mixed
      */
-    public function lastInsertID($m = null)
+    public function lastInsertID($model = null)
     {
-        return $this->connection()->lastInsertID();
+        return $this->handler->lastInsertID();
     }
 }

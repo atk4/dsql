@@ -16,7 +16,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
      */
     public function testServerConnection()
     {
-        $c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
+        $c = Connection::create($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
 
         return (string) $c->expr("SELECT date('now')")->getOne();
     }
