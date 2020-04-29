@@ -5,7 +5,7 @@ namespace atk4\dsql\PgSQL;
 use atk4\dsql\Connection as BaseConnection;
 
 /**
- * Custom Connection class specifically for PostgreSQL database
+ * Custom Connection class specifically for PostgreSQL database.
  */
 class Connection extends BaseConnection
 {

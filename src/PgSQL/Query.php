@@ -5,7 +5,7 @@ namespace atk4\dsql\PgSQL;
 use atk4\dsql\Query as BaseQuery;
 
 /**
- * Perform query operation on PostgreSQL server
+ * Perform query operation on PostgreSQL server.
  */
 class Query extends BaseQuery
 {

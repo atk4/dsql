@@ -191,7 +191,7 @@ class Connection
      */
     public static function register($driverType = null, $connectionClass = null)
     {
-        if (!$connectionClass && is_a($driverType, Connection::class, true)) {
+        if (!$connectionClass && is_a($driverType, self::class, true)) {
             $connectionClass = $driverType;
             $driverType = null;
         }
@@ -227,7 +227,7 @@ class Connection
 
     /**
      * Resolves $dsn to a handler
-     * By default the handler is new PDO object which can be overridden in child classes
+     * By default the handler is new PDO object which can be overridden in child classes.
      *
      * This does not silence PDO errors.
      */
@@ -284,7 +284,7 @@ class Connection
     }
 
     /**
-     * Execute Expression by using this connection
+     * Execute Expression by using this connection.
      *
      * @return \PDOStatement
      */
@@ -392,7 +392,7 @@ class Connection
     }
 
     /**
-     * Rollbacks queries since beginTransaction and resets transaction depth
+     * Rollbacks queries since beginTransaction and resets transaction depth.
      *
      * @see beginTransaction()
      *
