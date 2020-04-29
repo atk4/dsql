@@ -8,5 +8,4 @@ namespace atk4\dsql;
  */
 class Connection_Counter extends Counter\Connection
 {
-    
 }

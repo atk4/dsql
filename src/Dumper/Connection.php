@@ -28,7 +28,7 @@ class Connection extends ProxyConnection
     {
         return static::create($dsn['rest'], $dsn['user'], $dsn['pass']);
     }
-    
+
     /**
      * Execute expression.
      *
@@ -40,7 +40,7 @@ class Connection extends ProxyConnection
 
         try {
             $ret = parent::execute($expr);
-            
+
             $this->dump($expr);
         } catch (\Exception $e) {
             $this->dump($expr, true);
@@ -50,13 +50,13 @@ class Connection extends ProxyConnection
 
         return $ret;
     }
-    
+
     protected function dump(Expression $expr, $error = false)
     {
         $error = $error ? 'ERROR' : '';
-        
+
         $took = microtime(true) - $this->startTime;
-        
+
         if ($this->callback && is_callable($this->callback)) {
             call_user_func($this->callback, $expr, $took, false);
         } else {

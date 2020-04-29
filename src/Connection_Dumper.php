@@ -7,5 +7,4 @@ namespace atk4\dsql;
  */
 class Connection_Dumper extends Dumper\Connection
 {
-   
 }

@@ -10,7 +10,7 @@ class Connection
     use \atk4\core\DIContainerTrait;
 
     const DEFAULT_DRIVER_TYPE = null;
-    
+
     /** @var string Query classname */
     protected $queryClass = Query::class;
 
@@ -19,7 +19,7 @@ class Connection
 
     /** @var Connection|\PDO Connection or PDO object */
     protected $handler;
-    
+
     /**
      * @deprecated use $handler instead
      */
@@ -27,7 +27,7 @@ class Connection
 
     /** @var int Current depth of transaction */
     public $transactionDepth = 0;
-    
+
     /**
      * @deprecated use $transactionDepth instead
      */
@@ -40,7 +40,7 @@ class Connection
      * @var string
      */
     public $driverType;
-    
+
     protected static $registry = [
             'sqlite' => SQLite\Connection::class,
             'mysql'  => MySQL\Connection::class,
@@ -64,13 +64,13 @@ class Connection
                 'properties' => $properties,
             ]);
         }
-        
+
         $this->driverType = static::DEFAULT_DRIVER_TYPE;
 
         $this->setDefaults($properties);
-        
+
         // backward compatibility
-        $this->handler = $this->handler ?? $this->connection;        
+        $this->handler = $this->handler ?? $this->connection;
         $this->transactionDepth = $this->transactionDepth ?? $this->transaction_depth;
     }
 
@@ -122,7 +122,7 @@ class Connection
 
         return ['dsn' => $dsn, 'user' => $user ?: null, 'pass' => $pass ?: null, 'driverType' => $driverType, 'rest' => $rest];
     }
-    
+
     /**
      * @deprecated use Connection::create instead
      */
@@ -146,12 +146,12 @@ class Connection
         // If it's already PDO object, then we simply use it
         if ($dsn instanceof \PDO) {
             $driverType = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-            
+
             /**
              * @var Connection $connectionClass
              */
             $connectionClass = self::resolve($driverType);
-            
+
             return new $connectionClass(array_merge([
                     'handler' => $dsn,
             ], $args));
@@ -166,7 +166,7 @@ class Connection
 
         // Process DSN string
         $dsn = static::normalizeDSN($dsn, $user, $password);
-        
+
         /**
          * @var Connection $connectionClass
          */
@@ -176,7 +176,7 @@ class Connection
                 'handler' => $connectionClass::createHandler($dsn),
         ], $args));
     }
-    
+
     /**
      * Adds connection class to the registry for resolving in Connection::resolve method.
      *
@@ -193,23 +193,23 @@ class Connection
     public static function register($driverType = null, $connectionClass = null)
     {
         $driverType = $driverType ?? static::DEFAULT_DRIVER_TYPE;
-        
+
         $connectionClass = $connectionClass ?? static::class;
-                
+
         if (is_array($driverTypes = $driverType)) {
             foreach ($driverTypes as $driverType => $connectionClass) {
                 static::register($driverType, $connectionClass);
             }
         }
-        
+
         self::$registry[$driverType] = $connectionClass;
     }
-    
+
     /**
      * Resolves the connection class to use based on driver type
-     * 
+     *
      * @param string $driverType
-     * 
+     *
      * @return string
      */
     public static function resolve($driverType)
@@ -238,7 +238,7 @@ class Connection
         $query = new $this->queryClass($properties);
 
         $query->connection = $this->handler();
-        
+
         return $query;
     }
 
@@ -253,7 +253,7 @@ class Connection
         $expression = new $this->expressionClass($properties, $args);
 
         $expression->connection = $this->handler();
-        
+
         return $expression;
     }
 
@@ -264,7 +264,7 @@ class Connection
     {
         return $this->handler();
     }
-    
+
     /**
      * Returns the connection handler
      *

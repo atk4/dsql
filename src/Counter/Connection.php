@@ -38,7 +38,7 @@ class Connection extends ProxyConnection
     {
         return static::create($dsn['rest'], $dsn['user'], $dsn['pass']);
     }
-    
+
     /**
      * Iterate (yield) array.
      *

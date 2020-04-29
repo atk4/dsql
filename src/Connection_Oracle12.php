@@ -7,5 +7,4 @@ namespace atk4\dsql;
  */
 class Connection_Oracle12 extends Oracle\Version12c\Connection
 {
-    
 }

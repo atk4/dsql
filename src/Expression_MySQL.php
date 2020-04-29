@@ -7,5 +7,4 @@ namespace atk4\dsql;
  */
 class Expression_MySQL extends MySQL\Expression
 {
-
 }

@@ -7,5 +7,4 @@ namespace atk4\dsql;
  */
 class Query_Oracle extends Oracle\Query
 {
-    
 }

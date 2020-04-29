@@ -8,5 +8,4 @@ namespace atk4\dsql;
  */
 class Connection_Proxy extends ProxyConnection
 {
-    
 }

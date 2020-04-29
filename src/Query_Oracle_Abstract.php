@@ -7,5 +7,4 @@ namespace atk4\dsql;
  */
 abstract class Query_Oracle_Abstract extends Oracle\AbstractOracleQuery
 {
-    
 }

@@ -7,5 +7,4 @@ namespace atk4\dsql;
  */
 class Query_SQLite extends SQLite\Query
 {
-    
 }
