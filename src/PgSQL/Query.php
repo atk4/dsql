@@ -22,14 +22,14 @@ class Query extends BaseQuery
      *
      * @var string
      */
-    protected $templateUpdate = 'update [table][join] set [set] [where]';
+    protected $template_update = 'update [table][join] set [set] [where]';
 
     /**
      * REPLACE template.
      *
      * @var string
      */
-    protected $templateReplace;
+    protected $template_replace;
 
     /**
      * Renders [limit].

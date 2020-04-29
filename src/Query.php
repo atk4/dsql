@@ -31,42 +31,42 @@ class Query extends Expression
      *
      * @var string
      */
-    protected $templateSelect = '[with]select[option] [field] [from] [table][join][where][group][having][order][limit]';
+    protected $template_select = '[with]select[option] [field] [from] [table][join][where][group][having][order][limit]';
 
     /**
      * INSERT template.
      *
      * @var string
      */
-    protected $templateInsert = 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])';
+    protected $template_insert = 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])';
 
     /**
      * REPLACE template.
      *
      * @var string
      */
-    protected $templateReplace = 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])';
+    protected $template_replace = 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])';
 
     /**
      * DELETE template.
      *
      * @var string
      */
-    protected $templateDelete = '[with]delete [from] [table_noalias][where][having]';
+    protected $template_delete = '[with]delete [from] [table_noalias][where][having]';
 
     /**
      * UPDATE template.
      *
      * @var string
      */
-    protected $templateUpdate = '[with]update [table_noalias] set [set] [where]';
+    protected $template_update = '[with]update [table_noalias] set [set] [where]';
 
     /**
      * TRUNCATE template.
      *
      * @var string
      */
-    protected $templateTruncate = 'truncate table [table_noalias]';
+    protected $template_truncate = 'truncate table [table_noalias]';
 
     /**
      * Name or alias of base table to use when using default join().
@@ -1332,7 +1332,7 @@ class Query extends Expression
      */
     public function mode($mode)
     {
-        $prop = 'template' . str_replace('_', '', ucwords($mode, '_'));
+        $prop = 'template_' . $mode;
 
         if (isset($this->{$prop})) {
             $this->mode = $mode;

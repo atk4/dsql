@@ -22,8 +22,8 @@ abstract class AbstractOracleQuery extends Query
      *
      * @var string
      */
-    protected $templateSeqCurrval = 'select [sequence].CURRVAL from dual';
-    protected $templateSeqNextval = '[sequence].NEXTVAL';
+    protected $template_seq_currval = 'select [sequence].CURRVAL from dual';
+    protected $template_seq_nextval = '[sequence].NEXTVAL';
 
     /**
      * Set sequence.

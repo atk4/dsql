@@ -14,8 +14,8 @@ class Query extends AbstractOracleQuery
      *
      * @var string
      */
-    protected $templateSelect = 'select[option] [field] [from] [table][join][where][group][having][order]';
-    protected $templateSelectLimit = 'select * from (select rownum "__dsql_rownum","__t".* [from] (select[option] [field] [from] [table][join][where][group][having][order]) "__t") where "__dsql_rownum">[limit_start][and_limit_end]';
+    protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order]';
+    protected $template_select_limit = 'select * from (select rownum "__dsql_rownum","__t".* [from] (select[option] [field] [from] [table][join][where][group][having][order]) "__t") where "__dsql_rownum">[limit_start][and_limit_end]';
 
     /**
      * Limit how many rows will be returned.
@@ -28,7 +28,7 @@ class Query extends AbstractOracleQuery
     public function limit($cnt, $shift = null)
     {
         // This is for pre- 12c version
-        $this->templateSelect = $this->templateSelectLimit;
+        $this->template_select = $this->template_select_limit;
 
         return parent::limit($cnt, $shift);
     }

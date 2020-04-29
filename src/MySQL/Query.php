@@ -25,7 +25,7 @@ class Query extends BaseQuery
      *
      * @var string
      */
-    protected $templateUpdate = 'update [table][join] set [set] [where]';
+    protected $template_update = 'update [table][join] set [set] [where]';
 
     /**
      * Returns a query for a function, which can be used as part of the GROUP

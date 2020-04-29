@@ -14,7 +14,7 @@ class Query extends BaseQuery
      *
      * @var string
      */
-    protected $templateTruncate = 'delete [from] [table_noalias]';
+    protected $template_truncate = 'delete [from] [table_noalias]';
 
     /**
      * Returns a query for a function, which can be used as part of the GROUP
