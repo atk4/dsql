@@ -45,14 +45,13 @@ class Connection
         'sqlite' => SQLite\Connection::class,
         'mysql' => MySQL\Connection::class,
         'pgsql' => PgSQL\Connection::class,
-        'oci'    => Oracle\Connection::class,
+        'oci' => Oracle\Connection::class,
         'dumper' => Dumper\Connection::class,
-        'counter'=> Counter\Connection::class,
+        'counter' => Counter\Connection::class,
     ];
 
     /**
-     * Specifying $properties to constructors will override default
-     * property values of this class.
+     * Specifying $properties to constructors will override default property values of this class.
      *
      * @param array $properties
      */
@@ -178,7 +177,7 @@ class Connection
     }
 
     /**
-     * Adds connection class to the registry for resolving in Connection::resolve method
+     * Adds connection class to the registry for resolving in Connection::resolve method.
      *
      * Can be used as:
      *
@@ -206,7 +205,7 @@ class Connection
                 if (is_numeric($driverType)) {
                     $driverType = $connectionClass::DEFAULT_DRIVER_TYPE;
                 }
-
+                
                 static::register($driverType, $connectionClass);
             }
         }
@@ -215,7 +214,7 @@ class Connection
     }
 
     /**
-     * Resolves the connection class to use based on driver type
+     * Resolves the connection class to use based on driver type.
      *
      * @param string $driverType
      *
@@ -238,7 +237,7 @@ class Connection
     }
 
     /**
-     * Returns new Query object with connection already set
+     * Returns new Query object with connection already set.
      *
      * @param string|array $properties
      */
@@ -252,7 +251,7 @@ class Connection
     }
 
     /**
-     * Returns Expression object with connection already set
+     * Returns Expression object with connection already set.
      *
      * @param string|array $properties
      * @param array        $args
@@ -275,7 +274,7 @@ class Connection
     }
 
     /**
-     * Returns the connection handler
+     * Returns the connection handler.
      *
      * @return Connection|\PDO
      */
@@ -321,7 +320,7 @@ class Connection
     }
 
     /**
-     * Starts new transaction
+     * Starts new transaction.
      *
      * Database driver supports statements for starting and committing
      * transactions. Unfortunately most of them don't allow to nest
@@ -366,7 +365,7 @@ class Connection
     }
 
     /**
-     * Commits transaction
+     * Commits transaction.
      *
      * Each occurrence of beginTransaction() must be matched with commit().
      * Only when same amount of commits are executed, the actual commit will be
@@ -416,7 +415,7 @@ class Connection
     }
 
     /**
-     * Return last inserted ID value
+     * Return last inserted ID value.
      *
      * Few Connection drivers need to receive Model to get ID because PDO doesn't support this method.
      *

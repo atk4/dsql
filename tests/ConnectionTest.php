@@ -91,20 +91,20 @@ class ConnectionTest extends AtkPhpunit\TestCase
     {
         DummyConnection::register();
 
-        $this->assertEquals(DummyConnection::class, Connection::resolve('dummy'));
+        $this->assertSame(DummyConnection::class, Connection::resolve('dummy'));
 
         Connection::register([
             DummyConnection2::class,
             DummyConnection3::class,
         ]);
 
-        $this->assertEquals(DummyConnection2::class, Connection::resolve('dummy2'));
+        $this->assertSame(DummyConnection2::class, Connection::resolve('dummy2'));
 
-        $this->assertEquals(DummyConnection3::class, Connection::resolve('dummy3'));
+        $this->assertSame(DummyConnection3::class, Connection::resolve('dummy3'));
 
         Connection::register(DummyConnection4::class);
 
-        $this->assertEquals(DummyConnection4::class, Connection::resolve('dummy4'));
+        $this->assertSame(DummyConnection4::class, Connection::resolve('dummy4'));
     }
 
     public function testCreatePdo()
@@ -127,7 +127,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
         $c = Connection::create($handler);
 
-        $this->assertEquals(\atk4\dsql\ProxyConnection::class, get_class($c));
+        $this->assertSame(\atk4\dsql\ProxyConnection::class, get_class($c));
 
         $this->assertSame($c->handler(), 'aaa');
     }
