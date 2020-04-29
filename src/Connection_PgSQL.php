@@ -26,6 +26,7 @@ class Connection_PgSQL extends Connection
         // PostGRE SQL PDO requires sequence name in lastInertID method as parameter
         try {
             $seq = is_string($m) ? $m : ($m->sequence ?: $m->table . '_' . $m->id_field . '_seq');
+
             return $this->connection()->lastInsertID($seq);
         } catch (\PDOException $e) {
             throw $e;
