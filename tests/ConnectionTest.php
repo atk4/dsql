@@ -5,6 +5,26 @@ namespace atk4\dsql\tests;
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
 
+class DummyConnection extends Connection
+{
+    const DEFAULT_DRIVER_TYPE = 'dummy';
+}
+
+class DummyConnection2 extends Connection
+{
+    const DEFAULT_DRIVER_TYPE = 'dummy2';
+}
+
+class DummyConnection3 extends Connection
+{
+    const DEFAULT_DRIVER_TYPE = 'dummy3';
+}
+
+class DummyConnection4 extends Connection
+{
+    const DEFAULT_DRIVER_TYPE = 'dummy4';
+}
+
 /**
  * @coversDefaultClass \atk4\dsql\Connection
  */
@@ -65,6 +85,50 @@ class ConnectionTest extends AtkPhpunit\TestCase
         // with port number as DSN, leave port as :port
         $dsn = Connection::normalizeDSN('mysql:host=localhost:1234;dbname=db');
         $this->assertSame(['dsn' => 'mysql:host=localhost:1234;dbname=db', 'user' => null, 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost:1234;dbname=db'], $dsn);
+    }
+
+    public function testConnectionRegistry()
+    {
+        DummyConnection::register();
+        
+        $this->assertEquals(DummyConnection::class, Connection::resolve('dummy'));
+        
+        Connection::register([
+            DummyConnection2::class,
+            DummyConnection3::class,
+        ]);
+        
+        $this->assertEquals(DummyConnection2::class, Connection::resolve('dummy2'));
+        
+        $this->assertEquals(DummyConnection3::class, Connection::resolve('dummy3'));
+        
+        Connection::register(DummyConnection4::class);
+        
+        $this->assertEquals(DummyConnection4::class, Connection::resolve('dummy4'));
+    }
+    
+    public function testCreatePdo()
+    {
+        $c1 = Connection::create('sqlite::memory:');
+
+        $c2 = Connection::create($c1->handler());
+        
+        $this->assertSame($c1->handler(), $c2->handler());
+    }
+    
+    public function testCreateProxy()
+    {
+        $handler = new class {
+            function handler() {
+                return 'aaa';
+            }
+        };
+        
+        $c = Connection::create($handler);
+
+        $this->assertEquals(\atk4\dsql\ProxyConnection::class, get_class($c));
+        
+        $this->assertSame($c->handler(), 'aaa');
     }
 
     /**

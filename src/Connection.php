@@ -192,12 +192,21 @@ class Connection
      */
     public static function register($driverType = null, $connectionClass = null)
     {
-        $driverType = $driverType ?? static::DEFAULT_DRIVER_TYPE;
-
+        if (!$connectionClass && is_a($driverType, Connection::class, true)) {
+            $connectionClass = $driverType;
+            $driverType = null;
+        }
+        
         $connectionClass = $connectionClass ?? static::class;
+        
+        $driverType = $driverType ?? $connectionClass::DEFAULT_DRIVER_TYPE;
 
         if (is_array($driverTypes = $driverType)) {
             foreach ($driverTypes as $driverType => $connectionClass) {
+                if (is_numeric($driverType)) {
+                    $driverType = $connectionClass::DEFAULT_DRIVER_TYPE;
+                }
+                
                 static::register($driverType, $connectionClass);
             }
         }
