@@ -9,7 +9,7 @@ use atk4\dsql\Query;
 class Connection extends ProxyConnection
 {
     const DEFAULT_DRIVER_TYPE = 'counter';
-    
+
     /**
      * Callable to call for outputting.
      *

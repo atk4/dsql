@@ -8,7 +8,7 @@ use atk4\dsql\ProxyConnection;
 class Connection extends ProxyConnection
 {
     const DEFAULT_DRIVER_TYPE = 'dumper';
-    
+
     /**
      * Callable to call for outputting.
      *
