@@ -167,6 +167,8 @@ class SelectTest extends AtkPhpunit\TestCase
         if ($this->c->driverType === 'sqlite') {
             // SQLite uses primary key here always
             $this->assertSame('5', $this->c->lastInsertID());
+        } elseif ($this->c->driverType === 'mysql') {
+            $this->assertSame('0', $this->c->lastInsertID()); // ???
         } else {
             $this->assertSame('50', $this->c->lastInsertID());
         }
