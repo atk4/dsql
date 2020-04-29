@@ -11,8 +11,18 @@ class Connection
 
     const DEFAULT_DRIVER_TYPE = null;
 
+    /**
+     * @deprecated use $queryClass instead
+     */
+    protected $query_class;
+    
     /** @var string Query classname */
     protected $queryClass = Query::class;
+    
+    /**
+     * @deprecated use $expressionClass instead
+     */
+    protected $expression_class;
 
     /** @var string Expression classname */
     protected $expressionClass = Expression::class;
@@ -71,6 +81,8 @@ class Connection
         // backward compatibility
         $this->handler = $this->handler ?? $this->connection;
         $this->transactionDepth = $this->transactionDepth ?? $this->transaction_depth;
+        $this->queryClass = $this->queryClass ?? $this->query_class;
+        $this->expressionClass = $this->expressionClass ?? $this->expression_class;
     }
 
     /**
