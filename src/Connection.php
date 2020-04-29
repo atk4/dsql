@@ -42,12 +42,12 @@ class Connection
     public $driverType;
 
     protected static $registry = [
-            'sqlite' => SQLite\Connection::class,
-            'mysql'  => MySQL\Connection::class,
-            'pgsql'  => PgSQL\Connection::class,
-            'oci'    => Oracle\Connection::class,
-            'dumper' => Dumper\Connection::class,
-            'counter'=> Counter\Connection::class,
+        'sqlite' => SQLite\Connection::class,
+        'mysql' => MySQL\Connection::class,
+        'pgsql' => PgSQL\Connection::class,
+        'oci'    => Oracle\Connection::class,
+        'dumper' => Dumper\Connection::class,
+        'counter'=> Counter\Connection::class,
     ];
 
     /**
@@ -153,7 +153,7 @@ class Connection
             $connectionClass = self::resolve($driverType);
 
             return new $connectionClass(array_merge([
-                    'handler' => $dsn,
+                'handler' => $dsn,
             ], $args));
         }
 
@@ -173,12 +173,12 @@ class Connection
         $connectionClass = self::resolve($dsn['driverType']);
 
         return new $connectionClass(array_merge([
-                'handler' => $connectionClass::createHandler($dsn),
+            'handler' => $connectionClass::createHandler($dsn),
         ], $args));
     }
 
     /**
-     * Adds connection class to the registry for resolving in Connection::resolve method.
+     * Adds connection class to the registry for resolving in Connection::resolve method
      *
      * Can be used as:
      *
@@ -229,7 +229,7 @@ class Connection
     }
 
     /**
-     * Returns new Query object with connection already set.
+     * Returns new Query object with connection already set
      *
      * @param string|array $properties
      */
@@ -243,7 +243,7 @@ class Connection
     }
 
     /**
-     * Returns Expression object with connection already set.
+     * Returns Expression object with connection already set
      *
      * @param string|array $properties
      * @param array        $args
@@ -276,7 +276,7 @@ class Connection
     }
 
     /**
-     * Execute Expression by using this connection.
+     * Execute Expression by using this connection
      *
      * @return \PDOStatement
      */
@@ -312,7 +312,7 @@ class Connection
     }
 
     /**
-     * Starts new transaction.
+     * Starts new transaction
      *
      * Database driver supports statements for starting and committing
      * transactions. Unfortunately most of them don't allow to nest
@@ -342,7 +342,7 @@ class Connection
     }
 
     /**
-     * Will return true if currently running inside a transaction.
+     * Will return true if currently running inside a transaction
      * This is useful if you are logging anything into a database. If you are
      * inside a transaction, don't log or it may be rolled back.
      * Perhaps use a hook for this?
@@ -357,7 +357,7 @@ class Connection
     }
 
     /**
-     * Commits transaction.
+     * Commits transaction
      *
      * Each occurrence of beginTransaction() must be matched with commit().
      * Only when same amount of commits are executed, the actual commit will be
@@ -384,7 +384,7 @@ class Connection
     }
 
     /**
-     * Rollbacks queries since beginTransaction and resets transaction depth.
+     * Rollbacks queries since beginTransaction and resets transaction depth
      *
      * @see beginTransaction()
      *
@@ -407,7 +407,7 @@ class Connection
     }
 
     /**
-     * Return last inserted ID value.
+     * Return last inserted ID value
      *
      * Few Connection drivers need to receive Model to get ID because PDO doesn't support this method.
      *

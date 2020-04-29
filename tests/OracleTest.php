@@ -33,6 +33,7 @@ class OracleTest extends AtkPhpunit\TestCase
     public function connect($ver = '')
     {
         $version = $ver ? "\\Version{$ver}" : '';
+
         return new \atk4\dsql\Connection(array_merge([
             'handler' => new \PDO('sqlite::memory:'),
             'queryClass' => "\\atk4\\dsql\\Oracle{$version}\\Query",

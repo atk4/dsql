@@ -2,12 +2,14 @@
 
 namespace atk4\dsql\Counter;
 
-use atk4\dsql\ProxyConnection;
 use atk4\dsql\Expression;
+use atk4\dsql\ProxyConnection;
 use atk4\dsql\Query;
 
 class Connection extends ProxyConnection
 {
+    const DEFAULT_DRIVER_TYPE = 'counter';
+    
     /**
      * Callable to call for outputting.
      *
