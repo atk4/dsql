@@ -23,13 +23,13 @@ Other Interesting Drivers
 ===================== ========= ======== ============
 Class                 Support   PDO      Dependency
 ===================== ========= ======== ============
-Connection_Dumper     Full      dumper:  native, Proxy
-Connection_Counter    Full      counter: native, Proxy
+Dumper\Connection     Full      dumper:  native, Proxy
+Counter\Connection    Full      counter: native, Proxy
 ===================== ========= ======== ============
 
 
 3rd party vendor support
--------------------------
+------------------------
 
 ===================== ========= =========  ============================
 Class                 Support   PDO        Dependency

@@ -68,9 +68,9 @@ results too.
         id in (SELECT user_id from expired_users)
 
 If you are creating :php:class:`Connection` through constructor, you may have
-to explicitly specify property :php:attr:`Connection::query_class`::
+to explicitly specify property :php:attr:`Connection::queryClass`::
 
-    $c = new Connection(['connection'=>$pdo, 'query_class'=>atk4\dsql\Query_SQLite::class]);
+    $c = new Connection(['connection'=>$pdo, 'queryClass'=>atk4\dsql\SQLite\Query::class]);
 
 This is also useful, if you have created your own Query class in a different
 namespace and wish to use it.
@@ -136,15 +136,15 @@ call::
 
     return $connection->execute($this);
 
-:php:class:`Connection_Proxy` class would re-execute the query with a different
-connection class. In other words :php:class:`Connection_Proxy` allows you
+:php:class:`ProxyConnection` class would re-execute the query with a different
+connection class. In other words :php:class:`ProxyConnection` allows you
 to "wrap" your actual connection class. As a benefit you get to extend
 :php:class:`Proxy` class implementing some unified features that would work with
 any other connection class. Often this will require you to know externals, but
 let's build a proxy class that will add "DELAYED" options for all INSERT
 operations::
 
-    class Connection_DelayInserts extends \atk4\dsql\Connection_Proxy
+    class Connection_DelayInserts extends \atk4\dsql\ProxyConnection
     {
         function execute(\atk4\dsql\Expression $expr)
         {
@@ -168,7 +168,7 @@ quite simple to do::
 
     // use the new $c
 
-:php:class:`Connection_Proxy` can be used for many different things.
+:php:class:`ProxyConnection` can be used for many different things.
 
 .. _extending_query:
 
@@ -198,7 +198,7 @@ Let's say you want to add support for new SQL vendor::
 Now that our custom query class is complete, we would like to use it by default
 on the connection::
 
-    $c = \atk4\dsql\Connection::create($dsn, $user, $pass, ['query_class'=>'Query_MyVendor']);
+    $c = \atk4\dsql\Connection::create($dsn, $user, $pass, ['queryClass'=>'Query_MyVendor']);
 
 .. _new_vendor:
 
@@ -252,7 +252,7 @@ query "LOAD DATA INFILE":
 So to implement our task, you might need a class like this::
 
     use \atk4\dsql\Exception;
-    class Query_MySQL extends \atk4\dsql\Query_MySQL
+    class Query_MySQL extends \atk4\dsql\MySQL\Query
     {
         protected $template_load_data = 'load data local infile [file] into table [table]';
 
