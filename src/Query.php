@@ -77,7 +77,7 @@ class Query extends Expression
      * @var false|string|null
      */
     protected $mainTable;
-    
+
     /**
      * @deprecated use $mainTable instead
      */
@@ -254,10 +254,10 @@ class Query extends Expression
         if (is_string($table) && $alias === null) {
             $alias = $table;
         }
-        
+
         // backward compatibility
         $this->mainTable = $this->mainTable ?? $this->main_table;
-        
+
         // mainTable will be set only if table() is called once.
         // it's used as "default table" when joining with other tables, see join().
         // on multiple calls, main_table will be false and we won't
