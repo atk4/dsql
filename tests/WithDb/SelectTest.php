@@ -163,7 +163,13 @@ class SelectTest extends AtkPhpunit\TestCase
         $this->q('employee')
             ->set(['id' => 50, 'name' => 'Peter', 'surname' => 'Rabbit', 'retired' => 1])
             ->insert();
-        $this->assertSame(50, $this->c->lastInsertID());
+
+        if ($this->c->driverType === 'sqlite') {
+            // SQLite uses primary key here always
+            $this->assertSame(5, $this->c->lastInsertID());
+        } else {
+            $this->assertSame(50, $this->c->lastInsertID());
+        }
     }
 
     public function testOtherQueries()
