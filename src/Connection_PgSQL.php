@@ -25,8 +25,9 @@ class Connection_PgSQL extends Connection
         try {
             return $this->connection()->lastInsertID($m->sequence ?: $m->table . '_' . $m->id_field . '_seq');
         } catch (\PDOException $e) {
+            throw $e;
             // if no sequence defined (we do not always need it), then silence PDO exception
-            return null;
+            //return null;
         }
     }
 }
