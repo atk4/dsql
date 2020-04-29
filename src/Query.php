@@ -1245,7 +1245,7 @@ class Query extends Expression
 
         if (is_bool($desc)) {
             $desc = $desc ? 'desc' : '';
-        } elseif (strtolower($desc) === 'asc') {
+        } elseif (strtolower($desc ?? '') === 'asc') {
             $desc = '';
         }
         // no else - allow custom order like "order by name desc nulls last" for Oracle
