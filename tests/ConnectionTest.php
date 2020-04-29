@@ -90,44 +90,45 @@ class ConnectionTest extends AtkPhpunit\TestCase
     public function testConnectionRegistry()
     {
         DummyConnection::register();
-        
+
         $this->assertEquals(DummyConnection::class, Connection::resolve('dummy'));
-        
+
         Connection::register([
             DummyConnection2::class,
             DummyConnection3::class,
         ]);
-        
+
         $this->assertEquals(DummyConnection2::class, Connection::resolve('dummy2'));
-        
+
         $this->assertEquals(DummyConnection3::class, Connection::resolve('dummy3'));
-        
+
         Connection::register(DummyConnection4::class);
-        
+
         $this->assertEquals(DummyConnection4::class, Connection::resolve('dummy4'));
     }
-    
+
     public function testCreatePdo()
     {
         $c1 = Connection::create('sqlite::memory:');
 
         $c2 = Connection::create($c1->handler());
-        
+
         $this->assertSame($c1->handler(), $c2->handler());
     }
-    
+
     public function testCreateProxy()
     {
-        $handler = new class {
-            function handler() {
+        $handler = new class() {
+            public function handler()
+            {
                 return 'aaa';
             }
         };
-        
+
         $c = Connection::create($handler);
 
         $this->assertEquals(\atk4\dsql\ProxyConnection::class, get_class($c));
-        
+
         $this->assertSame($c->handler(), 'aaa');
     }
 
