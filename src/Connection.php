@@ -15,10 +15,10 @@ class Connection
      * @deprecated use $queryClass instead
      */
     protected $query_class;
-    
+
     /** @var string Query classname */
     protected $queryClass = Query::class;
-    
+
     /**
      * @deprecated use $expressionClass instead
      */
