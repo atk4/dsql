@@ -75,11 +75,11 @@ to explicitly specify property :php:attr:`Connection::queryClass`::
 This is also useful, if you have created your own Query class in a different
 namespace and wish to use it.
 
-Using Dumper and Counter
-------------------------
+Using Debug Proxy Connections (Stopwatch and Profiler)
+------------------------------------------------------
 
-DSQL comes with two nice features - "dumper" and "counter". Dumper will output
-all the executed queries and how much time each query took and Counter will
+DSQL comes with two nice features - "Stopwatch" and "Profiler". Stopwatch will output
+all the executed queries and how much time each query took and Profiler will
 record how many queries were executed and how many rows you have fetched through
 DSQL.
 
@@ -89,28 +89,28 @@ In order to enable those extensions you can simply change your DSN from::
 
 to::
 
-    "dumper:mysql:host=localhost;port=3307;dbname=testdb"
-    "counter:mysql:host=localhost;port=3307;dbname=testdb"
-    "dumper:counter:mysql:host=localhost;port=3307;dbname=testdb"
+    "stopwatch:mysql:host=localhost;port=3307;dbname=testdb"
+    "profile:mysql:host=localhost;port=3307;dbname=testdb"
+    "stopwatch:profile:mysql:host=localhost;port=3307;dbname=testdb"
 
-When this DSN is passed into :php:meth:`Connection::connect`, it will return
+When this DSN is passed into :php:meth:`Connection::create`, it will return
 a proxy connection object that will collect the necessary statistics and
 "echo" them out.
 
 If you would like to do something else with these statistics, you can set
-a callback. For Dumper::
+a callback. For Stopwatch::
 
     $c->callback = function($expression, $time, $fail = false) {
         ...
     }
 
-and for Counter::
+and for Profiler::
 
     $c->callback = function($queries, $selects, $rows, $expressions, $fail = false) {
         ...
     }
 
-If you have used "dumper:counter:", then use this::
+If you have used "stopwatch:profile:", then use this::
 
     $c->callback = function($expression, $time, $fail = false) {
         ...
@@ -208,14 +208,27 @@ If you think that more people can benefit from your custom query class, you can
 create a separate add-on with it's own namespace. Let's say you have created
 `myname/dsql-myvendor`.
 
-1. Create your own Query_* class inside your library. If necessary create your
-   own Connection_* class too.
+1. Create your own Query class inside your library (e.g `CustomQuery`). If necessary create your
+   own Connection class too (e.g `CustomConnection`)::
+   
+   class CustomConnection extends Connection
+   {
+      public $driverType = 'custom';
+
+      protected $queryClass = CustomQuery::class;
+   }
+   
 2. Make use of composer and add dependency to DSQL.
 3. Add a nice README file explaining all the quirks or extensions. Provide
    install instructions.
 4. Fork DSQL library.
-5. Modify :php:meth:`Connection::connect` to recognize your database identifier
-   and refer to your namespace.
+5. The new connection can then be registered and used in the code like::
+
+   CustomConnection::register();
+   
+When registering the `CustomConnection` DSQL automatically detects default driver type
+"custom" and will use this connection if this driver type listed in the DSN 
+   
 6. Modify docs/extensions.rst to list name of your database and link to your
    repository / composer requirement.
 7. Copy phpunit-mysql.xml into phpunit-myvendor.xml and make sure that

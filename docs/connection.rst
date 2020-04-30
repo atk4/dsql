@@ -19,7 +19,7 @@ connection in a global variable or global class::
     $app->db = atk4\dsql\Connection::create($dsn, $user, $pass);
 
 
-.. php:staticmethod:: connect($dsn, $user = null, $password = null, $args = [])
+.. php:staticmethod:: create($dsn, $user = null, $password = null, $args = [])
 
     Determine which Connection class should be used for specified $dsn,
     create new object of this connection class and return.
@@ -67,8 +67,8 @@ Here is how you can use all of this together::
 
     echo "Time now is : ". $expr;
 
-:php:meth:`connect` will determine appropriate class that can be used for this
-DSN string. This can be a PDO class or it may try to use a 3rd party connection
+:php:meth:`create` will determine appropriate class that can be used for this
+DSN string. This can be a PDO class or it may try to use a 3rd party driver
 class.
 
 Connection class is also responsible for executing queries. This is only used

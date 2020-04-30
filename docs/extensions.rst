@@ -20,12 +20,12 @@ MSSQL       Untested  mssql:   native, PDO
 Other Interesting Drivers
 -------------------------
 
-===================== ========= ======== ============
-Class                 Support   PDO      Dependency
-===================== ========= ======== ============
-Dumper\Connection     Full      dumper:  native, Proxy
-Counter\Connection    Full      counter: native, Proxy
-===================== ========= ======== ============
+=========================== ========= ======== ============
+Class                       Support   PDO      Dependency
+=========================== ========= ======== ============
+Debug\Stopwatch\Connection  Full      dumper:  native, Proxy
+Debug\Profiler\Connection   Full      counter: native, Proxy
+=========================== ========= ======== ============
 
 
 3rd party vendor support
