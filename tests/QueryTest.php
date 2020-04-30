@@ -6,11 +6,11 @@ use atk4\core\AtkPhpunit;
 use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 use atk4\dsql\Query;
-use atk4\dsql\Query_MySQL;
-use atk4\dsql\Query_Oracle;
-use atk4\dsql\Query_Oracle12c;
-use atk4\dsql\Query_PgSQL;
-use atk4\dsql\Query_SQLite;
+use atk4\dsql\MySQL\Query as MySQLQuery;
+use atk4\dsql\Oracle\Query as OracleQuery;
+use atk4\dsql\Oracle\Version12c\Query as Oracle12cQuery;
+use atk4\dsql\PgSQL\Query as PgSQLQuery;
+use atk4\dsql\SQLite\Query as SQLiteQuery;
 
 /**
  * @coversDefaultClass \atk4\dsql\Query
@@ -1176,19 +1176,19 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testGroupConcat()
     {
-        $q = new Query_MySQL();
+        $q = new MySQLQuery();
         $this->assertSame('group_concat(`foo` separator :a)', $q->groupConcat('foo', '-')->render());
 
-        $q = new Query_Oracle();
+        $q = new OracleQuery();
         $this->assertSame('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
-        $q = new Query_Oracle12c();
+        $q = new Oracle12cQuery();
         $this->assertSame('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
-        $q = new Query_PgSQL();
+        $q = new PgSQLQuery();
         $this->assertSame('string_agg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
-        $q = new Query_SQLite();
+        $q = new SQLiteQuery();
         $this->assertSame('group_concat("foo", :a)', $q->groupConcat('foo', '-')->render());
     }
 
