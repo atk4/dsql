@@ -78,13 +78,7 @@ class Connection extends ProxyConnection
             if ($this->callback && is_callable($this->callback)) {
                 call_user_func($this->callback, $this->queries, $this->selects, $this->rows, $this->expressions, true);
             } else {
-                printf(
-                    "[ERROR] Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
-                    $this->queries,
-                    $this->selects,
-                    $this->rows,
-                    $this->expressions
-                );
+                $this->dump(true);
             }
 
             throw $e;
@@ -101,13 +95,20 @@ class Connection extends ProxyConnection
         if ($this->callback && is_callable($this->callback)) {
             call_user_func($this->callback, $this->queries, $this->selects, $this->rows, $this->expressions, false);
         } else {
-            printf(
-                "Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
-                $this->queries,
-                $this->selects,
-                $this->rows,
-                $this->expressions
-            );
+            $this->dump();
         }
+    }
+
+    protected function dump($error = false)
+    {
+        $error = $error ? 'ERROR' : '';
+
+        printf(
+            "{$error} Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
+            $this->queries,
+            $this->selects,
+            $this->rows,
+            $this->expressions
+        );
     }
 }
