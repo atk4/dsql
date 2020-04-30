@@ -50,7 +50,7 @@ class Connection
     protected $connection;
 
     /**
-     * Stores the driverType => connectionClass array for resolving.
+     * Stores the driverType => driverClass array for resolving.
      *
      * @var array
      */
@@ -59,11 +59,9 @@ class Connection
         'mysql' => MySQL\Driver::class,
         'pgsql' => PgSQL\Driver::class,
         'oci' => Oracle\Driver::class,
-        // backward compatibility
-        'dumper' => Debug\Stopwatch\Driver::class,
+        'dumper' => Debug\Stopwatch\Driver::class, // backward compatibility
         'stopwatch' => Debug\Stopwatch\Driver::class,
-        // backward compatibility
-        'counter' => Debug\Profiler\Driver::class,
+        'counter' => Debug\Profiler\Driver::class, // backward compatibility
         'profile' => Debug\Profiler\Driver::class,
     ];
 
@@ -164,7 +162,7 @@ class Connection
             $driverType = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
             /**
-             * @var Connection $connectionClass
+             * @var Connection $driverClass
              */
             $driverClass = self::resolveDriver($driverType);
 
@@ -184,7 +182,7 @@ class Connection
         $dsn = static::normalizeDSN($dsn, $user, $password);
 
         /**
-         * @var Connection $connectionClass
+         * @var Connection $driverClass
          */
         $driverClass = self::resolveDriver($dsn['driverType']);
 
