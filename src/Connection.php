@@ -49,6 +49,11 @@ class Connection
      */
     public $driverType;
 
+    /**
+     * Stores the driverType => connectionClass array for resolving.
+     *
+     * @var array
+     */
     protected static $registry = [
         'sqlite' => SQLite\Connection::class,
         'mysql' => MySQL\Connection::class,
@@ -157,7 +162,7 @@ class Connection
             /**
              * @var Connection $connectionClass
              */
-            $connectionClass = self::resolve($driverType);
+            $connectionClass = self::resolveDriver($driverType);
 
             return new $connectionClass(array_merge([
                 'driver' => $dsn,
@@ -177,7 +182,7 @@ class Connection
         /**
          * @var Connection $connectionClass
          */
-        $connectionClass = self::resolve($dsn['driverType']);
+        $connectionClass = self::resolveDriver($dsn['driverType']);
 
         return new $connectionClass(array_merge([
             'driver' => $connectionClass::createDriver($dsn),
@@ -228,7 +233,7 @@ class Connection
      *
      * @return string
      */
-    public static function resolve($driverType)
+    public static function resolveDriver($driverType)
     {
         return self::$registry[$driverType] ?? static::class;
     }
@@ -291,6 +296,11 @@ class Connection
         return $this->driver ?? $this;
     }
 
+    /**
+     * Returns the default driver type set for the connection in $driverType.
+     *
+     * @return string|null
+     */
     public static function defaultDriverType()
     {
         return (new \ReflectionClass(static::class))->getDefaultProperties()['driverType'] ?? null;

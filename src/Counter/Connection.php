@@ -101,10 +101,10 @@ class Connection extends ProxyConnection
 
     protected function dump($error = false)
     {
-        $error = $error ? 'ERROR' : '';
+        $error = $error ? 'ERROR ' : '';
 
         printf(
-            "{$error} Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
+            "{$error}Queries: %3d, Selects: %3d, Rows fetched: %4d, Expressions %3d\n",
             $this->queries,
             $this->selects,
             $this->rows,
