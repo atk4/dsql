@@ -9,8 +9,6 @@ class Connection
 {
     use \atk4\core\DIContainerTrait;
 
-    const DEFAULT_DRIVER_TYPE = null;
-
     /**
      * @deprecated use $queryClass instead
      */
@@ -28,10 +26,10 @@ class Connection
     protected $expressionClass = Expression::class;
 
     /** @var Connection|\PDO Connection or PDO object */
-    protected $handler;
+    protected $driver;
 
     /**
-     * @deprecated use $handler instead
+     * @deprecated use $driver instead
      */
     protected $connection;
 
@@ -74,12 +72,10 @@ class Connection
             ]);
         }
 
-        $this->driverType = static::DEFAULT_DRIVER_TYPE;
-
         $this->setDefaults($properties);
 
         // backward compatibility
-        $this->handler = $this->handler ?? $this->connection;
+        $this->driver = $this->driver ?? $this->connection;
         $this->transactionDepth = $this->transactionDepth ?? $this->transaction_depth;
         $this->queryClass = $this->queryClass ?? $this->query_class;
         $this->expressionClass = $this->expressionClass ?? $this->expression_class;
@@ -164,14 +160,14 @@ class Connection
             $connectionClass = self::resolve($driverType);
 
             return new $connectionClass(array_merge([
-                'handler' => $dsn,
+                'driver' => $dsn,
             ], $args));
         }
 
         // If it's some other object, then we simply use it trough proxy connection
         if (is_object($dsn)) {
             return new ProxyConnection(array_merge([
-                'handler' => $dsn,
+                'driver' => $dsn,
             ], $args));
         }
 
@@ -184,7 +180,7 @@ class Connection
         $connectionClass = self::resolve($dsn['driverType']);
 
         return new $connectionClass(array_merge([
-            'handler' => $connectionClass::createHandler($dsn),
+            'driver' => $connectionClass::createDriver($dsn),
         ], $args));
     }
 
@@ -210,12 +206,12 @@ class Connection
 
         $connectionClass = $connectionClass ?? static::class;
 
-        $driverType = $driverType ?? $connectionClass::DEFAULT_DRIVER_TYPE;
+        $driverType = $driverType ?? $connectionClass::defaultDriverType();
 
         if (is_array($driverTypes = $driverType)) {
             foreach ($driverTypes as $driverType => $connectionClass) {
                 if (is_numeric($driverType)) {
-                    $driverType = $connectionClass::DEFAULT_DRIVER_TYPE;
+                    $driverType = $connectionClass::defaultDriverType();
                 }
 
                 static::register($driverType, $connectionClass);
@@ -238,12 +234,12 @@ class Connection
     }
 
     /**
-     * Resolves $dsn to a handler
-     * By default the handler is new PDO object which can be overridden in child classes.
+     * Resolves $dsn to a driver
+     * By default the driver is new PDO object which can be overridden in child classes.
      *
      * This does not silence PDO errors.
      */
-    public static function createHandler(array $dsn)
+    public static function createDriver(array $dsn)
     {
         return new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
     }
@@ -257,7 +253,7 @@ class Connection
     {
         $query = new $this->queryClass($properties);
 
-        $query->connection = $this->handler();
+        $query->connection = $this->driver();
 
         return $query;
     }
@@ -272,27 +268,32 @@ class Connection
     {
         $expression = new $this->expressionClass($properties, $args);
 
-        $expression->connection = $this->handler();
+        $expression->connection = $this->driver();
 
         return $expression;
     }
 
     /**
-     * @deprecated use Connection::handler instead
+     * @deprecated use Connection::driver() instead
      */
     public function connection()
     {
-        return $this->handler();
+        return $this->driver();
     }
 
     /**
-     * Returns the connection handler.
+     * Returns the connection driver.
      *
      * @return Connection|\PDO
      */
-    public function handler()
+    public function driver()
     {
-        return $this->handler ?? $this;
+        return $this->driver ?? $this;
+    }
+
+    public static function defaultDriverType()
+    {
+        return (new \ReflectionClass(static::class))->getDefaultProperties()['driverType'] ?? null;
     }
 
     /**
@@ -300,11 +301,11 @@ class Connection
      *
      * @return \PDOStatement
      */
-    public function execute(Expression $expression)
+    public function execute(Expression $expr)
     {
         // If custom connection is set, execute again using that
-        if ($this->handler && $this->handler !== $this) {
-            return $expression->execute($this->handler);
+        if ($this->driver && $this->driver !== $this) {
+            return $expr->execute($this->driver);
         }
 
         throw new Exception('Queries cannot be executed through this connection');
@@ -354,7 +355,7 @@ class Connection
         // transaction starts only if it was not started before
         $r = $this->inTransaction()
             ? false
-            : $this->handler->beginTransaction();
+            : $this->driver->beginTransaction();
 
         ++$this->transactionDepth;
 
@@ -397,7 +398,7 @@ class Connection
         --$this->transactionDepth;
 
         if ($this->transactionDepth === 0) {
-            return $this->handler->commit();
+            return $this->driver->commit();
         }
 
         return false;
@@ -420,7 +421,7 @@ class Connection
         --$this->transactionDepth;
 
         if ($this->transactionDepth === 0) {
-            return $this->handler->rollBack();
+            return $this->driver->rollBack();
         }
 
         return false;
@@ -437,6 +438,6 @@ class Connection
      */
     public function lastInsertID($model = null)
     {
-        return $this->handler->lastInsertID();
+        return $this->driver->lastInsertID();
     }
 }

@@ -7,7 +7,7 @@ use atk4\dsql\ProxyConnection;
 
 class Connection extends ProxyConnection
 {
-    const DEFAULT_DRIVER_TYPE = 'dumper';
+    public $driverType = 'dumper';
 
     /**
      * Callable to call for outputting.
@@ -26,7 +26,7 @@ class Connection extends ProxyConnection
      */
     protected $startTime;
 
-    public static function createHandler(array $dsn)
+    public static function createDriver(array $dsn)
     {
         return static::create($dsn['rest'], $dsn['user'], $dsn['pass']);
     }

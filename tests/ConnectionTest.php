@@ -7,22 +7,22 @@ use atk4\dsql\Connection;
 
 class DummyConnection extends Connection
 {
-    const DEFAULT_DRIVER_TYPE = 'dummy';
+    public $driverType = 'dummy';
 }
 
 class DummyConnection2 extends Connection
 {
-    const DEFAULT_DRIVER_TYPE = 'dummy2';
+    public $driverType = 'dummy2';
 }
 
 class DummyConnection3 extends Connection
 {
-    const DEFAULT_DRIVER_TYPE = 'dummy3';
+    public $driverType = 'dummy3';
 }
 
 class DummyConnection4 extends Connection
 {
-    const DEFAULT_DRIVER_TYPE = 'dummy4';
+    public $driverType = 'dummy4';
 }
 
 /**
@@ -111,25 +111,25 @@ class ConnectionTest extends AtkPhpunit\TestCase
     {
         $c1 = Connection::create('sqlite::memory:');
 
-        $c2 = Connection::create($c1->handler());
+        $c2 = Connection::create($c1->driver());
 
-        $this->assertSame($c1->handler(), $c2->handler());
+        $this->assertSame($c1->driver(), $c2->driver());
     }
 
     public function testCreateProxy()
     {
-        $handler = new class() {
-            public function handler()
+        $driver = new class() {
+            public function driver()
             {
                 return 'aaa';
             }
         };
 
-        $c = Connection::create($handler);
+        $c = Connection::create($driver);
 
         $this->assertSame(\atk4\dsql\ProxyConnection::class, get_class($c));
 
-        $this->assertSame($c->handler(), 'aaa');
+        $this->assertSame($c->driver(), 'aaa');
     }
 
     /**

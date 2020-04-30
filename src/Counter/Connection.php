@@ -8,7 +8,7 @@ use atk4\dsql\Query;
 
 class Connection extends ProxyConnection
 {
-    const DEFAULT_DRIVER_TYPE = 'counter';
+    public $driverType = 'counter';
 
     /**
      * Callable to call for outputting.
@@ -36,7 +36,7 @@ class Connection extends ProxyConnection
     /** @var int Count of rows iterated */
     protected $rows = 0;
 
-    public static function createHandler(array $dsn)
+    public static function createDriver(array $dsn)
     {
         return static::create($dsn['rest'], $dsn['user'], $dsn['pass']);
     }

@@ -9,7 +9,7 @@ use atk4\dsql\Connection as BaseConnection;
  */
 class Connection extends BaseConnection
 {
-    const DEFAULT_DRIVER_TYPE = 'pgsql';
+    public $driverType = 'pgsql';
 
     protected $queryClass = Query::class;
 
@@ -26,7 +26,7 @@ class Connection extends BaseConnection
     {
         // PostGRE SQL PDO requires sequence name in lastInertID method as parameter
         try {
-            return $this->handler->lastInsertID($model->sequence ?: $model->table . '_' . $model->id_field . '_seq');
+            return $this->driver->lastInsertID($model->sequence ?: $model->table . '_' . $model->id_field . '_seq');
         } catch (\PDOException $e) {
             // if no sequence defined (we do not always need it), then silence PDO exception
             return null;

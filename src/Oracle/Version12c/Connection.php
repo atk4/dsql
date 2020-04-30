@@ -9,15 +9,15 @@ use atk4\dsql\Oracle\Connection as BaseConnection;
  */
 class Connection extends BaseConnection
 {
-    const DEFAULT_DRIVER_TYPE = 'oci12';
+    public $driverType = 'oci12';
 
     /** @var string Query classname */
     protected $queryClass = Query::class;
 
-    public static function createHandler(array $dsn)
+    public static function createDriver(array $dsn)
     {
         $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
 
-        return parent::createHandler($dsn);
+        return parent::createDriver($dsn);
     }
 }
