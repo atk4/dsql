@@ -10,6 +10,22 @@ class Connection
     use \atk4\core\DIContainerTrait;
 
     /**
+     * Database driver abbreviation, for example mysql, sqlite, pgsql, oci etc.
+     * This is filled automatically while connection database.
+     *
+     * @var string
+     */
+    public $driverType;
+
+    /** @var int Current depth of transaction */
+    public $transactionDepth = 0;
+
+    /**
+     * @deprecated use $transactionDepth instead
+     */
+    public $transaction_depth;
+
+    /**
      * @deprecated use $queryClass instead
      */
     protected $query_class;
@@ -32,22 +48,6 @@ class Connection
      * @deprecated use $driver instead
      */
     protected $connection;
-
-    /** @var int Current depth of transaction */
-    public $transactionDepth = 0;
-
-    /**
-     * @deprecated use $transactionDepth instead
-     */
-    public $transaction_depth;
-
-    /**
-     * Database driver abbreviation, for example mysql, sqlite, pgsql, oci etc.
-     * This is filled automatically while connection database.
-     *
-     * @var string
-     */
-    public $driverType;
 
     /**
      * Stores the driverType => connectionClass array for resolving.

@@ -9,11 +9,12 @@ namespace atk4\dsql;
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
     /**
-     * Template string.
+     * When you are willing to execute the query, connection needs to be specified.
+     * By default this is PDO object.
      *
-     * @var string
+     * @var \PDO|Connection
      */
-    protected $template;
+    public $connection;
 
     /**
      * Hash containing configuration accumulated by calling methods
@@ -29,6 +30,27 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     public $args = ['custom' => []];
 
     /**
+     * Will be populated with actual values by _param().
+     *
+     * @var array
+     */
+    public $params = [];
+
+    /**
+     * Used for Linking.
+     *
+     * @var string
+     */
+    public $_paramBase;
+
+    /**
+     * Template string.
+     *
+     * @var string
+     */
+    protected $template;
+
+    /**
      * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc.
      *
      * @var string
@@ -42,28 +64,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * @var string
      */
     protected $quotedIdentifier = '"';
-
-    /**
-     * Used for Linking.
-     *
-     * @var string
-     */
-    public $_paramBase;
-
-    /**
-     * Will be populated with actual values by _param().
-     *
-     * @var array
-     */
-    public $params = [];
-
-    /**
-     * When you are willing to execute the query, connection needs to be specified.
-     * By default this is PDO object.
-     *
-     * @var \PDO|Connection
-     */
-    public $connection;
 
     /**
      * Specifying options to constructors will override default
