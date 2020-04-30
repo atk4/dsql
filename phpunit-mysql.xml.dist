@@ -13,6 +13,7 @@
     <testsuites>
         <testsuite name="dsql">
             <directory>tests</directory>
+            <exclude>tests/OracleTest.php</exclude>
         </testsuite>
     </testsuites>
     <logging>
