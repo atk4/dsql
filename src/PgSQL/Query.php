@@ -57,7 +57,7 @@ class Query extends BaseQuery
      * @param mixed  $field
      * @param string $delimiter
      *
-     * @return Expression
+     * @return \atk4\dsql\Expression
      */
     public function groupConcat($field, $delimeter = ',')
     {

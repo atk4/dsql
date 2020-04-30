@@ -478,42 +478,27 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function getDebugQuery($html = null)
     {
-        $d = $this->render();
-        $pp = [];
+        $result = $this->render();
+
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_numeric($val)) {
-                $d = preg_replace(
-                    '/' . $key . '([^_]|$)/',
-                    $val . '\1',
-                    $d
-                );
+                $replacement = $val . '\1';
             } elseif (is_string($val)) {
-                $d = preg_replace('/' . $key . '([^_]|$)/', "'" . addslashes($val) . "'\\1", $d);
+                $replacement = "'" . addslashes($val) . "'\\1";
             } elseif ($val === null) {
-                $d = preg_replace(
-                    '/' . $key . '([^_]|$)/',
-                    'NULL\1',
-                    $d
-                );
+                $replacement = 'NULL\1';
             } else {
-                $d = preg_replace('/' . $key . '([^_]|$)/', $val . '\\1', $d);
+                $replacement = $val . '\\1';
             }
-            $pp[] = $key;
-        }
-        if (class_exists('SqlFormatter')) {
-            if ($html) {
-                $result = \SqlFormatter::format($d);
-            } else {
-                $result = \SqlFormatter::format($d, false);
-            }
-        } else {
-            $result = $d;  // output as-is
-        }
-        if (!$html) {
-            return str_replace('#lte#', '<=', strip_tags(str_replace('<=', '#lte#', $result), '<>'));
+
+            $result = preg_replace('/' . $key . '([^_]|$)/', $replacement, $result);
         }
 
-        return $result;
+        if (class_exists('SqlFormatter')) {
+            $result = \SqlFormatter::format($result, (bool) $html);
+        }
+
+        return $html ? $result : str_replace('#lte#', '<=', strip_tags(str_replace('<=', '#lte#', $result), '<>'));
     }
 
     public function __debugInfo()
