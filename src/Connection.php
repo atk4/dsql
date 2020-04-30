@@ -59,8 +59,12 @@ class Connection
         'mysql' => MySQL\Connection::class,
         'pgsql' => PgSQL\Connection::class,
         'oci' => Oracle\Connection::class,
-        'dumper' => Dumper\Connection::class,
-        'counter' => Counter\Connection::class,
+        // backward compatibility
+        'dumper' => Debug\Stopwatch\Connection::class,
+        'stopwatch' => Debug\Stopwatch\Connection::class,
+        // backward compatibility
+        'counter' => Debug\Profiler\Connection::class,
+        'profile' => Debug\Profiler\Connection::class,
     ];
 
     /**

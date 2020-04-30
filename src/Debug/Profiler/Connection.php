@@ -1,6 +1,6 @@
 <?php
 
-namespace atk4\dsql\Counter;
+namespace atk4\dsql\Debug\Profiler;
 
 use atk4\dsql\Expression;
 use atk4\dsql\ProxyConnection;
@@ -8,7 +8,7 @@ use atk4\dsql\Query;
 
 class Connection extends ProxyConnection
 {
-    public $driverType = 'counter';
+    public $driverType = 'profile';
 
     /**
      * Callable to call for outputting.

@@ -1,13 +1,13 @@
 <?php
 
-namespace atk4\dsql\Dumper;
+namespace atk4\dsql\Debug\Stopwatch;
 
 use atk4\dsql\Expression;
 use atk4\dsql\ProxyConnection;
 
 class Connection extends ProxyConnection
 {
-    public $driverType = 'dumper';
+    public $driverType = 'stopwatch';
 
     /**
      * Callable to call for outputting.

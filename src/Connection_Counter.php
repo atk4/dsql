@@ -3,8 +3,8 @@
 namespace atk4\dsql;
 
 /**
- * @deprecated use Counter\Connection instead
+ * @deprecated use Debug\Profiler\Connection instead
  */
-class Connection_Counter extends Counter\Connection
+class Connection_Counter extends Debug\Profiler\Connection
 {
 }
