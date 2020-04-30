@@ -5,11 +5,11 @@ namespace atk4\dsql\tests;
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Exception;
 use atk4\dsql\Expression;
-use atk4\dsql\Query;
 use atk4\dsql\MySQL\Query as MySQLQuery;
 use atk4\dsql\Oracle\Query as OracleQuery;
 use atk4\dsql\Oracle\Version12c\Query as Oracle12cQuery;
 use atk4\dsql\PgSQL\Query as PgSQLQuery;
+use atk4\dsql\Query;
 use atk4\dsql\SQLite\Query as SQLiteQuery;
 
 /**
