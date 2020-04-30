@@ -3,8 +3,8 @@
 namespace atk4\dsql;
 
 /**
- * @deprecated use PgSQL\Connection instead
+ * @deprecated use PgSQL\Driver instead
  */
-class Connection_PgSQL extends PgSQL\Connection
+class Connection_PgSQL extends PgSQL\Driver
 {
 }

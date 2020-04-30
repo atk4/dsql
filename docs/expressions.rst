@@ -53,7 +53,7 @@ Another uses for expressions could be:
  - non-traditional constructions , UNIONS or SELECT INTO
 
 Properties, Arguments, Parameters
-====================================
+=================================
 
 Be careful when using those similar terms as they refer to different things:
 

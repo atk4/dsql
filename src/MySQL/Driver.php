@@ -2,9 +2,9 @@
 
 namespace atk4\dsql\MySQL;
 
-use atk4\dsql\Connection as BaseConnection;
+use atk4\dsql\Connection;
 
-class Connection extends BaseConnection
+class Driver extends Connection
 {
     public $driverType = 'mysql';
 

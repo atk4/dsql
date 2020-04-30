@@ -54,17 +54,17 @@ class Connection
      *
      * @var array
      */
-    protected static $registry = [
-        'sqlite' => SQLite\Connection::class,
-        'mysql' => MySQL\Connection::class,
-        'pgsql' => PgSQL\Connection::class,
-        'oci' => Oracle\Connection::class,
+    protected static $driverRegistry = [
+        'sqlite' => SQLite\Driver::class,
+        'mysql' => MySQL\Driver::class,
+        'pgsql' => PgSQL\Driver::class,
+        'oci' => Oracle\Driver::class,
         // backward compatibility
-        'dumper' => Debug\Stopwatch\Connection::class,
-        'stopwatch' => Debug\Stopwatch\Connection::class,
+        'dumper' => Debug\Stopwatch\Driver::class,
+        'stopwatch' => Debug\Stopwatch\Driver::class,
         // backward compatibility
-        'counter' => Debug\Profiler\Connection::class,
-        'profile' => Debug\Profiler\Connection::class,
+        'counter' => Debug\Profiler\Driver::class,
+        'profile' => Debug\Profiler\Driver::class,
     ];
 
     /**
@@ -166,9 +166,9 @@ class Connection
             /**
              * @var Connection $connectionClass
              */
-            $connectionClass = self::resolveDriver($driverType);
+            $driverClass = self::resolveDriver($driverType);
 
-            return new $connectionClass(array_merge([
+            return new $driverClass(array_merge([
                 'driver' => $dsn,
             ], $args));
         }
@@ -186,10 +186,10 @@ class Connection
         /**
          * @var Connection $connectionClass
          */
-        $connectionClass = self::resolveDriver($dsn['driverType']);
+        $driverClass = self::resolveDriver($dsn['driverType']);
 
-        return new $connectionClass(array_merge([
-            'driver' => $connectionClass::createDriver($dsn),
+        return new $driverClass(array_merge([
+            'driver' => $driverClass::createDriver($dsn),
         ], $args));
     }
 
@@ -204,30 +204,30 @@ class Connection
      * CustomDriver\Connection must be descendant of Connection class.
      *
      * @param string $driverType
-     * @param string $connectionClass
+     * @param string $driverClass
      */
-    public static function register($driverType = null, $connectionClass = null)
+    public static function registerDriver($driverType = null, $driverClass = null)
     {
-        if (!$connectionClass && is_a($driverType, self::class, true)) {
-            $connectionClass = $driverType;
+        if (!$driverClass && is_a($driverType, self::class, true)) {
+            $driverClass = $driverType;
             $driverType = null;
         }
 
-        $connectionClass = $connectionClass ?? static::class;
+        $driverClass = $driverClass ?? static::class;
 
-        $driverType = $driverType ?? $connectionClass::defaultDriverType();
+        $driverType = $driverType ?? $driverClass::defaultDriverType();
 
         if (is_array($driverTypes = $driverType)) {
-            foreach ($driverTypes as $driverType => $connectionClass) {
+            foreach ($driverTypes as $driverType => $driverClass) {
                 if (is_numeric($driverType)) {
-                    $driverType = $connectionClass::defaultDriverType();
+                    $driverType = $driverClass::defaultDriverType();
                 }
 
-                static::register($driverType, $connectionClass);
+                static::registerDriver($driverType, $driverClass);
             }
         }
 
-        self::$registry[$driverType] = $connectionClass;
+        self::$driverRegistry[$driverType] = $driverClass;
     }
 
     /**
@@ -239,7 +239,7 @@ class Connection
      */
     public static function resolveDriver($driverType)
     {
-        return self::$registry[$driverType] ?? static::class;
+        return self::$driverRegistry[$driverType] ?? static::class;
     }
 
     /**

@@ -44,7 +44,7 @@ a PDO object which you can use. In Laravel you can optimize some of your queries
 by switching to DSQL::
 
     $pdo = DB::connection()->getPdo();
-    $c = new Connection(['connection'=>$pdo]);
+    $c = new Connection(['driver'=>$pdo]);
 
     $user_ids = $c->dsql()->table('expired_users')->field('user_id');
     $c->dsql()->table('user')->where('id', 'in', $user_ids)->set('active', 0)->update();
@@ -70,7 +70,7 @@ results too.
 If you are creating :php:class:`Connection` through constructor, you may have
 to explicitly specify property :php:attr:`Connection::queryClass`::
 
-    $c = new Connection(['connection'=>$pdo, 'queryClass'=>atk4\dsql\SQLite\Query::class]);
+    $c = new Connection(['driver'=>$pdo, 'queryClass'=>atk4\dsql\SQLite\Query::class]);
 
 This is also useful, if you have created your own Query class in a different
 namespace and wish to use it.
@@ -130,7 +130,7 @@ A standard :php:class:`Connection` class with the use of PDO will do nothing
 inside its execute() because :php:meth:`Expression::execute` would handle all
 the work.
 
-However if :php:attr:`Connection::connection` is NOT PDO object, then
+However if :php:attr:`Connection::driver` is NOT PDO object, then
 :php:class:`Expression` will not know how to execute query and will simply
 call::
 
@@ -164,7 +164,7 @@ quite simple to do::
 
     $c = \atk4\dsql\Connection::create($dsn, $user, $pass);
 
-    $c = new Connection_DelayInserts(['connection'=>$c]);
+    $c = new Connection_DelayInserts(['driver'=>$c]);
 
     // use the new $c
 
@@ -209,9 +209,9 @@ create a separate add-on with it's own namespace. Let's say you have created
 `myname/dsql-myvendor`.
 
 1. Create your own Query class inside your library (e.g `CustomQuery`). If necessary create your
-   own Connection class too (e.g `CustomConnection`)::
+   own Driver class too (e.g `CustomDriver`)::
    
-   class CustomConnection extends Connection
+   class CustomDriver extends Connection
    {
       public $driverType = 'custom';
 
@@ -224,7 +224,7 @@ create a separate add-on with it's own namespace. Let's say you have created
 4. Fork DSQL library.
 5. The new connection can then be registered and used in the code like::
 
-   CustomConnection::register();
+   CustomDriver::registerDriver();
    
 When registering the `CustomConnection` DSQL automatically detects default driver type
 "custom" and will use this connection if this driver type listed in the DSN 
@@ -235,7 +235,7 @@ When registering the `CustomConnection` DSQL automatically detects default drive
    dsql/tests/db/* works with your database.
 
 Finally:
- - Submit pull request for only the Connection class and docs/extensions.rst.
+ - Submit pull request for only the Driver class and docs/extensions.rst.
 
 
 If you would like that your vendor support be bundled with DSQL, you should

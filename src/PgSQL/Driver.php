@@ -2,12 +2,12 @@
 
 namespace atk4\dsql\PgSQL;
 
-use atk4\dsql\Connection as BaseConnection;
+use atk4\dsql\Connection;
 
 /**
  * Custom Connection class specifically for PostgreSQL database.
  */
-class Connection extends BaseConnection
+class Driver extends Connection
 {
     public $driverType = 'pgsql';
 

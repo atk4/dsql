@@ -5,7 +5,7 @@ namespace atk4\dsql\Debug\Stopwatch;
 use atk4\dsql\Expression;
 use atk4\dsql\ProxyConnection;
 
-class Connection extends ProxyConnection
+class Driver extends ProxyConnection
 {
     public $driverType = 'stopwatch';
 

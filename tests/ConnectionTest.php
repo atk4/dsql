@@ -5,22 +5,22 @@ namespace atk4\dsql\tests;
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
 
-class DummyConnection extends Connection
+class DummyDriver extends Connection
 {
     public $driverType = 'dummy';
 }
 
-class DummyConnection2 extends Connection
+class DummyDriver2 extends Connection
 {
     public $driverType = 'dummy2';
 }
 
-class DummyConnection3 extends Connection
+class DummyDriver3 extends Connection
 {
     public $driverType = 'dummy3';
 }
 
-class DummyConnection4 extends Connection
+class DummyDriver4 extends Connection
 {
     public $driverType = 'dummy4';
 }
@@ -89,22 +89,22 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testConnectionRegistry()
     {
-        DummyConnection::register();
+        DummyDriver::registerDriver();
 
-        $this->assertSame(DummyConnection::class, Connection::resolveDriver('dummy'));
+        $this->assertSame(DummyDriver::class, Connection::resolveDriver('dummy'));
 
-        Connection::register([
-            DummyConnection2::class,
-            DummyConnection3::class,
+        Connection::registerDriver([
+            DummyDriver2::class,
+            DummyDriver3::class,
         ]);
 
-        $this->assertSame(DummyConnection2::class, Connection::resolveDriver('dummy2'));
+        $this->assertSame(DummyDriver2::class, Connection::resolveDriver('dummy2'));
 
-        $this->assertSame(DummyConnection3::class, Connection::resolveDriver('dummy3'));
+        $this->assertSame(DummyDriver3::class, Connection::resolveDriver('dummy3'));
 
-        Connection::register(DummyConnection4::class);
+        Connection::registerDriver(DummyDriver4::class);
 
-        $this->assertSame(DummyConnection4::class, Connection::resolveDriver('dummy4'));
+        $this->assertSame(DummyDriver4::class, Connection::resolveDriver('dummy4'));
     }
 
     public function testCreatePdo()

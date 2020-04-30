@@ -2,12 +2,12 @@
 
 namespace atk4\dsql\Oracle\Version12c;
 
-use atk4\dsql\Oracle\Connection as BaseConnection;
+use atk4\dsql\Oracle\Driver as BaseDriver;
 
 /**
  * Custom Connection class specifically for Oracle 12c database.
  */
-class Connection extends BaseConnection
+class Driver extends BaseDriver
 {
     public $driverType = 'oci12';
 

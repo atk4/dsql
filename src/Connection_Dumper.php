@@ -3,8 +3,8 @@
 namespace atk4\dsql;
 
 /**
- * @deprecated use Debug\Stopwatch\Connection instead
+ * @deprecated use Debug\Stopwatch\Driver instead
  */
-class Connection_Dumper extends Debug\Stopwatch\Connection
+class Connection_Dumper extends Debug\Stopwatch\Driver
 {
 }

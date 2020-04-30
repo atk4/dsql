@@ -23,8 +23,8 @@ Other Interesting Drivers
 =========================== ========= ======== ============
 Class                       Support   PDO      Dependency
 =========================== ========= ======== ============
-Debug\Stopwatch\Connection  Full      dumper:  native, Proxy
-Debug\Profiler\Connection   Full      counter: native, Proxy
+Debug\Stopwatch\Driver      Full      dumper:  native, Proxy
+Debug\Profiler\Driver       Full      counter: native, Proxy
 =========================== ========= ======== ============
 
 

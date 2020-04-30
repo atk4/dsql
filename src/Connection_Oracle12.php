@@ -3,8 +3,8 @@
 namespace atk4\dsql;
 
 /**
- * @deprecated use Oracle\Version12c\Connection instead
+ * @deprecated use Oracle\Version12c\Driver instead
  */
-class Connection_Oracle12 extends Oracle\Version12c\Connection
+class Connection_Oracle12 extends Oracle\Version12c\Driver
 {
 }
