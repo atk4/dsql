@@ -418,9 +418,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             throw new Exception('Template is not defined for Expression');
         }
 
+        // [xxx] = param
+        // {xxx} = escape
+        // {{xxx}} = escapeSoft
         $res = preg_replace_callback(
-            //     param     |  escape   |  escapeSoft
-            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}|{{[a-z0-9_]*}}/i',
+            '~(?<!\\\\)(?:\\\\\\\\)*+\K(?:\[\w*\]|{\w*}|{{\w*}})~i',
             function ($matches) use (&$nameless_count) {
                 $identifier = substr($matches[0], 1, -1);
 
@@ -435,7 +437,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     }
                 }
 
-                // Allow template to contain []
+                // allow template to contain []
                 if ($identifier === '') {
                     $identifier = $nameless_count++;
 
