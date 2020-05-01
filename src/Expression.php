@@ -423,7 +423,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // - {{xxx}} = escapeSoft
         // - backslash escapes next character
         $res = preg_replace_callback(
-            '~\\\\.|\[\w*\]|{\w*}|{{\w*}}~i',
+            '~\\\\.|\[\w*\]|{\w*}|{{\w*}}~is',
             function ($matches) use (&$nameless_count) {
                 $identifier = substr($matches[0], 1, -1);
 
