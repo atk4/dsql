@@ -2,7 +2,7 @@
 
 namespace atk4\dsql;
 
-class ProxyConnection extends Connection
+class ProxyDriver extends Connection
 {
     /**
      * Specifying $properties to constructors will override default
@@ -14,8 +14,8 @@ class ProxyConnection extends Connection
     {
         parent::__construct($properties);
 
-        if ($this->driver instanceof \atk4\dsql\Connection && $this->driver->driverType) {
-            $this->driverType = $this->driver->driverType;
+        if (method_exists($this->driver, 'getType')) {
+            $this->type = $this->driver->getType();
         }
     }
 

@@ -2,14 +2,14 @@
 
 namespace atk4\dsql\Oracle;
 
-use atk4\dsql\Connection;
+use atk4\dsql\Driver as BaseDriver;
 
 /**
  * Custom Connection class specifically for Oracle database.
  */
-class Driver extends Connection
+class Driver extends BaseDriver
 {
-    public $driverType = 'oci';
+    public $type = 'oci';
 
     /** @var string Query classname */
     protected $queryClass = Query::class;

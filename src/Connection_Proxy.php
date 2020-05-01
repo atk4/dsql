@@ -3,8 +3,8 @@
 namespace atk4\dsql;
 
 /**
- * @deprecated use ProxyConnection instead
+ * @deprecated use ProxyDriver instead
  */
-class Connection_Proxy extends ProxyConnection
+class Connection_Proxy extends ProxyDriver
 {
 }

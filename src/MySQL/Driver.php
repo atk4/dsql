@@ -2,11 +2,11 @@
 
 namespace atk4\dsql\MySQL;
 
-use atk4\dsql\Connection;
+use atk4\dsql\Driver as BaseDriver;
 
-class Driver extends Connection
+class Driver extends BaseDriver
 {
-    public $driverType = 'mysql';
+    public $type = 'mysql';
 
     protected $queryClass = Query::class;
 

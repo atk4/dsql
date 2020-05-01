@@ -3,11 +3,11 @@
 namespace atk4\dsql\Debug\Stopwatch;
 
 use atk4\dsql\Expression;
-use atk4\dsql\ProxyConnection;
+use atk4\dsql\ProxyDriver;
 
-class Driver extends ProxyConnection
+class Driver extends ProxyDriver
 {
-    public $driverType = 'stopwatch';
+    public $type = 'stopwatch';
 
     /**
      * Callable to call for outputting.
@@ -26,7 +26,7 @@ class Driver extends ProxyConnection
      */
     protected $startTime;
 
-    public static function createDriver(array $dsn)
+    public static function factory(array $dsn)
     {
         return static::create($dsn['rest'], $dsn['user'], $dsn['pass']);
     }

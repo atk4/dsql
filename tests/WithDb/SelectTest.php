@@ -86,7 +86,7 @@ class SelectTest extends AtkPhpunit\TestCase
          * But CAST(.. AS int) does not work in mysql. So we use two different tests..
          * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
          */
-        if ($this->c->driverType === 'pgsql') {
+        if ($this->c->getDriverType() === 'pgsql') {
             $this->assertSame(
                 [['now' => '6']],
                 $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
@@ -112,7 +112,7 @@ class SelectTest extends AtkPhpunit\TestCase
          * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
          * entire string on mysql.
          */
-        if ($this->c->driverType === 'pgsql') {
+        if ($this->c->getDriverType() === 'pgsql') {
             $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS TEXT)', ['foo'])->getOne()
@@ -190,7 +190,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
 
         // replace
-        if ($this->c->driverType === 'pgsql') {
+        if ($this->c->getDriverType() === 'pgsql') {
             $this->q('employee')
                 ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->where('id', 1)
@@ -247,11 +247,11 @@ class SelectTest extends AtkPhpunit\TestCase
                 'sqlite' => 1,    // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
                 'mysql' => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
                 'pgsql' => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
-            ][$this->c->driverType];
+            ][$this->c->getDriverType()];
             $this->assertSame($unknownFieldErrorCode, $e->getCode());
 
             // test debug query
-            if ($this->c->driverType === 'mysql') {
+            if ($this->c->getDriverType() === 'mysql') {
                 $this->assertSame('select `non_existing_field` from `non_existing_table`', $e->getDebugQuery());
             } else {
                 $this->assertSame('select "non_existing_field" from "non_existing_table"', $e->getDebugQuery());

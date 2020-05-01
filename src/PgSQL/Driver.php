@@ -2,14 +2,14 @@
 
 namespace atk4\dsql\PgSQL;
 
-use atk4\dsql\Connection;
+use atk4\dsql\Driver as BaseDriver;
 
 /**
  * Custom Connection class specifically for PostgreSQL database.
  */
-class Driver extends Connection
+class Driver extends BaseDriver
 {
-    public $driverType = 'pgsql';
+    public $type = 'pgsql';
 
     protected $queryClass = Query::class;
 

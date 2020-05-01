@@ -4,25 +4,26 @@ namespace atk4\dsql\tests;
 
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
+use atk4\dsql\Driver;
 
-class DummyDriver extends Connection
+class DummyDriver extends Driver
 {
-    public $driverType = 'dummy';
+    public $type = 'dummy';
 }
 
-class DummyDriver2 extends Connection
+class DummyDriver2 extends Driver
 {
-    public $driverType = 'dummy2';
+    public $type = 'dummy2';
 }
 
-class DummyDriver3 extends Connection
+class DummyDriver3 extends Driver
 {
-    public $driverType = 'dummy3';
+    public $type = 'dummy3';
 }
 
-class DummyDriver4 extends Connection
+class DummyDriver4 extends Driver
 {
-    public $driverType = 'dummy4';
+    public $type = 'dummy4';
 }
 
 /**
@@ -89,22 +90,22 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testConnectionRegistry()
     {
-        DummyDriver::registerDriver();
+        DummyDriver::register();
 
-        $this->assertSame(DummyDriver::class, Connection::resolveDriver('dummy'));
+        $this->assertSame(DummyDriver::class, Driver::resolve('dummy'));
 
-        Connection::registerDriver([
+        Driver::register([
             DummyDriver2::class,
             DummyDriver3::class,
         ]);
 
-        $this->assertSame(DummyDriver2::class, Connection::resolveDriver('dummy2'));
+        $this->assertSame(DummyDriver2::class, Driver::resolve('dummy2'));
 
-        $this->assertSame(DummyDriver3::class, Connection::resolveDriver('dummy3'));
+        $this->assertSame(DummyDriver3::class, Driver::resolve('dummy3'));
 
-        Connection::registerDriver(DummyDriver4::class);
+        Driver::register(DummyDriver4::class);
 
-        $this->assertSame(DummyDriver4::class, Connection::resolveDriver('dummy4'));
+        $this->assertSame(DummyDriver4::class, Driver::resolve('dummy4'));
     }
 
     public function testCreatePdo()
@@ -118,7 +119,9 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testCreateProxy()
     {
-        $driver = new class() {
+        $driver = new class() extends Driver {
+            public $type = 'aaa';
+
             public function driver()
             {
                 return 'aaa';
@@ -127,7 +130,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
         $c = Connection::create($driver);
 
-        $this->assertSame(\atk4\dsql\ProxyConnection::class, get_class($c));
+        $this->assertSame(\atk4\dsql\ProxyDriver::class, get_class($c));
 
         $this->assertSame($c->driver(), 'aaa');
     }
@@ -138,13 +141,13 @@ class ConnectionTest extends AtkPhpunit\TestCase
     public function testDriverType()
     {
         $c = Connection::create('sqlite::memory:');
-        $this->assertSame('sqlite', $c->driverType);
+        $this->assertSame('sqlite', $c->getDriverType());
 
         $c = Connection::create('stopwatch:sqlite::memory:');
-        $this->assertSame('sqlite', $c->driverType);
+        $this->assertSame('sqlite', $c->getDriverType());
 
         $c = Connection::create('profile:sqlite::memory:');
-        $this->assertSame('sqlite', $c->driverType);
+        $this->assertSame('sqlite', $c->getDriverType());
     }
 
     /**

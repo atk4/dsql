@@ -2,11 +2,11 @@
 
 namespace atk4\dsql\SQLite;
 
-use atk4\dsql\Connection;
+use atk4\dsql\Driver as BaseDriver;
 
-class Driver extends Connection
+class Driver extends BaseDriver
 {
-    public $driverType = 'sqlite';
+    public $type = 'sqlite';
 
     /** @var string Query classname */
     protected $queryClass = Query::class;

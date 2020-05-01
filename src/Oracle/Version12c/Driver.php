@@ -9,15 +9,15 @@ use atk4\dsql\Oracle\Driver as BaseDriver;
  */
 class Driver extends BaseDriver
 {
-    public $driverType = 'oci12';
+    public $type = 'oci12';
 
     /** @var string Query classname */
     protected $queryClass = Query::class;
 
-    public static function createDriver(array $dsn)
+    public static function factory(array $dsn)
     {
         $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
 
-        return parent::createDriver($dsn);
+        return parent::factory($dsn);
     }
 }

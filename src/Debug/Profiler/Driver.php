@@ -3,12 +3,12 @@
 namespace atk4\dsql\Debug\Profiler;
 
 use atk4\dsql\Expression;
-use atk4\dsql\ProxyConnection;
+use atk4\dsql\ProxyDriver;
 use atk4\dsql\Query;
 
-class Driver extends ProxyConnection
+class Driver extends ProxyDriver
 {
-    public $driverType = 'profile';
+    public $type = 'profile';
 
     /**
      * Callable to call for outputting.
@@ -36,7 +36,7 @@ class Driver extends ProxyConnection
     /** @var int Count of rows iterated */
     protected $rows = 0;
 
-    public static function createDriver(array $dsn)
+    public static function factory(array $dsn)
     {
         return static::create($dsn['rest'], $dsn['user'], $dsn['pass']);
     }
