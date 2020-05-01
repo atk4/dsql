@@ -418,13 +418,18 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             throw new Exception('Template is not defined for Expression');
         }
 
-        // [xxx] = param
-        // {xxx} = escape
-        // {{xxx}} = escapeSoft
+        // - [xxx] = param
+        // - {xxx} = escape
+        // - {{xxx}} = escapeSoft
+        // - backslash escapes next character
         $res = preg_replace_callback(
-            '~(?<!\\\\)(?:\\\\\\\\)*+\K(?:\[\w*\]|{\w*}|{{\w*}})~i',
+            '~\\\\.|\[\w*\]|{\w*}|{{\w*}}~i',
             function ($matches) use (&$nameless_count) {
                 $identifier = substr($matches[0], 1, -1);
+
+                if ($identifier === '\\') {
+                    return $matches[0][1];
+                }
 
                 if ($matches[0][0] === '[') {
                     $escaping = 'param';
