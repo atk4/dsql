@@ -2,8 +2,6 @@
 
 namespace atk4\dsql;
 
-use atk4\data\Model;
-
 /**
  * Class for establishing and maintaining connection with your database.
  */
@@ -404,15 +402,14 @@ class Connection
     /**
      * Return last inserted ID value.
      *
-     * Few Connection drivers need to receive Model to get ID because PDO doesn't support this method.
+     * Few Connection drivers need to receive sequence name to get ID because PDO doesn't support this method.
      *
-     * @param Model Optional data model from which to return last ID
-     * @param string Optional sequence name from which to return last ID (this takes precedence)
+     * @param string $sequence Optional sequence name from which to return last ID
      *
      * @return mixed
      */
-    public function lastInsertID(Model $m = null, string $sequence = null)
+    public function lastInsertID(string $sequence = null)
     {
-        return $this->connection()->lastInsertID();
+        return $sequence === null ? $this->connection()->lastInsertID() : $this->connection()->lastInsertID($sequence);
     }
 }
