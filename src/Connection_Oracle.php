@@ -2,6 +2,8 @@
 
 namespace atk4\dsql;
 
+use atk4\data\Model;
+
 /**
  * Custom Connection class specifically for Oracle database.
  */
@@ -32,18 +34,18 @@ class Connection_Oracle extends Connection
      *
      * Few Connection drivers need to receive Model to get ID because PDO doesn't support this method.
      *
-     * @param \atk4\data\Model Optional data model from which to return last ID
+     * @param Model Optional data model from which to return last ID
+     * @param string Optional sequence name from which to return last ID (this takes precedence)
      *
      * @return mixed
      */
-    public function lastInsertID($m = null)
+    public function lastInsertID(Model $m = null, string $sequence = null)
     {
-        if ($m instanceof \atk4\data\Model) {
-            // if we use sequence, then we can easily get current value
-            if (isset($m->sequence)) {
-                return $this->dsql()->mode('seq_currval')->sequence($m->sequence)->getOne();
-            }
+        $seq = $sequence ?? ($m && $m->sequence ? $m->sequence : null);
 
+        if ($seq) {
+            return $this->dsql()->mode('seq_currval')->sequence($seq)->getOne();
+        } elseif ($m instanceof Model) {
             // otherwise we have to select max(id_field) - this can be bad for performance !!!
             // Imants: Disabled for now because otherwise this will work even if database use triggers or
             // any other mechanism to automatically increment ID and we can't tell this line to not execute.
@@ -51,6 +53,6 @@ class Connection_Oracle extends Connection
         }
 
         // fallback
-        return parent::lastInsertID($m);
+        return parent::lastInsertID($m, $sequence);
     }
 }
