@@ -637,7 +637,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * @param string|int|bool|null $v
      */
-    protected function getCastValue($v): ?string
+    private function getCastValue($v): ?string
     {
         if ($v === null) {
             return null;
