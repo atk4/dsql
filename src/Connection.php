@@ -404,14 +404,14 @@ class Connection
     /**
      * Return last inserted ID value.
      *
-     * Few Connection drivers need to receive Model to get ID because PDO doesn't support this method.
+     * Few Connection drivers need to receive sequence name to get ID because PDO doesn't support this method.
      *
-     * @param \atk4\data\Model Optional data model from which to return last ID
+     * @param string $sequence Optional sequence name from which to return last ID
      *
      * @return mixed
      */
-    public function lastInsertID($m = null)
+    public function lastInsertID(string $sequence = null)
     {
-        return $this->connection()->lastInsertID();
+        return $sequence === null ? $this->connection()->lastInsertID() : $this->connection()->lastInsertID($sequence);
     }
 }
