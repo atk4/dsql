@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace atk4\dsql;
 
 use atk4\core\AtkPhpunit;

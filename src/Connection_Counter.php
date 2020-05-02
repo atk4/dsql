@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace atk4\dsql;
 
 class Connection_Counter extends Connection_Proxy
