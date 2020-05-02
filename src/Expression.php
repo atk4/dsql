@@ -587,7 +587,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     // workaround to support LOB data type 2/2, see https://github.com/doctrine/dbal/pull/2434
                     $statement->boundValues[$key] = $val;
                     if ($type === \PDO::PARAM_STR) {
-                        $bind = $statement->bindParam($key, $statement->boundValues[$key], $type, strlen($val));
+                        $bind = $statement->bindParam($key, $statement->boundValues[$key], $type, strlen((string)$val));
                     } else {
                         $bind = $statement->bindParam($key, $statement->boundValues[$key], $type);
                     }
