@@ -635,6 +635,20 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     // {{{ Result Querying
 
     /**
+     * @param string|int|bool|null $v
+     */
+    protected function getCastValue($v): ?string
+    {
+        if ($v === null) {
+            return null;
+        } elseif (is_bool($v)) {
+            return $v ? '1' : '0';
+        }
+
+        return (string) $v;
+    }
+
+    /**
      * Executes expression and return whole result-set in form of array of hashes.
      *
      * @return string[][]|null[][]
@@ -651,7 +665,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         return array_map(function ($row) {
             return array_map(function ($v) {
-                return $v !== null ? (string) $v : $v;
+                return $this->getCastValue($v);
             }, $row);
         }, $res);
     }
@@ -679,7 +693,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         return array_map(function ($v) {
-            return $v !== null ? (string) $v : $v;
+            return $this->getCastValue($v);
         }, $res);
     }
 
