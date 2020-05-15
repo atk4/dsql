@@ -783,7 +783,7 @@ class Query extends Expression
                 $cond = '=';
             }
         } else {
-            $cond = trim(strtolower($cond));
+            $cond = trim(mb_strtolower($cond));
         }
 
         // below we can be sure that all 3 arguments has been passed
@@ -1236,7 +1236,7 @@ class Query extends Expression
         // Explode string only if ordering keyword is 'desc' or 'asc'.
         if ($desc === null && is_string($order) && mb_strpos($order, ' ') !== false) {
             $_chunks = explode(' ', $order);
-            $_desc = strtolower(array_pop($_chunks));
+            $_desc = mb_strtolower(array_pop($_chunks));
             if (in_array($_desc, ['desc', 'asc'], true)) {
                 $order = implode(' ', $_chunks);
                 $desc = $_desc;
@@ -1245,7 +1245,7 @@ class Query extends Expression
 
         if (is_bool($desc)) {
             $desc = $desc ? 'desc' : '';
-        } elseif (strtolower($desc ?? '') === 'asc') {
+        } elseif (mb_strtolower($desc ?? '') === 'asc') {
             $desc = '';
         }
         // no else - allow custom order like "order by name desc nulls last" for Oracle

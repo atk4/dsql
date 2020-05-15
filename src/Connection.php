@@ -89,7 +89,7 @@ class Connection
                 ]);
             }
             list($driverType, $rest) = explode(':', $dsn, 2);
-            $driverType = strtolower($driverType);
+            $driverType = mb_strtolower($driverType);
         } else {
             // currently impossible to be like this, but we don't want ugly exceptions here
             $driverType = $rest = null;
