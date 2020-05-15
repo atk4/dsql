@@ -308,8 +308,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     {
         return is_object($value)
             || $value === '*'
-            || strpos($value, '(') !== false
-            || strpos($value, $this->escape_char) !== false;
+            || mb_strpos($value, '(') !== false
+            || mb_strpos($value, $this->escape_char) !== false;
     }
 
     /**
@@ -336,7 +336,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return $value;
         }
 
-        if (is_string($value) && strpos($value, '.') !== false) {
+        if (is_string($value) && mb_strpos($value, '.') !== false) {
             return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
@@ -424,14 +424,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             //     param     |  escape   |  escapeSoft
             '/\[[a-z0-9_]*\]|{[a-z0-9_]*}|{{[a-z0-9_]*}}/i',
             function ($matches) use (&$nameless_count) {
-                $identifier = substr($matches[0], 1, -1);
+                $identifier = mb_substr($matches[0], 1, -1);
 
                 if ($matches[0][0] === '[') {
                     $escaping = 'param';
                 } elseif ($matches[0][0] === '{') {
                     if ($matches[0][1] === '{') {
                         $escaping = 'soft-escape';
-                        $identifier = substr($identifier, 1, -1);
+                        $identifier = mb_substr($identifier, 1, -1);
                     } else {
                         $escaping = 'escape';
                     }

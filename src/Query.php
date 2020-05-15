@@ -119,7 +119,7 @@ class Query extends Expression
     public function field($field, $alias = null)
     {
         // field is passed as string, may contain commas
-        if (is_string($field) && strpos($field, ',') !== false) {
+        if (is_string($field) && mb_strpos($field, ',') !== false) {
             $field = explode(',', $field);
         }
 
@@ -220,7 +220,7 @@ class Query extends Expression
     public function table($table, $alias = null)
     {
         // comma-separated table names
-        if (is_string($table) && strpos($table, ',') !== false) {
+        if (is_string($table) && mb_strpos($table, ',') !== false) {
             $table = explode(',', $table);
         }
 
@@ -898,7 +898,7 @@ class Query extends Expression
     public function group($group)
     {
         // Case with comma-separated fields
-        if (is_string($group) && !$this->isUnescapablePattern($group) && strpos($group, ',') !== false) {
+        if (is_string($group) && !$this->isUnescapablePattern($group) && mb_strpos($group, ',') !== false) {
             $group = explode(',', $group);
         }
 
@@ -1062,7 +1062,7 @@ class Query extends Expression
     public function option($option, $mode = 'select')
     {
         // Case with comma-separated options
-        if (is_string($option) && strpos($option, ',') !== false) {
+        if (is_string($option) && mb_strpos($option, ',') !== false) {
             $option = explode(',', $option);
         }
 
@@ -1215,7 +1215,7 @@ class Query extends Expression
     public function order($order, $desc = null)
     {
         // Case with comma-separated fields or first argument being an array
-        if (is_string($order) && strpos($order, ',') !== false) {
+        if (is_string($order) && mb_strpos($order, ',') !== false) {
             $order = explode(',', $order);
         }
 
@@ -1234,7 +1234,7 @@ class Query extends Expression
 
         // First argument may contain space, to divide field and ordering keyword.
         // Explode string only if ordering keyword is 'desc' or 'asc'.
-        if ($desc === null && is_string($order) && strpos($order, ' ') !== false) {
+        if ($desc === null && is_string($order) && mb_strpos($order, ' ') !== false) {
             $_chunks = explode(' ', $order);
             $_desc = strtolower(array_pop($_chunks));
             if (in_array($_desc, ['desc', 'asc'], true)) {
