@@ -431,7 +431,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif ($matches[0][0] === '{') {
                     if ($matches[0][1] === '{') {
                         $escaping = 'soft-escape';
-                        $identifier = mb_substr($identifier, 1, -1);
+                        $identifier = substr($identifier, 1, -1);
                     } else {
                         $escaping = 'escape';
                     }
