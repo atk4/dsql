@@ -308,8 +308,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     {
         return is_object($value)
             || $value === '*'
-            || mb_strpos($value, '(') !== false
-            || mb_strpos($value, $this->escape_char) !== false;
+            || strpos($value, '(') !== false
+            || strpos($value, $this->escape_char) !== false;
     }
 
     /**
@@ -336,7 +336,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return $value;
         }
 
-        if (is_string($value) && mb_strpos($value, '.') !== false) {
+        if (is_string($value) && strpos($value, '.') !== false) {
             return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 

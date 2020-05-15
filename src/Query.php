@@ -119,7 +119,7 @@ class Query extends Expression
     public function field($field, $alias = null)
     {
         // field is passed as string, may contain commas
-        if (is_string($field) && mb_strpos($field, ',') !== false) {
+        if (is_string($field) && strpos($field, ',') !== false) {
             $field = explode(',', $field);
         }
 
@@ -220,7 +220,7 @@ class Query extends Expression
     public function table($table, $alias = null)
     {
         // comma-separated table names
-        if (is_string($table) && mb_strpos($table, ',') !== false) {
+        if (is_string($table) && strpos($table, ',') !== false) {
             $table = explode(',', $table);
         }
 
@@ -783,7 +783,7 @@ class Query extends Expression
                 $cond = '=';
             }
         } else {
-            $cond = trim(mb_strtolower($cond));
+            $cond = trim(strtolower($cond));
         }
 
         // below we can be sure that all 3 arguments has been passed
@@ -898,7 +898,7 @@ class Query extends Expression
     public function group($group)
     {
         // Case with comma-separated fields
-        if (is_string($group) && !$this->isUnescapablePattern($group) && mb_strpos($group, ',') !== false) {
+        if (is_string($group) && !$this->isUnescapablePattern($group) && strpos($group, ',') !== false) {
             $group = explode(',', $group);
         }
 
@@ -1062,7 +1062,7 @@ class Query extends Expression
     public function option($option, $mode = 'select')
     {
         // Case with comma-separated options
-        if (is_string($option) && mb_strpos($option, ',') !== false) {
+        if (is_string($option) && strpos($option, ',') !== false) {
             $option = explode(',', $option);
         }
 
@@ -1215,7 +1215,7 @@ class Query extends Expression
     public function order($order, $desc = null)
     {
         // Case with comma-separated fields or first argument being an array
-        if (is_string($order) && mb_strpos($order, ',') !== false) {
+        if (is_string($order) && strpos($order, ',') !== false) {
             $order = explode(',', $order);
         }
 
@@ -1234,9 +1234,9 @@ class Query extends Expression
 
         // First argument may contain space, to divide field and ordering keyword.
         // Explode string only if ordering keyword is 'desc' or 'asc'.
-        if ($desc === null && is_string($order) && mb_strpos($order, ' ') !== false) {
+        if ($desc === null && is_string($order) && strpos($order, ' ') !== false) {
             $_chunks = explode(' ', $order);
-            $_desc = mb_strtolower(array_pop($_chunks));
+            $_desc = strtolower(array_pop($_chunks));
             if (in_array($_desc, ['desc', 'asc'], true)) {
                 $order = implode(' ', $_chunks);
                 $desc = $_desc;
@@ -1245,7 +1245,7 @@ class Query extends Expression
 
         if (is_bool($desc)) {
             $desc = $desc ? 'desc' : '';
-        } elseif (mb_strtolower($desc ?? '') === 'asc') {
+        } elseif (strtolower($desc ?? '') === 'asc') {
             $desc = '';
         }
         // no else - allow custom order like "order by name desc nulls last" for Oracle
