@@ -70,7 +70,7 @@ class Connection
             // DSN is using URL-like format, so we need to convert it
             $dsn = $parts['scheme'] . ':host=' . $parts['host']
                 . (isset($parts['port']) ? ';port=' . $parts['port'] : '')
-                . ';dbname=' . mb_substr($parts['path'], 1);
+                . ';dbname=' . substr($parts['path'], 1);
             $user = $user ?? ($parts['user'] ?? null);
             $pass = $pass ?? ($parts['pass'] ?? null);
         }
@@ -82,7 +82,7 @@ class Connection
 
         // If it's string, then find driver
         if (is_string($dsn)) {
-            if (mb_strpos($dsn, ':') === false) {
+            if (strpos($dsn, ':') === false) {
                 throw new Exception([
                     "Your DSN format is invalid. Must be in 'driverType:host;options' format",
                     'dsn' => $dsn,

@@ -424,7 +424,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             //     param     |  escape   |  escapeSoft
             '/\[[a-z0-9_]*\]|{[a-z0-9_]*}|{{[a-z0-9_]*}}/i',
             function ($matches) use (&$nameless_count) {
-                $identifier = mb_substr($matches[0], 1, -1);
+                $identifier = substr($matches[0], 1, -1);
 
                 if ($matches[0][0] === '[') {
                     $escaping = 'param';
@@ -587,7 +587,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     // workaround to support LOB data type 2/2, see https://github.com/doctrine/dbal/pull/2434
                     $statement->boundValues[$key] = $val;
                     if ($type === \PDO::PARAM_STR) {
-                        $bind = $statement->bindParam($key, $statement->boundValues[$key], $type, mb_strlen((string) $val));
+                        $bind = $statement->bindParam($key, $statement->boundValues[$key], $type, strlen((string) $val));
                     } else {
                         $bind = $statement->bindParam($key, $statement->boundValues[$key], $type);
                     }
