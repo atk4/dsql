@@ -84,7 +84,7 @@ class Connection
         if (is_string($dsn)) {
             if (strpos($dsn, ':') === false) {
                 throw new Exception([
-                    "Your DSN format is invalid. Must be in 'driverType:host;options' format",
+                    'Your DSN format is invalid. Must be in "driverType:host;options" format',
                     'dsn' => $dsn,
                 ]);
             }
