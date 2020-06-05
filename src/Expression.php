@@ -82,11 +82,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         if (is_string($properties)) {
             $properties = ['template' => $properties];
         } elseif (!is_array($properties)) {
-            throw new Exception([
-                'Incorrect use of Expression constructor',
-                'properties' => $properties,
-                'arguments' => $arguments,
-            ]);
+            throw (new Exception('Incorrect use of Expression constructor'))
+                ->addMoreInfo('properties', $properties)
+                ->addMoreInfo('arguments', $arguments);
         }
 
         // supports passing template as property value without key 'template'
@@ -98,11 +96,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // save arguments
         if ($arguments !== null) {
             if (!is_array($arguments)) {
-                throw new Exception([
-                    'Expression arguments must be an array',
-                    'properties' => $properties,
-                    'arguments' => $arguments,
-                ]);
+                throw (new Exception('Expression arguments must be an array'))
+                    ->addMoreInfo('properties', $properties)
+                    ->addMoreInfo('arguments', $arguments);
             }
             $this->args['custom'] = $arguments;
         }
@@ -224,10 +220,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (!is_string($tag)) {
-            throw new Exception([
-                'Tag should be string',
-                'tag' => $tag,
-            ]);
+            throw (new Exception('Tag should be string'))
+                ->addMoreInfo('tag', $tag);
         }
 
         // unset custom/argument or argument if such exists
@@ -262,10 +256,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     return $sql_code;
             }
 
-            throw new Exception([
-                '$escape_mode value is incorrect',
-                'escape_mode' => $escape_mode,
-            ]);
+            throw (new Exception('$escape_mode value is incorrect'))
+                ->addMoreInfo('escape_mode', $escape_mode);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
@@ -274,10 +266,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (!$sql_code instanceof self) {
-            throw new Exception([
-                'Only Expressions or Expressionable objects may be used in Expression',
-                'object' => $sql_code,
-            ]);
+            throw (new Exception('Only Expressions or Expressionable objects may be used in Expression'))
+                ->addMoreInfo('object', $sql_code);
         }
 
         // at this point $sql_code is instance of Expression
@@ -452,10 +442,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 } elseif (method_exists($this, $fx)) {
                     $value = $this->{$fx}();
                 } else {
-                    throw new Exception([
-                        'Expression could not render tag',
-                        'tag' => $identifier,
-                    ]);
+                    throw (new Exception('Expression could not render tag'))
+                        ->addMoreInfo('tag', $identifier);
                 }
 
                 return is_array($value) ? '(' . implode(',', $value) . ')' : $value;
@@ -576,12 +564,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     } elseif (is_resource($val)) {
                         $type = \PDO::PARAM_LOB;
                     } else {
-                        throw new Exception([
-                            'Incorrect param type',
-                            'key' => $key,
-                            'value' => $val,
-                            'type' => gettype($val),
-                        ]);
+                        throw (new Exception('Incorrect param type'))
+                            ->addMoreInfo('key', $key)
+                            ->addMoreInfo('value', $val)
+                            ->addMoreInfo('type', gettype($val));
                     }
 
                     // workaround to support LOB data type 2/2, see https://github.com/doctrine/dbal/pull/2434
@@ -593,23 +579,19 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     }
 
                     if (!$bind) {
-                        throw new Exception([
-                            'Unable to bind parameter',
-                            'param' => $key,
-                            'value' => $val,
-                            'type' => $type,
-                        ]);
+                        throw (new Exception('Unable to bind parameter'))
+                            ->addMoreInfo('param', $key)
+                            ->addMoreInfo('value', $val)
+                            ->addMoreInfo('type', $type);
                     }
                 }
 
                 $statement->setFetchMode(\PDO::FETCH_ASSOC);
                 $statement->execute();
             } catch (\PDOException $e) {
-                $new = new ExecuteException([
-                    'DSQL got Exception when executing this query',
-                    'error' => $e->errorInfo[2],
-                    'query' => $this->getDebugQuery(),
-                ], $e->errorInfo[1]);
+                $new = (new ExecuteException('DSQL got Exception when executing this query', $e->errorInfo[1]))
+                    ->addMoreInfo('error', $e->errorInfo[2])
+                    ->addMoreInfo('query', $this->getDebugQuery());
 
                 throw $new;
             }
@@ -617,7 +599,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return $statement;
         }
 
-        /** @var Connection $connection */
+        // @var Connection $connection
         return $connection->execute($this);
     }
 
@@ -704,11 +686,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     {
         $row = $this->getRow();
         if ($row === null || count($row) === 0) {
-            throw new Exception([
-                'Unable to fetch single cell of data for getOne from this query',
-                'result' => $row,
-                'query' => $this->getDebugQuery(),
-            ]);
+            throw (new Exception('Unable to fetch single cell of data for getOne from this query'))
+                ->addMoreInfo('result', $row)
+                ->addMoreInfo('query', $this->getDebugQuery());
         }
 
         return reset($row);

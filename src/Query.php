@@ -126,10 +126,8 @@ class Query extends Expression
         // recursively add array fields
         if (is_array($field)) {
             if ($alias !== null) {
-                throw new Exception([
-                    'Alias must not be specified when $field is an array',
-                    'alias' => $alias,
-                ]);
+                throw (new Exception('Alias must not be specified when $field is an array'))
+                    ->addMoreInfo('alias', $alias);
             }
 
             foreach ($field as $alias => $f) {
@@ -227,10 +225,8 @@ class Query extends Expression
         // array of tables - recursively process each
         if (is_array($table)) {
             if ($alias !== null) {
-                throw new Exception([
-                    'You cannot use single alias with multiple tables',
-                    'alias' => $alias,
-                ]);
+                throw (new Exception('You cannot use single alias with multiple tables'))
+                    ->addMoreInfo('alias', $alias);
             }
 
             foreach ($table as $alias => $t) {
@@ -680,11 +676,9 @@ class Query extends Expression
                 break;
             case 2:
                 if (is_object($cond) && !$cond instanceof Expressionable && !$cond instanceof Expression) {
-                    throw new Exception([
-                        'Value cannot be converted to SQL-compatible expression',
-                        'field' => $field,
-                        'value' => $cond,
-                    ]);
+                    throw (new Exception('Value cannot be converted to SQL-compatible expression'))
+                        ->addMoreInfo('field', $field)
+                        ->addMoreInfo('value', $cond);
                 }
 
                 $this->args[$kind][] = [$field, $cond];
@@ -692,12 +686,10 @@ class Query extends Expression
                 break;
             case 3:
                 if (is_object($value) && !$value instanceof Expressionable && !$value instanceof Expression) {
-                    throw new Exception([
-                        'Value cannot be converted to SQL-compatible expression',
-                        'field' => $field,
-                        'cond' => $cond,
-                        'value' => $value,
-                    ]);
+                    throw (new Exception('Value cannot be converted to SQL-compatible expression'))
+                        ->addMoreInfo('field', $field)
+                        ->addMoreInfo('cond', $cond)
+                        ->addMoreInfo('value', $value);
                 }
 
                 $this->args[$kind][] = [$field, $cond, $value];
@@ -948,19 +940,15 @@ class Query extends Expression
     public function set($field, $value = null)
     {
         if ($value === false) {
-            throw new Exception([
-                'Value "false" is not supported by SQL',
-                'field' => $field,
-                'value' => $value,
-            ]);
+            throw (new Exception('Value "false" is not supported by SQL'))
+                ->addMoreInfo('field', $field)
+                ->addMoreInfo('value', $value);
         }
 
         if (is_array($value)) {
-            throw new Exception([
-                'Array values are not supported by SQL',
-                'field' => $field,
-                'value' => $value,
-            ]);
+            throw (new Exception('Array values are not supported by SQL'))
+                ->addMoreInfo('field', $field)
+                ->addMoreInfo('value', $value);
         }
 
         if (is_array($field)) {
@@ -974,10 +962,8 @@ class Query extends Expression
         if (is_string($field) || $field instanceof Expression || $field instanceof Expressionable) {
             $this->args['set'][] = [$field, $value];
         } else {
-            throw new Exception([
-                'Field name should be string or Expressionable',
-                'field' => $field,
-            ]);
+            throw (new Exception('Field name should be string or Expressionable'))
+                ->addMoreInfo('field', $field);
         }
 
         return $this;
@@ -1332,10 +1318,8 @@ class Query extends Expression
             $this->mode = $mode;
             $this->template = $this->{$prop};
         } else {
-            throw new Exception([
-                'Query does not have this mode',
-                'mode' => $mode,
-            ]);
+            throw (new Exception('Query does not have this mode'))
+                ->addMoreInfo('mode', $mode);
         }
 
         return $this;
@@ -1501,20 +1485,16 @@ class Query extends Expression
         // when, then
         foreach ($this->args['case_when'] as $row) {
             if (!array_key_exists(0, $row) || !array_key_exists(1, $row)) {
-                throw new Exception([
-                    'Incorrect use of "when" method parameters',
-                    'row' => $row,
-                ]);
+                throw (new Exception('Incorrect use of "when" method parameters'))
+                    ->addMoreInfo('row', $row);
             }
 
             $ret .= ' when ';
             if ($short_form) {
                 // short-form
                 if (is_array($row[0])) {
-                    throw new Exception([
-                        'When using short form CASE statement, then you should not set array as when() method 1st parameter',
-                        'when' => $row[0],
-                    ]);
+                    throw (new Exception('When using short form CASE statement, then you should not set array as when() method 1st parameter'))
+                        ->addMoreInfo('when', $row[0]);
                 }
                 $ret .= $this->_consume($row[0], 'param');
             } else {
@@ -1548,11 +1528,9 @@ class Query extends Expression
         } else {
             // don't allow multiple values with same alias
             if (isset($this->args[$what][$alias])) {
-                throw new Exception([
-                    'Alias should be unique',
-                    'what' => $what,
-                    'alias' => $alias,
-                ]);
+                throw (new Exception('Alias should be unique'))
+                    ->addMoreInfo('what', $what)
+                    ->addMoreInfo('alias', $alias);
             }
 
             $this->args[$what][$alias] = $value;
