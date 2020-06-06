@@ -40,10 +40,8 @@ class Connection
     public function __construct($properties = [])
     {
         if (!is_array($properties)) {
-            throw new Exception([
-                'Invalid properties for "new Connection()". Did you mean to call Connection::connect()?',
-                'properties' => $properties,
-            ]);
+            throw (new Exception('Invalid properties for "new Connection()". Did you mean to call Connection::connect()?'))
+                ->addMoreInfo('properties', $properties);
         }
 
         $this->setDefaults($properties);
@@ -83,10 +81,8 @@ class Connection
         // If it's string, then find driver
         if (is_string($dsn)) {
             if (strpos($dsn, ':') === false) {
-                throw new Exception([
-                    "Your DSN format is invalid. Must be in 'driverType:host;options' format",
-                    'dsn' => $dsn,
-                ]);
+                throw (new Exception('Your DSN format is invalid. Must be in "driverType:host;options" format'))
+                    ->addMoreInfo('dsn', $dsn);
             }
             list($driverType, $rest) = explode(':', $dsn, 2);
             $driverType = strtolower($driverType);

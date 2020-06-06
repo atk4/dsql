@@ -309,7 +309,8 @@ Usage::
 
     throw new atk4\dsql\Exception('Hello');
 
-    throw new atk4\dsql\Exception(['File is not readable', 'file'=>$file]);
+    throw (new atk4\dsql\Exception('File is not readable'))
+        ->addMoreInfo('file', $file);
 
 When displayed to the user the exception will hide parameter for $file, but you
 still can get it if you really need it:
