@@ -11,18 +11,24 @@
   "homepage": "http://agiletoolkit.org/",
   "license": "MIT",
   "authors": [
-    {"name": "Romans Malinovskis", "email": "romans@agiletoolkit.org", "homepage": "https://nearly.guru/" },
-    {"name": "Imants Horsts", "homepage": "https://darkside.lv/"},
-    {"name": "Michael Voříšek", "homepage": "https://mvorisek.cz/"}
+    {
+      "name": "Romans Malinovskis",
+      "email": "romans@agiletoolkit.org",
+      "homepage": "https://nearly.guru/"
+    },
+    {
+      "name": "Imants Horsts",
+      "homepage": "https://darkside.lv/"
+    },
+    {
+      "name": "Michael Voříšek",
+      "homepage": "https://mvorisek.cz/"
+    }
   ],
   "config": {
     "sort-packages": true
   },
   "require": {
-    "php": ">=7.2.0",
-    "atk4/core": "dev-develop"
-  },
-  "require-release": {
     "php": ">=7.2.0",
     "atk4/core": "^2.0"
   },
