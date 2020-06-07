@@ -31,7 +31,7 @@ class SelectTest extends \PHPUnit_Extensions_Database_TestCase
      */
     protected function getDataSet()
     {
-        return $this->createFlatXMLDataSet(dirname(__FILE__).'/SelectTest.xml');
+        return $this->createFlatXMLDataSet(dirname(__FILE__) . '/SelectTest.xml');
     }
 
     private function q($table = null, $alias = null)
