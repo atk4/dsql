@@ -599,7 +599,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return $statement;
         }
 
-        // @var Connection $connection
         return $connection->execute($this);
     }
 
