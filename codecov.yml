@@ -1,16 +1,11 @@
 ignore:
   - docs
-  - tests
-  - tools
+comment: false
 coverage:
-  precision: 2
-  round: down
-  range: "80...100"
   status:
     project:
       default:
-        threshold: 1%
-        target: 100
-        target: 80
-    patch: yes
-    changes: no
+        target: auto
+        threshold: 0.25
+    patch: false
+    changes: false
