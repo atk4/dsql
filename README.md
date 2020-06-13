@@ -21,15 +21,10 @@ Obviously because existing ones are not good enough. DSQL tries to do things dif
 
 DSQL has been in production since 2006, initially included in [AModules2](https://sourceforge.net/projects/amodules3/) and later [Agile Toolkit](https://github.com/atk4/atk4/blob/release-4.0.1/lib/DBlite/dsql.php). We simply forked it and cleaned it up for you:
 
-[![Documentation Status](https://readthedocs.org/projects/dsql/badge/?version=latest)](http://dsql.readthedocs.io/en/latest/?badge=latest)
 ![Build](https://github.com/atk4/dsql/workflows/Unit%20Testing/badge.svg)
-[![Code Climate](https://codeclimate.com/github/atk4/dsql/badges/gpa.svg)](https://codeclimate.com/github/atk4/dsql)
-[![StyleCI](https://styleci.io/repos/50448904/shield)](https://styleci.io/repos/50448904)
 [![CodeCov](https://codecov.io/gh/atk4/dsql/branch/develop/graph/badge.svg)](https://codecov.io/gh/atk4/dsql)
-[![Issue Count](https://codeclimate.com/github/atk4/dsql/badges/issue_count.svg)](https://codeclimate.com/github/atk4/dsql)
-
-[![License](https://poser.pugx.org/atk4/dsql/license)](https://packagist.org/packages/atk4/dsql)
-[![GitHub release](https://img.shields.io/github/release/atk4/dsql.svg?maxAge=2592000)](CHANGELOG.md)
+[![GitHub release](https://img.shields.io/github/release/atk4/dsql.svg)](CHANGELOG.md)
+[![Code Climate](https://codeclimate.com/github/atk4/dsql/badges/gpa.svg)](https://codeclimate.com/github/atk4/dsql)
 
 
 ## DSQL Is Simple and Powerful
@@ -179,15 +174,6 @@ of the frequent topics:
 
 ## Community and Support
 
-[![Gitter](https://img.shields.io/gitter/room/atk4/data.svg?maxAge=2592000)](https://gitter.im/atk4/dataset?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Stack Overlfow Community](https://img.shields.io/stackexchange/stackoverflow/t/atk4.svg?maxAge=2592000)](http://stackoverflow.com/questions/ask?tags=atk4)
+[![Gitter](https://img.shields.io/gitter/room/atk4/data.svg)](https://gitter.im/atk4/dataset?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Stack Overlfow Community](https://img.shields.io/stackexchange/stackoverflow/t/atk4.svg)](http://stackoverflow.com/questions/ask?tags=atk4)
 [![Discord User forum](https://img.shields.io/badge/discord-User_Forum-green.svg)](https://forum.agiletoolkit.org/c/44)
-
-
-## License and Thanks
-
-The code of DSQL is available under MIT license with community and
-[commercial support](http://www.agiletoolkit.org/enterprise) available.
-
-Our team wishes to thanks [Reddit PHP community](https://www.reddit.com/r/PHP/)
-for feedback and help in creation of this project.
