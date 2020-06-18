@@ -27,6 +27,9 @@ class Query extends Expression
 
     /** @var string Expression classname */
     protected $expression_class = Expression::class;
+    
+    /** @var bool Should we wrap query in parenthesis when rendering? */
+    public $wrapInParenthesis = true;
 
     /**
      * SELECT template.

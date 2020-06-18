@@ -669,9 +669,9 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         // $q1 union $q2
-        $u = new Expression('[] union []', [$q1, $q2]);
+        $u = new Expression('([] union [])', [$q1, $q2]);
         $this->assertSame(
-            '(select "date","amount" "debit",0 "credit" from "sales") union (select "date",0 "debit","amount" "credit" from "purchases")',
+            '((select "date","amount" "debit",0 "credit" from "sales") union (select "date",0 "debit","amount" "credit" from "purchases"))',
             $u->render()
         );
 
@@ -679,16 +679,30 @@ class QueryTest extends AtkPhpunit\TestCase
         $q = $this->q()
             ->field('date,debit,credit')
             ->table($u, 'derrivedTable');
-        /*
-         * @see https://github.com/atk4/dsql/issues/33
-         * @see https://github.com/atk4/dsql/issues/34
-         */
-        /*
         $this->assertEquals(
             'select "date","debit","credit" from ((select "date","amount" "debit",0 "credit" from "sales") union (select "date",0 "debit","amount" "credit" from "purchases")) "derrivedTable"',
             $q->render()
         );
-        */
+
+        // SQLite do not support (($q1) union ($q2)) syntax. Correct syntax is ($q1 union $q2) without additional braces
+        // Other SQL engines are more relaxed, but still these additional braces are not needed for union
+        // Let's test how to do that properly
+        $q1->wrapInParenthesis = false;
+        $q2->wrapInParenthesis = false;
+        $u = new Expression('([] union [])', [$q1, $q2]);
+        $this->assertSame(
+            '(select "date","amount" "debit",0 "credit" from "sales" union select "date",0 "debit","amount" "credit" from "purchases")',
+            $u->render()
+        );
+
+        // SELECT date,debit,credit FROM ($q1 union $q2)
+        $q = $this->q()
+            ->field('date,debit,credit')
+            ->table($u, 'derrivedTable');
+        $this->assertEquals(
+            'select "date","debit","credit" from (select "date","amount" "debit",0 "credit" from "sales" union select "date",0 "debit","amount" "credit" from "purchases") "derrivedTable"',
+            $q->render()
+        );
     }
 
     /**
