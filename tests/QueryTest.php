@@ -679,7 +679,7 @@ class QueryTest extends AtkPhpunit\TestCase
         $q = $this->q()
             ->field('date,debit,credit')
             ->table($u, 'derrivedTable');
-        $this->assertEquals(
+        $this->assertSame(
             'select "date","debit","credit" from ((select "date","amount" "debit",0 "credit" from "sales") union (select "date",0 "debit","amount" "credit" from "purchases")) "derrivedTable"',
             $q->render()
         );
@@ -699,7 +699,7 @@ class QueryTest extends AtkPhpunit\TestCase
         $q = $this->q()
             ->field('date,debit,credit')
             ->table($u, 'derrivedTable');
-        $this->assertEquals(
+        $this->assertSame(
             'select "date","debit","credit" from (select "date","amount" "debit",0 "credit" from "sales" union select "date",0 "debit","amount" "credit" from "purchases") "derrivedTable"',
             $q->render()
         );
