@@ -276,7 +276,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         $ret = $sql_code->render();
 
         // Queries should be wrapped in parentheses in most cases
-        if ($sql_code instanceof Query) {
+        if ($sql_code instanceof Query && $sql_code->allowToWrapInParenthesis === true) {
             $ret = '(' . $ret . ')';
         }
 
