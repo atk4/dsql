@@ -28,11 +28,6 @@ class Connection extends Connection_Proxy
      */
     protected $startTime;
 
-    public static function createDriver(array $dsn)
-    {
-        return static::create($dsn['rest'], $dsn['user'], $dsn['pass']);
-    }
-
     /**
      * Execute expression.
      *
