@@ -115,7 +115,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
     public function testMysqlFail()
     {
         $this->expectException(\Exception::class);
-        $c = Connection::connect('mysql:host=localhost;dbname=nosuchdb');
+        $c = Connection::connect('mysql:host=256.256.256.256'); // invalid host
     }
 
     public function testStopwatchEcho()
@@ -127,7 +127,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
             $c->expr('select (2+2)')->getOne()
         );
 
-        $this->expectOutputRegex('/select \\(2\\+2\\)/');
+        $this->expectOutputRegex('/select\s*\(2\s*\+\s*2\)/');
     }
 
     public function testProfiler()

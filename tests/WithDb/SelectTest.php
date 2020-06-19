@@ -253,11 +253,10 @@ class SelectTest extends AtkPhpunit\TestCase
             $this->assertSame($unknownFieldErrorCode, $e->getCode());
 
             // test debug query
-            if ($this->c->driverType === 'mysql') {
-                $this->assertSame('select `non_existing_field` from `non_existing_table`', $e->getDebugQuery());
-            } else {
-                $this->assertSame('select "non_existing_field" from "non_existing_table"', $e->getDebugQuery());
-            }
+            $expectedQuery = $this->c->driverType === 'mysql'
+                ? 'select `non_existing_field` from `non_existing_table`'
+                : 'select "non_existing_field" from "non_existing_table"';
+            $this->assertSame(preg_replace('~\s+~', '', $expectedQuery), preg_replace('~\s+~', '', $e->getDebugQuery()));
 
             throw $e;
         }

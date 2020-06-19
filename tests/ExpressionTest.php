@@ -202,22 +202,13 @@ class ExpressionTest extends AtkPhpunit\TestCase
             $this->e('--[]', [2]),
         ]);
 
-        $this->assertSame(
-            '++1 and --2',
-            strip_tags($e1->getDebugQuery())
-        );
+        $this->assertSame('++:a and --:b', $e1->render());
 
         $e2 = $this->e('=== [foo] ===', ['foo' => $e1]);
 
-        $this->assertSame(
-            '=== ++1 and --2 ===',
-            strip_tags($e2->getDebugQuery())
-        );
+        $this->assertSame('=== ++:a and --:b ===', $e2->render());
 
-        $this->assertSame(
-            '++1 and --2',
-            strip_tags($e1->getDebugQuery())
-        );
+        $this->assertSame('++:a and --:b', $e1->render());
     }
 
     /**
@@ -456,7 +447,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
         $e = $this->e('[], []');
         $e[] = 'Hello';
         $e[] = 'World';
-        $this->assertSame("'Hello', 'World'", strip_tags($e->getDebugQuery()));
+        $this->assertSame(':a, :b', $e->render());
 
         // real-life example
         $age = $this->e('coalesce([age], [default_age])');

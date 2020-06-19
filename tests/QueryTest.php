@@ -582,57 +582,55 @@ class QueryTest extends AtkPhpunit\TestCase
         $q = $this->q()->table('user')->field($age, 'calculated_age');
 
         $this->assertSame(
-            "select coalesce(year(now()) - year(birth_date), 18, 'foo', NULL) \"calculated_age\" from \"user\"",
-            strip_tags($q->getDebugQuery())
+            preg_replace('~\s+~', '', 'select coalesce(year(now()) - year(birth_date), 18, \'foo\', NULL) "calculated_age" from "user"'),
+            preg_replace('~\s+~', '', $q->getDebugQuery())
         );
     }
 
     /**
-     * @requires PHP 5.6
      * @covers ::__debugInfo
      */
     public function testVarDump()
     {
-        ini_set('xdebug.overload_var_dump', 'off');
-        $this->expectOutputRegex('/.*select \* from "user".*/');
-        var_dump($this->q()->table('user'));
+        $this->assertMatchesRegularExpression(
+            '/select\s+\*\s+from\s*"user".*/',
+            $this->q()->table('user')->__debugInfo()['R']
+        );
     }
 
     /**
-     * @requires PHP 5.6
      * @covers ::__debugInfo
      */
     public function testVarDump2()
     {
-        ini_set('xdebug.overload_var_dump', 'off');
-        $this->expectOutputRegex('/.*Expression could not render tag.*/');
-        var_dump(new Expression('Hello [world]'));
+        $this->assertMatchesRegularExpression(
+            '/.*Expression could not render tag.*/',
+            (new Expression('Hello [world]'))->__debugInfo()['R']
+        );
     }
 
     /**
-     * @requires PHP 5.6
      * @covers ::__debugInfo
      */
     public function testVarDump3()
     {
-        ini_set('xdebug.overload_var_dump', 'off');
-        $this->expectOutputRegex('/.*Hello \'php\'.*/');
-        var_dump(new Expression('Hello [world]', ['world' => 'php']));
+        $this->assertMatchesRegularExpression(
+            '/.*Hello \'php\'.*/',
+            (new Expression('Hello [world]', ['world' => 'php']))->__debugInfo()['R']
+        );
     }
 
     /**
-     * @requires PHP 5.6
      * @covers ::__debugInfo
      */
     public function testVarDump4()
     {
-        ini_set('xdebug.overload_var_dump', 'off');
-        $this->expectOutputRegex('/.*Table cannot be Query.*/');
         // should throw exception "Table cannot be Query in UPDATE, INSERT etc. query modes"
-        var_dump(
-            $this->q()
+        $this->assertMatchesRegularExpression(
+            '/.*Table cannot be Query.*/',
+            ($this->q()
                 ->mode('update')
-                ->table($this->q()->table('test'), 'foo')
+                ->table($this->q()->table('test'), 'foo'))->__debugInfo()['R']
         );
     }
 

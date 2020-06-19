@@ -456,51 +456,32 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Return formatted debug output.
-     *
-     * Ignore false positive warnings of PHPMD.
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     *
-     * @param bool $html Show as HTML?
-     *
-     * @return string SQL syntax of query
+     * Return formatted debug SQL query.
      */
-    public function getDebugQuery($html = null)
+    public function getDebugQuery(): string
     {
-        $d = $this->render();
-        $pp = [];
+        if (func_num_args() > 0) { // remove in 2020-dec
+            throw new Exception('Use of $html argument and html rendering has been deprecated');
+        }
+
+        $result = $this->render();
+
         foreach (array_reverse($this->params) as $key => $val) {
             if (is_numeric($val)) {
-                $d = preg_replace(
-                    '/' . $key . '([^_]|$)/',
-                    $val . '\1',
-                    $d
-                );
+                $replacement = $val . '\1';
             } elseif (is_string($val)) {
-                $d = preg_replace('/' . $key . '([^_]|$)/', "'" . addslashes($val) . "'\\1", $d);
+                $replacement = "'" . addslashes($val) . "'\\1";
             } elseif ($val === null) {
-                $d = preg_replace(
-                    '/' . $key . '([^_]|$)/',
-                    'NULL\1',
-                    $d
-                );
+                $replacement = 'NULL\1';
             } else {
-                $d = preg_replace('/' . $key . '([^_]|$)/', $val . '\\1', $d);
+                $replacement = $val . '\\1';
             }
-            $pp[] = $key;
+
+            $result = preg_replace('~' . $key . '([^_]|$)~', $replacement, $result);
         }
-        if (class_exists('SqlFormatter')) {
-            if ($html) {
-                $result = \SqlFormatter::format($d);
-            } else {
-                $result = \SqlFormatter::format($d, false);
-            }
-        } else {
-            $result = $d;  // output as-is
-        }
-        if (!$html) {
-            return str_replace('#lte#', '<=', strip_tags(str_replace('<=', '#lte#', $result), '<>'));
+
+        if (class_exists('SqlFormatter')) { // requires optional "jdorn/sql-formatter" package
+            $result = \SqlFormatter::format($result, false);
         }
 
         return $result;
@@ -512,7 +493,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             'R' => false,
             'template' => $this->template,
             'params' => $this->params,
-            //            'connection' => $this->connection,
+            // 'connection' => $this->connection,
             'args' => $this->args,
         ];
 
