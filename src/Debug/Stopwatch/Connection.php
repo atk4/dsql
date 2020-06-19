@@ -52,14 +52,14 @@ class Connection extends Connection_Proxy
 
     protected function dump(Expression $expr, $error = false)
     {
-        $error = $error ? 'ERROR' : '';
+        $error = $error ? 'ERROR ' : '';
 
         $took = microtime(true) - $this->startTime;
 
         if ($this->callback && is_callable($this->callback)) {
             call_user_func($this->callback, $expr, $took, false);
         } else {
-            printf("[{$error} %02.6f] %s\n", $took, $expr->getDebugQuery());
+            printf("[{$error}%02.6f] %s\n", $took, $expr->getDebugQuery());
         }
     }
 }
