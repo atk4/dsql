@@ -8,7 +8,7 @@ use atk4\dsql\Connection_Proxy;
 use atk4\dsql\Expression;
 use atk4\dsql\Query;
 
-class Driver extends Connection_Proxy
+class Connection extends Connection_Proxy
 {
     public $driverType = 'profile';
 
