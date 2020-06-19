@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace atk4\dsql\Debug\Profiler;
 
-use atk4\dsql\Expression;
 use atk4\dsql\Connection_Proxy;
+use atk4\dsql\Expression;
 use atk4\dsql\Query;
 
 class Driver extends Connection_Proxy

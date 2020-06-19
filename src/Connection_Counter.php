@@ -9,5 +9,4 @@ namespace atk4\dsql;
  */
 class Connection_Counter extends Debug\Profiler\Driver
 {
-    
 }

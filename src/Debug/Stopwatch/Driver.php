@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace atk4\dsql\Debug\Stopwatch;
 
-use atk4\dsql\Expression;
 use atk4\dsql\Connection_Proxy;
+use atk4\dsql\Expression;
 
 class Driver extends Connection_Proxy
 {
