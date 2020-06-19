@@ -182,7 +182,7 @@ class Connection
                 break;
             case 'oci12':
                 $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
-                $c = new Oracle\Version12\Connection(array_merge([
+                $c = new Oracle\Version12c\Connection(array_merge([
                     'connection' => static::getPDO($dsn),
                     'driverType' => $dsn['driverType'],
                 ], $args));
