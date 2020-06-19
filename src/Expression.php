@@ -456,16 +456,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Return formatted debug output.
-     *
-     * Ignore false positive warnings of PHPMD.
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     *
-     * @return string SQL syntax of query
+     * Return formatted debug SQL query.
      */
-    public function getDebugQuery()
+    public function getDebugQuery(): string
     {
+        if (func_num_args() > 0) { // remove in 2020-dec
+            throw new Exception('Use of $html argument and html rendering has been deprecated');
+        }
+
         $result = $this->render();
 
         foreach (array_reverse($this->params) as $key => $val) {
@@ -479,14 +477,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 $replacement = $val . '\\1';
             }
 
-            $result = preg_replace('/' . $key . '([^_]|$)/', $replacement, $result);
+            $result = preg_replace('~' . $key . '([^_]|$)~', $replacement, $result);
         }
 
-        if (func_num_args() > 0) { // remove in 2020-dec
-            throw new Exception('Use of $html argument and html rendering has been deprecated');
-        }
-
-        return str_replace('#lte#', '<=', strip_tags(str_replace('<=', '#lte#', $result), '<>'));
+        return $result;
     }
 
     public function __debugInfo()
@@ -495,7 +489,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             'R' => false,
             'template' => $this->template,
             'params' => $this->params,
-            //            'connection' => $this->connection,
+            // 'connection' => $this->connection,
             'args' => $this->args,
         ];
 
