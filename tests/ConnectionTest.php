@@ -54,8 +54,8 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
         // specific DSNs
-        $dsn = Connection::normalizeDSN('dumper:sqlite::memory');
-        $this->assertSame(['dsn' => 'dumper:sqlite::memory', 'user' => null, 'pass' => null, 'driverType' => 'dumper', 'rest' => 'sqlite::memory'], $dsn);
+        $dsn = Connection::normalizeDSN('stopwatch:sqlite::memory');
+        $this->assertSame(['dsn' => 'stopwatch:sqlite::memory', 'user' => null, 'pass' => null, 'driverType' => 'stopwatch', 'rest' => 'sqlite::memory'], $dsn);
 
         $dsn = Connection::normalizeDSN('sqlite::memory');
         $this->assertSame(['dsn' => 'sqlite::memory', 'user' => null, 'pass' => null, 'driverType' => 'sqlite', 'rest' => ':memory'], $dsn); // rest is unusable anyway in this context
@@ -77,19 +77,19 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $c = Connection::connect('sqlite::memory:');
         $this->assertSame('sqlite', $c->driverType);
 
-        $c = Connection::connect('dumper:sqlite::memory:');
+        $c = Connection::connect('stopwatch:sqlite::memory:');
         $this->assertSame('sqlite', $c->driverType);
 
-        $c = Connection::connect('counter:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
         $this->assertSame('sqlite', $c->driverType);
     }
 
     /**
-     * Test Dumper connection.
+     * Test Debug\Stopwatch\Connection.
      */
-    public function testDumper()
+    public function testStopwatch()
     {
-        $c = Connection::connect('dumper:sqlite::memory:');
+        $c = Connection::connect('stopwatch:sqlite::memory:');
 
         $result = false;
         $c->callback = function ($expr, $time, $fail) use (&$result) {
@@ -118,9 +118,9 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $c = Connection::connect('mysql:host=localhost;dbname=nosuchdb');
     }
 
-    public function testDumperEcho()
+    public function testStopwatchEcho()
     {
-        $c = Connection::connect('dumper:sqlite::memory:');
+        $c = Connection::connect('stopwatch:sqlite::memory:');
 
         $this->assertSame(
             '4',
@@ -130,9 +130,9 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $this->expectOutputRegex('/select \\(2\\+2\\)/');
     }
 
-    public function testCounter()
+    public function testProfiler()
     {
-        $c = Connection::connect('counter:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
 
         $result = false;
         $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
@@ -151,9 +151,9 @@ class ConnectionTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function testCounterEcho()
+    public function testProfilerEcho()
     {
-        $c = Connection::connect('counter:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
 
         $this->assertSame(
             '4',
@@ -165,9 +165,9 @@ class ConnectionTest extends AtkPhpunit\TestCase
         unset($c);
     }
 
-    public function testCounter2()
+    public function testProfiler2()
     {
-        $c = Connection::connect('counter:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
 
         $result = false;
         $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
@@ -190,9 +190,9 @@ class ConnectionTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function testCounter3()
+    public function testProfiler3()
     {
-        $c = Connection::connect('counter:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
 
         $result = false;
         $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
