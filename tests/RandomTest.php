@@ -81,22 +81,22 @@ class RandomTest extends AtkPhpunit\TestCase
     public function testGroupConcat()
     {
         $this->_groupConcatTest(
-            new Query_MySQL(),
+            new MySQL\Query(),
             'select `age`,group_concat(`name` separator :a) from `people` group by `age`'
         );
 
         $this->_groupConcatTest(
-            new Query_SQLite(),
+            new SQLite\Query(),
             'select "age",group_concat("name", :a) from "people" group by "age"'
         );
 
         $this->_groupConcatTest(
-            new Query_PgSQL(),
+            new PgSQL\Query(),
             'select "age",string_agg("name", :a) from "people" group by "age"'
         );
 
         $this->_groupConcatTest(
-            new Query_Oracle(),
+            new Oracle\Query(),
             'select "age",listagg("name", :a) from "people" group by "age"'
         );
     }

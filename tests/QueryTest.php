@@ -8,11 +8,11 @@ use atk4\core\AtkPhpunit;
 use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 use atk4\dsql\Query;
-use atk4\dsql\Query_MySQL;
-use atk4\dsql\Query_Oracle;
-use atk4\dsql\Query_Oracle12c;
-use atk4\dsql\Query_PgSQL;
-use atk4\dsql\Query_SQLite;
+use atk4\dsql\MySQL\Query as Query_MySQL;
+use atk4\dsql\Oracle\Query as Query_Oracle;
+use atk4\dsql\Oracle\Version12c\Query as Query_Oracle12c;
+use atk4\dsql\PgSQL\Query as Query_PgSQL;
+use atk4\dsql\SQLite\Query as Query_SQLite;
 
 /**
  * @coversDefaultClass \atk4\dsql\Query
@@ -1216,7 +1216,7 @@ class QueryTest extends AtkPhpunit\TestCase
         $this->assertSame(Expression::class, get_class($this->q()->expr('foo')));
 
         $q = new Query_MySQL();
-        $this->assertSame(\atk4\dsql\Expression_MySQL::class, get_class($q->expr('foo')));
+        $this->assertSame(\atk4\dsql\MySQL\Expression::class, get_class($q->expr('foo')));
     }
 
     /**
