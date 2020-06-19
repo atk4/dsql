@@ -6,7 +6,6 @@ namespace atk4\dsql\MySQL;
 
 use atk4\dsql\Query as BaseQuery;
 
-
 /**
  * Perform query operation on MySQL server.
  */

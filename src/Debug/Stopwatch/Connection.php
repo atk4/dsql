@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql\Debug\Stopwatch;
 
-use atk4\dsql\ProxyConnection;
 use atk4\dsql\Expression;
+use atk4\dsql\ProxyConnection;
 
 class Connection extends ProxyConnection
 {
