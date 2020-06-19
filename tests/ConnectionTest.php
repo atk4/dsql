@@ -127,7 +127,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
             $c->expr('select (2+2)')->getOne()
         );
 
-        $this->expectOutputRegex('/select \\(2\\+2\\)/');
+        $this->expectOutputRegex('/select\s*\(2\s*\+\s*2\)/');
     }
 
     public function testProfiler()

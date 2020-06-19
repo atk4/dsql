@@ -480,7 +480,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $result = preg_replace('~' . $key . '([^_]|$)~', $replacement, $result);
         }
 
-        if (class_exists('SqlFormatter')) {
+        if (class_exists('SqlFormatter')) { // requires optional "jdorn/sql-formatter" package
             $result = \SqlFormatter::format($result, false);
         }
 
