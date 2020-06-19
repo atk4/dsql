@@ -174,7 +174,7 @@ following code will connect your expression with the database::
 If you are looking to use connection :php:class:`Query` class, you may want to
 consider using a proper vendor-specific subclass::
 
-    $query = new Query_MySQL('connection'=>$pdo_dbh);
+    $query = new \atk4\dsql\MySQL\Query('connection'=>$pdo_dbh);
 
 
 If your expression already exist and you wish to associate it with connection
