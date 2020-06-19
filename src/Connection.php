@@ -195,14 +195,16 @@ class Connection
                 ], $args));
 
                 break;
-            case 'dumper':
-                $c = new Connection_Dumper(array_merge([
+            case 'dumper': // deprecated - will be removed in dec-2020
+            case 'stopwatch':
+                $c = new Debug\Stopwatch\Connection(array_merge([
                     'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
                 ], $args));
 
                 break;
-            case 'counter':
-                $c = new Connection_Counter(array_merge([
+            case 'counter': // deprecated - will be removed in dec-2020
+            case 'profile':
+                $c = new Debug\Profiler\Connection(array_merge([
                     'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
                 ], $args));
 
