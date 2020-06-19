@@ -2,9 +2,14 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql;
+namespace atk4\dsql\tests;
 
 use atk4\core\AtkPhpunit;
+use atk4\dsql\MySQL\Query as Query_MySQL;
+use atk4\dsql\Oracle\Query as Query_Oracle;
+use atk4\dsql\PgSQL\Query as Query_PgSQL;
+use atk4\dsql\Query;
+use atk4\dsql\SQLite\Query as Query_SQLite;
 
 /**
  * @coversDefaultClass \atk4\dsql\Query
@@ -81,22 +86,22 @@ class RandomTest extends AtkPhpunit\TestCase
     public function testGroupConcat()
     {
         $this->_groupConcatTest(
-            new MySQL\Query(),
+            new Query_MySQL(),
             'select `age`,group_concat(`name` separator :a) from `people` group by `age`'
         );
 
         $this->_groupConcatTest(
-            new SQLite\Query(),
+            new Query_SQLite(),
             'select "age",group_concat("name", :a) from "people" group by "age"'
         );
 
         $this->_groupConcatTest(
-            new PgSQL\Query(),
+            new Query_PgSQL(),
             'select "age",string_agg("name", :a) from "people" group by "age"'
         );
 
         $this->_groupConcatTest(
-            new Oracle\Query(),
+            new Query_Oracle(),
             'select "age",listagg("name", :a) from "people" group by "age"'
         );
     }
