@@ -98,19 +98,19 @@ a proxy connection object that will collect the necessary statistics and
 "echo" them out.
 
 If you would like to do something else with these statistics, you can set
-a callback. For Dumper::
+a callback. For Stopwatch::
 
     $c->callback = function($expression, $time, $fail = false) {
         ...
     }
 
-and for Counter::
+and for Profiler::
 
     $c->callback = function($queries, $selects, $rows, $expressions, $fail = false) {
         ...
     }
 
-If you have used "dumper:counter:", then use this::
+If you have used "stopwatch:profile:", then use this::
 
     $c->callback = function($expression, $time, $fail = false) {
         ...
