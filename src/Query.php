@@ -1346,7 +1346,7 @@ class Query extends Expression
 
     /**
      * Returns Expression object for the corresponding Query
-     * sub-class (e.g. Query_MySQL will return Expression_MySQL).
+     * sub-class (e.g. MySQL\Query will return MySQL\Expression).
      *
      * Connection is not mandatory, but if set, will be preserved. This
      * method should be used for building parts of the query internally.

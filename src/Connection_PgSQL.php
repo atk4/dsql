@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace atk4\dsql;
 
 /**
- * Custom Connection class specifically for PostgreSQL database.
+ * @deprecated use PgSQL\Connection instead - will be removed dec-2020
  */
-class Connection_PgSQL extends Connection
+class Connection_PgSQL extends PgSQL\Connection
 {
-    /** @var string Query classname */
-    protected $query_class = Query_PgSQL::class;
 }

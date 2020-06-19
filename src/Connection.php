@@ -114,24 +114,24 @@ class Connection
             $expressionClass = null;
             switch ($driverType) {
                 case 'pgsql':
-                    $connectionClass = Connection_PgSQL::class;
-                    $queryClass = Query_PgSQL::class;
+                    $connectionClass = PgSQL\Connection::class;
+                    $queryClass = PgSQL\Query::class;
 
                     break;
                 case 'oci':
-                    $connectionClass = Connection_Oracle::class;
+                    $connectionClass = Oracle\Connection::class;
 
                     break;
                 case 'sqlite':
-                    $queryClass = Query_SQLite::class;
+                    $queryClass = SQLite\Query::class;
 
                     break;
                 case 'mysql':
-                    $expressionClass = Expression_MySQL::class;
+                    $expressionClass = MySQL\Expression::class;
                     // no break
                 default:
                     // Default, for backwards compatibility
-                    $queryClass = Query_MySQL::class;
+                    $queryClass = MySQL\Query::class;
 
                     break;
             }
@@ -146,7 +146,7 @@ class Connection
 
         // If it's some other object, then we simply use it trough proxy connection
         if (is_object($dsn)) {
-            return new Connection_Proxy(array_merge([
+            return new ProxyConnection(array_merge([
                 'connection' => $dsn,
             ], $args));
         }
@@ -159,8 +159,8 @@ class Connection
             case 'mysql':
                 $c = new static(array_merge([
                     'connection' => static::getPDO($dsn),
-                    'expression_class' => Expression_MySQL::class,
-                    'query_class' => Query_MySQL::class,
+                    'expression_class' => MySQL\Expression::class,
+                    'query_class' => MySQL\Query::class,
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
@@ -168,13 +168,13 @@ class Connection
             case 'sqlite':
                 $c = new static(array_merge([
                     'connection' => static::getPDO($dsn),
-                    'query_class' => Query_SQLite::class,
+                    'query_class' => SQLite\Query::class,
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
                 break;
             case 'oci':
-                $c = new Connection_Oracle(array_merge([
+                $c = new Oracle\Connection(array_merge([
                     'connection' => static::getPDO($dsn),
                     'driverType' => $dsn['driverType'],
                 ], $args));
@@ -182,14 +182,14 @@ class Connection
                 break;
             case 'oci12':
                 $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
-                $c = new Connection_Oracle12(array_merge([
+                $c = new Oracle\Version12c\Connection(array_merge([
                     'connection' => static::getPDO($dsn),
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
                 break;
             case 'pgsql':
-                $c = new Connection_PgSQL(array_merge([
+                $c = new PgSQL\Connection(array_merge([
                     'connection' => static::getPDO($dsn),
                     'driverType' => $dsn['driverType'],
                 ], $args));
