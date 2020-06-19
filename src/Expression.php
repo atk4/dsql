@@ -481,7 +481,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
             $result = preg_replace('/' . $key . '([^_]|$)/', $replacement, $result);
         }
-        
+
         if (func_num_args() > 0) { // remove in 2020-dec
             throw new Exception('Use of $html argument and html rendering has been deprecated');
         }
