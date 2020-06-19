@@ -462,11 +462,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      *
-     * @param bool $html Show as HTML?
-     *
      * @return string SQL syntax of query
      */
-    public function getDebugQuery($html = null)
+    public function getDebugQuery()
     {
         $result = $this->render();
 
@@ -483,12 +481,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
             $result = preg_replace('/' . $key . '([^_]|$)/', $replacement, $result);
         }
-
-        if (class_exists('SqlFormatter')) {
-            $result = \SqlFormatter::format($result, (bool) $html);
+        
+        if (func_num_args() > 0) { // remove in 2020-dec
+            throw new Exception('Use of $html argument and html rendering has been deprecated');
         }
 
-        return $html ? $result : str_replace('#lte#', '<=', strip_tags(str_replace('<=', '#lte#', $result), '<>'));
+        return str_replace('#lte#', '<=', strip_tags(str_replace('<=', '#lte#', $result), '<>'));
     }
 
     public function __debugInfo()
