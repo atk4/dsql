@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Oracle\Version12c;
+namespace atk4\dsql\Oracle\Version12;
 
 use atk4\dsql\Oracle\AbstractQuery;
 
