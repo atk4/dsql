@@ -284,6 +284,14 @@ Magic an Debug Methods
     places. The parameters will be escaped, but you should still avoid using
     generated query as it can potentially make you vulnerable to SQL injection.
 
+    This method will use HTML formatting if argument is passed.
+
+In order for HTML parsing to work and to make your debug queries better
+formatted, install `sql-formatter`::
+
+    composer require jdorn/sql-formatter
+
+
 Escaping Methods
 ================
 
