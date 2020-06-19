@@ -115,7 +115,7 @@ echo $m->addCondition('vip', true)
   ->ref('Order')
   ->ref('Line')
   ->action('fx', ['sum', 'total'])
-  ->getDebugQuery(true);
+  ->getDebugQuery();
 ```
 
 ```sql

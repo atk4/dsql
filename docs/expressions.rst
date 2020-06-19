@@ -53,7 +53,7 @@ Another uses for expressions could be:
  - non-traditional constructions , UNIONS or SELECT INTO
 
 Properties, Arguments, Parameters
-====================================
+=================================
 
 Be careful when using those similar terms as they refer to different things:
 
@@ -278,19 +278,11 @@ Magic an Debug Methods
     Calling this method will set :php:attr:`debug` into ``true`` and the further
     execution to :php:meth:`render` will also attempt to echo query.
 
-.. php:method:: getDebugQuery($html = false)
+.. php:method:: getDebugQuery()
 
     Outputs query as a string by placing parameters into their respective
     places. The parameters will be escaped, but you should still avoid using
     generated query as it can potentially make you vulnerable to SQL injection.
-
-    This method will use HTML formatting if argument is passed.
-
-In order for HTML parsing to work and to make your debug queries better
-formatted, install `sql-formatter`::
-
-    composer require jdorn/sql-formatter
-
 
 Escaping Methods
 ================
