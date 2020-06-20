@@ -82,6 +82,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
         $c = Connection::connect('profile:sqlite::memory:');
         $this->assertSame('sqlite', $c->driverType);
+        $c->callback = function () {}; // prevent output from __destruct
     }
 
     /**
