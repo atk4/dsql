@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
+@trigger_error('Use atk4\dsql\MySQL\Query instead', E_USER_DEPRECATED);
+
 /**
  * @deprecated use MySQL\Query instead - will be removed dec-2020
  */
