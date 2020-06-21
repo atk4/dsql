@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\MySQL;
+namespace atk4\dsql\Mysql;
 
 use atk4\dsql\Query as BaseQuery;
 

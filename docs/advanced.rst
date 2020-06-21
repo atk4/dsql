@@ -70,7 +70,7 @@ results too.
 If you are creating :php:class:`Connection` through constructor, you may have
 to explicitly specify property :php:attr:`Connection::query_class`::
 
-    $c = new Connection(['connection'=>$pdo, 'query_class'=>atk4\dsql\SQLite\Query::class]);
+    $c = new Connection(['connection'=>$pdo, 'query_class'=>atk4\dsql\Sqlite\Query::class]);
 
 This is also useful, if you have created your own Query class in a different
 namespace and wish to use it.
@@ -252,7 +252,7 @@ query "LOAD DATA INFILE":
 So to implement our task, you might need a class like this::
 
     use \atk4\dsql\Exception;
-    class Query_MySQL extends \atk4\dsql\MySQL\Query
+    class Query_MySQL extends \atk4\dsql\Mysql\Query
     {
         protected $template_load_data = 'load data local infile [file] into table [table]';
 

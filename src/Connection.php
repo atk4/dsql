@@ -114,8 +114,8 @@ class Connection
             $expressionClass = null;
             switch ($driverType) {
                 case 'pgsql':
-                    $connectionClass = PgSQL\Connection::class;
-                    $queryClass = PgSQL\Query::class;
+                    $connectionClass = Postgresql\Connection::class;
+                    $queryClass = Postgresql\Query::class;
 
                     break;
                 case 'oci':
@@ -123,15 +123,15 @@ class Connection
 
                     break;
                 case 'sqlite':
-                    $queryClass = SQLite\Query::class;
+                    $queryClass = Sqlite\Query::class;
 
                     break;
                 case 'mysql':
-                    $expressionClass = MySQL\Expression::class;
+                    $expressionClass = Mysql\Expression::class;
                     // no break
                 default:
                     // Default, for backwards compatibility
-                    $queryClass = MySQL\Query::class;
+                    $queryClass = Mysql\Query::class;
 
                     break;
             }
@@ -159,8 +159,8 @@ class Connection
             case 'mysql':
                 $c = new static(array_merge([
                     'connection' => static::getPDO($dsn),
-                    'expression_class' => MySQL\Expression::class,
-                    'query_class' => MySQL\Query::class,
+                    'expression_class' => Mysql\Expression::class,
+                    'query_class' => Mysql\Query::class,
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
@@ -168,7 +168,7 @@ class Connection
             case 'sqlite':
                 $c = new static(array_merge([
                     'connection' => static::getPDO($dsn),
-                    'query_class' => SQLite\Query::class,
+                    'query_class' => Sqlite\Query::class,
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
@@ -189,7 +189,7 @@ class Connection
 
                 break;
             case 'pgsql':
-                $c = new PgSQL\Connection(array_merge([
+                $c = new Postgresql\Connection(array_merge([
                     'connection' => static::getPDO($dsn),
                     'driverType' => $dsn['driverType'],
                 ], $args));

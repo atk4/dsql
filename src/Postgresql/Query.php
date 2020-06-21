@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\PgSQL;
+namespace atk4\dsql\Postgresql;
 
 use atk4\dsql\Query as BaseQuery;
 

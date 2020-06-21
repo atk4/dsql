@@ -7,11 +7,11 @@ namespace atk4\dsql\tests;
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Exception;
 use atk4\dsql\Expression;
-use atk4\dsql\MySQL;
+use atk4\dsql\Mysql;
 use atk4\dsql\Oracle;
-use atk4\dsql\PgSQL;
+use atk4\dsql\Postgresql;
 use atk4\dsql\Query;
-use atk4\dsql\SQLite;
+use atk4\dsql\Sqlite;
 
 /**
  * @coversDefaultClass \atk4\dsql\Query
@@ -1189,7 +1189,7 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testGroupConcat()
     {
-        $q = new MySQL\Query();
+        $q = new Mysql\Query();
         $this->assertSame('group_concat(`foo` separator :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Oracle\Query();
@@ -1198,10 +1198,10 @@ class QueryTest extends AtkPhpunit\TestCase
         $q = new Oracle\Version12\Query();
         $this->assertSame('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
-        $q = new PgSQL\Query();
+        $q = new Postgresql\Query();
         $this->assertSame('string_agg("foo", :a)', $q->groupConcat('foo', '-')->render());
 
-        $q = new SQLite\Query();
+        $q = new Sqlite\Query();
         $this->assertSame('group_concat("foo", :a)', $q->groupConcat('foo', '-')->render());
     }
 
@@ -1214,8 +1214,8 @@ class QueryTest extends AtkPhpunit\TestCase
     {
         $this->assertSame(Expression::class, get_class($this->q()->expr('foo')));
 
-        $q = new MySQL\Query();
-        $this->assertSame(\atk4\dsql\MySQL\Expression::class, get_class($q->expr('foo')));
+        $q = new Mysql\Query();
+        $this->assertSame(\atk4\dsql\Mysql\Expression::class, get_class($q->expr('foo')));
     }
 
     /**
