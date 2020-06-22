@@ -38,6 +38,11 @@ class Connection extends ProxyConnection
     /** @var int Count of rows iterated */
     protected $rows = 0;
 
+    public static function createDriverConnection(array $dsn)
+    {
+        return static::establish($dsn['rest'], $dsn['user'], $dsn['pass']);
+    }
+
     /**
      * Iterate (yield) array.
      *

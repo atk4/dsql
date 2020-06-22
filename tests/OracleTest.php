@@ -18,7 +18,7 @@ class OracleTest extends AtkPhpunit\TestCase
     public function testDetection()
     {
         try {
-            $c = Connection::connect('oci:dbname=mydb');
+            $c = Connection::establish('oci:dbname=mydb');
             $this->assertSame(
                 'select "baz" from "foo" where "bar" = :a',
                 $c->dsql()->table('foo')->where('bar', 1)->field('baz')->render()

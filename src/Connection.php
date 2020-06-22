@@ -32,6 +32,22 @@ class Connection
     public $driverType;
 
     /**
+     * Stores the driverType => connectionClass array for resolving.
+     *
+     * @var array
+     */
+    protected static $driverRegistry = [
+        'sqlite' => Sqlite\Connection::class,
+        'mysql' => Mysql\Connection::class,
+        'pgsql' => Postgresql\Connection::class,
+        'oci' => Oracle\Connection::class,
+        'dumper' => Debug\Stopwatch\Connection::class, // backward compatibility - will be removed dec-2020
+        'stopwatch' => Debug\Stopwatch\Connection::class,
+        'counter' => Debug\Profiler\Connection::class, // backward compatibility - will be removed dec-2020
+        'profile' => Debug\Profiler\Connection::class,
+    ];
+
+    /**
      * Specifying $properties to constructors will override default
      * property values of this class.
      *
@@ -40,7 +56,7 @@ class Connection
     public function __construct($properties = [])
     {
         if (!is_array($properties)) {
-            throw (new Exception('Invalid properties for "new Connection()". Did you mean to call Connection::connect()?'))
+            throw (new Exception('Invalid properties for "new Connection()". Did you mean to call Connection::create()?'))
                 ->addMoreInfo('properties', $properties);
         }
 
@@ -95,7 +111,15 @@ class Connection
     }
 
     /**
-     * Connect database.
+     * @deprecated use Connection::create instead
+     */
+    public static function connect($dsn, $user = null, $password = null, $args = [])
+    {
+        return static::establish(...func_get_args());
+    }
+
+    /**
+     * Connect to database and return connection class.
      *
      * @param string|\PDO $dsn
      * @param string|null $user
@@ -104,43 +128,19 @@ class Connection
      *
      * @return Connection
      */
-    public static function connect($dsn, $user = null, $password = null, $args = [])
+    public static function establish($dsn, $user = null, $password = null, $args = [])
     {
         // If it's already PDO object, then we simply use it
         if ($dsn instanceof \PDO) {
             $driverType = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-            $connectionClass = self::class;
-            $queryClass = null;
-            $expressionClass = null;
-            switch ($driverType) {
-                case 'pgsql':
-                    $connectionClass = Postgresql\Connection::class;
-                    $queryClass = Postgresql\Query::class;
 
-                    break;
-                case 'oci':
-                    $connectionClass = Oracle\Connection::class;
-
-                    break;
-                case 'sqlite':
-                    $queryClass = Sqlite\Query::class;
-
-                    break;
-                case 'mysql':
-                    $expressionClass = Mysql\Expression::class;
-                    // no break
-                default:
-                    // Default, for backwards compatibility
-                    $queryClass = Mysql\Query::class;
-
-                    break;
-            }
+            /**
+             * @var Connection $driverClass
+             */
+            $connectionClass = self::resolveDriver($driverType);
 
             return new $connectionClass(array_merge([
                 'connection' => $dsn,
-                'query_class' => $queryClass,
-                'expression_class' => $expressionClass,
-                'driverType' => $driverType,
             ], $args));
         }
 
@@ -154,77 +154,72 @@ class Connection
         // Process DSN string
         $dsn = static::normalizeDSN($dsn, $user, $password);
 
-        // Create driverType specific connection
-        switch ($dsn['driverType']) {
-            case 'mysql':
-                $c = new static(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'expression_class' => Mysql\Expression::class,
-                    'query_class' => Mysql\Query::class,
-                    'driverType' => $dsn['driverType'],
-                ], $args));
+        /**
+         * @var Connection $driverClass
+         */
+        $connectionClass = self::resolveDriver($dsn['driverType']);
 
-                break;
-            case 'sqlite':
-                $c = new static(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'query_class' => Sqlite\Query::class,
-                    'driverType' => $dsn['driverType'],
-                ], $args));
-
-                break;
-            case 'oci':
-                $c = new Oracle\Connection(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'driverType' => $dsn['driverType'],
-                ], $args));
-
-                break;
-            case 'oci12':
-                $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
-                $c = new Oracle\Version12\Connection(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'driverType' => $dsn['driverType'],
-                ], $args));
-
-                break;
-            case 'pgsql':
-                $c = new Postgresql\Connection(array_merge([
-                    'connection' => static::getPDO($dsn),
-                    'driverType' => $dsn['driverType'],
-                ], $args));
-
-                break;
-            case 'dumper': // deprecated - will be removed in dec-2020
-            case 'stopwatch':
-                $c = new Debug\Stopwatch\Connection(array_merge([
-                    'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
-                ], $args));
-
-                break;
-            case 'counter': // deprecated - will be removed in dec-2020
-            case 'profile':
-                $c = new Debug\Profiler\Connection(array_merge([
-                    'connection' => static::connect($dsn['rest'], $dsn['user'], $dsn['pass']),
-                ], $args));
-
-                break;
-            // let PDO handle the rest
-            default:
-                $c = new static(array_merge([
-                    'connection' => static::connect(static::getPDO($dsn)),
-                ], $args));
-        }
-
-        return $c;
+        return new $connectionClass(array_merge([
+            'connection' => $connectionClass::createDriverConnection($dsn),
+        ], $args));
     }
 
     /**
-     * Returns new PDO object.
+     * Adds connection class to the registry for resolving in Connection::resolve method.
+     *
+     * Can be used as:
+     *
+     * Connection::register('mysql', MySQL\Connection::class), or
+     * MySQL\Connection::register()
+     *
+     * CustomDriver\Connection must be descendant of Connection class.
+     *
+     * @param string $driverType
+     * @param string $connectionClass
+     */
+    public static function registerDriver($driverType = null, $connectionClass = null)
+    {
+        if (!$connectionClass && is_a($driverType, self::class, true)) {
+            $connectionClass = $driverType;
+            $driverType = null;
+        }
+
+        $connectionClass = $connectionClass ?? static::class;
+
+        $driverType = $driverType ?? $connectionClass::defaultDriverType();
+
+        if (is_array($driverTypes = $driverType)) {
+            foreach ($driverTypes as $driverType => $connectionClass) {
+                if (is_numeric($driverType)) {
+                    $driverType = $connectionClass::defaultDriverType();
+                }
+
+                static::registerDriver($driverType, $connectionClass);
+            }
+        }
+
+        self::$driverRegistry[$driverType] = $connectionClass;
+    }
+
+    /**
+     * Resolves the connection class to use based on driver type.
+     *
+     * @param string $driverType
+     *
+     * @return string
+     */
+    public static function resolveDriver($driverType)
+    {
+        return self::$driverRegistry[$driverType] ?? static::class;
+    }
+
+    /**
+     * Resolves $dsn to a driver
+     * By default the driver is new PDO object which can be overridden in child classes.
      *
      * This does not silence PDO errors.
      */
-    protected static function getPDO(array $dsn)
+    public static function createDriverConnection(array $dsn)
     {
         return new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
     }
@@ -266,6 +261,16 @@ class Connection
     public function connection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Returns the default driver type set for the connection in $driverType.
+     *
+     * @return string|null
+     */
+    public static function defaultDriverType()
+    {
+        return (new \ReflectionClass(static::class))->getDefaultProperties()['driverType'] ?? null;
     }
 
     /**
