@@ -84,7 +84,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
 
         /*
-         * Postgresql needs to have values cast, to make the query work.
+         * PostgreSQL needs to have values cast, to make the query work.
          * But CAST(.. AS int) does not work in mysql. So we use two different tests..
          * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
          */
@@ -109,7 +109,7 @@ class SelectTest extends AtkPhpunit\TestCase
     public function testExpression()
     {
         /*
-         * Postgresql, at least versions before 10, needs to have the string cast to the
+         * PostgreSQL, at least versions before 10, needs to have the string cast to the
          * correct datatype.
          * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
          * entire string on mysql.

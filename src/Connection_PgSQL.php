@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
+if (!class_exists(\SebastianBergmann\CodeCoverage\CodeCoverage::class, false)) {
+    'trigger_error'('Use atk4\dsql\Postgresql\Connection instead', E_USER_DEPRECATED);
+}
+
 /**
- * Custom Connection class specifically for PostgreSQL database.
+ * @deprecated use Postgresql\Connection instead - will be removed dec-2020
  */
-class Connection_PgSQL extends Connection
+class Connection_PgSQL extends Postgresql\Connection
 {
-    /** @var string Query classname */
-    protected $query_class = Query_PgSQL::class;
 }

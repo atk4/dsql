@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace atk4\dsql\Debug\Profiler;
 
-use atk4\dsql\Connection_Proxy;
 use atk4\dsql\Expression;
+use atk4\dsql\ProxyConnection;
 use atk4\dsql\Query;
 
-class Connection extends Connection_Proxy
+class Connection extends ProxyConnection
 {
     public $driverType = 'profile';
 

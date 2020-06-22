@@ -4,46 +4,13 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
-class Connection_Proxy extends Connection
+if (!class_exists(\SebastianBergmann\CodeCoverage\CodeCoverage::class, false)) {
+    'trigger_error'('Use atk4\dsql\ProxyConnection instead', E_USER_DEPRECATED);
+}
+
+/**
+ * @deprecated use ProxyConnection instead - will be removed dec-2020
+ */
+class Connection_Proxy extends ProxyConnection
 {
-    /**
-     * Specifying $properties to constructors will override default
-     * property values of this class.
-     *
-     * @param array $properties
-     */
-    public function __construct($properties = [])
-    {
-        parent::__construct($properties);
-
-        if ($this->connection instanceof \atk4\dsql\Connection && $this->connection->driverType) {
-            $this->driverType = $this->connection->driverType;
-        }
-    }
-
-    public function connection()
-    {
-        return $this->connection->connection();
-    }
-
-    public function dsql($properties = []): Query
-    {
-        $dsql = $this->connection->dsql($properties);
-        $dsql->connection = $this;
-
-        return $dsql;
-    }
-
-    public function expr($properties = [], $arguments = null): Expression
-    {
-        $expr = $this->connection->expr($properties, $arguments);
-        $expr->connection = $this;
-
-        return $expr;
-    }
-
-    public function execute(Expression $expr)
-    {
-        return $this->connection->execute($expr);
-    }
 }
