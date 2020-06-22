@@ -19,10 +19,10 @@ connection in a global variable or global class::
     $app->db = atk4\dsql\Connection::establish($dsn, $user, $pass);
 
 
-.. php:staticmethod:: connect($dsn, $user = null, $password = null, $args = [])
+.. php:staticmethod:: establish($dsn, $user = null, $password = null, $args = [])
 
     Determine which Connection class should be used for specified $dsn,
-    create new object of this connection class and return.
+    establish connection to DB by creating new object of this connection class and return.
 
     :param string $dsn: DSN, see http://php.net/manual/en/ref.pdo-mysql.connection.php
     :param string $user: username
@@ -91,9 +91,11 @@ Developers can register custom classes to handle driver types using the `Conneci
    Connection::register('mysql', Custom\MySQL\Connection::class); // or directly using the class
    Custom\MySQL\Connection::register();
    
-The driver type used in the latter case is the default value of the `$driverType` property of `Custom\MySQL\Connection`
+The driver type used in the latter case is the default value of the `$driverType` property of 
+`Custom\MySQL\Connection`
 
-.. php:method:: createDriverConnection(array $dsn)
+.. php:method:: establishDriverConnection(array $dsn)
 
-   The method should return the underlying connection object used by the `Connection` class. By default PDO is used but
-   the method can be overriden to return custom object to be used for connection to DB.
+   The method should establish connection with DB and return the underlying connection object used by 
+   the `Connection` class. By default PDO is used but the method can be overriden to return custom object to be 
+   used for connection to DB.

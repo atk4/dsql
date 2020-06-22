@@ -56,7 +56,7 @@ class Connection
     public function __construct($properties = [])
     {
         if (!is_array($properties)) {
-            throw (new Exception('Invalid properties for "new Connection()". Did you mean to call Connection::create()?'))
+            throw (new Exception('Invalid properties for "new Connection()". Did you mean to call Connection::establish()?'))
                 ->addMoreInfo('properties', $properties);
         }
 
@@ -111,7 +111,7 @@ class Connection
     }
 
     /**
-     * @deprecated use Connection::create instead
+     * @deprecated use Connection::establish instead
      */
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
@@ -160,7 +160,7 @@ class Connection
         $connectionClass = self::resolveDriver($dsn['driverType']);
 
         return new $connectionClass(array_merge([
-            'connection' => $connectionClass::createDriverConnection($dsn),
+            'connection' => $connectionClass::establishDriverConnection($dsn),
         ], $args));
     }
 
@@ -219,7 +219,7 @@ class Connection
      *
      * This does not silence PDO errors.
      */
-    public static function createDriverConnection(array $dsn)
+    public static function establishDriverConnection(array $dsn)
     {
         return new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
     }
