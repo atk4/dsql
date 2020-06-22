@@ -59,7 +59,6 @@ new Query or Expression class::
 
 Here is how you can use all of this together::
 
-
     $dsn = 'mysql:host=localhost;port=3307;dbname=testdb';
 
     $connection = atk4\dsql\Connection::establish($dsn, 'root', 'root');
@@ -79,3 +78,22 @@ if you connect to vendor that does not use PDO.
 
     :param Expression  $expr: Expression (or query) to execute
     :returns: PDOStatement, Iterable object or Generator.
+    
+.. php:method:: registerDriver($driverType = null, $connectionClass = null)
+
+    Adds connection class to the registry for resolving in Connection::resolve method.
+
+    :param string $driverType Alias of the driver
+    :param string $connectionClass The connection class to be used for the diver type
+
+Developers can register custom classes to handle driver types using the `Connecion::registerDriver` method::
+
+   Connection::register('mysql', Custom\MySQL\Connection::class); // or directly using the class
+   Custom\MySQL\Connection::register();
+   
+The driver type used in the latter case is the default value of the `$driverType` property of `Custom\MySQL\Connection`
+
+.. php:method:: createDriverConnection(array $dsn)
+
+   The method should return the underlying connection object used by the `Connection` class. By default PDO is used but
+   the method can be overriden to return custom object to be used for connection to DB.
