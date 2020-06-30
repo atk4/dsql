@@ -358,17 +358,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * query rendering. Consider using `_consume()` instead, which will
      * also handle nested expressions properly.
      *
-     * @param string|array $value String literal or array of strings containing input data
+     * @param string|int|float $value
      *
-     * @return string|array Name of parameter or array of names
+     * @return string Name of parameter
      */
-    protected function _param($value)
+    protected function _param($value): string
     {
-        // supports array
-        if (is_array($value)) {
-            return array_map(__METHOD__, $value);
-        }
-
         $name = ':' . $this->_paramBase;
         ++$this->_paramBase;
         $this->params[$name] = $value;

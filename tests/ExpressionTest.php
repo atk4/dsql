@@ -337,19 +337,6 @@ class ExpressionTest extends AtkPhpunit\TestCase
             [':a' => 'world'],
             $e->params
         );
-
-        // @todo Imants: allowing to pass value as array looks wrong.
-        //      See test case in testParam() method.
-        //      Maybe we should add implode(' ', array_map(...)) here ?
-        $e = new Expression('hello, [who]', ['who' => ['cruel', 'world']]);
-        $this->assertSame(
-            'hello, (:a,:b)',
-            $e->render()
-        );
-        $this->assertSame(
-            [':a' => 'cruel', ':b' => 'world'],
-            $e->params
-        );
     }
 
     /**
@@ -518,7 +505,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
 // @codingStandardsIgnoreStart
 class JsonExpression extends Expression
 {
-    public function _param($value)
+    public function _param($value): string
     {
         return json_encode($value);
     }
