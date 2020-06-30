@@ -306,21 +306,6 @@ class ExpressionTest extends AtkPhpunit\TestCase
             '"users".*',
             $this->callProtected($this->e(), '_escapeSoft', ['users.*'])
         );
-        $this->assertTrue(
-            $this->callProtected($this->e(), '_escapeSoft', [new \stdClass()]) instanceof \stdClass
-        );
-
-        // escaping array - escapes each of its elements using hard escape
-        $this->assertSame(
-            ['"first_name"', '*', '"last_name"'],
-            $this->callProtected($this->e(), '_escapeSoft', [['first_name', '*', 'last_name']])
-        );
-
-        // escaping array - escapes each of its elements using hard escape
-        $this->assertSame(
-            ['"first_name"', '"*"', '"last_name"'],
-            $this->callProtected($this->e(), '_escape', [['first_name', '*', 'last_name']])
-        );
 
         $this->assertSame(
             '"first_name"',

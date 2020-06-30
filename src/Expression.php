@@ -309,24 +309,15 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * It will smartly escape table.field type of strings resulting
      * in "table"."field".
-     *
-     * @param mixed $value Any string or array of strings
-     *
-     * @return string|array Escaped string or array of strings
      */
-    protected function _escapeSoft($value)
+    protected function _escapeSoft(string $value): string
     {
-        // supports array
-        if (is_array($value)) {
-            return array_map(__METHOD__, $value);
-        }
-
         // in some cases we should not escape
         if ($this->isUnescapablePattern($value)) {
             return $value;
         }
 
-        if (is_string($value) && strpos($value, '.') !== false) {
+        if (strpos($value, '.') !== false) {
             return implode('.', array_map(__METHOD__, explode('.', $value)));
         }
 
@@ -353,18 +344,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * This will allow you to use reserved SQL words as table or field
      * names such as "table" as well as other characters that SQL
      * permits in the identifiers (e.g. spaces or equation signs).
-     *
-     * @param mixed $value Any string or array of strings
-     *
-     * @return string|array Escaped string or array of strings
      */
-    protected function _escape($value)
+    protected function _escape(string $value): string
     {
-        // supports array
-        if (is_array($value)) {
-            return array_map(__METHOD__, $value);
-        }
-
         // in all other cases we should escape
         $c = $this->escape_char;
 
