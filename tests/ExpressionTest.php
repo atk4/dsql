@@ -274,7 +274,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
         );
         $this->assertSame(
             '"123"',
-            $this->callProtected($this->e(), '_escape', [123])
+            $this->callProtected($this->e(), '_escape', ['123'])
         );
         $this->assertSame(
             '"he""llo"',
@@ -375,7 +375,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
         // few brief tests on _consume
         $this->assertSame(
             '"123"',
-            $this->callProtected($this->e(), '_consume', [123, 'escape'])
+            $this->callProtected($this->e(), '_consume', ['123', 'escape'])
         );
         $this->assertSame(
             ':x',
