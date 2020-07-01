@@ -27,7 +27,7 @@ jobs:
     services:
       mysql:
         image: mysql:8
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5 -e "MYSQL_ROOT_PASSWORD=atk4_pass" -e "MYSQL_USER=atk4_test" -e "MYSQL_PASSWORD=atk4_pass" -e "MYSQL_DATABASE=atk4_test__dsql" --entrypoint sh mysql:8 -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5 -e MYSQL_ROOT_PASSWORD=atk4_pass -e MYSQL_USER=atk4_test -e MYSQL_PASSWORD=atk4_pass -e MYSQL_DATABASE=atk4_test__dsql --entrypoint sh mysql:8 -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
       postgres:
         image: postgres:12-alpine
         env:
