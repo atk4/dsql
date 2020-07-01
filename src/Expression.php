@@ -556,8 +556,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Returns ArrayIterator, for example PDOStatement.
+     *
+     * @return \PDOStatement
      */
-    public function getIterator(): \PDOStatement
+    public function getIterator()
     {
         return $this->execute();
     }
