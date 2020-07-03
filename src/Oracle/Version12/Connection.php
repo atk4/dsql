@@ -16,10 +16,10 @@ class Connection extends BaseConnection
     /** @var string Query classname */
     protected $query_class = Query::class;
 
-    public static function establishDriverConnection(array $dsn)
+    public static function establishConnection(array $dsn)
     {
         $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
 
-        return parent::establishDriverConnection($dsn);
+        return parent::establishConnection($dsn);
     }
 }

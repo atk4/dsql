@@ -28,9 +28,9 @@ class Connection extends ProxyConnection
      */
     protected $startTime;
 
-    public static function establishDriverConnection(array $dsn)
+    public static function establishConnection(array $dsn)
     {
-        return static::establish($dsn['rest'], $dsn['user'], $dsn['pass']);
+        return static::connect($dsn['rest'], $dsn['user'], $dsn['pass']);
     }
 
     /**

@@ -93,7 +93,7 @@ to::
     "profile:mysql:host=localhost;port=3307;dbname=testdb"
     "stopwatch:profile:mysql:host=localhost;port=3307;dbname=testdb"
 
-When this DSN is passed into :php:meth:`Connection::establish`, it will return
+When this DSN is passed into :php:meth:`Connection::connect`, it will return
 a proxy connection object that will collect the necessary statistics and
 "echo" them out.
 
@@ -161,7 +161,7 @@ operations::
 
 Next we need to use this proxy class instead of the normal one which is quite simple to do::
 
-    $connection = \atk4\dsql\Connection::establish($dsn, $user, $pass);
+    $connection = \atk4\dsql\Connection::connect($dsn, $user, $pass);
 
     $connection = new DelayInsertsConnection(['connection' => $connection]);
 
@@ -197,7 +197,7 @@ Let's say you want to add support for new SQL vendor::
 Now that our custom query class is complete, we would like to use it by default
 on the connection::
 
-    $c = \atk4\dsql\Connection::establish($dsn, $user, $pass, ['query_class'=>'Query_MyVendor']);
+    $c = \atk4\dsql\Connection::connect($dsn, $user, $pass, ['query_class'=>'Query_MyVendor']);
 
 .. _new_vendor:
 
@@ -213,7 +213,7 @@ create a separate add-on with it's own namespace. Let's say you have created
 3. Add a nice README file explaining all the quirks or extensions. Provide
    install instructions.
 4. Fork DSQL library.
-5. Modify :php:meth:`Connection::establish` to recognize your database identifier
+5. Modify :php:meth:`Connection::connect` to recognize your database identifier
    and refer to your namespace.
 6. Modify docs/extensions.rst to list name of your database and link to your
    repository / composer requirement.

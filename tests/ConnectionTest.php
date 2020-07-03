@@ -37,7 +37,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
      */
     public function testInit()
     {
-        $c = Connection::establish('sqlite::memory:');
+        $c = Connection::connect('sqlite::memory:');
         $this->assertSame(
             '4',
             $c->expr('select (2+2)')->getOne()
@@ -91,29 +91,29 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testConnectionRegistry()
     {
-        DummyConnection::registerDriver();
+        DummyConnection::registerConnection();
 
-        $this->assertSame(DummyConnection::class, Connection::resolveDriver('dummy'));
+        $this->assertSame(DummyConnection::class, Connection::resolveConnection('dummy'));
 
-        Connection::registerDriver([
+        Connection::registerConnection([
             DummyConnection2::class,
             DummyConnection3::class,
         ]);
 
-        $this->assertSame(DummyConnection2::class, Connection::resolveDriver('dummy2'));
+        $this->assertSame(DummyConnection2::class, Connection::resolveConnection('dummy2'));
 
-        $this->assertSame(DummyConnection3::class, Connection::resolveDriver('dummy3'));
+        $this->assertSame(DummyConnection3::class, Connection::resolveConnection('dummy3'));
 
-        Connection::registerDriver(DummyConnection4::class);
+        Connection::registerConnection(DummyConnection4::class);
 
-        $this->assertSame(DummyConnection4::class, Connection::resolveDriver('dummy4'));
+        $this->assertSame(DummyConnection4::class, Connection::resolveConnection('dummy4'));
     }
 
     public function testCreatePdo()
     {
-        $c1 = Connection::establish('sqlite::memory:');
+        $c1 = Connection::connect('sqlite::memory:');
 
-        $c2 = Connection::establish($c1->connection());
+        $c2 = Connection::connect($c1->connection());
 
         $this->assertSame($c1->connection(), $c2->connection());
     }
@@ -127,7 +127,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
             }
         };
 
-        $c = Connection::establish($driver);
+        $c = Connection::connect($driver);
 
         $this->assertSame(\atk4\dsql\ProxyConnection::class, get_class($c));
 
@@ -139,13 +139,13 @@ class ConnectionTest extends AtkPhpunit\TestCase
      */
     public function testDriverType()
     {
-        $c = Connection::establish('sqlite::memory:');
+        $c = Connection::connect('sqlite::memory:');
         $this->assertSame('sqlite', $c->driverType);
 
-        $c = Connection::establish('stopwatch:sqlite::memory:');
+        $c = Connection::connect('stopwatch:sqlite::memory:');
         $this->assertSame('sqlite', $c->driverType);
 
-        $c = Connection::establish('profile:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
         $this->assertSame('sqlite', $c->driverType);
         $c->callback = function () {}; // prevent output from __destruct
     }
@@ -155,7 +155,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
      */
     public function testStopwatch()
     {
-        $c = Connection::establish('stopwatch:sqlite::memory:');
+        $c = Connection::connect('stopwatch:sqlite::memory:');
 
         $result = false;
         $c->callback = function ($expr, $time, $fail) use (&$result) {
@@ -181,12 +181,12 @@ class ConnectionTest extends AtkPhpunit\TestCase
     public function testMysqlFail()
     {
         $this->expectException(\Exception::class);
-        $c = Connection::establish('mysql:host=256.256.256.256'); // invalid host
+        $c = Connection::connect('mysql:host=256.256.256.256'); // invalid host
     }
 
     public function testStopwatchEcho()
     {
-        $c = Connection::establish('stopwatch:sqlite::memory:');
+        $c = Connection::connect('stopwatch:sqlite::memory:');
 
         $this->assertSame(
             '4',
@@ -198,7 +198,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testProfiler()
     {
-        $c = Connection::establish('profile:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
 
         $result = false;
         $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
@@ -219,7 +219,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testProfilerEcho()
     {
-        $c = Connection::establish('profile:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
 
         $this->assertSame(
             '4',
@@ -233,7 +233,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testProfiler2()
     {
-        $c = Connection::establish('profile:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
 
         $result = false;
         $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
@@ -258,7 +258,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testProfiler3()
     {
-        $c = Connection::establish('profile:sqlite::memory:');
+        $c = Connection::connect('profile:sqlite::memory:');
 
         $result = false;
         $c->callback = function ($a, $b, $c, $d, $fail) use (&$result) {
@@ -290,13 +290,13 @@ class ConnectionTest extends AtkPhpunit\TestCase
     public function testException1()
     {
         $this->expectException(\PDOException::class);
-        $c = Connection::establish(':');
+        $c = Connection::connect(':');
     }
 
     public function testException2()
     {
         $this->expectException(\atk4\dsql\Exception::class);
-        $c = Connection::establish('');
+        $c = Connection::connect('');
     }
 
     public function testException3()
