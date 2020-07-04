@@ -36,7 +36,7 @@ class Connection
      *
      * @var array
      */
-    protected static $connectionRegistry = [
+    protected static $connectionClassRegistry = [
         'sqlite' => Sqlite\Connection::class,
         'mysql' => Mysql\Connection::class,
         'pgsql' => Postgresql\Connection::class,
@@ -59,9 +59,6 @@ class Connection
             throw (new Exception('Invalid properties for "new Connection()". Did you mean to call Connection::connect()?'))
                 ->addMoreInfo('properties', $properties);
         }
-
-        // backward compatibility - to be removed with Connection::$driverType
-        $this->driverType = array_search(static::class, self::$connectionRegistry, true);
 
         $this->setDefaults($properties);
     }
@@ -149,7 +146,7 @@ class Connection
         $connectionClass = self::resolveConnection($dsn['driverType']);
 
         return new $connectionClass(array_merge([
-            'connection' => $connectionClass::establishConnection($dsn),
+            'connection' => $connectionClass::connectDriver($dsn),
         ], $args));
     }
 
@@ -158,36 +155,27 @@ class Connection
      *
      * Can be used as:
      *
-     * Connection::register('mysql', MySQL\Connection::class), or
-     * MySQL\Connection::register()
+     * Connection::registerConnection(MySQL\Connection::class, 'mysql'), or
+     * MySQL\Connection::registerConnection()
      *
      * CustomDriver\Connection must be descendant of Connection class.
      *
-     * @param string $connectionType
      * @param string $connectionClass
+     * @param string $connectionType
      */
-    public static function registerConnection($connectionType = null, $connectionClass = null)
+    public static function registerConnection($connectionClass = null, $connectionType = null)
     {
-        if (!$connectionClass && is_a($connectionType, self::class, true)) {
-            $connectionClass = $connectionType;
-            $connectionType = null;
+        if (is_array($driverTypes = $connectionClass)) {
+            foreach ($driverTypes as $connectionType => $connectionClass) {
+                static::registerConnection($connectionClass, !is_numeric($connectionType) ? $connectionType : null);
+            }
         }
-
+        
         $connectionClass = $connectionClass ?? static::class;
 
         $connectionType = $connectionType ?? $connectionClass::defaultDriverType();
 
-        if (is_array($driverTypes = $connectionType)) {
-            foreach ($driverTypes as $connectionType => $connectionClass) {
-                if (is_numeric($connectionType)) {
-                    $connectionType = $connectionClass::defaultDriverType();
-                }
-
-                static::registerConnection($connectionType, $connectionClass);
-            }
-        }
-
-        self::$connectionRegistry[$connectionType] = $connectionClass;
+        self::$connectionClassRegistry[$connectionType] = $connectionClass;
     }
 
     /**
@@ -199,7 +187,7 @@ class Connection
      */
     public static function resolveConnection($connectionType)
     {
-        return self::$connectionRegistry[$connectionType] ?? static::class;
+        return self::$connectionClassRegistry[$connectionType] ?? static::class;
     }
 
     /**
@@ -208,7 +196,7 @@ class Connection
      *
      * This does not silence PDO errors.
      */
-    public static function establishConnection(array $dsn)
+    protected static function connectDriver(array $dsn)
     {
         return new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
     }

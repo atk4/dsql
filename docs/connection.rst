@@ -79,7 +79,7 @@ if you connect to vendor that does not use PDO.
     :param Expression  $expr: Expression (or query) to execute
     :returns: PDOStatement, Iterable object or Generator.
     
-.. php:method:: registerConnection($connectionType = null, $connectionClass = null)
+.. php:method:: registerConnection($connectionClass = null, $connectionType = null)
 
     Adds connection class to the registry for resolving in Connection::resolveConnection method.
 
@@ -88,13 +88,13 @@ if you connect to vendor that does not use PDO.
 
 Developers can register custom classes to handle driver types using the `Connecion::registerConnection` method::
 
-   Connection::registerConnection('mysql', Custom\MySQL\Connection::class); // or directly using the class
+   Connection::registerConnection(Custom\MySQL\Connection::class, 'mysql'); // or directly using the class
    Custom\MySQL\Connection::registerConnection();
    
 The driver type used in the latter case is the default value of the `$driverType` property of 
 `Custom\MySQL\Connection`
 
-.. php:method:: establishConnection(array $dsn)
+.. php:method:: connectDriver(array $dsn)
 
    The method should establish connection with DB and return the underlying connection object used by 
    the `Connection` class. By default PDO is used but the method can be overriden to return custom object to be 
