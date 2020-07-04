@@ -95,10 +95,8 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
         $this->assertSame(DummyConnection::class, Connection::resolveConnectionClass('dummy'));
 
-        Connection::registerConnectionClass([
-            DummyConnection2::class,
-            DummyConnection3::class,
-        ]);
+        Connection::registerConnectionClass(DummyConnection2::class);
+        Connection::registerConnectionClass(DummyConnection3::class);
 
         $this->assertSame(DummyConnection2::class, Connection::resolveConnectionClass('dummy2'));
 

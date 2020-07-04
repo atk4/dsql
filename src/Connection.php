@@ -165,12 +165,6 @@ class Connection
      */
     public static function registerConnectionClass($connectionClass = null, $connectionType = null)
     {
-        if (is_array($driverTypes = $connectionClass)) {
-            foreach ($driverTypes as $connectionType => $connectionClass) {
-                static::registerConnectionClass($connectionClass, !is_numeric($connectionType) ? $connectionType : null);
-            }
-        }
-
         $connectionClass = $connectionClass ?? static::class;
 
         $connectionType = $connectionType ?? $connectionClass::defaultDriverType();
