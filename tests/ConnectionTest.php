@@ -91,22 +91,22 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testConnectionRegistry()
     {
-        DummyConnection::registerConnection();
+        DummyConnection::registerConnectionClass();
 
-        $this->assertSame(DummyConnection::class, Connection::resolveConnection('dummy'));
+        $this->assertSame(DummyConnection::class, Connection::resolveConnectionClass('dummy'));
 
-        Connection::registerConnection([
+        Connection::registerConnectionClass([
             DummyConnection2::class,
             DummyConnection3::class,
         ]);
 
-        $this->assertSame(DummyConnection2::class, Connection::resolveConnection('dummy2'));
+        $this->assertSame(DummyConnection2::class, Connection::resolveConnectionClass('dummy2'));
 
-        $this->assertSame(DummyConnection3::class, Connection::resolveConnection('dummy3'));
+        $this->assertSame(DummyConnection3::class, Connection::resolveConnectionClass('dummy3'));
 
-        Connection::registerConnection(DummyConnection4::class);
+        Connection::registerConnectionClass(DummyConnection4::class);
 
-        $this->assertSame(DummyConnection4::class, Connection::resolveConnection('dummy4'));
+        $this->assertSame(DummyConnection4::class, Connection::resolveConnectionClass('dummy4'));
     }
 
     public function testCreatePdo()

@@ -126,7 +126,7 @@ class Connection
         if ($dsn instanceof \PDO) {
             $driverType = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
-            $connectionClass = self::resolveConnection($driverType);
+            $connectionClass = self::resolveConnectionClass($driverType);
 
             return new $connectionClass(array_merge([
                 'connection' => $dsn,
@@ -143,7 +143,7 @@ class Connection
         // Process DSN string
         $dsn = static::normalizeDSN($dsn, $user, $password);
 
-        $connectionClass = self::resolveConnection($dsn['driverType']);
+        $connectionClass = self::resolveConnectionClass($dsn['driverType']);
 
         return new $connectionClass(array_merge([
             'connection' => $connectionClass::connectDriver($dsn),
@@ -156,21 +156,21 @@ class Connection
      * Can be used as:
      *
      * Connection::registerConnection(MySQL\Connection::class, 'mysql'), or
-     * MySQL\Connection::registerConnection()
+     * MySQL\Connection::registerConnectionClass()
      *
      * CustomDriver\Connection must be descendant of Connection class.
      *
      * @param string $connectionClass
      * @param string $connectionType
      */
-    public static function registerConnection($connectionClass = null, $connectionType = null)
+    public static function registerConnectionClass($connectionClass = null, $connectionType = null)
     {
         if (is_array($driverTypes = $connectionClass)) {
             foreach ($driverTypes as $connectionType => $connectionClass) {
-                static::registerConnection($connectionClass, !is_numeric($connectionType) ? $connectionType : null);
+                static::registerConnectionClass($connectionClass, !is_numeric($connectionType) ? $connectionType : null);
             }
         }
-        
+
         $connectionClass = $connectionClass ?? static::class;
 
         $connectionType = $connectionType ?? $connectionClass::defaultDriverType();
@@ -185,7 +185,7 @@ class Connection
      *
      * @return string
      */
-    public static function resolveConnection($connectionType)
+    public static function resolveConnectionClass($connectionType)
     {
         return self::$connectionClassRegistry[$connectionType] ?? static::class;
     }
