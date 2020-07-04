@@ -129,9 +129,6 @@ class Connection
         if ($dsn instanceof \PDO) {
             $driverType = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
-            /**
-             * @var Connection $connectionClass
-             */
             $connectionClass = self::resolveConnection($driverType);
 
             return new $connectionClass(array_merge([
@@ -149,9 +146,6 @@ class Connection
         // Process DSN string
         $dsn = static::normalizeDSN($dsn, $user, $password);
 
-        /**
-         * @var Connection $connectionClass
-         */
         $connectionClass = self::resolveConnection($dsn['driverType']);
 
         return new $connectionClass(array_merge([
