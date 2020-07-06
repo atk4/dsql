@@ -1367,18 +1367,13 @@ class Query extends Expression
 
     /**
      * Returns Expression object for NOW() or CURRENT_TIMESTAMP() method.
-     *
-     * @param int $precision
-     *
-     * @return Expression
      */
-    public function exprNow($precision = null)
+    public function exprNow(int $precision = null): Expression
     {
-        if ($precision !== null) {
-            return $this->expr('current_timestamp([])', [$precision]);
-        }
-
-        return $this->expr('current_timestamp()');
+        return $this->expr(
+            'current_timestamp(' . ($precision !== null ? '[]' : '') . ')',
+            $precision !== null ? [$precision] : []
+        );
     }
 
     /**
