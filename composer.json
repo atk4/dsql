@@ -19,17 +19,17 @@
     "sort-packages": true
   },
   "require": {
-    "php": ">=7.2.0",
+    "php": ">=7.3.0",
     "atk4/core": "dev-develop"
   },
   "require-release": {
-    "php": ">=7.2.0",
+    "php": ">=7.3.0",
     "atk4/core": "^2.0"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.16",
     "phpunit/phpcov": "*",
-    "phpunit/phpunit": ">=8.0"
+    "phpunit/phpunit": ">=9.0"
   },
   "suggest": {
     "jdorn/sql-formatter": "*"
