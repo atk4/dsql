@@ -33,7 +33,7 @@ class QueryTest extends AtkPhpunit\TestCase
         // passing properties in constructor
         $this->assertSame(
             '"q"',
-            $this->callProtected($this->q(), '_escape', ['q'])
+            $this->callProtected($this->q(), '_escape', 'q')
         );
     }
 
