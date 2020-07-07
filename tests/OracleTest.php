@@ -34,11 +34,11 @@ class OracleTest extends AtkPhpunit\TestCase
 
     public function connect($ver = '')
     {
-        $version = $ver ? '\Version' . $ver : '';
+        $version = $ver ? 'Version' . $ver . '\\' : '';
 
         return new \atk4\dsql\Connection(array_merge([
             'connection' => new \PDO('sqlite::memory:'),
-            'query_class' => '\atk4\dsql\Oracle' . $version . 'Query',
+            'query_class' => '\\atk4\\dsql\\Oracle\\' . $version . 'Query',
         ]));
     }
 
@@ -70,9 +70,9 @@ class OracleTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function test12cOracleLimit()
+    public function test12OracleLimit()
     {
-        $c = $this->connect('12c');
+        $c = $this->connect('12');
         $this->assertSame(
             'select "baz" from "foo" where "bar" = :a FETCH NEXT 10 ROWS ONLY',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10)->render()
@@ -88,9 +88,9 @@ class OracleTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function test12cOracleSkip()
+    public function test12OracleSkip()
     {
-        $c = $this->connect('12c');
+        $c = $this->connect('12');
         $this->assertSame(
             'select "baz" from "foo" where "bar" = :a OFFSET 10 ROWS',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(null, 10)->render()
@@ -106,9 +106,9 @@ class OracleTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function test12cOracleLimitSkip()
+    public function test12OracleLimitSkip()
     {
-        $c = $this->connect('12c');
+        $c = $this->connect('12');
         $this->assertSame(
             'select "baz" from "foo" where "bar" = :a OFFSET 99 ROWS FETCH NEXT 10 ROWS ONLY',
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10, 99)->render()

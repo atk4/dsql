@@ -810,7 +810,7 @@ class Query extends Expression
                 return '(' . $field . '=' . $field . ' or ' . $field . ' is null)'; // always true
             }
 
-            $value = '(' . implode(',', $this->_param($value)) . ')';
+            $value = '(' . implode(',', array_map([$this, '_param'], $value)) . ')';
 
             return $field . ' ' . $cond . ' ' . $value;
         }

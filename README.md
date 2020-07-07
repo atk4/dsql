@@ -14,8 +14,6 @@ Obviously because existing ones are not good enough. DSQL tries to do things dif
 5. Almost no dependencies. Use DSQL in any PHP application or framework.
 6. NoSQL support. In addition to supporting PDO, DSQL can be extended to deal with SQL-compatible NoSQL servers.
 
-[See our "Awesome Queries" gallery](https://github.com/atk4/dsql/wiki/Awesome-Queries)
-
 
 ## DSQL Is Stable!
 
