@@ -6,5 +6,5 @@ namespace atk4\dsql;
 
 interface Expressionable
 {
-    public function getDSQLExpression($expression);
+    public function getDsqlExpression($expression);
 }

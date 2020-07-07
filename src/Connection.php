@@ -9,7 +9,7 @@ namespace atk4\dsql;
  */
 class Connection
 {
-    use \atk4\core\DIContainerTrait;
+    use \atk4\core\DiContainerTrait;
 
     /** @var string Query classname */
     protected $query_class = Query::class;
@@ -58,7 +58,7 @@ class Connection
      *
      * @return array
      */
-    public static function normalizeDSN($dsn, $user = null, $pass = null)
+    public static function normalizeDsn($dsn, $user = null, $pass = null)
     {
         // Try to dissect DSN into parts
         $parts = is_array($dsn) ? $dsn : parse_url($dsn);
@@ -152,13 +152,13 @@ class Connection
         }
 
         // Process DSN string
-        $dsn = static::normalizeDSN($dsn, $user, $password);
+        $dsn = static::normalizeDsn($dsn, $user, $password);
 
         // Create driverType specific connection
         switch ($dsn['driverType']) {
             case 'mysql':
                 $c = new static(array_merge([
-                    'connection' => static::getPDO($dsn),
+                    'connection' => static::getPdo($dsn),
                     'expression_class' => Mysql\Expression::class,
                     'query_class' => Mysql\Query::class,
                     'driverType' => $dsn['driverType'],
@@ -167,7 +167,7 @@ class Connection
                 break;
             case 'sqlite':
                 $c = new static(array_merge([
-                    'connection' => static::getPDO($dsn),
+                    'connection' => static::getPdo($dsn),
                     'query_class' => Sqlite\Query::class,
                     'driverType' => $dsn['driverType'],
                 ], $args));
@@ -175,7 +175,7 @@ class Connection
                 break;
             case 'oci':
                 $c = new Oracle\Connection(array_merge([
-                    'connection' => static::getPDO($dsn),
+                    'connection' => static::getPdo($dsn),
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
@@ -183,14 +183,14 @@ class Connection
             case 'oci12':
                 $dsn['dsn'] = str_replace('oci12:', 'oci:', $dsn['dsn']);
                 $c = new Oracle\Version12\Connection(array_merge([
-                    'connection' => static::getPDO($dsn),
+                    'connection' => static::getPdo($dsn),
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
                 break;
             case 'pgsql':
                 $c = new Postgresql\Connection(array_merge([
-                    'connection' => static::getPDO($dsn),
+                    'connection' => static::getPdo($dsn),
                     'driverType' => $dsn['driverType'],
                 ], $args));
 
@@ -212,7 +212,7 @@ class Connection
             // let PDO handle the rest
             default:
                 $c = new static(array_merge([
-                    'connection' => static::connect(static::getPDO($dsn)),
+                    'connection' => static::connect(static::getPdo($dsn)),
                 ], $args));
         }
 
@@ -224,7 +224,7 @@ class Connection
      *
      * This does not silence PDO errors.
      */
-    protected static function getPDO(array $dsn)
+    protected static function getPdo(array $dsn)
     {
         return new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
     }
@@ -406,8 +406,8 @@ class Connection
      *
      * @return mixed
      */
-    public function lastInsertID(string $sequence = null)
+    public function lastInsertId(string $sequence = null)
     {
-        return $sequence === null ? $this->connection()->lastInsertID() : $this->connection()->lastInsertID($sequence);
+        return $sequence === null ? $this->connection()->lastInsertId() : $this->connection()->lastInsertId($sequence);
     }
 }
