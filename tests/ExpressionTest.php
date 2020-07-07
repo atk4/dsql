@@ -270,41 +270,41 @@ class ExpressionTest extends AtkPhpunit\TestCase
         // escaping expressions
         $this->assertSame(
             '"first_name"',
-            $this->callProtected($this->e(), '_escape', ['first_name'])
+            $this->callProtected($this->e(), '_escape', 'first_name')
         );
         $this->assertSame(
             '"123"',
-            $this->callProtected($this->e(), '_escape', ['123'])
+            $this->callProtected($this->e(), '_escape', '123')
         );
         $this->assertSame(
             '"he""llo"',
-            $this->callProtected($this->e(), '_escape', ['he"llo'])
+            $this->callProtected($this->e(), '_escape', 'he"llo')
         );
 
         // should not escape expressions
         $this->assertSame(
             '*',
-            $this->callProtected($this->e(), '_escapeSoft', ['*'])
+            $this->callProtected($this->e(), '_escapeSoft', '*')
         );
         $this->assertSame(
             '"*"',
-            $this->callProtected($this->e(), '_escape', ['*'])
+            $this->callProtected($this->e(), '_escape', '*')
         );
         $this->assertSame(
             '(2+2) age',
-            $this->callProtected($this->e(), '_escapeSoft', ['(2+2) age'])
+            $this->callProtected($this->e(), '_escapeSoft', '(2+2) age')
         );
         $this->assertSame(
             '"(2+2) age"',
-            $this->callProtected($this->e(), '_escape', ['(2+2) age'])
+            $this->callProtected($this->e(), '_escape', '(2+2) age')
         );
         $this->assertSame(
             '"users"."first_name"',
-            $this->callProtected($this->e(), '_escapeSoft', ['users.first_name'])
+            $this->callProtected($this->e(), '_escapeSoft', 'users.first_name')
         );
         $this->assertSame(
             '"users".*',
-            $this->callProtected($this->e(), '_escapeSoft', ['users.*'])
+            $this->callProtected($this->e(), '_escapeSoft', 'users.*')
         );
 
         $this->assertSame(
@@ -347,19 +347,19 @@ class ExpressionTest extends AtkPhpunit\TestCase
         // few brief tests on _consume
         $this->assertSame(
             '"123"',
-            $this->callProtected($this->e(), '_consume', ['123', 'escape'])
+            $this->callProtected($this->e(), '_consume', '123', 'escape')
         );
         $this->assertSame(
             ':x',
-            $this->callProtected($this->e(['_paramBase' => 'x']), '_consume', [123, 'param'])
+            $this->callProtected($this->e(['_paramBase' => 'x']), '_consume', 123, 'param')
         );
         $this->assertSame(
             123,
-            $this->callProtected($this->e(), '_consume', [123, 'none'])
+            $this->callProtected($this->e(), '_consume', 123, 'none')
         );
         $this->assertSame(
             '(select *)',
-            $this->callProtected($this->e(), '_consume', [new Query()])
+            $this->callProtected($this->e(), '_consume', new Query())
         );
 
         $this->assertSame(
@@ -376,7 +376,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testConsumeException1()
     {
         $this->expectException(Exception::class);
-        $this->callProtected($this->e(), '_consume', [123, 'blahblah']);
+        $this->callProtected($this->e(), '_consume', 123, 'blahblah');
     }
 
     /**
@@ -387,7 +387,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testConsumeException2()
     {
         $this->expectException(Exception::class);
-        $this->callProtected($this->e(), '_consume', [new \StdClass()]);
+        $this->callProtected($this->e(), '_consume', new \StdClass());
     }
 
     /**
