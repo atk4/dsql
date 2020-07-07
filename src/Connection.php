@@ -9,7 +9,7 @@ namespace atk4\dsql;
  */
 class Connection
 {
-    use \atk4\core\DIContainerTrait;
+    use \atk4\core\DiContainerTrait;
 
     /** @var string Query classname */
     protected $query_class = Query::class;
@@ -74,7 +74,7 @@ class Connection
      *
      * @return array
      */
-    public static function normalizeDSN($dsn, $user = null, $pass = null)
+    public static function normalizeDsn($dsn, $user = null, $pass = null)
     {
         // Try to dissect DSN into parts
         $parts = is_array($dsn) ? $dsn : parse_url($dsn);
@@ -141,7 +141,7 @@ class Connection
         }
 
         // Process DSN string
-        $dsn = static::normalizeDSN($dsn, $user, $password);
+        $dsn = static::normalizeDsn($dsn, $user, $password);
 
         $connectionClass = self::resolveConnectionClass($dsn['driverType']);
 
@@ -382,8 +382,8 @@ class Connection
      *
      * @return mixed
      */
-    public function lastInsertID(string $sequence = null)
+    public function lastInsertId(string $sequence = null)
     {
-        return $sequence === null ? $this->connection()->lastInsertID() : $this->connection()->lastInsertID($sequence);
+        return $sequence === null ? $this->connection()->lastInsertId() : $this->connection()->lastInsertId($sequence);
     }
 }

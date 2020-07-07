@@ -42,13 +42,13 @@ class Connection extends BaseConnection
      *
      * @return mixed
      */
-    public function lastInsertID(string $sequence = null)
+    public function lastInsertId(string $sequence = null)
     {
         if ($sequence) {
             return $this->dsql()->mode('seq_currval')->sequence($sequence)->getOne();
         }
 
         // fallback
-        return parent::lastInsertID($sequence);
+        return parent::lastInsertId($sequence);
     }
 }
