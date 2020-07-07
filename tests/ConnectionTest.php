@@ -27,45 +27,45 @@ class ConnectionTest extends AtkPhpunit\TestCase
     /**
      * Test DSN normalize.
      */
-    public function testDSNNormalize()
+    public function testDsnNormalize()
     {
         // standard
-        $dsn = Connection::normalizeDSN('mysql://root:pass@localhost/db');
+        $dsn = Connection::normalizeDsn('mysql://root:pass@localhost/db');
         $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => 'pass', 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
-        $dsn = Connection::normalizeDSN('mysql:host=localhost;dbname=db');
+        $dsn = Connection::normalizeDsn('mysql:host=localhost;dbname=db');
         $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => null, 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
-        $dsn = Connection::normalizeDSN('mysql:host=localhost;dbname=db', 'root', 'pass');
+        $dsn = Connection::normalizeDsn('mysql:host=localhost;dbname=db', 'root', 'pass');
         $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => 'pass', 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
         // username and password should take precedence
-        $dsn = Connection::normalizeDSN('mysql://root:pass@localhost/db', 'foo', 'bar');
+        $dsn = Connection::normalizeDsn('mysql://root:pass@localhost/db', 'foo', 'bar');
         $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'foo', 'pass' => 'bar', 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
         // more options
-        $dsn = Connection::normalizeDSN('mysql://root:pass@localhost/db;foo=bar');
+        $dsn = Connection::normalizeDsn('mysql://root:pass@localhost/db;foo=bar');
         $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db;foo=bar', 'user' => 'root', 'pass' => 'pass', 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db;foo=bar'], $dsn);
 
         // no password
-        $dsn = Connection::normalizeDSN('mysql://root@localhost/db');
+        $dsn = Connection::normalizeDsn('mysql://root@localhost/db');
         $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
-        $dsn = Connection::normalizeDSN('mysql://root:@localhost/db'); // see : after root
+        $dsn = Connection::normalizeDsn('mysql://root:@localhost/db'); // see : after root
         $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
         // specific DSNs
-        $dsn = Connection::normalizeDSN('stopwatch:sqlite::memory');
+        $dsn = Connection::normalizeDsn('stopwatch:sqlite::memory');
         $this->assertSame(['dsn' => 'stopwatch:sqlite::memory', 'user' => null, 'pass' => null, 'driverType' => 'stopwatch', 'rest' => 'sqlite::memory'], $dsn);
 
-        $dsn = Connection::normalizeDSN('sqlite::memory');
+        $dsn = Connection::normalizeDsn('sqlite::memory');
         $this->assertSame(['dsn' => 'sqlite::memory', 'user' => null, 'pass' => null, 'driverType' => 'sqlite', 'rest' => ':memory'], $dsn); // rest is unusable anyway in this context
 
         // with port number as URL, normalize port to ;port=1234
-        $dsn = Connection::normalizeDSN('mysql://root:pass@localhost:1234/db');
+        $dsn = Connection::normalizeDsn('mysql://root:pass@localhost:1234/db');
         $this->assertSame(['dsn' => 'mysql:host=localhost;port=1234;dbname=db', 'user' => 'root', 'pass' => 'pass', 'driverType' => 'mysql', 'rest' => 'host=localhost;port=1234;dbname=db'], $dsn);
 
         // with port number as DSN, leave port as :port
-        $dsn = Connection::normalizeDSN('mysql:host=localhost:1234;dbname=db');
+        $dsn = Connection::normalizeDsn('mysql:host=localhost:1234;dbname=db');
         $this->assertSame(['dsn' => 'mysql:host=localhost:1234;dbname=db', 'user' => null, 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost:1234;dbname=db'], $dsn);
     }
 

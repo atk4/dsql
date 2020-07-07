@@ -252,7 +252,7 @@ query "LOAD DATA INFILE":
 So to implement our task, you might need a class like this::
 
     use \atk4\dsql\Exception;
-    class Query_MySQL extends \atk4\dsql\Mysql\Query
+    class QueryMysqlCustom extends \atk4\dsql\Mysql\Query
     {
         protected $template_load_data = 'load data local infile [file] into table [table]';
 

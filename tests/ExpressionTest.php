@@ -512,7 +512,7 @@ class JsonExpression extends Expression
 }
 class MyField implements Expressionable
 {
-    public function getDSQLExpression($e)
+    public function getDsqlExpression($e)
     {
         return $e->expr('"myfield"');
     }
