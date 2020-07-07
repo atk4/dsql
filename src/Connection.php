@@ -317,10 +317,8 @@ class Connection
      * Perhaps use a hook for this?
      *
      * @see beginTransaction()
-     *
-     * @return bool if in transaction
      */
-    public function inTransaction()
+    public function inTransaction(): bool
     {
         return $this->transaction_depth > 0;
     }

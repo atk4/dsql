@@ -120,13 +120,34 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Whether or not an offset exists.
+     *
+     * @param string An offset to check for
+     */
+    public function offsetExists($offset): bool
+    {
+        return array_key_exists($offset, $this->args['custom']);
+    }
+
+    /**
+     * Returns the value at specified offset.
+     *
+     * @param string The offset to retrieve
+     *
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->args['custom'][$offset];
+    }
+
+    /**
      * Assigns a value to the specified offset.
      *
      * @param string The offset to assign the value to
      * @param mixed  The value to set
-     * @abstracting ArrayAccess
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if ($offset === null) {
             $this->args['custom'][] = $value;
@@ -136,40 +157,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Whether or not an offset exists.
-     *
-     * @param string An offset to check for
-     *
-     * @return bool
-     * @abstracting ArrayAccess
-     */
-    public function offsetExists($offset)
-    {
-        return array_key_exists($offset, $this->args['custom']);
-    }
-
-    /**
      * Unsets an offset.
      *
      * @param string The offset to unset
-     * @abstracting ArrayAccess
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->args['custom'][$offset]);
-    }
-
-    /**
-     * Returns the value at specified offset.
-     *
-     * @param string The offset to retrieve
-     *
-     * @return mixed
-     * @abstracting ArrayAccess
-     */
-    public function offsetGet($offset)
-    {
-        return $this->args['custom'][$offset];
     }
 
     /**
@@ -564,7 +558,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * Returns ArrayIterator, for example PDOStatement.
      *
      * @return \PDOStatement
-     * @abstracting \IteratorAggregate
      */
     public function getIterator()
     {
