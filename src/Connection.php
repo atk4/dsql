@@ -236,10 +236,8 @@ class Connection
 
     /**
      * Returns the default driver type set for the connection in $driverType.
-     *
-     * @return string|null
      */
-    public static function defaultDriverType()
+    public static function defaultDriverType(): ?string
     {
         return (new \ReflectionClass(static::class))->getDefaultProperties()['driverType'] ?? null;
     }
