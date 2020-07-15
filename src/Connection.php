@@ -100,7 +100,7 @@ class Connection
                 throw (new Exception('Your DSN format is invalid. Must be in "driverType:host;options" format'))
                     ->addMoreInfo('dsn', $dsn);
             }
-            list($driverType, $rest) = explode(':', $dsn, 2);
+            [$driverType, $rest] = explode(':', $dsn, 2);
             $driverType = strtolower($driverType);
         } else {
             // currently impossible to be like this, but we don't want ugly exceptions here
