@@ -139,12 +139,12 @@ call::
 :php:class:`ProxyConnection` class would re-execute the query with a different
 connection class. In other words :php:class:`ProxyConnection` allows you
 to "wrap" your actual connection class. As a benefit you get to extend
-:php:class:`Proxy` class implementing some unified features that would work with
+:php:class:`ProxyConnection` class implementing some unified features that would work with
 any other connection class. Often this will require you to know externals, but
 let's build a proxy class that will add "DELAYED" options for all INSERT
 operations::
 
-    class Connection_DelayInserts extends \atk4\dsql\ProxyConnection
+    class DelayInsertsConnection extends \atk4\dsql\ProxyConnection
     {
         function execute(\atk4\dsql\Expression $expr)
         {
@@ -159,14 +159,13 @@ operations::
         }
     }
 
-Next we need to use this proxy class instead of the normal one. Frankly, that's
-quite simple to do::
+Next we need to use this proxy class instead of the normal one which is quite simple to do::
 
-    $c = \atk4\dsql\Connection::connect($dsn, $user, $pass);
+    $connection = \atk4\dsql\Connection::connect($dsn, $user, $pass);
 
-    $c = new Connection_DelayInserts(['connection'=>$c]);
+    $connection = new DelayInsertsConnection(['connection' => $connection]);
 
-    // use the new $c
+    // now use the new $connection
 
 :php:class:`ProxyConnection` can be used for many different things.
 

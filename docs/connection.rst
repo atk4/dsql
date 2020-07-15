@@ -16,13 +16,13 @@ Connection class is handy to have if you plan on building and executing
 queries in your application. It's more appropriate to store
 connection in a global variable or global class::
 
-    $app->db = atk4\dsql\Connection::connect($dsn, $user, $pass);
+    $app->db = atk4\dsql\Connection::connect($dsn, $user, $pass, $args);
 
 
 .. php:staticmethod:: connect($dsn, $user = null, $password = null, $args = [])
 
     Determine which Connection class should be used for specified $dsn,
-    create new object of this connection class and return.
+    establish connection to DB by creating new object of this connection class and return.
 
     :param string $dsn: DSN, see http://php.net/manual/en/ref.pdo-mysql.connection.php
     :param string $user: username
@@ -59,13 +59,11 @@ new Query or Expression class::
 
 Here is how you can use all of this together::
 
-
     $dsn = 'mysql:host=localhost;port=3307;dbname=testdb';
 
-    $c = atk4\dsql\Connection::connect($dsn, 'root', 'root');
-    $expr = $c -> expr("select now()");
+    $connection = atk4\dsql\Connection::connect($dsn, 'root', 'root');
 
-    echo "Time now is : ". $expr;
+    echo "Time now is : ". $connection->expr("select now()");
 
 :php:meth:`connect` will determine appropriate class that can be used for this
 DSN string. This can be a PDO class or it may try to use a 3rd party connection
@@ -80,3 +78,24 @@ if you connect to vendor that does not use PDO.
 
     :param Expression  $expr: Expression (or query) to execute
     :returns: PDOStatement, Iterable object or Generator.
+    
+.. php:method:: registerConnectionClass($connectionClass = null, $connectionType = null)
+
+    Adds connection class to the registry for resolving in Connection::resolveConnectionClass method.
+
+    :param string $connectionType Alias of the connection
+    :param string $connectionClass The connection class to be used for the diver type
+
+Developers can register custom classes to handle driver types using the `Connecion::registerConnectionClass` method::
+
+   Connection::registerConnectionClass(Custom\MySQL\Connection::class, 'mysql'); // or directly using the class
+   Custom\MySQL\Connection::registerConnectionClass();
+   
+The driver type used in the latter case is the default value of the `$driverType` property of 
+`Custom\MySQL\Connection`
+
+.. php:method:: connectDriver(array $dsn)
+
+   The method should establish connection with DB and return the underlying connection object used by 
+   the `Connection` class. By default PDO is used but the method can be overriden to return custom object to be 
+   used for connection to DB.

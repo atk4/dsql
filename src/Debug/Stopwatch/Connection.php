@@ -28,6 +28,11 @@ class Connection extends ProxyConnection
      */
     protected $startTime;
 
+    protected static function connectDriver(array $dsn)
+    {
+        return static::connect($dsn['rest'], $dsn['user'], $dsn['pass']);
+    }
+
     /**
      * Execute expression.
      *

@@ -475,21 +475,21 @@ class Query extends Expression
 
         // try to find alias in foreign table definition. this behaviour should be deprecated
         if ($_foreign_alias === null) {
-            list($foreign_table, $_foreign_alias) = array_pad(explode(' ', $foreign_table, 2), 2, null);
+            [$foreign_table, $_foreign_alias] = array_pad(explode(' ', $foreign_table, 2), 2, null);
         }
 
         // Split and deduce fields
         // NOTE that this will not allow table names with dots in there !!!
-        list($f1, $f2) = array_pad(explode('.', $foreign_table, 2), 2, null);
+        [$f1, $f2] = array_pad(explode('.', $foreign_table, 2), 2, null);
 
         if (is_object($master_field)) {
             $j['expr'] = $master_field;
         } else {
             // Split and deduce primary table
             if ($master_field === null) {
-                list($m1, $m2) = [null, null];
+                [$m1, $m2] = [null, null];
             } else {
-                list($m1, $m2) = array_pad(explode('.', $master_field, 2), 2, null);
+                [$m1, $m2] = array_pad(explode('.', $master_field, 2), 2, null);
             }
             if ($m2 === null) {
                 $m2 = $m1;
@@ -750,11 +750,11 @@ class Query extends Expression
     protected function _sub_render_condition($row)
     {
         if (count($row) === 3) {
-            list($field, $cond, $value) = $row;
+            [$field, $cond, $value] = $row;
         } elseif (count($row) === 2) {
-            list($field, $cond) = $row;
+            [$field, $cond] = $row;
         } elseif (count($row) === 1) {
-            list($field) = $row;
+            [$field] = $row;
         }
 
         $field = $this->_consume($field, 'soft-escape');
@@ -983,7 +983,7 @@ class Query extends Expression
         $ret = [];
 
         if (isset($this->args['set']) && $this->args['set']) {
-            foreach ($this->args['set'] as list($field, $value)) {
+            foreach ($this->args['set'] as [$field, $value]) {
                 $field = $this->_consume($field, 'escape');
                 $value = $this->_consume($value, 'param');
 
@@ -1005,7 +1005,7 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as list($field/*, $value*/)) {
+            foreach ($this->args['set'] as [$field/*, $value*/]) {
                 $field = $this->_consume($field, 'escape');
 
                 $ret[] = $field;
@@ -1026,7 +1026,7 @@ class Query extends Expression
         $ret = [];
 
         if ($this->args['set']) {
-            foreach ($this->args['set'] as list(/*$field*/, $value)) {
+            foreach ($this->args['set'] as [/*$field*/, $value]) {
                 $value = $this->_consume($value, 'param');
 
                 $ret[] = $value;
@@ -1257,7 +1257,7 @@ class Query extends Expression
 
         $x = [];
         foreach ($this->args['order'] as $tmp) {
-            list($arg, $desc) = $tmp;
+            [$arg, $desc] = $tmp;
             $x[] = $this->_consume($arg, 'soft-escape') . ($desc ? (' ' . $desc) : '');
         }
 
