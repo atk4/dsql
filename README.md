@@ -112,7 +112,7 @@ $m = new Client($db);
 echo $m->addCondition('vip', true)
   ->ref('Order')
   ->ref('Line')
-  ->action('fx', ['sum', 'total'])
+  ->toQuery('fx', ['sum', 'total'])
   ->getDebugQuery();
 ```
 
