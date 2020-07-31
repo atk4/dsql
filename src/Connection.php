@@ -262,12 +262,12 @@ class Connection
      * the code inside callback will fail, then all of the transaction
      * will be also rolled back.
      */
-    public function atomic(callable $fx, ...$args)
+    public function atomic(\Closure $fx, ...$args)
     {
         $this->beginTransaction();
 
         try {
-            $res = call_user_func_array($fx, $args);
+            $res = $fx(...$args);
             $this->commit();
 
             return $res;

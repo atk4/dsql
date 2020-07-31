@@ -630,7 +630,7 @@ class Query extends Expression
             $or = $this->orExpr();
             foreach ($field as $row) {
                 if (is_array($row)) {
-                    call_user_func_array([$or, 'where'], $row);
+                    $or->where(...$row);
                 } else {
                     $or->where($row);
                 }

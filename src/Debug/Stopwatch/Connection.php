@@ -12,14 +12,14 @@ class Connection extends ProxyConnection
     public $driverType = 'stopwatch';
 
     /**
-     * Callable to call for outputting.
+     * Closure to call for outputting.
      *
      * Will receive parameters:
      *  - Expression Expression object
      *  - float      How long it took to execute expression
      *  - boolean    True if we had exception while executing expression
      *
-     * @var callable
+     * @var \Closure
      */
     public $callback;
 
@@ -57,14 +57,12 @@ class Connection extends ProxyConnection
 
     protected function dump(Expression $expr, $error = false)
     {
-        $error = $error ? 'ERROR ' : '';
-
         $took = microtime(true) - $this->startTime;
 
-        if ($this->callback && is_callable($this->callback)) {
-            call_user_func($this->callback, $expr, $took, false);
+        if ($this->callback instanceof \Closure) {
+            ($this->callback)($expr, $took, false);
         } else {
-            printf("[{$error}%02.6f] %s\n", $took, $expr->getDebugQuery());
+            printf('[%s%02.6f] %s' . "\n", $error ? 'ERROR ' : '', $took, $expr->getDebugQuery());
         }
     }
 }
