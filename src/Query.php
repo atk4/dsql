@@ -770,6 +770,10 @@ class Query extends Expression
         if (count($row) === 2) {
             $value = $cond;
 
+            if ($value instanceof Expressionable) {
+                $value = $value->getDsqlExpression($this);
+            }
+
             if (is_array($value)) {
                 $cond = 'in';
             } elseif ($value instanceof self && $value->mode === 'select') {
