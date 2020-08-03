@@ -13,7 +13,7 @@ class Connection extends ProxyConnection
     public $driverType = 'profile';
 
     /**
-     * Callable to call for outputting.
+     * Closure to call for outputting.
      *
      * Will receive parameters:
      *  - int     Count of executed queries
@@ -22,7 +22,7 @@ class Connection extends ProxyConnection
      *  - int     Count of executed expressions
      *  - boolean True if we had exception while executing expression
      *
-     * @var callable
+     * @var \Closure
      */
     public $callback;
 
@@ -77,8 +77,8 @@ class Connection extends ProxyConnection
         try {
             $ret = parent::execute($expr);
         } catch (\Exception $e) {
-            if ($this->callback && is_callable($this->callback)) {
-                call_user_func($this->callback, $this->queries, $this->selects, $this->rows, $this->expressions, true);
+            if ($this->callback instanceof \Closure) {
+                ($this->callback)($this->queries, $this->selects, $this->rows, $this->expressions, true);
             } else {
                 $this->dump(true);
             }
@@ -94,8 +94,8 @@ class Connection extends ProxyConnection
      */
     public function __destruct()
     {
-        if ($this->callback && is_callable($this->callback)) {
-            call_user_func($this->callback, $this->queries, $this->selects, $this->rows, $this->expressions, false);
+        if ($this->callback instanceof \Closure) {
+            ($this->callback)($this->queries, $this->selects, $this->rows, $this->expressions, false);
         } else {
             $this->dump();
         }
