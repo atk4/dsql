@@ -265,7 +265,6 @@ class Connection
     public function atomic(\Closure $fx, ...$args)
     {
         $this->beginTransaction();
-
         try {
             $res = $fx(...$args);
             $this->commit();
