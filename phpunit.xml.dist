@@ -5,18 +5,18 @@
         <var name="DB_PASSWD" value="" />
         <var name="DB_DBNAME" value="" />
     </php>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src</directory>
-        </whitelist>
-    </filter>
     <testsuites>
-        <testsuite name="dsql">
+        <testsuite name="tests">
             <directory>tests</directory>
             <exclude>tests/OracleTest.php</exclude>
         </testsuite>
     </testsuites>
-    <logging>
-        <log type="coverage-php" target="build/logs/clover.cov"/>
-    </logging>
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <report>
+            <php outputFile="build/logs/clover.cov" />
+        </report>
+    </coverage>
 </phpunit>
