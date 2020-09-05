@@ -757,12 +757,12 @@ class QueryTest extends AtkPhpunit\TestCase
             $this->q('[where]')->where('db.user.id', 1)->render()
         );
         $this->assertSame(
-            'where "id" is :a',
+            'where "id" is null',
             $this->q('[where]')->where('id', null)->render()
         );
         $this->assertSame(
-            'where "id" is :a',
-            $this->q('[where]')->where('id', null)->render()
+            'where "id" is not null',
+            $this->q('[where]')->where('id', '!=', null)->render()
         );
 
         // three parameters - field, condition, value
@@ -819,7 +819,7 @@ class QueryTest extends AtkPhpunit\TestCase
 
         // more than one where condition - join with AND keyword
         $this->assertSame(
-            'where "a" = :a and "b" is :b',
+            'where "a" = :a and "b" is null',
             $this->q('[where]')->where('a', 1)->where('b', null)->render()
         );
     }
@@ -916,27 +916,27 @@ class QueryTest extends AtkPhpunit\TestCase
 
         // is | is not
         $this->assertSame(
-            'where "id" is :a',
+            'where "id" is null',
             $this->q('[where]')->where('id', 'is', null)->render()
         );
         $this->assertSame(
-            'where "id" is not :a',
+            'where "id" is not null',
             $this->q('[where]')->where('id', 'is not', null)->render()
         );
         $this->assertSame(
-            'where "id" is not :a',
+            'where "id" is not null',
             $this->q('[where]')->where('id', 'not', null)->render()
         );
         $this->assertSame(
-            'where "id" is :a',
+            'where "id" is null',
             $this->q('[where]')->where('id', '=', null)->render()
         );
         $this->assertSame(
-            'where "id" is not :a',
+            'where "id" is not null',
             $this->q('[where]')->where('id', '<>', null)->render()
         );
         $this->assertSame(
-            'where "id" is not :a',
+            'where "id" is not null',
             $this->q('[where]')->where('id', '!=', null)->render()
         );
 
@@ -953,15 +953,15 @@ class QueryTest extends AtkPhpunit\TestCase
         // two parameters - more_than_just_a_field, value
         // is | is not
         $this->assertSame(
-            'where "id" is :a',
+            'where "id" is null',
             $this->q('[where]')->where('id=', null)->render()
         );
         $this->assertSame(
-            'where "id" is not :a',
+            'where "id" is not null',
             $this->q('[where]')->where('id!=', null)->render()
         );
         $this->assertSame(
-            'where "id" is not :a',
+            'where "id" is not null',
             $this->q('[where]')->where('id<>', null)->render()
         );
 
