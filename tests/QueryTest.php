@@ -893,11 +893,11 @@ class QueryTest extends AtkPhpunit\TestCase
         );
         // speacial treatment for empty array values
         $this->assertSame(
-            'where "id"<>"id"',
+            'where 1 = 0',
             $this->q('[where]')->where('id', '=', [])->render()
         );
         $this->assertSame(
-            'where ("id"="id" or "id" is null)',
+            'where 1 = 1',
             $this->q('[where]')->where('id', '<>', [])->render()
         );
         // pass array as CSV
