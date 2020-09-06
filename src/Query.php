@@ -789,10 +789,10 @@ class Query extends Expression
 
         // special conditions (IS | IS NOT) if value is null
         if ($value === null) {
-            if ($cond === '=') {
-                $cond = 'is';
-            } elseif (in_array($cond, ['!=', '<>', 'not'], true)) {
-                $cond = 'is not';
+            if (in_array($cond, ['=', 'is'], true)) {
+                return $field . ' is null';
+            } elseif (in_array($cond, ['!=', '<>', 'not', 'is not'], true)) {
+                return $field . ' is not null';
             }
         }
 
