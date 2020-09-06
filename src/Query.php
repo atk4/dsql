@@ -808,10 +808,10 @@ class Query extends Expression
             // special treatment of empty array condition
             if (empty($value)) {
                 if ($cond === 'in') {
-                    return $field . '<>' . $field; // never true
+                    return '1 = 0'; // never true
                 }
 
-                return '(' . $field . '=' . $field . ' or ' . $field . ' is null)'; // always true
+                return '1 = 1'; // always true
             }
 
             $value = '(' . implode(',', array_map([$this, '_param'], $value)) . ')';
