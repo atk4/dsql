@@ -36,13 +36,9 @@ class Connection extends BaseConnection
     /**
      * Return last inserted ID value.
      *
-     * Few Connection drivers need to receive sequence name to get ID because PDO doesn't support this method.
-     *
-     * @param string $sequence Optional sequence name from which to return last ID
-     *
-     * @return mixed
+     * Drivers like PostgreSQL need to receive sequence name to get ID because PDO doesn't support this method.
      */
-    public function lastInsertId(string $sequence = null)
+    public function lastInsertId(string $sequence = null): string
     {
         if ($sequence) {
             return $this->dsql()->mode('seq_currval')->sequence($sequence)->getOne();

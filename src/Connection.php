@@ -373,13 +373,9 @@ class Connection
     /**
      * Return last inserted ID value.
      *
-     * Few Connection drivers need to receive sequence name to get ID because PDO doesn't support this method.
-     *
-     * @param string $sequence Optional sequence name from which to return last ID
-     *
-     * @return mixed
+     * Drivers like PostgreSQL need to receive sequence name to get ID because PDO doesn't support this method.
      */
-    public function lastInsertId(string $sequence = null)
+    public function lastInsertId(string $sequence = null): string
     {
         return $sequence === null ? $this->connection()->lastInsertId() : $this->connection()->lastInsertId($sequence);
     }
