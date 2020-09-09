@@ -20,7 +20,7 @@ class SelectTest extends AtkPhpunit\TestCase
 
         $pdo = $this->c->connection();
         $pdo->query('DROP TABLE IF EXISTS employee');
-        $pdo->query('CREATE TABLE employee (id int not null, name text, surname text, retired bool, PRIMARY KEY (id))');
+        $pdo->query('CREATE TABLE employee (id int not null, name varchar(100), surname text, retired ' . ($this->c->driverType === 'sqlsrv' ? 'bit' : 'bool') . ', PRIMARY KEY (id))');
         $pdo->query('INSERT INTO employee (id, name, surname, retired) VALUES
                 (1, \'Oliver\', \'Smith\', ' . ($this->c->driverType === 'pgsql' ? 'false' : '0') . '),
                 (2, \'Jack\', \'Williams\', ' . ($this->c->driverType === 'pgsql' ? 'true' : '1') . '),
@@ -253,7 +253,7 @@ class SelectTest extends AtkPhpunit\TestCase
         } catch (\atk4\dsql\ExecuteException $e) {
             // test error code
             $unknownFieldErrorCode = [
-                'sqlite' => 1,    // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
+                'sqlite' => 1,   // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
                 'mysql' => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
                 'pgsql' => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
             ][$this->c->driverType];
