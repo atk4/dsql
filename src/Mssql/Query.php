@@ -22,4 +22,16 @@ class Query extends BaseQuery
 
     /** @var string Expression classname */
     protected $expression_class = Expression::class;
+
+    public function _render_limit()
+    {
+        if (isset($this->args['limit'])) {
+            $cnt = (int) $this->args['limit']['cnt'];
+            $shift = (int) $this->args['limit']['shift'];
+
+            return (!isset($this->args['order']) ? ' order by (select null)' : '')
+                . ' offset ' . $shift . ' rows'
+                . ' fetch next ' . $cnt . ' rows only';
+        }
+    }
 }
