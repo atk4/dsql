@@ -41,6 +41,7 @@ class Connection
         'mysql' => Mysql\Connection::class,
         'pgsql' => Postgresql\Connection::class,
         'oci' => Oracle\Connection::class,
+        'sqlsrv' => Mssql\Connection::class,
         'stopwatch' => Debug\Stopwatch\Connection::class,
         'profile' => Debug\Profiler\Connection::class,
         'dumper' => Debug\Stopwatch\Connection::class, // backward compatibility - will be removed dec-2020
