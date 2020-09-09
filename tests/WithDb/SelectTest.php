@@ -124,7 +124,7 @@ class SelectTest extends AtkPhpunit\TestCase
         if ($this->c->driverType === 'pgsql') {
             $this->assertSame(
                 'foo',
-                $this->e('select CAST([] AS TEXT)', ['foo'])->getOne()
+                $this->e('select CAST([] AS VARCHAR)', ['foo'])->getOne()
             );
         } else {
             $this->assertSame(
