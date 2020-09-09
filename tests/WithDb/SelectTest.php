@@ -121,7 +121,7 @@ class SelectTest extends AtkPhpunit\TestCase
          * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
          * entire string on mysql.
          */
-        if ($this->c->driverType === 'pgsql') {
+        if ($this->c->driverType === 'pgsql' || $this->c->driverType === 'sqlsrv') {
             $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS VARCHAR)', ['foo'])->getOne()
@@ -199,7 +199,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
 
         // replace
-        if ($this->c->driverType === 'pgsql') {
+        if ($this->c->driverType === 'pgsql' || $this->c->driverType === 'sqlsrv') {
             $this->q('employee')
                 ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->where('id', 1)
@@ -256,13 +256,15 @@ class SelectTest extends AtkPhpunit\TestCase
                 'sqlite' => 1,   // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
                 'mysql' => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
                 'pgsql' => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
+                'sqlsrv' => 208, // SQLSTATE[42S02]: Invalid object name 'non_existing_table'
             ][$this->c->driverType];
             $this->assertSame($unknownFieldErrorCode, $e->getCode());
 
             // test debug query
-            $expectedQuery = $this->c->driverType === 'mysql'
-                ? 'select `non_existing_field` from `non_existing_table`'
-                : 'select "non_existing_field" from "non_existing_table"';
+            $expectedQuery = [
+                'mysql' => 'select `non_existing_field` from `non_existing_table`',
+                'sqlsrv' => 'select [non_existing_field] from [non_existing_table]',
+            ][$this->c->driverType] ?? 'select "non_existing_field" from "non_existing_table"';
             $this->assertSame(preg_replace('~\s+~', '', $expectedQuery), preg_replace('~\s+~', '', $e->getDebugQuery()));
 
             throw $e;
