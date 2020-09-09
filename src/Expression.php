@@ -499,7 +499,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             try {
                 $statement = $connection->prepare($query);
 
-                // workaround to support LOB data type 1/2, see https://github.com/doctrine/dbal/pull/2434
+                // workaround to support LOB data type 1/3, see https://github.com/doctrine/dbal/pull/2434
                 $statement->boundValues = [];
 
                 foreach ($this->params as $key => $val) {
@@ -522,13 +522,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                             ->addMoreInfo('type', gettype($val));
                     }
 
-                    // workaround to support LOB data type 2/2, see https://github.com/doctrine/dbal/pull/2434
+                    // workaround to support LOB data type 2/3, see https://github.com/doctrine/dbal/pull/2434
                     $statement->boundValues[$key] = $val;
-                    if ($type === \PDO::PARAM_STR) {
-                        $bind = $statement->bindParam($key, $statement->boundValues[$key], $type, strlen((string) $val));
-                    } else {
-                        $bind = $statement->bindParam($key, $statement->boundValues[$key], $type);
-                    }
+                    $bind = $statement->bindParam($key, $statement->boundValues[$key], $type);
 
                     if (!$bind) {
                         throw (new Exception('Unable to bind parameter'))
@@ -542,10 +538,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 $statement->execute();
             } catch (\PDOException $e) {
                 $new = (new ExecuteException('DSQL got Exception when executing this query', $e->errorInfo[1]))
-                    ->addMoreInfo('error', $e->errorInfo[2])
+                    ->addMoreInfo('error', $e->errorInfo[2] ?? 'n/a (' . $e->errorInfo[0] . ')')
                     ->addMoreInfo('query', $this->getDebugQuery());
 
                 throw $new;
+            } finally {
+                // workaround to support LOB data type 3/3, see https://github.com/doctrine/dbal/pull/2434
+                unset($statement->{'boundValues'});
             }
 
             return $statement;
