@@ -13,15 +13,17 @@ class Query extends BaseQuery
 {
     use ExpressionTrait;
 
-    /**
-     * Field, table and alias name escaping symbol.
-     *
-     * @var string
-     */
     protected $escape_char = ']';
 
-    /** @var string Expression classname */
     protected $expression_class = Expression::class;
+
+    protected $template_insert = 'begin try'
+        . "\n" . 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])'
+        . "\n" . 'end try begin catch if ERROR_NUMBER() = 544 begin'
+        . "\n" . 'set IDENTITY_INSERT [table_noalias] on'
+        . "\n" . 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])'
+        . "\n" . 'set IDENTITY_INSERT [table_noalias] off'
+        . "\n" . 'end end  catch';
 
     public function _render_limit()
     {
