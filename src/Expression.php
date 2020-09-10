@@ -438,6 +438,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         $result = $this->render();
 
         foreach (array_reverse($this->params) as $key => $val) {
+            if (is_numeric($key)) {
+                continue;
+            }
+
             if (is_numeric($val)) {
                 $replacement = $val . '\1';
             } elseif (is_string($val)) {
