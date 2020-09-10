@@ -36,4 +36,9 @@ class Query extends BaseQuery
                 . ' fetch next ' . $cnt . ' rows only';
         }
     }
+
+    public function groupConcat($field, $delimeter = ',')
+    {
+        return $this->expr('string_agg({}, \'' . $delimeter . '\')', [$field]);
+    }
 }
