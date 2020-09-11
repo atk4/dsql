@@ -23,7 +23,7 @@ class Query extends BaseQuery
         . "\n" . 'set IDENTITY_INSERT [table_noalias] on'
         . "\n" . 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])'
         . "\n" . 'set IDENTITY_INSERT [table_noalias] off'
-        . "\n" . 'end end  catch';
+        . "\n" . 'end end catch';
 
     public function _render_limit()
     {
