@@ -23,7 +23,7 @@ trait ExpressionTrait
 
     // {{{ MSSQL does not support named parameters, so convert them to numerical inside execute
 
-    private $paramsBackup;
+    private $paramsBackup = [];
     private $fixedRender;
 
     public function execute(object $connection = null)
