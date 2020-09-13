@@ -500,8 +500,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
             $query = $this->render();
 
-            $statement = null;
-
             try {
                 $statement = $connection->prepare($query);
 
