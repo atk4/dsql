@@ -503,10 +503,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             try {
                 $statement = $connection->prepare($query);
 
-                // workaround to support LOB data type 1/2
-                // see https://github.com/doctrine/dbal/pull/2434
-                $boundValues = [];
-
                 foreach ($this->params as $key => $val) {
                     if (is_int($val)) {
                         $type = \PDO::PARAM_INT;
@@ -527,9 +523,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                             ->addMoreInfo('type', gettype($val));
                     }
 
-                    // workaround to support LOB data type 2/2
-                    $boundValues[$key] = $val;
-                    $bind = $statement->bindParam($key, $boundValues[$key], $type);
+                    $boundValue = $val;
+                    $bind = $statement->bindParam($key, $boundValue, $type);
+                    unset($boundValue);
                     if ($bind === false) {
                         throw (new Exception('Unable to bind parameter'))
                             ->addMoreInfo('param', $key)
