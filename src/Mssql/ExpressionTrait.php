@@ -23,7 +23,7 @@ trait ExpressionTrait
 
     // {{{ MSSQL does not support named parameters, so convert them to numerical inside execute
 
-    private $paramsBackup = [];
+    private $paramsBackup;
     private $fixedRender;
 
     public function execute(object $connection = null)
@@ -47,6 +47,7 @@ trait ExpressionTrait
             return parent::execute($connection);
         } finally {
             $this->params = $this->paramsBackup;
+            $this->paramsBackup = null;
             $this->fixedRender = null;
         }
     }
@@ -62,7 +63,9 @@ trait ExpressionTrait
 
     public function getDebugQuery(): string
     {
-        $this->params = $this->paramsBackup;
+        if ($this->paramsBackup !== null) {
+            $this->params = $this->paramsBackup;
+        }
         $this->fixedRender = null;
 
         return parent::getDebugQuery();
