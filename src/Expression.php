@@ -538,7 +538,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 }
 
                 $statement->setFetchMode(\PDO::FETCH_ASSOC);
-                unset($boundValues); gc_collect_cycles();
                 $statement->execute();
             } catch (\PDOException $e) {
                 $new = (new ExecuteException('DSQL got Exception when executing this query', $e->errorInfo[1]))
