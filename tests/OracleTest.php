@@ -5,33 +5,12 @@ declare(strict_types=1);
 namespace atk4\dsql\tests;
 
 use atk4\core\AtkPhpunit;
-use atk4\dsql\Connection;
 
 /**
  * @coversDefaultClass \atk4\dsql\Connection
  */
 class OracleTest extends AtkPhpunit\TestCase
 {
-    /**
-     * Test constructor.
-     */
-    public function testDetection()
-    {
-        try {
-            $c = Connection::connect('oci:dbname=mydb');
-            $this->assertSame(
-                'select "baz" from "foo" where "bar" = :a',
-                $c->dsql()->table('foo')->where('bar', 1)->field('baz')->render()
-            );
-        } catch (\PDOException $e) {
-            if (!extension_loaded('oci8')) {
-                $this->markTestSkipped('The oci8 extension is not available.');
-            }
-
-            throw $e;
-        }
-    }
-
     public function connect($ver = '')
     {
         $version = $ver ? 'Version' . $ver . '\\' : '';
