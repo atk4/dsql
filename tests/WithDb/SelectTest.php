@@ -14,24 +14,71 @@ class SelectTest extends AtkPhpunit\TestCase
     /** @var Connection */
     protected $c;
 
+    private function dropDbIfExists(): void
+    {
+        $pdo = $this->c->connection();
+        if ($this->c->driverType === 'oci') {
+            $pdo->query('begin
+                execute immediate \'drop table "employee"\';
+            exception
+                when others then
+                    if sqlcode != -942 then
+                        raise;
+                    end if;
+            end;');
+        } else {
+            $pdo->query('DROP TABLE IF EXISTS employee');
+        }
+    }
+
     protected function setUp(): void
     {
         $this->c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
 
+        $this->dropDbIfExists();
+
         $pdo = $this->c->connection();
-        $pdo->query('DROP TABLE IF EXISTS employee');
-        $pdo->query('CREATE TABLE employee (id int not null, name varchar(100), surname text, retired ' . ($this->c->driverType === 'sqlsrv' ? 'bit' : 'bool') . ', PRIMARY KEY (id))');
-        $pdo->query('INSERT INTO employee (id, name, surname, retired) VALUES
-                (1, \'Oliver\', \'Smith\', ' . ($this->c->driverType === 'pgsql' ? 'false' : '0') . '),
-                (2, \'Jack\', \'Williams\', ' . ($this->c->driverType === 'pgsql' ? 'true' : '1') . '),
-                (3, \'Harry\', \'Taylor\', ' . ($this->c->driverType === 'pgsql' ? 'true' : '1') . '),
-                (4, \'Charlie\', \'Lee\', ' . ($this->c->driverType === 'pgsql' ? 'false' : '0') . ')');
+        $strType = $this->c->driverType === 'oci' ? 'nvarchar2' : 'varchar';
+        $boolType = ['sqlsrv' => 'bit', 'oci' => 'number(1)'][$this->c->driverType] ?? 'bool';
+        $fixIdentifiersFunc = function ($sql) {
+            return preg_replace_callback('~(?:\'(?:\'\'|\\\\\'|[^\'])*\')?+\K"([^\'"()\[\]{}]*?)"~s', function ($matches) {
+                if ($this->c->driverType === 'mysql') {
+                    return '`' . $matches[1] . '`';
+                } elseif ($this->c->driverType === 'mssql') {
+                    return '[' . $matches[1] . ']';
+                }
+
+                return '"' . $matches[1] . '"';
+            }, $sql);
+        };
+        $pdo->query($fixIdentifiersFunc('CREATE TABLE "employee" ("id" int not null, "name" ' . $strType . '(100), "surname" ' . $strType . '(100), "retired" ' . $boolType . ', ' . ($this->c->driverType === 'oci' ? 'CONSTRAINT "employee_pk" ' : '') . 'PRIMARY KEY ("id"))'));
+        foreach ([
+            ['id' => 1, 'name' => 'Oliver', 'surname' => 'Smith', 'retired' => false],
+            ['id' => 2, 'name' => 'Jack', 'surname' => 'Williams', 'retired' => true],
+            ['id' => 3, 'name' => 'Harry', 'surname' => 'Taylor', 'retired' => true],
+            ['id' => 4, 'name' => 'Charlie', 'surname' => 'Lee', 'retired' => false],
+        ] as $row) {
+            $pdo->query($fixIdentifiersFunc('INSERT INTO "employee" (' . implode(', ', array_map(function ($v) {
+                return '"' . $v . '"';
+            }, array_keys($row))) . ') VALUES(' . implode(', ', array_map(function ($v) {
+                if (is_bool($v)) {
+                    if ($this->c->driverType === 'pgsql') {
+                        return $v ? 'true' : 'false';
+                    }
+
+                    return $v ? 1 : 0;
+                } elseif (is_int($v) || is_float($v)) {
+                    return $v;
+                }
+
+                return '\'' . $v . '\'';
+            }, $row)) . ')'));
+        }
     }
 
     protected function tearDown(): void
     {
-        $pdo = $this->c->connection();
-        $pdo->query('DROP TABLE IF EXISTS employee');
+        $this->dropDbIfExists();
     }
 
     private function q($table = null, $alias = null)
