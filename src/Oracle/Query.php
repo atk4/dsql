@@ -19,6 +19,15 @@ class Query extends AbstractQuery
     protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order]';
     protected $template_select_limit = 'select * from (select rownum "__dsql_rownum","__t".* [from] (select[option] [field] [from] [table][join][where][group][having][order]) "__t") where "__dsql_rownum">[limit_start][and_limit_end]';
 
+    public function execute(object $connection = null)
+    {
+        if ($this->mode === 'select' && $this->main_table === null) {
+            $this->table('DUAL');
+        }
+
+        return parent::execute($connection);
+    }
+
     /**
      * Limit how many rows will be returned.
      *
