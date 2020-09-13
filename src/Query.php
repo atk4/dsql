@@ -543,7 +543,7 @@ class Query extends Expression
             $jj .= $this->_escapeSoft($j['f1']);
 
             if ($j['fa'] !== null) {
-                $jj .= ' as ' . $this->_escape($j['fa']);
+                $jj .= ' ' . $this->_escape($j['fa']);
             }
 
             $jj .= ' on ';
