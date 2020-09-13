@@ -503,7 +503,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             try {
                 $statement = $connection->prepare($query);
 
-                // workaround to support LOB data type 1/2, see https://github.com/doctrine/dbal/pull/2434
+                // workaround to support LOB data type 1/2
+                // see https://github.com/doctrine/dbal/pull/2434
                 $boundValues = [];
 
                 foreach ($this->params as $key => $val) {
@@ -526,7 +527,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                             ->addMoreInfo('type', gettype($val));
                     }
 
-                    // workaround to support LOB data type 2/2, see https://github.com/doctrine/dbal/pull/2434
+                    // workaround to support LOB data type 2/2
                     $boundValues[$key] = $val;
                     $bind = $statement->bindParam($key, $boundValues[$key], $type);
                     if ($bind === false) {
