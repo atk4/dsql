@@ -523,9 +523,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                             ->addMoreInfo('type', gettype($val));
                     }
 
-                    $boundValue = $val;
-                    $bind = $statement->bindParam($key, $boundValue, $type);
-                    unset($boundValue);
+                    $bind = $statement->bindValue($key, $val, $type);
                     if ($bind === false) {
                         throw (new Exception('Unable to bind parameter'))
                             ->addMoreInfo('param', $key)
