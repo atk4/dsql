@@ -9,33 +9,11 @@ namespace atk4\dsql\Oracle;
  */
 class Query extends AbstractQuery
 {
-    /**
-     * SELECT template.
-     *
-     * Default [limit] syntax not supported. Add rownum implementation instead.
-     *
-     * @var string
-     */
-    protected $template_select = 'select[option] [field] [from] [table][join][where][group][having][order]';
-    protected $template_select_limit = 'select * from (select rownum "__dsql_rownum","__t".* [from] (select[option] [field] [from] [table][join][where][group][having][order]) "__t") where "__dsql_rownum">[limit_start][and_limit_end]';
+    // {{{ for Oracle 11 and lower to support LIMIT with OFFSET
 
-    public function execute(object $connection = null)
-    {
-        if ($this->mode === 'select' && $this->main_table === null) {
-            $this->table('DUAL');
-        }
+    protected $template_select = '[with]select[option] [field] [from] [table][join][where][group][having][order]';
+    protected $template_select_limit = 'select * from (select "__t".*, rownum "__dsql_rownum" [from] ([with]select[option] [field] [from] [table][join][where][group][having][order]) "__t") where "__dsql_rownum" > [limit_start][and_limit_end]';
 
-        return parent::execute($connection);
-    }
-
-    /**
-     * Limit how many rows will be returned.
-     *
-     * @param int $cnt   Number of rows to return
-     * @param int $shift Offset, how many rows to skip
-     *
-     * @return $this
-     */
     public function limit($cnt, $shift = null)
     {
         // This is for pre- 12c version
@@ -65,7 +43,38 @@ class Query extends AbstractQuery
             return '';
         }
 
-        return ' and "__dsql_rownum"<=' .
-            ((int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']));
+        return ' and "__dsql_rownum" <= ' .
+            max((int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']), (int) $this->args['limit']['cnt']);
     }
+
+    public function getIterator(): iterable
+    {
+        foreach (parent::getIterator() as $row) {
+            unset($row['__dsql_rownum']);
+
+            yield $row;
+        }
+    }
+
+    public function get(): array
+    {
+        return array_map(function ($row) {
+            unset($row['__dsql_rownum']);
+
+            return $row;
+        }, parent::get());
+    }
+
+    public function getRow(): ?array
+    {
+        $row = parent::getRow();
+
+        if ($row !== null) {
+            unset($row['__dsql_rownum']);
+        }
+
+        return $row;
+    }
+
+    /// }}}
 }

@@ -548,12 +548,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         return $connection->execute($this);
     }
 
-    /**
-     * Returns ArrayIterator, for example PDOStatement.
-     *
-     * @return \PDOStatement
-     */
-    public function getIterator()
+    public function getIterator(): iterable
     {
         return $this->execute();
     }
@@ -561,17 +556,17 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     // {{{ Result Querying
 
     /**
-     * @param string|int|bool|null $v
+     * @param string|int|float|bool|null $v
      */
     private function getCastValue($v): ?string
     {
-        if ($v === null) {
-            return null;
+        if (is_int($v) || is_float($v)) {
+            return (string) $v;
         } elseif (is_bool($v)) {
             return $v ? '1' : '0';
         }
 
-        return (string) $v;
+        return $v; // throw a type error if not null nor string
     }
 
     /**

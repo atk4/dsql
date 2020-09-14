@@ -11,11 +11,6 @@ use atk4\dsql\Oracle\AbstractQuery;
  */
 class Query extends AbstractQuery
 {
-    /**
-     * Renders [limit].
-     *
-     * @return string rendered SQL chunk
-     */
     public function _render_limit()
     {
         if (isset($this->args['limit'])) {

@@ -156,7 +156,7 @@ class SelectTest extends AtkPhpunit\TestCase
 
         $this->assertSame(
             '5',
-            $this->q()->field(new Expression('COALESCE([],5)', [null]), 'null_test')->getOne()
+            $this->q()->field(new Expression('COALESCE([], \'5\')', [null]), 'null_test')->getOne()
         );
     }
 
@@ -172,6 +172,11 @@ class SelectTest extends AtkPhpunit\TestCase
             $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS VARCHAR)', ['foo'])->getOne()
+            );
+        } elseif ($this->c->driverType === 'oci') {
+            $this->assertSame(
+                'foo',
+                $this->e('select CAST([] AS NVARCHAR2(100)) FROM DUAL', ['foo'])->getOne()
             );
         } else {
             $this->assertSame(
@@ -199,7 +204,7 @@ class SelectTest extends AtkPhpunit\TestCase
         // field as expression
         $this->assertSame(
             'Williams',
-            (string) $this->q('employee')->field($this->e('surname'))->where('name', 'Jack')
+            (string) $this->q('employee')->field($this->e('{}', ['surname']))->where('name', 'Jack')
         );
         // cast to string multiple times
         $q = $this->q('employee')->field('surname')->where('name', 'Jack');
@@ -210,7 +215,7 @@ class SelectTest extends AtkPhpunit\TestCase
         // cast custom Expression to string
         $this->assertSame(
             '7',
-            (string) $this->e('select 3+4')
+            (string) $this->e('select 3+4' . ($this->c->driverType === 'oci' ? ' FROM DUAL' : ''))
         );
     }
 
@@ -246,7 +251,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
 
         // replace
-        if ($this->c->driverType === 'pgsql' || $this->c->driverType === 'sqlsrv') {
+        if ($this->c->driverType === 'pgsql' || $this->c->driverType === 'sqlsrv' || $this->c->driverType === 'oci') {
             $this->q('employee')
                 ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->where('id', 1)
@@ -304,6 +309,7 @@ class SelectTest extends AtkPhpunit\TestCase
                 'mysql' => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
                 'pgsql' => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
                 'sqlsrv' => 208, // SQLSTATE[42S02]: Invalid object name 'non_existing_table'
+                'oci' => 942,    // SQLSTATE[HY000]: ORA-00942: table or view does not exist
             ][$this->c->driverType];
             $this->assertSame($unknownFieldErrorCode, $e->getCode());
 
