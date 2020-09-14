@@ -38,7 +38,7 @@ class TransactionTest extends AtkPhpunit\TestCase
         $this->dropDbIfExists();
 
         $pdo = $this->c->connection();
-        $strType = $this->c->driverType === 'oci' ? 'nvarchar2' : 'varchar';
+        $strType = $this->c->driverType === 'oci' ? 'varchar2' : 'varchar';
         $boolType = ['sqlsrv' => 'bit', 'oci' => 'number(1)'][$this->c->driverType] ?? 'bool';
         $fixIdentifiersFunc = function ($sql) {
             return preg_replace_callback('~(?:\'(?:\'\'|\\\\\'|[^\'])*\')?+\K"([^\'"()\[\]{}]*?)"~s', function ($matches) {

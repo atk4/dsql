@@ -38,7 +38,7 @@ class SelectTest extends AtkPhpunit\TestCase
         $this->dropDbIfExists();
 
         $pdo = $this->c->connection();
-        $strType = $this->c->driverType === 'oci' ? 'nvarchar2' : 'varchar';
+        $strType = $this->c->driverType === 'oci' ? 'varchar2' : 'varchar';
         $boolType = ['sqlsrv' => 'bit', 'oci' => 'number(1)'][$this->c->driverType] ?? 'bool';
         $fixIdentifiersFunc = function ($sql) {
             return preg_replace_callback('~(?:\'(?:\'\'|\\\\\'|[^\'])*\')?+\K"([^\'"()\[\]{}]*?)"~s', function ($matches) {
@@ -176,7 +176,7 @@ class SelectTest extends AtkPhpunit\TestCase
         } elseif ($this->c->driverType === 'oci') {
             $this->assertSame(
                 'foo',
-                $this->e('select CAST([] AS NVARCHAR2(100)) FROM DUAL', ['foo'])->getOne()
+                $this->e('select CAST([] AS VARCHAR2(100)) FROM DUAL', ['foo'])->getOne()
             );
         } else {
             $this->assertSame(
