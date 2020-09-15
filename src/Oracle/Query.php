@@ -59,4 +59,11 @@ class Query extends AbstractQuery
         return ' and "__dsql_rownum"<=' .
             ((int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']));
     }
+
+    public function exists()
+    {
+        return $this->dsql()->mode('select')->field(
+            $this->dsql()->expr('case when exists[] then 1 else 0 end', [$this])
+        );
+    }
 }

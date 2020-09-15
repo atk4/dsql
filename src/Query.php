@@ -1270,6 +1270,20 @@ class Query extends Expression
 
     // }}}
 
+    // {{{ Exists
+
+    /**
+     * Creates 'select exists' query based on the query object.
+     *
+     * @return self
+     */
+    public function exists()
+    {
+        return $this->dsql()->mode('select')->option('exists')->field($this);
+    }
+
+    // }}}
+
     public function __debugInfo()
     {
         $arr = [

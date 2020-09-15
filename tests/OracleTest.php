@@ -114,4 +114,12 @@ class OracleTest extends AtkPhpunit\TestCase
             $c->dsql()->table('foo')->where('bar', 1)->field('baz')->limit(10, 99)->render()
         );
     }
+
+    public function testOracleExists()
+    {
+        $this->assertSame(
+            'case when exists(select * from "contacts" where "first_name" = \'John\') then 1 else 0 end',
+            $this->q()->table('contacts')->where('first_name', 'John')->exists()->getDebugQuery()
+        );
+    }
 }
