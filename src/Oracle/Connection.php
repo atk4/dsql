@@ -16,6 +16,8 @@ class Connection extends BaseConnection
     /** @var string Query classname */
     protected $query_class = Query::class;
 
+    private static $_killerHack = [];
+
     /**
      * Add some configuration for current connection session.
      *
@@ -31,6 +33,21 @@ class Connection extends BaseConnection
             'date_format' => 'YYYY-MM-DD', // date format
             'dec_char' => '. ', // decimal separator, no thousands separator
         ])->execute();
+
+        // TODO hack to pass tests, currently, something prevents previous connection instances to be released
+        // and thus high number of concurrent connections is active
+        self::$_killerHack[] = PHP_MAJOR_VERSION > 7 || PHP_MINOR_VERSION === 4 ? \WeakReference::create($this) : $this;
+        while (count(self::$_killerHack) > 50) {
+            $c = array_shift(self::$_killerHack);
+            if ($c instanceof \WeakReference) {
+                $c = $c->get();
+            }
+
+            if ($c !== null) {
+                $c->connection = null;
+            }
+        }
+        gc_collect_cycles();
     }
 
     /**

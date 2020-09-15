@@ -20,7 +20,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
     {
         $c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
 
-        return (string) $c->expr('SELECT 1')->getOne();
+        return (string) $c->expr('SELECT 1' . ($c->driverType === 'oci' ? ' FROM DUAL' : ''))->getOne();
     }
 
     public function testGenerator()

@@ -1193,10 +1193,10 @@ class QueryTest extends AtkPhpunit\TestCase
         $this->assertSame('group_concat(`foo` separator :a)', $q->groupConcat('foo', '-')->render());
 
         $q = new Oracle\Query();
-        $this->assertSame('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
+        $this->assertSame('listagg("foo", :a) within group (order by "foo")', $q->groupConcat('foo', '-')->render());
 
         $q = new Oracle\Version12\Query();
-        $this->assertSame('listagg("foo", :a)', $q->groupConcat('foo', '-')->render());
+        $this->assertSame('listagg("foo", :a) within group (order by "foo")', $q->groupConcat('foo', '-')->render());
 
         $q = new Postgresql\Query();
         $this->assertSame('string_agg("foo", :a)', $q->groupConcat('foo', '-')->render());
@@ -1231,28 +1231,28 @@ class QueryTest extends AtkPhpunit\TestCase
             $this->q('[join]')->join('address')->render()
         );
         $this->assertSame(
-            'left join "address" as "a" on "a"."id" = "address_id"',
+            'left join "address" "a" on "a"."id" = "address_id"',
             $this->q('[join]')->join('address a')->render()
         );
         $this->assertSame(
-            'left join "address" as "a" on "a"."id" = "user"."address_id"',
+            'left join "address" "a" on "a"."id" = "user"."address_id"',
             $this->q('[join]')->table('user')->join('address a')->render()
         );
         $this->assertSame(
-            'left join "address" as "a" on "a"."id" = "user"."my_address_id"',
+            'left join "address" "a" on "a"."id" = "user"."my_address_id"',
             $this->q('[join]')->table('user')->join('address a', 'my_address_id')->render()
         );
         $this->assertSame(
-            'left join "address" as "a" on "a"."id" = "u"."address_id"',
+            'left join "address" "a" on "a"."id" = "u"."address_id"',
             $this->q('[join]')->table('user', 'u')->join('address a')->render()
         );
         $this->assertSame(
-            'left join "address" as "a" on "a"."user_id" = "u"."id"',
+            'left join "address" "a" on "a"."user_id" = "u"."id"',
             $this->q('[join]')->table('user', 'u')->join('address.user_id a')->render()
         );
         $this->assertSame(
-            'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
-            'left join "bank" as "b" on "b"."id" = "u"."bank_id"',
+            'left join "address" "a" on "a"."user_id" = "u"."id" ' .
+            'left join "bank" "b" on "b"."id" = "u"."bank_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a' => 'address.user_id', 'b' => 'bank'])->render()
         );
@@ -1263,8 +1263,8 @@ class QueryTest extends AtkPhpunit\TestCase
                 ->join(['address.user_id', 'bank'])->render()
         );
         $this->assertSame(
-            'left join "address" as "a" on "a"."user_id" = "u"."id" ' .
-            'left join "bank" as "b" on "b"."id" = "u"."bank_id" ' .
+            'left join "address" "a" on "a"."user_id" = "u"."id" ' .
+            'left join "bank" "b" on "b"."id" = "u"."bank_id" ' .
             'left join "bank_details" on "bank_details"."id" = "bank"."details_id"',
             $this->q('[join]')->table('user', 'u')
                 ->join(['a' => 'address.user_id', 'b' => 'bank'])
@@ -1272,7 +1272,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         $this->assertSame(
-            'left join "address" as "a" on a.name like u.pattern',
+            'left join "address" "a" on a.name like u.pattern',
             $this->q('[join]')->table('user', 'u')
                 ->join('address a', new Expression('a.name like u.pattern'))->render()
         );

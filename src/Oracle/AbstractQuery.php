@@ -27,6 +27,15 @@ abstract class AbstractQuery extends BaseQuery
     protected $template_seq_currval = 'select [sequence].CURRVAL from dual';
     protected $template_seq_nextval = '[sequence].NEXTVAL';
 
+    public function render()
+    {
+        if ($this->mode === 'select' && $this->main_table === null) {
+            $this->table('DUAL');
+        }
+
+        return parent::render();
+    }
+
     /**
      * Set sequence.
      *
@@ -69,6 +78,6 @@ abstract class AbstractQuery extends BaseQuery
      */
     public function groupConcat($field, $delimeter = ',')
     {
-        return $this->expr('listagg({}, [])', [$field, $delimeter]);
+        return $this->expr('listagg({field}, []) within group (order by {field})', ['field' => $field, $delimeter]);
     }
 }
