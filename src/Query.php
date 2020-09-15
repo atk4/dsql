@@ -1270,6 +1270,15 @@ class Query extends Expression
 
     // }}}
 
+    // {{{ Exists
+
+    public function exists()
+    {
+        return $this->dsql()->mode('select')->option('exists')->field($this);
+    }
+
+    // }}}
+
     public function __debugInfo()
     {
         $arr = [

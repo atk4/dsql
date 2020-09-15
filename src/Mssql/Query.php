@@ -41,4 +41,11 @@ class Query extends BaseQuery
     {
         return $this->expr('string_agg({}, \'' . $delimeter . '\')', [$field]);
     }
+
+    public function exists()
+    {
+        return $this->dsql()->mode('select')->field(
+            $this->dsql()->expr('case when exists[] then 1 else 0 end', [$this])
+        );
+    }
 }
