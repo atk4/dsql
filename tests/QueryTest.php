@@ -7,6 +7,7 @@ namespace atk4\dsql\tests;
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Exception;
 use atk4\dsql\Expression;
+use atk4\dsql\Mssql;
 use atk4\dsql\Mysql;
 use atk4\dsql\Oracle;
 use atk4\dsql\Postgresql;
@@ -1787,8 +1788,20 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testExists()
     {
         $this->assertSame(
-            'select exists (select * from "contacts" where "first_name" = \'John\')',
-            $this->q()->table('contacts')->where('first_name', 'John')->exists()->getDebugQuery()
+            'select exists (select * from "contacts" where "first_name" = :a)',
+            $this->q()->table('contacts')->where('first_name', 'John')->exists()->render()
+        );
+
+        $q = new Oracle\Query();
+        $this->assertSame(
+            'select case when exists(select * from "contacts" where "first_name" = :a) then 1 else 0 end from "DUAL"',
+            $q->table('contacts')->where('first_name', 'John')->exists()->render()
+        );
+
+        $q = new Mssql\Query();
+        $this->assertSame(
+            'select case when exists(select * from [contacts] where [first_name] = :a) then 1 else 0 end',
+            $q->table('contacts')->where('first_name', 'John')->exists()->render()
         );
     }
 }
