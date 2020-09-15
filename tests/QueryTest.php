@@ -1783,4 +1783,12 @@ class QueryTest extends AtkPhpunit\TestCase
             $q->render()
         );
     }
+
+    public function testExists()
+    {
+        $this->assertSame(
+            'select exists (select * from "contacts" where "first_name" = \'John\')',
+            $this->q()->table('contacts')->where('first_name', 'John')->exists()->getDebugQuery()
+        );
+    }
 }
