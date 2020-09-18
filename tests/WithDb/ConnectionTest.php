@@ -7,6 +7,7 @@ namespace atk4\dsql\tests\WithDb;
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
 use atk4\dsql\Expression;
+use Doctrine\DBAL\Platforms;
 
 /**
  * @coversDefaultClass \atk4\dsql\Query
@@ -37,6 +38,11 @@ class ConnectionTest extends AtkPhpunit\TestCase
 // @codingStandardsIgnoreStart
 class HelloWorldConnection extends Connection
 {
+    public function getDbalPlatform(): Platforms\AbstractPlatform
+    {
+        throw new \atk4\dsql\Exception('Not implemented');
+    }
+
     public function execute(Expression $e)
     {
         for ($x = 0; $x < 10; ++$x) {

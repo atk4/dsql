@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace atk4\dsql\Mssql;
 
 use atk4\dsql\Connection as BaseConnection;
+use Doctrine\DBAL\Platforms;
 
 /**
  * Custom Connection class specifically for MSSQL database.
@@ -18,4 +19,9 @@ class Connection extends BaseConnection
 
     /** @var string Expression classname */
     protected $expression_class = Expression::class;
+
+    public function getDbalPlatform(): Platforms\AbstractPlatform
+    {
+        return new Platforms\SQLServer2012Platform();
+    }
 }

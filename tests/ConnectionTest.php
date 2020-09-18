@@ -6,23 +6,32 @@ namespace atk4\dsql\tests;
 
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
+use Doctrine\DBAL\Platforms;
 
-class DummyConnection extends Connection
+abstract class DummyConnectionWithPlatform extends Connection
+{
+    public function getDbalPlatform(): Platforms\AbstractPlatform
+    {
+        throw new \atk4\dsql\Exception('Not implemented');
+    }
+}
+
+class DummyConnection extends DummyConnectionWithPlatform
 {
     public $driverType = 'dummy';
 }
 
-class DummyConnection2 extends Connection
+class DummyConnection2 extends DummyConnectionWithPlatform
 {
     public $driverType = 'dummy2';
 }
 
-class DummyConnection3 extends Connection
+class DummyConnection3 extends DummyConnectionWithPlatform
 {
     public $driverType = 'dummy3';
 }
 
-class DummyConnection4 extends Connection
+class DummyConnection4 extends DummyConnectionWithPlatform
 {
     public $driverType = 'dummy4';
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
+use Doctrine\DBAL\Platforms;
+
 /**
  * Class for establishing and maintaining connection with your database.
  */
@@ -380,4 +382,6 @@ abstract class Connection
     {
         return $sequence === null ? $this->connection()->lastInsertId() : $this->connection()->lastInsertId($sequence);
     }
+
+    abstract public function getDbalPlatform(): Platforms\AbstractPlatform;
 }

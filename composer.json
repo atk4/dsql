@@ -33,11 +33,13 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "atk4/core": "dev-develop"
+    "atk4/core": "dev-develop",
+    "doctrine/dbal": "^2.9.3"
   },
   "require-release": {
     "php": ">=7.3.0",
-    "atk4/core": "^2.2.0"
+    "atk4/core": "^2.2.0",
+    "doctrine/dbal": "^2.9.3"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.16",
