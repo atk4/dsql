@@ -7,7 +7,7 @@ namespace atk4\dsql;
 /**
  * Class for establishing and maintaining connection with your database.
  */
-class Connection
+abstract class Connection
 {
     use \atk4\core\DiContainerTrait;
 

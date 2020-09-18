@@ -288,7 +288,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
     public function testException1()
     {
         $this->expectException(\PDOException::class);
-        $c = Connection::connect(':');
+        $c = \atk4\dsql\Sqlite\Connection::connect(':');
     }
 
     public function testException2()
@@ -300,12 +300,12 @@ class ConnectionTest extends AtkPhpunit\TestCase
     public function testException3()
     {
         $this->expectException(\atk4\dsql\Exception::class);
-        $c = new Connection('sqlite::memory');
+        $c = new \atk4\dsql\Sqlite\Connection('sqlite::memory');
     }
 
     public function testException4()
     {
-        $c = new Connection();
+        $c = new \atk4\dsql\Sqlite\Connection();
         $q = $c->expr('select (2+2)');
 
         $this->assertSame(
