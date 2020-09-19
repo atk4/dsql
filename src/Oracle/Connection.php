@@ -100,7 +100,7 @@ class Connection extends BaseConnection
         return parent::lastInsertId($sequence);
     }
 
-    public function getDbalPlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): Platforms\AbstractPlatform
     {
         return new Platforms\OraclePlatform();
     }

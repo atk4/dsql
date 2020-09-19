@@ -49,8 +49,8 @@ class ProxyConnection extends Connection
         return $this->connection->execute($expr);
     }
 
-    public function getDbalPlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): Platforms\AbstractPlatform
     {
-        return $this->connection->getDbalPlatform();
+        return $this->connection->getDatabasePlatform();
     }
 }

@@ -17,7 +17,7 @@ class Connection extends BaseConnection
     /** @var string Query classname */
     protected $query_class = Query::class;
 
-    public function getDbalPlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): Platforms\AbstractPlatform
     {
         return new Platforms\PostgreSQL100Platform();
     }

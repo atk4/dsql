@@ -20,7 +20,7 @@ class Connection extends BaseConnection
     /** @var string Expression classname */
     protected $expression_class = Expression::class;
 
-    public function getDbalPlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): Platforms\AbstractPlatform
     {
         return new Platforms\MySQL57Platform();
     }

@@ -383,5 +383,5 @@ abstract class Connection
         return $sequence === null ? $this->connection()->lastInsertId() : $this->connection()->lastInsertId($sequence);
     }
 
-    abstract public function getDbalPlatform(): Platforms\AbstractPlatform;
+    abstract public function getDatabasePlatform(): Platforms\AbstractPlatform;
 }

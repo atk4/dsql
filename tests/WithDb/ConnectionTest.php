@@ -38,7 +38,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 // @codingStandardsIgnoreStart
 class HelloWorldConnection extends Connection
 {
-    public function getDbalPlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): Platforms\AbstractPlatform
     {
         throw new \atk4\dsql\Exception('Not implemented');
     }

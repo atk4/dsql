@@ -10,7 +10,7 @@ use Doctrine\DBAL\Platforms;
 
 abstract class DummyConnectionWithPlatform extends Connection
 {
-    public function getDbalPlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): Platforms\AbstractPlatform
     {
         throw new \atk4\dsql\Exception('Not implemented');
     }
