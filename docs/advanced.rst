@@ -75,53 +75,6 @@ to explicitly specify property :php:attr:`Connection::query_class`::
 This is also useful, if you have created your own Query class in a different
 namespace and wish to use it.
 
-Using Debug Proxy Connections (Stopwatch and Profiler)
-------------------------------------------------------
-
-DSQL comes with two nice features - "Stopwatch" and "Profiler". Stopwatch will output
-all the executed queries and how much time each query took and Profiler will
-record how many queries were executed and how many rows you have fetched through
-DSQL.
-
-In order to enable those extensions you can simply change your DSN from::
-
-    "mysql:host=localhost;port=3307;dbname=testdb"
-
-to::
-
-    "stopwatch:mysql:host=localhost;port=3307;dbname=testdb"
-    "profile:mysql:host=localhost;port=3307;dbname=testdb"
-    "stopwatch:profile:mysql:host=localhost;port=3307;dbname=testdb"
-
-When this DSN is passed into :php:meth:`Connection::connect`, it will return
-a proxy connection object that will collect the necessary statistics and
-"echo" them out.
-
-If you would like to do something else with these statistics, you can set
-a callback. For Stopwatch::
-
-    $c->callback = function($expression, $time, $fail = false) {
-        ...
-    }
-
-and for Profiler::
-
-    $c->callback = function($queries, $selects, $rows, $expressions, $fail = false) {
-        ...
-    }
-
-If you have used "stopwatch:profile:", then use this::
-
-    $c->callback = function($expression, $time, $fail = false) {
-        ...
-    }
-
-    $c->connection()->callback = function($queries, $selects, $rows, $expressions, $fail = false) {
-        ...
-    }
-
-.. _proxy:
-
 Proxy Connection
 ----------------
 Connection class is designed to create instances of :php:class:`Expression`,

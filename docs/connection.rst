@@ -90,9 +90,6 @@ Developers can register custom classes to handle driver types using the `Conneci
 
    Connection::registerConnectionClass(Custom\MySQL\Connection::class, 'mysql'); // or directly using the class
    Custom\MySQL\Connection::registerConnectionClass();
-   
-The driver type used in the latter case is the default value of the `$driverType` property of 
-`Custom\MySQL\Connection`
 
 .. php:method:: connectDriver(array $dsn)
 

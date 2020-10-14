@@ -12,8 +12,6 @@ use Doctrine\DBAL\Platforms;
  */
 class Connection extends BaseConnection
 {
-    public $driverType = 'sqlsrv';
-
     /** @var string Query classname */
     protected $query_class = Query::class;
 

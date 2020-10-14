@@ -26,14 +26,6 @@ abstract class Connection
     public $transaction_depth = 0;
 
     /**
-     * Database driver abbreviation, for example mysql, sqlite, pgsql, oci etc.
-     * This is filled automatically while connection database.
-     *
-     * @var string
-     */
-    public $driverType;
-
-    /**
      * Stores the connectionType => connectionClass array for resolving.
      *
      * @var array
@@ -41,13 +33,9 @@ abstract class Connection
     protected static $connectionClassRegistry = [
         'sqlite' => Sqlite\Connection::class,
         'mysql' => Mysql\Connection::class,
-        'pgsql' => Postgresql\Connection::class,
-        'oci' => Oracle\Connection::class,
-        'sqlsrv' => Mssql\Connection::class,
-        'stopwatch' => Debug\Stopwatch\Connection::class,
-        'profile' => Debug\Profiler\Connection::class,
-        'dumper' => Debug\Stopwatch\Connection::class, // backward compatibility - will be removed dec-2020
-        'counter' => Debug\Profiler\Connection::class, // backward compatibility - will be removed dec-2020
+        'postgresql' => Postgresql\Connection::class,
+        'oracle' => Oracle\Connection::class,
+        'mssql' => Mssql\Connection::class,
     ];
 
     /**
@@ -238,11 +226,14 @@ abstract class Connection
     }
 
     /**
-     * Returns the default driver type set for the connection in $driverType.
+     * Returns the default driver type.
      */
-    public static function defaultDriverType(): ?string
+    public static function defaultDriverType(): string
     {
-        return (new \ReflectionClass(static::class))->getDefaultProperties()['driverType'] ?? null;
+        /** @var static $c */
+        $c = (new \ReflectionClass(static::class))->newInstanceWithoutConstructor();
+
+        return $c->getDatabasePlatform()->getName();
     }
 
     /**

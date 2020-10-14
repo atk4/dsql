@@ -7,7 +7,8 @@ namespace atk4\dsql\tests\WithDb;
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
 use atk4\dsql\Expression;
-use Doctrine\DBAL\Platforms;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
 
 /**
  * @coversDefaultClass \atk4\dsql\Query
@@ -21,7 +22,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
     {
         $c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
 
-        return (string) $c->expr('SELECT 1' . ($c->driverType === 'oci' ? ' FROM DUAL' : ''))->getOne();
+        return (string) $c->expr('SELECT 1' . ($c->getDatabasePlatform() instanceof OraclePlatform ? ' FROM DUAL' : ''))->getOne();
     }
 
     public function testGenerator()
@@ -38,7 +39,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 // @codingStandardsIgnoreStart
 class HelloWorldConnection extends Connection
 {
-    public function getDatabasePlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): AbstractPlatform
     {
         throw new \atk4\dsql\Exception('Not implemented');
     }

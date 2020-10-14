@@ -17,16 +17,6 @@ MSSQL       Untested  mssql:   native, PDO
 
   Most PDO vendors should work out of the box
 
-Other Interesting Drivers
--------------------------
-
-=========================== ========= ========== ============
-Class                       Support   PDO        Dependency
-=========================== ========= ========== ============
-Debug\Stopwatch\Driver      Full      stopwatch: native, Proxy
-Debug\Profiler\Driver       Full      profile:   native, Proxy
-=========================== ========= ========== ============
-
 
 3rd party vendor support
 ------------------------
