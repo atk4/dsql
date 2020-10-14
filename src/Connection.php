@@ -33,9 +33,9 @@ abstract class Connection
     protected static $connectionClassRegistry = [
         'sqlite' => Sqlite\Connection::class,
         'mysql' => Mysql\Connection::class,
-        'postgresql' => Postgresql\Connection::class,
-        'oracle' => Oracle\Connection::class,
-        'mssql' => Mssql\Connection::class,
+        'pgsql' => Postgresql\Connection::class,
+        'oci' => Oracle\Connection::class,
+        'sqlsrv' => Mssql\Connection::class,
     ];
 
     /**
