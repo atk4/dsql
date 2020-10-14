@@ -85,38 +85,38 @@ class ConnectionTest extends AtkPhpunit\TestCase
     {
         // standard
         $dsn = Connection::normalizeDsn('mysql://root:pass@localhost/db');
-        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => 'pass', 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
+        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => 'pass', 'driverSchema' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
         $dsn = Connection::normalizeDsn('mysql:host=localhost;dbname=db');
-        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => null, 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
+        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => null, 'pass' => null, 'driverSchema' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
         $dsn = Connection::normalizeDsn('mysql:host=localhost;dbname=db', 'root', 'pass');
-        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => 'pass', 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
+        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => 'pass', 'driverSchema' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
         // username and password should take precedence
         $dsn = Connection::normalizeDsn('mysql://root:pass@localhost/db', 'foo', 'bar');
-        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'foo', 'pass' => 'bar', 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
+        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'foo', 'pass' => 'bar', 'driverSchema' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
         // more options
         $dsn = Connection::normalizeDsn('mysql://root:pass@localhost/db;foo=bar');
-        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db;foo=bar', 'user' => 'root', 'pass' => 'pass', 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db;foo=bar'], $dsn);
+        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db;foo=bar', 'user' => 'root', 'pass' => 'pass', 'driverSchema' => 'mysql', 'rest' => 'host=localhost;dbname=db;foo=bar'], $dsn);
 
         // no password
         $dsn = Connection::normalizeDsn('mysql://root@localhost/db');
-        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
+        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => null, 'driverSchema' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
         $dsn = Connection::normalizeDsn('mysql://root:@localhost/db'); // see : after root
-        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
+        $this->assertSame(['dsn' => 'mysql:host=localhost;dbname=db', 'user' => 'root', 'pass' => null, 'driverSchema' => 'mysql', 'rest' => 'host=localhost;dbname=db'], $dsn);
 
         $dsn = Connection::normalizeDsn('sqlite::memory');
-        $this->assertSame(['dsn' => 'sqlite::memory', 'user' => null, 'pass' => null, 'driverType' => 'sqlite', 'rest' => ':memory'], $dsn); // rest is unusable anyway in this context
+        $this->assertSame(['dsn' => 'sqlite::memory', 'user' => null, 'pass' => null, 'driverSchema' => 'sqlite', 'rest' => ':memory'], $dsn); // rest is unusable anyway in this context
 
         // with port number as URL, normalize port to ;port=1234
         $dsn = Connection::normalizeDsn('mysql://root:pass@localhost:1234/db');
-        $this->assertSame(['dsn' => 'mysql:host=localhost;port=1234;dbname=db', 'user' => 'root', 'pass' => 'pass', 'driverType' => 'mysql', 'rest' => 'host=localhost;port=1234;dbname=db'], $dsn);
+        $this->assertSame(['dsn' => 'mysql:host=localhost;port=1234;dbname=db', 'user' => 'root', 'pass' => 'pass', 'driverSchema' => 'mysql', 'rest' => 'host=localhost;port=1234;dbname=db'], $dsn);
 
         // with port number as DSN, leave port as :port
         $dsn = Connection::normalizeDsn('mysql:host=localhost:1234;dbname=db');
-        $this->assertSame(['dsn' => 'mysql:host=localhost:1234;dbname=db', 'user' => null, 'pass' => null, 'driverType' => 'mysql', 'rest' => 'host=localhost:1234;dbname=db'], $dsn);
+        $this->assertSame(['dsn' => 'mysql:host=localhost:1234;dbname=db', 'user' => null, 'pass' => null, 'driverSchema' => 'mysql', 'rest' => 'host=localhost:1234;dbname=db'], $dsn);
     }
 
     public function testConnectionRegistry()
