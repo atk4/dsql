@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
+use Doctrine\DBAL\Platforms;
+
 class ProxyConnection extends Connection
 {
     /**
@@ -45,5 +47,10 @@ class ProxyConnection extends Connection
     public function execute(Expression $expr)
     {
         return $this->connection->execute($expr);
+    }
+
+    public function getDatabasePlatform(): Platforms\AbstractPlatform
+    {
+        return $this->connection->getDatabasePlatform();
     }
 }
