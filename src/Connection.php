@@ -227,8 +227,10 @@ abstract class Connection
 
     /**
      * Returns the default driver type.
+     *
+     * TODO remove this method, used only for registry
      */
-    public static function defaultDriverType(): string
+    protected static function defaultDriverType(): string
     {
         /** @var static $c */
         $c = (new \ReflectionClass(static::class))->newInstanceWithoutConstructor();
