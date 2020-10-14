@@ -10,8 +10,8 @@ use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
-use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 
 class SelectTest extends AtkPhpunit\TestCase
 {
