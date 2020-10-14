@@ -6,7 +6,7 @@ namespace atk4\dsql\Mysql;
 
 use atk4\dsql\Connection as BaseConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\MySQL57Platform;
+use Doctrine\DBAL\Platforms\MySQL57Platform;
 
 /**
  * Custom Connection class specifically for MySQL/MariaDB database.
