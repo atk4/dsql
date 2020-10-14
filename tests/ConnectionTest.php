@@ -6,13 +6,14 @@ namespace atk4\dsql\tests;
 
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
-use Doctrine\DBAL\Platforms;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 
 class DummyConnection extends Connection
 {
-    public function getDatabasePlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): AbstractPlatform
     {
-        return new class() extends Platforms\SqlitePlatform {
+        return new class() extends SqlitePlatform {
             public function getName()
             {
                 return 'dummy';
@@ -23,9 +24,9 @@ class DummyConnection extends Connection
 
 class DummyConnection2 extends Connection
 {
-    public function getDatabasePlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): AbstractPlatform
     {
-        return new class() extends Platforms\SqlitePlatform {
+        return new class() extends SqlitePlatform {
             public function getName()
             {
                 return 'dummy2';
@@ -36,9 +37,9 @@ class DummyConnection2 extends Connection
 
 class DummyConnection3 extends Connection
 {
-    public function getDatabasePlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): AbstractPlatform
     {
-        return new class() extends Platforms\SqlitePlatform {
+        return new class() extends SqlitePlatform {
             public function getName()
             {
                 return 'dummy3';
@@ -49,9 +50,9 @@ class DummyConnection3 extends Connection
 
 class DummyConnection4 extends Connection
 {
-    public function getDatabasePlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): AbstractPlatform
     {
-        return new class() extends Platforms\SqlitePlatform {
+        return new class() extends SqlitePlatform {
             public function getName()
             {
                 return 'dummy4';

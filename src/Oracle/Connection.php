@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace atk4\dsql\Oracle;
 
 use atk4\dsql\Connection as BaseConnection;
-use Doctrine\DBAL\Platforms;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
 
 /**
  * Custom Connection class specifically for Oracle database.
@@ -98,8 +99,8 @@ class Connection extends BaseConnection
         return parent::lastInsertId($sequence);
     }
 
-    public function getDatabasePlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): AbstractPlatform
     {
-        return new Platforms\OraclePlatform();
+        return new OraclePlatform();
     }
 }
