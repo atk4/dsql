@@ -4,25 +4,10 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
-use Doctrine\DBAL\Platforms;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 class ProxyConnection extends Connection
 {
-    /**
-     * Specifying $properties to constructors will override default
-     * property values of this class.
-     *
-     * @param array $properties
-     */
-    public function __construct($properties = [])
-    {
-        parent::__construct($properties);
-
-        if ($this->connection instanceof \atk4\dsql\Connection && $this->connection->driverType) {
-            $this->driverType = $this->connection->driverType;
-        }
-    }
-
     public function connection()
     {
         return $this->connection->connection();
@@ -49,7 +34,7 @@ class ProxyConnection extends Connection
         return $this->connection->execute($expr);
     }
 
-    public function getDatabasePlatform(): Platforms\AbstractPlatform
+    public function getDatabasePlatform(): AbstractPlatform
     {
         return $this->connection->getDatabasePlatform();
     }

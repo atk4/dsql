@@ -6,7 +6,7 @@ on:
   push:
     branches: '**'
   schedule:
-    - cron: '0 0/2 * * *'
+    - cron: '0 * * * *'
 
 jobs:
   smoke-test:

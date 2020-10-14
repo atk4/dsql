@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
-use Doctrine\DBAL\Platforms;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * Class for establishing and maintaining connection with your database.
@@ -26,15 +26,7 @@ abstract class Connection
     public $transaction_depth = 0;
 
     /**
-     * Database driver abbreviation, for example mysql, sqlite, pgsql, oci etc.
-     * This is filled automatically while connection database.
-     *
-     * @var string
-     */
-    public $driverType;
-
-    /**
-     * Stores the connectionType => connectionClass array for resolving.
+     * Stores the driverSchema => connectionClass array for resolving.
      *
      * @var array
      */
@@ -44,10 +36,6 @@ abstract class Connection
         'pgsql' => Postgresql\Connection::class,
         'oci' => Oracle\Connection::class,
         'sqlsrv' => Mssql\Connection::class,
-        'stopwatch' => Debug\Stopwatch\Connection::class,
-        'profile' => Debug\Profiler\Connection::class,
-        'dumper' => Debug\Stopwatch\Connection::class, // backward compatibility - will be removed dec-2020
-        'counter' => Debug\Profiler\Connection::class, // backward compatibility - will be removed dec-2020
     ];
 
     /**
@@ -69,7 +57,7 @@ abstract class Connection
     /**
      * Normalize DSN connection string.
      *
-     * Returns normalized DSN as array ['dsn', 'user', 'pass', 'driverType', 'rest'].
+     * Returns normalized DSN as array ['dsn', 'user', 'pass', 'driverSchema', 'rest'].
      *
      * @param array|string $dsn  DSN string
      * @param string       $user Optional username, this takes precedence over dsn string
@@ -100,17 +88,18 @@ abstract class Connection
         // If it's string, then find driver
         if (is_string($dsn)) {
             if (strpos($dsn, ':') === false) {
-                throw (new Exception('Your DSN format is invalid. Must be in "driverType:host;options" format'))
+                throw (new Exception('Your DSN format is invalid. Must be in "driverSchema:host;options" format'))
                     ->addMoreInfo('dsn', $dsn);
             }
-            [$driverType, $rest] = explode(':', $dsn, 2);
-            $driverType = strtolower($driverType);
+            [$driverSchema, $rest] = explode(':', $dsn, 2);
+            $driverSchema = strtolower($driverSchema);
         } else {
             // currently impossible to be like this, but we don't want ugly exceptions here
-            $driverType = $rest = null;
+            $driverSchema = null;
+            $rest = null;
         }
 
-        return ['dsn' => $dsn, 'user' => $user ?: null, 'pass' => $pass ?: null, 'driverType' => $driverType, 'rest' => $rest];
+        return ['dsn' => $dsn, 'user' => $user ?: null, 'pass' => $pass ?: null, 'driverSchema' => $driverSchema, 'rest' => $rest];
     }
 
     /**
@@ -127,9 +116,8 @@ abstract class Connection
     {
         // If it's already PDO object, then we simply use it
         if ($dsn instanceof \PDO) {
-            $driverType = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-
-            $connectionClass = self::resolveConnectionClass($driverType);
+            $driverSchema = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
+            $connectionClass = self::resolveConnectionClass($driverSchema);
 
             return new $connectionClass(array_merge([
                 'connection' => $dsn,
@@ -143,10 +131,8 @@ abstract class Connection
             ], $args));
         }
 
-        // Process DSN string
         $dsn = static::normalizeDsn($dsn, $user, $password);
-
-        $connectionClass = self::resolveConnectionClass($dsn['driverType']);
+        $connectionClass = self::resolveConnectionClass($dsn['driverSchema']);
 
         return new $connectionClass(array_merge([
             'connection' => $connectionClass::connectDriver($dsn),
@@ -164,27 +150,33 @@ abstract class Connection
      * CustomDriver\Connection must be descendant of Connection class.
      *
      * @param string $connectionClass
-     * @param string $connectionType
+     * @param string $driverSchema
      */
-    public static function registerConnectionClass($connectionClass = null, $connectionType = null)
+    public static function registerConnectionClass($connectionClass = null, $driverSchema = null)
     {
-        $connectionClass = $connectionClass ?? static::class;
+        if ($connectionClass === null) {
+            $connectionClass = static::class;
+        }
 
-        $connectionType = $connectionType ?? $connectionClass::defaultDriverType();
+        if ($driverSchema === null) {
+            /** @var static $c */
+            $c = (new \ReflectionClass($connectionClass))->newInstanceWithoutConstructor();
+            $driverSchema = $c->getDatabasePlatform()->getName();
+        }
 
-        self::$connectionClassRegistry[$connectionType] = $connectionClass;
+        self::$connectionClassRegistry[$driverSchema] = $connectionClass;
     }
 
     /**
      * Resolves the connection class to use based on driver type.
      *
-     * @param string $connectionType
+     * @param string $driverSchema
      *
      * @return string
      */
-    public static function resolveConnectionClass($connectionType)
+    public static function resolveConnectionClass($driverSchema)
     {
-        return self::$connectionClassRegistry[$connectionType] ?? static::class;
+        return self::$connectionClassRegistry[$driverSchema] ?? static::class;
     }
 
     /**
@@ -235,14 +227,6 @@ abstract class Connection
     public function connection()
     {
         return $this->connection;
-    }
-
-    /**
-     * Returns the default driver type set for the connection in $driverType.
-     */
-    public static function defaultDriverType(): ?string
-    {
-        return (new \ReflectionClass(static::class))->getDefaultProperties()['driverType'] ?? null;
     }
 
     /**
@@ -383,5 +367,5 @@ abstract class Connection
         return $sequence === null ? $this->connection()->lastInsertId() : $this->connection()->lastInsertId($sequence);
     }
 
-    abstract public function getDatabasePlatform(): Platforms\AbstractPlatform;
+    abstract public function getDatabasePlatform(): AbstractPlatform;
 }

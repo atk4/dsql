@@ -8,6 +8,10 @@ use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
 use atk4\dsql\Exception;
 use atk4\dsql\Expression;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 
 class SelectTest extends AtkPhpunit\TestCase
 {
@@ -17,7 +21,7 @@ class SelectTest extends AtkPhpunit\TestCase
     private function dropDbIfExists(): void
     {
         $pdo = $this->c->connection();
-        if ($this->c->driverType === 'oci') {
+        if ($this->c->getDatabasePlatform() instanceof OraclePlatform) {
             $pdo->query('begin
                 execute immediate \'drop table "employee"\';
             exception
@@ -38,20 +42,20 @@ class SelectTest extends AtkPhpunit\TestCase
         $this->dropDbIfExists();
 
         $pdo = $this->c->connection();
-        $strType = $this->c->driverType === 'oci' ? 'varchar2' : 'varchar';
-        $boolType = ['sqlsrv' => 'bit', 'oci' => 'number(1)'][$this->c->driverType] ?? 'bool';
+        $strType = $this->c->getDatabasePlatform() instanceof OraclePlatform ? 'varchar2' : 'varchar';
+        $boolType = ['mssql' => 'bit', 'oracle' => 'number(1)'][$this->c->getDatabasePlatform()->getName()] ?? 'bool';
         $fixIdentifiersFunc = function ($sql) {
             return preg_replace_callback('~(?:\'(?:\'\'|\\\\\'|[^\'])*\')?+\K"([^\'"()\[\]{}]*?)"~s', function ($matches) {
-                if ($this->c->driverType === 'mysql') {
+                if ($this->c->getDatabasePlatform() instanceof MySqlPlatform) {
                     return '`' . $matches[1] . '`';
-                } elseif ($this->c->driverType === 'mssql') {
+                } elseif ($this->c->getDatabasePlatform() instanceof SQLServerPlatform) {
                     return '[' . $matches[1] . ']';
                 }
 
                 return '"' . $matches[1] . '"';
             }, $sql);
         };
-        $pdo->query($fixIdentifiersFunc('CREATE TABLE "employee" ("id" int not null, "name" ' . $strType . '(100), "surname" ' . $strType . '(100), "retired" ' . $boolType . ', ' . ($this->c->driverType === 'oci' ? 'CONSTRAINT "employee_pk" ' : '') . 'PRIMARY KEY ("id"))'));
+        $pdo->query($fixIdentifiersFunc('CREATE TABLE "employee" ("id" int not null, "name" ' . $strType . '(100), "surname" ' . $strType . '(100), "retired" ' . $boolType . ', ' . ($this->c->getDatabasePlatform() instanceof OraclePlatform ? 'CONSTRAINT "employee_pk" ' : '') . 'PRIMARY KEY ("id"))'));
         foreach ([
             ['id' => 1, 'name' => 'Oliver', 'surname' => 'Smith', 'retired' => false],
             ['id' => 2, 'name' => 'Jack', 'surname' => 'Williams', 'retired' => true],
@@ -62,7 +66,7 @@ class SelectTest extends AtkPhpunit\TestCase
                 return '"' . $v . '"';
             }, array_keys($row))) . ') VALUES(' . implode(', ', array_map(function ($v) {
                 if (is_bool($v)) {
-                    if ($this->c->driverType === 'pgsql') {
+                    if ($this->c->getDatabasePlatform() instanceof PostgreSqlPlatform) {
                         return $v ? 'true' : 'false';
                     }
 
@@ -142,7 +146,7 @@ class SelectTest extends AtkPhpunit\TestCase
          * But CAST(.. AS int) does not work in mysql. So we use two different tests..
          * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
          */
-        if ($this->c->driverType === 'pgsql') {
+        if ($this->c->getDatabasePlatform() instanceof PostgreSqlPlatform) {
             $this->assertSame(
                 [['now' => '6']],
                 $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
@@ -168,12 +172,12 @@ class SelectTest extends AtkPhpunit\TestCase
          * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
          * entire string on mysql.
          */
-        if ($this->c->driverType === 'pgsql' || $this->c->driverType === 'sqlsrv') {
+        if ($this->c->getDatabasePlatform() instanceof PostgreSqlPlatform || $this->c->getDatabasePlatform() instanceof SQLServerPlatform) {
             $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS VARCHAR)', ['foo'])->getOne()
             );
-        } elseif ($this->c->driverType === 'oci') {
+        } elseif ($this->c->getDatabasePlatform() instanceof OraclePlatform) {
             $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS VARCHAR2(100)) FROM DUAL', ['foo'])->getOne()
@@ -215,7 +219,7 @@ class SelectTest extends AtkPhpunit\TestCase
         // cast custom Expression to string
         $this->assertSame(
             '7',
-            (string) $this->e('select 3+4' . ($this->c->driverType === 'oci' ? ' FROM DUAL' : ''))
+            (string) $this->e('select 3+4' . ($this->c->getDatabasePlatform() instanceof OraclePlatform ? ' FROM DUAL' : ''))
         );
     }
 
@@ -251,7 +255,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
 
         // replace
-        if ($this->c->driverType === 'pgsql' || $this->c->driverType === 'sqlsrv' || $this->c->driverType === 'oci') {
+        if ($this->c->getDatabasePlatform() instanceof PostgreSqlPlatform || $this->c->getDatabasePlatform() instanceof SQLServerPlatform || $this->c->getDatabasePlatform() instanceof OraclePlatform) {
             $this->q('employee')
                 ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->where('id', 1)
@@ -305,19 +309,19 @@ class SelectTest extends AtkPhpunit\TestCase
         } catch (\atk4\dsql\ExecuteException $e) {
             // test error code
             $unknownFieldErrorCode = [
-                'sqlite' => 1,   // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
-                'mysql' => 1146, // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
-                'pgsql' => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
-                'sqlsrv' => 208, // SQLSTATE[42S02]: Invalid object name 'non_existing_table'
-                'oci' => 942,    // SQLSTATE[HY000]: ORA-00942: table or view does not exist
-            ][$this->c->driverType];
+                'sqlite' => 1,        // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table
+                'mysql' => 1146,      // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'non_existing_table' doesn't exist
+                'postgresql' => 7,    // SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "non_existing_table" does not exist
+                'mssql' => 208,       // SQLSTATE[42S02]: Invalid object name 'non_existing_table'
+                'oracle' => 942,      // SQLSTATE[HY000]: ORA-00942: table or view does not exist
+            ][$this->c->getDatabasePlatform()->getName()];
             $this->assertSame($unknownFieldErrorCode, $e->getCode());
 
             // test debug query
             $expectedQuery = [
                 'mysql' => 'select `non_existing_field` from `non_existing_table`',
-                'sqlsrv' => 'select [non_existing_field] from [non_existing_table]',
-            ][$this->c->driverType] ?? 'select "non_existing_field" from "non_existing_table"';
+                'mssql' => 'select [non_existing_field] from [non_existing_table]',
+            ][$this->c->getDatabasePlatform()->getName()] ?? 'select "non_existing_field" from "non_existing_table"';
             $this->assertSame(preg_replace('~\s+~', '', $expectedQuery), preg_replace('~\s+~', '', $e->getDebugQuery()));
 
             throw $e;
