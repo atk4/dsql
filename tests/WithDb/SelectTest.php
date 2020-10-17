@@ -20,7 +20,7 @@ class SelectTest extends AtkPhpunit\TestCase
 
     private function dropDbIfExists(): void
     {
-        $pdo = $this->c->connection();
+        $pdo = $this->c->connection()->getWrappedConnection();
         if ($this->c->getDatabasePlatform() instanceof OraclePlatform) {
             $pdo->query('begin
                 execute immediate \'drop table "employee"\';
@@ -41,7 +41,7 @@ class SelectTest extends AtkPhpunit\TestCase
 
         $this->dropDbIfExists();
 
-        $pdo = $this->c->connection();
+        $pdo = $this->c->connection()->getWrappedConnection();
         $strType = $this->c->getDatabasePlatform() instanceof OraclePlatform ? 'varchar2' : 'varchar';
         $boolType = ['mssql' => 'bit', 'oracle' => 'number(1)'][$this->c->getDatabasePlatform()->getName()] ?? 'bool';
         $fixIdentifiersFunc = function ($sql) {

@@ -91,7 +91,7 @@ Developers can register custom classes to handle driver types using the `Conneci
    Connection::registerConnectionClass(Custom\MySQL\Connection::class, 'mysql'); // or directly using the class
    Custom\MySQL\Connection::registerConnectionClass();
 
-.. php:method:: connectDriver(array $dsn)
+.. php:method:: connectDbalConnection(array $dsn)
 
    The method should establish connection with DB and return the underlying connection object used by 
    the `Connection` class. By default PDO is used but the method can be overriden to return custom object to be 

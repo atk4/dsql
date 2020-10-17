@@ -137,15 +137,6 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $this->assertSame(DummyConnection4::class, Connection::resolveConnectionClass('dummy4'));
     }
 
-    public function testCreatePdo()
-    {
-        $c1 = Connection::connect('sqlite::memory:');
-
-        $c2 = Connection::connect($c1->connection());
-
-        $this->assertSame($c1->connection(), $c2->connection());
-    }
-
     public function testCreateProxy()
     {
         $driver = new class() {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
+use Doctrine\DBAL\Connection as DbalConnection;
+
 /**
  * Creates new expression. Optionally specify a string - a piece
  * of SQL code that will become expression template and arguments.
@@ -61,9 +63,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     /**
      * When you are willing to execute the query, connection needs to be specified.
-     * By default this is PDO object.
      *
-     * @var \PDO|Connection
+     * @var Connection
      */
     public $connection;
 
@@ -495,8 +496,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // If it's a PDO connection, we're cool
-        if ($connection instanceof \PDO) {
-            $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        if ($connection instanceof DbalConnection) {
+            $connection = $connection->getWrappedConnection();
 
             $query = $this->render();
 

@@ -40,7 +40,7 @@ class Connection extends BaseConnection
     /** @var \PDO */
     private static $ciLastConnectPdo;
 
-    protected static function connectDriver(array $dsn)
+    protected static function connectDbalConnection(array $dsn)
     {
         // for some reasons, the following error:
         // PDOException: SQLSTATE[HY000]: pdo_oci_handle_factory: ORA-12516: TNS:listener could not find available handler with matching protocol stack
@@ -70,7 +70,7 @@ class Connection extends BaseConnection
             if (self::$ciLastConnectPdo !== null) {
                 $pdo = self::$ciLastConnectPdo;
             } else {
-                $pdo = parent::connectDriver($dsn);
+                $pdo = parent::connectDbalConnection($dsn);
             }
 
             self::$ciLastConnectPdo = $pdo;
@@ -79,7 +79,7 @@ class Connection extends BaseConnection
             return $pdo;
         }
 
-        return parent::connectDriver($dsn);
+        return parent::connectDbalConnection($dsn);
     }
 
     /// }}}

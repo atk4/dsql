@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
+use Doctrine\DBAL\Connection as DbalConnection;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
@@ -19,7 +21,7 @@ abstract class Connection
     /** @var string Expression classname */
     protected $expression_class = Expression::class;
 
-    /** @var Connection|\PDO Connection or PDO object */
+    /** @var DbalConnection|Connection */
     protected $connection;
 
     /** @var int Current depth of transaction */
@@ -105,18 +107,24 @@ abstract class Connection
     /**
      * Connect to database and return connection class.
      *
-     * @param string|\PDO $dsn
-     * @param string|null $user
-     * @param string|null $password
-     * @param array       $args
+     * @param string|\PDO|DbalConnection $dsn
+     * @param string|null                $user
+     * @param string|null                $password
+     * @param array                      $args
      *
      * @return Connection
      */
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
-        // If it's already PDO object, then we simply use it
+        // If it's already PDO or DbalConnection object, then we simply use it
         if ($dsn instanceof \PDO) {
             $driverSchema = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
+            $connectionClass = self::resolveConnectionClass($driverSchema);
+
+            return new $connectionClass(array_merge([
+                'connection' => $dsn,
+            ], $args));
+        } elseif ($dsn instanceof DbalConnection) {
             $connectionClass = self::resolveConnectionClass($driverSchema);
 
             return new $connectionClass(array_merge([
@@ -135,7 +143,7 @@ abstract class Connection
         $connectionClass = self::resolveConnectionClass($dsn['driverSchema']);
 
         return new $connectionClass(array_merge([
-            'connection' => $connectionClass::connectDriver($dsn),
+            'connection' => $connectionClass::connectDbalConnection($dsn),
         ], $args));
     }
 
@@ -180,14 +188,17 @@ abstract class Connection
     }
 
     /**
-     * Establishes connection based on a $dsn
-     * By default connection is established using new PDO object which can be overridden in child classes.
+     * Establishes connection based on a $dsn.
      *
-     * This does not silence PDO errors.
+     * @return DbalConnection
      */
-    protected static function connectDriver(array $dsn)
+    protected static function connectDbalConnection(array $dsn)
     {
-        return new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        $pdo = new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']);
+
+        $connectionParams = ['pdo' => $pdo];
+
+        return DriverManager::getConnection($connectionParams);
     }
 
     /**
@@ -214,15 +225,13 @@ abstract class Connection
     {
         $c = $this->expression_class;
         $e = new $c($properties, $arguments);
-        $e->connection = $this->connection ?: $this;
+        $e->connection = $this;
 
         return $e;
     }
 
     /**
-     * Returns Connection or PDO object.
-     *
-     * @return Connection|\PDO
+     * @return DbalConnection|Connection
      */
     public function connection()
     {
@@ -364,7 +373,7 @@ abstract class Connection
      */
     public function lastInsertId(string $sequence = null): string
     {
-        return $sequence === null ? $this->connection()->lastInsertId() : $this->connection()->lastInsertId($sequence);
+        return $this->connection()->lastInsertId($sequence);
     }
 
     abstract public function getDatabasePlatform(): AbstractPlatform;
