@@ -287,7 +287,11 @@ abstract class Connection
      */
     public function beginTransaction(): void
     {
-        $this->connection->beginTransaction();
+        try {
+            $this->connection->beginTransaction();
+        } catch (\Doctrine\DBAL\ConnectionException $e) {
+            throw new Exception('Begin transaction failed', 0, $e);
+        }
     }
 
     /**
@@ -310,7 +314,11 @@ abstract class Connection
      */
     public function commit(): void
     {
-        $this->connection->commit();
+        try {
+            $this->connection->commit();
+        } catch (\Doctrine\DBAL\ConnectionException $e) {
+            throw new Exception('Commit failed', 0, $e);
+        }
     }
 
     /**
@@ -318,7 +326,11 @@ abstract class Connection
      */
     public function rollBack()
     {
-        $this->connection->rollBack();
+        try {
+            $this->connection->rollBack();
+        } catch (\Doctrine\DBAL\ConnectionException $e) {
+            throw new Exception('Rollback failed', 0, $e);
+        }
     }
 
     /**
