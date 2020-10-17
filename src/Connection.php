@@ -343,5 +343,8 @@ abstract class Connection
         return $this->connection()->lastInsertId($sequence);
     }
 
-    abstract public function getDatabasePlatform(): AbstractPlatform;
+    public function getDatabasePlatform(): AbstractPlatform
+    {
+        return $this->connection->getDatabasePlatform();
+    }
 }
