@@ -68,15 +68,15 @@ class Connection extends BaseConnection
             }
 
             if (self::$ciLastConnectPdo !== null) {
-                $pdo = self::$ciLastConnectPdo;
+                $dbalConnection = parent::connectDbalConnection(['pdo' => self::$ciLastConnectPdo]);
             } else {
-                $pdo = parent::connectDbalConnection($dsn);
+                $dbalConnection = parent::connectDbalConnection($dsn);
             }
 
-            self::$ciLastConnectPdo = $pdo;
+            self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection();
             self::$ciLastConnectDsn = $dsn;
 
-            return $pdo;
+            return $dbalConnection;
         }
 
         return parent::connectDbalConnection($dsn);

@@ -120,7 +120,7 @@ abstract class Connection
             );
 
             return new $connectionClass(array_merge([
-                'connection' => DriverManager::getConnection($dsn),
+                'connection' => $connectionClass::connectDbalConnection(['pdo' => $dsn]),
             ], $args));
         } elseif ($dsn instanceof DbalConnection) {
             $connectionClass = self::resolveConnectionClass(
@@ -187,7 +187,11 @@ abstract class Connection
      */
     protected static function connectDbalConnection(array $dsn)
     {
-        $pdo = new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']);
+        if (isset($dsn['pdo'])) {
+            $pdo = $dsn['pdo'];
+        } else {
+            $pdo = new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']);
+        }
 
         $connectionParams = ['pdo' => $pdo];
 
