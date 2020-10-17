@@ -21,11 +21,8 @@ abstract class Connection
     /** @var string Expression classname */
     protected $expression_class = Expression::class;
 
-    /** @var DbalConnection|Connection */
+    /** @var DbalConnection */
     protected $connection;
-
-    /** @var int Current depth of transaction */
-    public $transaction_depth = 0;
 
     /**
      * Stores the driverSchema => connectionClass array for resolving.
@@ -118,23 +115,19 @@ abstract class Connection
     {
         // If it's already PDO or DbalConnection object, then we simply use it
         if ($dsn instanceof \PDO) {
-            $driverSchema = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-            $connectionClass = self::resolveConnectionClass($driverSchema);
+            $connectionClass = self::resolveConnectionClass(
+                $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME)
+            );
 
             return new $connectionClass(array_merge([
-                'connection' => $dsn,
+                'connection' => DriverManager::getConnection($dsn),
             ], $args));
         } elseif ($dsn instanceof DbalConnection) {
-            $connectionClass = self::resolveConnectionClass($driverSchema);
+            $connectionClass = self::resolveConnectionClass(
+                $dsn->getWrappedConnection()->getAttribute(\PDO::ATTR_DRIVER_NAME)
+            );
 
             return new $connectionClass(array_merge([
-                'connection' => $dsn,
-            ], $args));
-        }
-
-        // If it's some other object, then we simply use it trough proxy connection
-        if (is_object($dsn)) {
-            return new ProxyConnection(array_merge([
                 'connection' => $dsn,
             ], $args));
         }
@@ -231,7 +224,7 @@ abstract class Connection
     }
 
     /**
-     * @return DbalConnection|Connection
+     * @return DbalConnection
      */
     public function connection()
     {
@@ -245,12 +238,11 @@ abstract class Connection
      */
     public function execute(Expression $expr)
     {
-        // If custom connection is set, execute again using that
-        if ($this->connection && $this->connection !== $this) {
-            return $expr->execute($this->connection);
+        if ($this->connection === null) {
+            throw new Exception('Queries cannot be executed through this connection');
         }
 
-        throw new Exception('Queries cannot be executed through this connection');
+        return $expr->execute($this->connection);
     }
 
     /**
@@ -288,19 +280,10 @@ abstract class Connection
      *
      * So, if you have been working with the database and got un-handled
      * exception in the middle of your code, everything will be rolled back.
-     *
-     * @return mixed Don't rely on any meaningful return
      */
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
-        // transaction starts only if it was not started before
-        $r = $this->inTransaction()
-            ? false
-            : $this->connection->beginTransaction();
-
-        ++$this->transaction_depth;
-
-        return $r;
+        $this->connection->beginTransaction();
     }
 
     /**
@@ -308,12 +291,10 @@ abstract class Connection
      * This is useful if you are logging anything into a database. If you are
      * inside a transaction, don't log or it may be rolled back.
      * Perhaps use a hook for this?
-     *
-     * @see beginTransaction()
      */
     public function inTransaction(): bool
     {
-        return $this->transaction_depth > 0;
+        return $this->connection->isTransactionActive();
     }
 
     /**
@@ -322,48 +303,18 @@ abstract class Connection
      * Each occurrence of beginTransaction() must be matched with commit().
      * Only when same amount of commits are executed, the actual commit will be
      * issued to the database.
-     *
-     * @see beginTransaction()
-     *
-     * @return mixed Don't rely on any meaningful return
      */
-    public function commit()
+    public function commit(): void
     {
-        // check if transaction is actually started
-        if (!$this->inTransaction()) {
-            throw new Exception('Using commit() when no transaction has started');
-        }
-
-        --$this->transaction_depth;
-
-        if ($this->transaction_depth === 0) {
-            return $this->connection->commit();
-        }
-
-        return false;
+        $this->connection->commit();
     }
 
     /**
      * Rollbacks queries since beginTransaction and resets transaction depth.
-     *
-     * @see beginTransaction()
-     *
-     * @return mixed Don't rely on any meaningful return
      */
     public function rollBack()
     {
-        // check if transaction is actually started
-        if (!$this->inTransaction()) {
-            throw new Exception('Using rollBack() when no transaction has started');
-        }
-
-        --$this->transaction_depth;
-
-        if ($this->transaction_depth === 0) {
-            return $this->connection->rollBack();
-        }
-
-        return false;
+        $this->connection->rollBack();
     }
 
     /**

@@ -8,6 +8,7 @@ use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
 use atk4\dsql\Exception;
 use atk4\dsql\Expression;
+use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
@@ -105,7 +106,7 @@ class TransactionTest extends AtkPhpunit\TestCase
     public function testCommitException1()
     {
         // try to commit when not in transaction
-        $this->expectException(Exception::class);
+        $this->expectException(ConnectionException::class);
         $this->c->commit();
     }
 
@@ -114,14 +115,14 @@ class TransactionTest extends AtkPhpunit\TestCase
         // try to commit when not in transaction anymore
         $this->c->beginTransaction();
         $this->c->commit();
-        $this->expectException(Exception::class);
+        $this->expectException(ConnectionException::class);
         $this->c->commit();
     }
 
     public function testRollbackException1()
     {
         // try to rollback when not in transaction
-        $this->expectException(Exception::class);
+        $this->expectException(ConnectionException::class);
         $this->c->rollBack();
     }
 
@@ -130,7 +131,7 @@ class TransactionTest extends AtkPhpunit\TestCase
         // try to rollback when not in transaction anymore
         $this->c->beginTransaction();
         $this->c->rollBack();
-        $this->expectException(Exception::class);
+        $this->expectException(ConnectionException::class);
         $this->c->rollBack();
     }
 

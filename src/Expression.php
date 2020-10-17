@@ -181,6 +181,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // If we use DSQL Connection, then we should call expr() from there.
         // Connection->expr() will return correct, connection specific Expression class.
         if ($this->connection instanceof Connection) {
+            // TODO - condition above always satisfied when connection is set - adjust tests,
+            // so connection is always set and remove the code below
             return $this->connection->expr($properties, $arguments);
         }
 
