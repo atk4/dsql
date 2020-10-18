@@ -386,15 +386,15 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // - {{xxx}} = escapeSoft
         $res = preg_replace_callback(
             <<<'EOF'
-            ~
-             '(?:[^'\\]+|\\.|'')*'\K
-            |"(?:[^"\\]+|\\.|"")*"\K
-            |`(?:[^`\\]+|\\.|``)*`\K
-            |\[\w*\]
-            |\{\w*\}
-            |\{\{\w*\}\}
-            ~xs
-            EOF,
+                ~
+                 '(?:[^'\\]+|\\.|'')*'\K
+                |"(?:[^"\\]+|\\.|"")*"\K
+                |`(?:[^`\\]+|\\.|``)*`\K
+                |\[\w*\]
+                |\{\w*\}
+                |\{\{\w*\}\}
+                ~xs
+                EOF,
             function ($matches) use (&$nameless_count) {
                 if ($matches[0] === '') {
                     return '';

@@ -208,7 +208,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
                 '\'\\\\[]\'',
                 '\'[\'\']\'',
                 '\'\'\'[]\'',
-                '\'[]\'\'\''
+                '\'[]\'\'\'',
             ] as $testStr) {
                 if ($enclosureChar !== '\'') {
                     $testStr = str_replace('\'', $enclosureChar, $testStr);
