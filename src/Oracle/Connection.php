@@ -34,6 +34,8 @@ class Connection extends BaseConnection
     // {{{ fix for too many connections for CI testing
 
     /** @var array */
+    private static $ciDifferentDsnCounter = 0;
+    /** @var array */
     private static $ciLastConnectDsn;
     /** @var \PDO */
     private static $ciLastConnectPdo;
@@ -52,7 +54,10 @@ class Connection extends BaseConnection
             };
 
             if (self::$ciLastConnectDsn !== $dsn) {
-                $notReusableFunc('different DSN');
+                self::$ciDifferentDsnCounter++;
+                if (self::$ciDifferentDsnCounter >= 4) {
+                    $notReusableFunc('different DSN');
+                }
             } elseif (self::$ciLastConnectPdo !== null) {
                 try {
                     self::$ciLastConnectPdo->query('select 1 from dual')->fetch();
