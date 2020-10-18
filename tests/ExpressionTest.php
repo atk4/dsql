@@ -188,6 +188,49 @@ class ExpressionTest extends AtkPhpunit\TestCase
     }
 
     /**
+     * @dataProvider provideNoTemplatingInSqlStringData
+     */
+    public function testNoTemplatingInSqlString(string $expectedStr, string $exprStr, array $exprArgs)
+    {
+        $this->assertSame($expectedStr, $this->e($exprStr, $exprArgs)->render());
+    }
+
+    public function provideNoTemplatingInSqlStringData()
+    {
+        $testStrs = [];
+        foreach (['\'', '"', '`'] as $enclosureChar) {
+            foreach ([
+                '\'[]\'',
+                '\'{}\'',
+                '\'{{}}\'',
+                '\'[a]\'',
+                '\'\\\'[]\'',
+                '\'\\\\[]\'',
+                '\'[\'\']\'',
+                '\'\'\'[]\'',
+                '\'[]\'\'\''
+            ] as $testStr) {
+                if ($enclosureChar !== '\'') {
+                    $testStr = str_replace('\'', $enclosureChar, $testStr);
+                }
+
+                yield [$testStr, $testStr, []];
+
+                $testStrs[] = $testStr;
+            }
+        }
+
+        $fullStr = implode('', $testStrs);
+        yield [$fullStr, $fullStr, []];
+
+        $fullStr = implode(' ', $testStrs);
+        yield [$fullStr, $fullStr, []];
+
+        $fullStr = implode('x', $testStrs);
+        yield [$fullStr, $fullStr, []];
+    }
+
+    /**
      * Test nested parameters.
      *
      * @covers ::__construct
