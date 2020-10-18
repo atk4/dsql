@@ -324,7 +324,7 @@ abstract class Connection
     /**
      * Rollbacks queries since beginTransaction and resets transaction depth.
      */
-    public function rollBack()
+    public function rollBack(): void
     {
         try {
             $this->connection->rollBack();
