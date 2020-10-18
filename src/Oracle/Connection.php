@@ -54,7 +54,7 @@ class Connection extends BaseConnection
             };
 
             if (self::$ciLastConnectDsn !== $dsn) {
-                self::$ciDifferentDsnCounter++;
+                ++self::$ciDifferentDsnCounter;
                 if (self::$ciDifferentDsnCounter >= 4) {
                     $notReusableFunc('different DSN');
                 }

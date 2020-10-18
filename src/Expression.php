@@ -569,6 +569,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return $v ? '1' : '0';
         }
 
+        // for Oracle CLOB/BLOB datatypes and PDO driver
+        if (is_resource($v) && get_resource_type($v) === 'stream'
+                && $this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\OraclePlatform) {
+            $v = stream_get_contents($v);
+        }
+
         return $v; // throw a type error if not null nor string
     }
 
