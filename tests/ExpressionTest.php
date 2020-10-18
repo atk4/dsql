@@ -162,9 +162,9 @@ class ExpressionTest extends AtkPhpunit\TestCase
 
         // numeric argument = Expression
         $this->assertSame(
-            'testing "hello, world"',
+            'hello, world',
             $this->e(
-                'testing "[]"',
+                '[]',
                 [
                     $this->e(
                         '[what], [who]',
