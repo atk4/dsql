@@ -50,7 +50,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @var string
      */
-    public $_paramBase;
+    private $_paramBase;
 
     /**
      * Will be populated with actual values by _param().
