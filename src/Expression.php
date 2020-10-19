@@ -386,16 +386,31 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         $nameless_count = 0;
 
+        // - [xxx] = param
+        // - {xxx} = escape
+        // - {{xxx}} = escapeSoft
         $res = preg_replace_callback(
-            //     param     |  escape   |  escapeSoft
-            '/\[[a-z0-9_]*\]|{[a-z0-9_]*}|{{[a-z0-9_]*}}/i',
+            <<<'EOF'
+                ~
+                 '(?:[^'\\]+|\\.|'')*'\K
+                |"(?:[^"\\]+|\\.|"")*"\K
+                |`(?:[^`\\]+|\\.|``)*`\K
+                |\[\w*\]
+                |\{\w*\}
+                |\{\{\w*\}\}
+                ~xs
+                EOF,
             function ($matches) use (&$nameless_count) {
+                if ($matches[0] === '') {
+                    return '';
+                }
+
                 $identifier = substr($matches[0], 1, -1);
 
-                if ($matches[0][0] === '[') {
+                if (substr($matches[0], 0, 1) === '[') {
                     $escaping = 'param';
-                } elseif ($matches[0][0] === '{') {
-                    if ($matches[0][1] === '{') {
+                } elseif (substr($matches[0], 0, 1) === '{') {
+                    if (substr($matches[0], 1, 1) === '{') {
                         $escaping = 'soft-escape';
                         $identifier = substr($identifier, 1, -1);
                     } else {
@@ -403,7 +418,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     }
                 }
 
-                // Allow template to contain []
+                // allow template to contain []
                 if ($identifier === '') {
                     $identifier = $nameless_count++;
 

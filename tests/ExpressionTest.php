@@ -162,9 +162,9 @@ class ExpressionTest extends AtkPhpunit\TestCase
 
         // numeric argument = Expression
         $this->assertSame(
-            'testing "hello, world"',
+            'hello, world',
             $this->e(
-                'testing "[]"',
+                '[]',
                 [
                     $this->e(
                         '[what], [who]',
@@ -185,6 +185,47 @@ class ExpressionTest extends AtkPhpunit\TestCase
                 ['who' => $this->e('world')]
             )->render()
         );
+    }
+
+    /**
+     * @dataProvider provideNoTemplatingInSqlStringData
+     */
+    public function testNoTemplatingInSqlString(string $expectedStr, string $exprStr, array $exprArgs)
+    {
+        $this->assertSame($expectedStr, $this->e($exprStr, $exprArgs)->render());
+    }
+
+    public function provideNoTemplatingInSqlStringData()
+    {
+        $testStrs = [];
+        foreach (['\'', '"', '`'] as $enclosureChar) {
+            foreach ([
+                '\'[]\'',
+                '\'{}\'',
+                '\'{{}}\'',
+                '\'[a]\'',
+                '\'\\\'[]\'',
+                '\'\\\\[]\'',
+                '\'[\'\']\'',
+                '\'\'\'[]\'',
+                '\'[]\'\'\'',
+            ] as $testStr) {
+                $testStr = str_replace('\'', $enclosureChar, $testStr);
+
+                yield [$testStr, $testStr, []];
+
+                $testStrs[] = $testStr;
+            }
+        }
+
+        $fullStr = implode('', $testStrs);
+        yield [$fullStr, $fullStr, []];
+
+        $fullStr = implode(' ', $testStrs);
+        yield [$fullStr, $fullStr, []];
+
+        $fullStr = implode('x', $testStrs);
+        yield [$fullStr, $fullStr, []];
     }
 
     /**
