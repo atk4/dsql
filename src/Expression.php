@@ -50,7 +50,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @var string
      */
-    public $_paramBase;
+    private $_paramBase;
 
     /**
      * Will be populated with actual values by _param().
@@ -265,19 +265,21 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // at this point $sql_code is instance of Expression
-        $sql_code->params = &$this->params;
-        $sql_code->_paramBase = &$this->_paramBase;
-        $ret = $sql_code->render();
+        $sql_code->params = $this->params;
+        $sql_code->_paramBase = $this->_paramBase;
+        try {
+            $ret = $sql_code->render();
+            $this->params = $sql_code->params;
+            $this->_paramBase = $sql_code->_paramBase;
+        } finally {
+            $sql_code->params = [];
+            $sql_code->_paramBase = null;
+        }
 
         // Queries should be wrapped in parentheses in most cases
         if ($sql_code instanceof Query && $sql_code->allowToWrapInParenthesis === true) {
             $ret = '(' . $ret . ')';
         }
-
-        // unset is needed here because ->params=&$othervar->params=foo will also change $othervar.
-        // if we unset() first, we’re safe.
-        unset($sql_code->{'params'});
-        $sql_code->params = [];
 
         return $ret;
     }
@@ -372,14 +374,17 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function render()
     {
-        $nameless_count = 0;
-        if (!isset($this->_paramBase)) {
+        $hadUnderscoreParamBase = isset($this->_paramBase);
+        if (!$hadUnderscoreParamBase) {
+            $hadUnderscoreParamBase = false;
             $this->_paramBase = $this->paramBase;
         }
 
         if ($this->template === null) {
             throw new Exception('Template is not defined for Expression');
         }
+
+        $nameless_count = 0;
 
         // - [xxx] = param
         // - {xxx} = escape
@@ -436,7 +441,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             },
             $this->template
         );
-        unset($this->{'_paramBase'});
+
+        if (!$hadUnderscoreParamBase) {
+            $this->_paramBase = null;
+        }
 
         return trim($res);
     }
