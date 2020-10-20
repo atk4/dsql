@@ -75,53 +75,6 @@ to explicitly specify property :php:attr:`Connection::query_class`::
 This is also useful, if you have created your own Query class in a different
 namespace and wish to use it.
 
-Proxy Connection
-----------------
-Connection class is designed to create instances of :php:class:`Expression`,
-:php:class:`Query` as well as executing queries.
-A standard :php:class:`Connection` class with the use of PDO will do nothing
-inside its execute() because :php:meth:`Expression::execute` would handle all
-the work.
-
-However if :php:attr:`Connection::connection` is NOT PDO object, then
-:php:class:`Expression` will not know how to execute query and will simply
-call::
-
-    return $connection->execute($this);
-
-:php:class:`ProxyConnection` class would re-execute the query with a different
-connection class. In other words :php:class:`ProxyConnection` allows you
-to "wrap" your actual connection class. As a benefit you get to extend
-:php:class:`ProxyConnection` class implementing some unified features that would work with
-any other connection class. Often this will require you to know externals, but
-let's build a proxy class that will add "DELAYED" options for all INSERT
-operations::
-
-    class DelayInsertsConnection extends \atk4\dsql\ProxyConnection
-    {
-        function execute(\atk4\dsql\Expression $expr)
-        {
-            if ($expr instanceof \atk4\dsql\Query) {
-
-                if ($expr->mode == 'insert') {
-                    $expr->insertOption('delayed');
-                }
-
-            }
-            return parent::execute($expr);
-        }
-    }
-
-Next we need to use this proxy class instead of the normal one which is quite simple to do::
-
-    $connection = \atk4\dsql\Connection::connect($dsn, $user, $pass);
-
-    $connection = new DelayInsertsConnection(['connection' => $connection]);
-
-    // now use the new $connection
-
-:php:class:`ProxyConnection` can be used for many different things.
-
 .. _extending_query:
 
 Extending Query Class

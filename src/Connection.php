@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
+use Doctrine\DBAL\Connection as DbalConnection;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
@@ -19,11 +21,8 @@ abstract class Connection
     /** @var string Expression classname */
     protected $expression_class = Expression::class;
 
-    /** @var Connection|\PDO Connection or PDO object */
+    /** @var DbalConnection */
     protected $connection;
-
-    /** @var int Current depth of transaction */
-    public $transaction_depth = 0;
 
     /**
      * Stores the driverSchema => connectionClass array for resolving.
@@ -105,28 +104,30 @@ abstract class Connection
     /**
      * Connect to database and return connection class.
      *
-     * @param string|\PDO $dsn
-     * @param string|null $user
-     * @param string|null $password
-     * @param array       $args
+     * @param string|\PDO|DbalConnection $dsn
+     * @param string|null                $user
+     * @param string|null                $password
+     * @param array                      $args
      *
      * @return Connection
      */
     public static function connect($dsn, $user = null, $password = null, $args = [])
     {
-        // If it's already PDO object, then we simply use it
+        // If it's already PDO or DbalConnection object, then we simply use it
         if ($dsn instanceof \PDO) {
-            $driverSchema = $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-            $connectionClass = self::resolveConnectionClass($driverSchema);
+            $connectionClass = self::resolveConnectionClass(
+                $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME)
+            );
 
             return new $connectionClass(array_merge([
-                'connection' => $dsn,
+                'connection' => $connectionClass::connectDbalConnection(['pdo' => $dsn]),
             ], $args));
-        }
+        } elseif ($dsn instanceof DbalConnection) {
+            $connectionClass = self::resolveConnectionClass(
+                $dsn->getWrappedConnection()->getAttribute(\PDO::ATTR_DRIVER_NAME)
+            );
 
-        // If it's some other object, then we simply use it trough proxy connection
-        if (is_object($dsn)) {
-            return new ProxyConnection(array_merge([
+            return new $connectionClass(array_merge([
                 'connection' => $dsn,
             ], $args));
         }
@@ -135,7 +136,7 @@ abstract class Connection
         $connectionClass = self::resolveConnectionClass($dsn['driverSchema']);
 
         return new $connectionClass(array_merge([
-            'connection' => $connectionClass::connectDriver($dsn),
+            'connection' => $connectionClass::connectDbalConnection($dsn),
         ], $args));
     }
 
@@ -180,14 +181,21 @@ abstract class Connection
     }
 
     /**
-     * Establishes connection based on a $dsn
-     * By default connection is established using new PDO object which can be overridden in child classes.
+     * Establishes connection based on a $dsn.
      *
-     * This does not silence PDO errors.
+     * @return DbalConnection
      */
-    protected static function connectDriver(array $dsn)
+    protected static function connectDbalConnection(array $dsn)
     {
-        return new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        if (isset($dsn['pdo'])) {
+            $pdo = $dsn['pdo'];
+        } else {
+            $pdo = new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']);
+        }
+
+        $connectionParams = ['pdo' => $pdo];
+
+        return DriverManager::getConnection($connectionParams);
     }
 
     /**
@@ -214,15 +222,13 @@ abstract class Connection
     {
         $c = $this->expression_class;
         $e = new $c($properties, $arguments);
-        $e->connection = $this->connection ?: $this;
+        $e->connection = $this;
 
         return $e;
     }
 
     /**
-     * Returns Connection or PDO object.
-     *
-     * @return Connection|\PDO
+     * @return DbalConnection
      */
     public function connection()
     {
@@ -236,12 +242,11 @@ abstract class Connection
      */
     public function execute(Expression $expr)
     {
-        // If custom connection is set, execute again using that
-        if ($this->connection && $this->connection !== $this) {
-            return $expr->execute($this->connection);
+        if ($this->connection === null) {
+            throw new Exception('Queries cannot be executed through this connection');
         }
 
-        throw new Exception('Queries cannot be executed through this connection');
+        return $expr->execute($this->connection);
     }
 
     /**
@@ -279,19 +284,14 @@ abstract class Connection
      *
      * So, if you have been working with the database and got un-handled
      * exception in the middle of your code, everything will be rolled back.
-     *
-     * @return mixed Don't rely on any meaningful return
      */
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
-        // transaction starts only if it was not started before
-        $r = $this->inTransaction()
-            ? false
-            : $this->connection->beginTransaction();
-
-        ++$this->transaction_depth;
-
-        return $r;
+        try {
+            $this->connection->beginTransaction();
+        } catch (\Doctrine\DBAL\ConnectionException $e) {
+            throw new Exception('Begin transaction failed', 0, $e);
+        }
     }
 
     /**
@@ -299,12 +299,10 @@ abstract class Connection
      * This is useful if you are logging anything into a database. If you are
      * inside a transaction, don't log or it may be rolled back.
      * Perhaps use a hook for this?
-     *
-     * @see beginTransaction()
      */
     public function inTransaction(): bool
     {
-        return $this->transaction_depth > 0;
+        return $this->connection->isTransactionActive();
     }
 
     /**
@@ -313,48 +311,26 @@ abstract class Connection
      * Each occurrence of beginTransaction() must be matched with commit().
      * Only when same amount of commits are executed, the actual commit will be
      * issued to the database.
-     *
-     * @see beginTransaction()
-     *
-     * @return mixed Don't rely on any meaningful return
      */
-    public function commit()
+    public function commit(): void
     {
-        // check if transaction is actually started
-        if (!$this->inTransaction()) {
-            throw new Exception('Using commit() when no transaction has started');
+        try {
+            $this->connection->commit();
+        } catch (\Doctrine\DBAL\ConnectionException $e) {
+            throw new Exception('Commit failed', 0, $e);
         }
-
-        --$this->transaction_depth;
-
-        if ($this->transaction_depth === 0) {
-            return $this->connection->commit();
-        }
-
-        return false;
     }
 
     /**
      * Rollbacks queries since beginTransaction and resets transaction depth.
-     *
-     * @see beginTransaction()
-     *
-     * @return mixed Don't rely on any meaningful return
      */
-    public function rollBack()
+    public function rollBack(): void
     {
-        // check if transaction is actually started
-        if (!$this->inTransaction()) {
-            throw new Exception('Using rollBack() when no transaction has started');
+        try {
+            $this->connection->rollBack();
+        } catch (\Doctrine\DBAL\ConnectionException $e) {
+            throw new Exception('Rollback failed', 0, $e);
         }
-
-        --$this->transaction_depth;
-
-        if ($this->transaction_depth === 0) {
-            return $this->connection->rollBack();
-        }
-
-        return false;
     }
 
     /**
@@ -364,8 +340,11 @@ abstract class Connection
      */
     public function lastInsertId(string $sequence = null): string
     {
-        return $sequence === null ? $this->connection()->lastInsertId() : $this->connection()->lastInsertId($sequence);
+        return $this->connection()->lastInsertId($sequence);
     }
 
-    abstract public function getDatabasePlatform(): AbstractPlatform;
+    public function getDatabasePlatform(): AbstractPlatform
+    {
+        return $this->connection->getDatabasePlatform();
+    }
 }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace atk4\dsql\Oracle;
 
 use atk4\dsql\Connection as BaseConnection;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\OraclePlatform;
 
 /**
  * Custom Connection class specifically for Oracle database.
@@ -36,11 +34,13 @@ class Connection extends BaseConnection
     // {{{ fix for too many connections for CI testing
 
     /** @var array */
+    private static $ciDifferentDsnCounter = 0;
+    /** @var array */
     private static $ciLastConnectDsn;
     /** @var \PDO */
     private static $ciLastConnectPdo;
 
-    protected static function connectDriver(array $dsn)
+    protected static function connectDbalConnection(array $dsn)
     {
         // for some reasons, the following error:
         // PDOException: SQLSTATE[HY000]: pdo_oci_handle_factory: ORA-12516: TNS:listener could not find available handler with matching protocol stack
@@ -54,7 +54,10 @@ class Connection extends BaseConnection
             };
 
             if (self::$ciLastConnectDsn !== $dsn) {
-                $notReusableFunc('different DSN');
+                ++self::$ciDifferentDsnCounter;
+                if (self::$ciDifferentDsnCounter >= 4) {
+                    $notReusableFunc('different DSN');
+                }
             } elseif (self::$ciLastConnectPdo !== null) {
                 try {
                     self::$ciLastConnectPdo->query('select 1 from dual')->fetch();
@@ -68,18 +71,18 @@ class Connection extends BaseConnection
             }
 
             if (self::$ciLastConnectPdo !== null) {
-                $pdo = self::$ciLastConnectPdo;
+                $dbalConnection = parent::connectDbalConnection(['pdo' => self::$ciLastConnectPdo]);
             } else {
-                $pdo = parent::connectDriver($dsn);
+                $dbalConnection = parent::connectDbalConnection($dsn);
             }
 
-            self::$ciLastConnectPdo = $pdo;
+            self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection();
             self::$ciLastConnectDsn = $dsn;
 
-            return $pdo;
+            return $dbalConnection;
         }
 
-        return parent::connectDriver($dsn);
+        return parent::connectDbalConnection($dsn);
     }
 
     /// }}}
@@ -97,10 +100,5 @@ class Connection extends BaseConnection
 
         // fallback
         return parent::lastInsertId($sequence);
-    }
-
-    public function getDatabasePlatform(): AbstractPlatform
-    {
-        return new OraclePlatform();
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
+use Doctrine\DBAL\Connection as DbalConnection;
+
 /**
  * Creates new expression. Optionally specify a string - a piece
  * of SQL code that will become expression template and arguments.
@@ -61,9 +63,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     /**
      * When you are willing to execute the query, connection needs to be specified.
-     * By default this is PDO object.
      *
-     * @var \PDO|Connection
+     * @var Connection
      */
     public $connection;
 
@@ -180,6 +181,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         // If we use DSQL Connection, then we should call expr() from there.
         // Connection->expr() will return correct, connection specific Expression class.
         if ($this->connection instanceof Connection) {
+            // TODO - condition above always satisfied when connection is set - adjust tests,
+            // so connection is always set and remove the code below
             return $this->connection->expr($properties, $arguments);
         }
 
@@ -518,8 +521,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         // If it's a PDO connection, we're cool
-        if ($connection instanceof \PDO) {
-            $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        if ($connection instanceof DbalConnection) {
+            $connection = $connection->getWrappedConnection();
 
             $query = $this->render();
 
@@ -587,6 +590,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             return (string) $v;
         } elseif (is_bool($v)) {
             return $v ? '1' : '0';
+        }
+
+        // for Oracle CLOB/BLOB datatypes and PDO driver
+        if (is_resource($v) && get_resource_type($v) === 'stream'
+                && $this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\OraclePlatform) {
+            $v = stream_get_contents($v);
         }
 
         return $v; // throw a type error if not null nor string

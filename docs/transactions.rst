@@ -31,13 +31,12 @@ It is recommended to always use atomic() in your code.
 .. php:method:: beginTransaction
 
     Start new transaction. If already started, will do nothing but will increase
-    :php:attr:`Connection::$transaction_depth`.
+    transaction depth.
 
 .. php:method:: commit
 
     Will commit transaction, however if :php:meth:`Connection::beginTransaction`
-    was executed more than once, will only decrease
-    :php:attr:`Connection::$transaction_depth`.
+    was executed more than once, will only decrease transaction depth.
 
 .. php:method:: inTransaction
 
@@ -47,8 +46,7 @@ It is recommended to always use atomic() in your code.
 .. php:method:: rollBack
 
     Roll-back the transaction, however if :php:meth:`Connection::beginTransaction`
-    was executed more than once, will only decrease
-    :php:attr:`Connection::$transaction_depth`.
+    was executed more than once, will only decrease transaction depth.
 
 
 

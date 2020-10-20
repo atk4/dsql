@@ -8,9 +8,9 @@ use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;
 use atk4\dsql\Exception;
 use atk4\dsql\Expression;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
 
 class TransactionTest extends AtkPhpunit\TestCase
@@ -20,7 +20,7 @@ class TransactionTest extends AtkPhpunit\TestCase
 
     private function dropDbIfExists(): void
     {
-        $pdo = $this->c->connection();
+        $pdo = $this->c->connection()->getWrappedConnection();
         if ($this->c->getDatabasePlatform() instanceof OraclePlatform) {
             $pdo->query('begin
                 execute immediate \'drop table "employee"\';
@@ -41,12 +41,12 @@ class TransactionTest extends AtkPhpunit\TestCase
 
         $this->dropDbIfExists();
 
-        $pdo = $this->c->connection();
+        $pdo = $this->c->connection()->getWrappedConnection();
         $strType = $this->c->getDatabasePlatform() instanceof OraclePlatform ? 'varchar2' : 'varchar';
         $boolType = ['mssql' => 'bit', 'oracle' => 'number(1)'][$this->c->getDatabasePlatform()->getName()] ?? 'bool';
         $fixIdentifiersFunc = function ($sql) {
             return preg_replace_callback('~(?:\'(?:\'\'|\\\\\'|[^\'])*\')?+\K"([^\'"()\[\]{}]*?)"~s', function ($matches) {
-                if ($this->c->getDatabasePlatform() instanceof MySqlPlatform) {
+                if ($this->c->getDatabasePlatform() instanceof MySQLPlatform) {
                     return '`' . $matches[1] . '`';
                 } elseif ($this->c->getDatabasePlatform() instanceof SQLServerPlatform) {
                     return '[' . $matches[1] . ']';
@@ -66,7 +66,7 @@ class TransactionTest extends AtkPhpunit\TestCase
                 return '"' . $v . '"';
             }, array_keys($row))) . ') VALUES(' . implode(', ', array_map(function ($v) {
                 if (is_bool($v)) {
-                    if ($this->c->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+                    if ($this->c->getDatabasePlatform() instanceof PostgreSQLPlatform) {
                         return $v ? 'true' : 'false';
                     }
 
