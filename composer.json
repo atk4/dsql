@@ -45,7 +45,7 @@
     "friendsofphp/php-cs-fixer": "^2.16",
     "johnkary/phpunit-speedtrap": "^3.2",
     "phpunit/phpcov": "*",
-    "phpunit/phpunit": ">=9.0"
+    "phpunit/phpunit": ">=9.1"
   },
   "suggest": {
     "jdorn/sql-formatter": "*"
