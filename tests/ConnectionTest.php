@@ -145,7 +145,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testException1()
     {
-        $this->expectException(\PDOException::class);
+        $this->expectException(\atk4\dsql\Exception::class);
         $c = \atk4\dsql\Sqlite\Connection::connect(':');
     }
 
