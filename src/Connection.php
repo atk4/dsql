@@ -170,14 +170,15 @@ abstract class Connection
 
     /**
      * Resolves the connection class to use based on driver type.
-     *
-     * @param string $driverSchema
-     *
-     * @return string
      */
-    public static function resolveConnectionClass($driverSchema)
+    public static function resolveConnectionClass(string $driverSchema): string
     {
-        return self::$connectionClassRegistry[$driverSchema] ?? static::class;
+        if (!isset(self::$connectionClassRegistry[$driverSchema])) {
+            throw (new Exception('Driver schema is not registered'))
+                ->addMoreInfo('driver_schema', $driverSchema);
+        }
+
+        return self::$connectionClassRegistry[$driverSchema];
     }
 
     /**
