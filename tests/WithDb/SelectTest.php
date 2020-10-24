@@ -20,9 +20,8 @@ class SelectTest extends AtkPhpunit\TestCase
 
     private function dropDbIfExists(): void
     {
-        $pdo = $this->c->connection()->getWrappedConnection();
         if ($this->c->getDatabasePlatform() instanceof OraclePlatform) {
-            $pdo->query('begin
+            $this->c->connection()->executeQuery('begin
                 execute immediate \'drop table "employee"\';
             exception
                 when others then
@@ -31,7 +30,7 @@ class SelectTest extends AtkPhpunit\TestCase
                     end if;
             end;');
         } else {
-            $pdo->query('DROP TABLE IF EXISTS employee');
+            $this->c->connection()->executeQuery('DROP TABLE IF EXISTS employee');
         }
     }
 
@@ -41,7 +40,6 @@ class SelectTest extends AtkPhpunit\TestCase
 
         $this->dropDbIfExists();
 
-        $pdo = $this->c->connection()->getWrappedConnection();
         $strType = $this->c->getDatabasePlatform() instanceof OraclePlatform ? 'varchar2' : 'varchar';
         $boolType = ['mssql' => 'bit', 'oracle' => 'number(1)'][$this->c->getDatabasePlatform()->getName()] ?? 'bool';
         $fixIdentifiersFunc = function ($sql) {
@@ -55,14 +53,14 @@ class SelectTest extends AtkPhpunit\TestCase
                 return '"' . $matches[1] . '"';
             }, $sql);
         };
-        $pdo->query($fixIdentifiersFunc('CREATE TABLE "employee" ("id" int not null, "name" ' . $strType . '(100), "surname" ' . $strType . '(100), "retired" ' . $boolType . ', ' . ($this->c->getDatabasePlatform() instanceof OraclePlatform ? 'CONSTRAINT "employee_pk" ' : '') . 'PRIMARY KEY ("id"))'));
+        $this->c->connection()->executeQuery($fixIdentifiersFunc('CREATE TABLE "employee" ("id" int not null, "name" ' . $strType . '(100), "surname" ' . $strType . '(100), "retired" ' . $boolType . ', ' . ($this->c->getDatabasePlatform() instanceof OraclePlatform ? 'CONSTRAINT "employee_pk" ' : '') . 'PRIMARY KEY ("id"))'));
         foreach ([
             ['id' => 1, 'name' => 'Oliver', 'surname' => 'Smith', 'retired' => false],
             ['id' => 2, 'name' => 'Jack', 'surname' => 'Williams', 'retired' => true],
             ['id' => 3, 'name' => 'Harry', 'surname' => 'Taylor', 'retired' => true],
             ['id' => 4, 'name' => 'Charlie', 'surname' => 'Lee', 'retired' => false],
         ] as $row) {
-            $pdo->query($fixIdentifiersFunc('INSERT INTO "employee" (' . implode(', ', array_map(function ($v) {
+            $this->c->connection()->executeQuery($fixIdentifiersFunc('INSERT INTO "employee" (' . implode(', ', array_map(function ($v) {
                 return '"' . $v . '"';
             }, array_keys($row))) . ') VALUES(' . implode(', ', array_map(function ($v) {
                 if (is_bool($v)) {

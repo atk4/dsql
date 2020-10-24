@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace atk4\dsql;
 
 use Doctrine\DBAL\Connection as DbalConnection;
+use Doctrine\DBAL\DBALException;
 
 /**
  * Creates new expression. Optionally specify a string - a piece
@@ -522,8 +523,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         // If it's a PDO connection, we're cool
         if ($connection instanceof DbalConnection) {
-            $connection = $connection->getWrappedConnection();
-
             $query = $this->render();
 
             try {
@@ -560,9 +559,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                 $statement->setFetchMode(\PDO::FETCH_ASSOC);
                 $statement->execute();
-            } catch (\PDOException $e) {
-                $new = (new ExecuteException('DSQL got Exception when executing this query', $e->errorInfo[1]))
-                    ->addMoreInfo('error', $e->errorInfo[2] ?? 'n/a (' . $e->errorInfo[0] . ')')
+            } catch (DBALException $e) {
+                $errorInfo = $e->getPrevious() !== null && $e->getPrevious() instanceof \PDOException
+                    ? $e->getPrevious()->errorInfo
+                    : null;
+
+                $new = (new ExecuteException('DSQL got Exception when executing this query', $errorInfo[1] ?? 0))
+                    ->addMoreInfo('error', $errorInfo[2] ?? 'n/a (' . $errorInfo[0] . ')')
                     ->addMoreInfo('query', $this->getDebugQuery());
 
                 throw $new;
