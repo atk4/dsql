@@ -30,7 +30,7 @@ class Query extends Expression
 
     public $consumeWrappedInParenthesis = true;
 
-    /** @deprecated use $consumeWrappedInParenthesis instead */
+    /** @deprecated use $consumeWrappedInParenthesis instead - will be removed in version 2.5 */
     public $allowToWrapInParenthesis;
 
     /**

@@ -77,7 +77,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public $connection;
 
-    /** @var bool Do we wrap the expression in parenthesis when rendering? */
+    /**
+     * Wrap the expression in parenthesis when consumed by another expression or not.
+     *
+     * @var bool
+     * */
     public $consumeWrappedInParenthesis = false;
 
     /**
