@@ -390,7 +390,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
         // few brief tests on _consume
         $this->assertSame(
             '"123"',
-            $this->callProtected($this->e(), '_consume', '123', $constants['ESCAPE_COMPLETE'])
+            $this->callProtected($this->e(), '_consume', '123', $constants['ESCAPE_IDENTIFIER'])
         );
         $this->assertSame(
             ':x',

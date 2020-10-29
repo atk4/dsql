@@ -14,8 +14,8 @@ use Doctrine\DBAL\DBALException;
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
     protected const ESCAPE_PARAM = 'param';
-    protected const ESCAPE_COMPLETE = 'escape';
-    protected const ESCAPE_SOFT = 'soft-escape';
+    protected const ESCAPE_IDENTIFIER = 'identifier';
+    protected const ESCAPE_IDENTIFIER_SOFT = 'identifier-soft';
     protected const ESCAPE_NONE = 'none';
 
     /**
@@ -251,9 +251,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             switch ($escape_mode) {
                 case self::ESCAPE_PARAM:
                     return $this->_param($sql_code);
-                case self::ESCAPE_COMPLETE:
+                case self::ESCAPE_IDENTIFIER:
                     return $this->_escape($sql_code);
-                case self::ESCAPE_SOFT:
+                case self::ESCAPE_IDENTIFIER_SOFT:
                     return $this->_escapeSoft($sql_code);
                 case self::ESCAPE_NONE:
                     return $sql_code;
@@ -420,10 +420,10 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     $escaping = self::ESCAPE_PARAM;
                 } elseif (substr($matches[0], 0, 1) === '{') {
                     if (substr($matches[0], 1, 1) === '{') {
-                        $escaping = self::ESCAPE_SOFT;
+                        $escaping = self::ESCAPE_IDENTIFIER_SOFT;
                         $identifier = substr($identifier, 1, -1);
                     } else {
-                        $escaping = self::ESCAPE_COMPLETE;
+                        $escaping = self::ESCAPE_IDENTIFIER;
                     }
                 }
 
