@@ -814,7 +814,7 @@ class Query extends Expression
                 return '1 = 1'; // always true
             }
 
-            $value = '(' . implode(',', array_map([$this, 'escapeParam'], $value)) . ')';
+            $value = '(' . implode(',', array_map(function ($v) { return $this->escapeParam($v); }, $value)) . ')';
 
             return $field . ' ' . $cond . ' ' . $value;
         }
