@@ -13,6 +13,14 @@ use Doctrine\DBAL\DBALException;
  */
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
+    /** @const string "[]" in template, escape as parameter */
+    protected const ESCAPE_PARAM = 'param';
+    /** @const string "{}" in template, escape as identifier */
+    protected const ESCAPE_IDENTIFIER = 'identifier';
+    /** @const string "{{}}" in template, escape as identifier, but keep input with special characters like "." or "(" unescaped */
+    protected const ESCAPE_IDENTIFIER_SOFT = 'identifier-soft';
+    protected const ESCAPE_NONE = 'none';
+
     /**
      * Template string.
      *
@@ -34,7 +42,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     public $args = ['custom' => []];
 
     /**
-     * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc.
+     * As per PDO, escapeParam() will convert value into :a, :b, :c .. :aa .. etc.
      *
      * @var string
      */
@@ -56,7 +64,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     private $_paramBase;
 
     /**
-     * Will be populated with actual values by _param().
+     * Will be populated with actual values by escapeParam().
      *
      * @var array
      */
@@ -235,53 +243,53 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Recursively renders sub-query or expression, combining parameters.
      *
-     * @param mixed  $sql_code    Expression
-     * @param string $escape_mode Fall-back escaping mode - param|escape|none
+     * @param mixed  $expression Expression
+     * @param string $escapeMode Fall-back escaping mode - using one of the Expression::ESCAPE_* constants
      *
      * @return string|array Quoted expression or array of param names
      */
-    protected function _consume($sql_code, $escape_mode = 'param')
+    protected function consume($expression, string $escapeMode = self::ESCAPE_PARAM)
     {
-        if (!is_object($sql_code)) {
-            switch ($escape_mode) {
-                case 'param':
-                    return $this->_param($sql_code);
-                case 'escape':
-                    return $this->_escape($sql_code);
-                case 'soft-escape':
-                    return $this->_escapeSoft($sql_code);
-                case 'none':
-                    return $sql_code;
+        if (!is_object($expression)) {
+            switch ($escapeMode) {
+                case self::ESCAPE_PARAM:
+                    return $this->escapeParam($expression);
+                case self::ESCAPE_IDENTIFIER:
+                    return $this->escapeIdentifier($expression);
+                case self::ESCAPE_IDENTIFIER_SOFT:
+                    return $this->escapeIdentifierSoft($expression);
+                case self::ESCAPE_NONE:
+                    return $expression;
             }
 
             throw (new Exception('$escape_mode value is incorrect'))
-                ->addMoreInfo('escape_mode', $escape_mode);
+                ->addMoreInfo('escape_mode', $escapeMode);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
-        if ($sql_code instanceof Expressionable) {
-            $sql_code = $sql_code->getDsqlExpression($this);
+        if ($expression instanceof Expressionable) {
+            $expression = $expression->getDsqlExpression($this);
         }
 
-        if (!$sql_code instanceof self) {
+        if (!$expression instanceof self) {
             throw (new Exception('Only Expressions or Expressionable objects may be used in Expression'))
-                ->addMoreInfo('object', $sql_code);
+                ->addMoreInfo('object', $expression);
         }
 
         // at this point $sql_code is instance of Expression
-        $sql_code->params = $this->params;
-        $sql_code->_paramBase = $this->_paramBase;
+        $expression->params = $this->params;
+        $expression->_paramBase = $this->_paramBase;
         try {
-            $ret = $sql_code->render();
-            $this->params = $sql_code->params;
-            $this->_paramBase = $sql_code->_paramBase;
+            $ret = $expression->render();
+            $this->params = $expression->params;
+            $this->_paramBase = $expression->_paramBase;
         } finally {
-            $sql_code->params = [];
-            $sql_code->_paramBase = null;
+            $expression->params = [];
+            $expression->_paramBase = null;
         }
 
         // Queries should be wrapped in parentheses in most cases
-        if ($sql_code instanceof Query && $sql_code->allowToWrapInParenthesis === true) {
+        if ($expression instanceof Query && $expression->allowToWrapInParenthesis === true) {
             $ret = '(' . $ret . ')';
         }
 
@@ -289,43 +297,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Given the string parameter, it will detect some "deal-breaker" for our
-     * soft escaping, such as "*" or "(".
-     * Those will typically indicate that expression is passed and shouldn't
-     * be escaped.
-     */
-    protected function isUnescapablePattern($value)
-    {
-        return is_object($value)
-            || $value === '*'
-            || strpos($value, '(') !== false
-            || strpos($value, $this->escape_char) !== false;
-    }
-
-    /**
-     * Soft-escaping SQL identifier. This method will attempt to put
-     * escaping char around the identifier, however will not do so if you
-     * are using special characters like ".", "(" or escaping char.
-     *
-     * It will smartly escape table.field type of strings resulting
-     * in "table"."field".
-     */
-    protected function _escapeSoft(string $value): string
-    {
-        // in some cases we should not escape
-        if ($this->isUnescapablePattern($value)) {
-            return $value;
-        }
-
-        if (strpos($value, '.') !== false) {
-            return implode('.', array_map(__METHOD__, explode('.', $value)));
-        }
-
-        return $this->escape_char . trim($value) . $this->escape_char;
-    }
-
-    /**
-     * Creates new expression where $sql_code appears escaped. Use this
+     * Creates new expression where $value appears escaped. Use this
      * method as a conventional means of specifying arguments when you
      * think they might have a nasty back-ticks or commas in the field
      * names.
@@ -340,12 +312,30 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Converts value into parameter and returns reference. Use only during
+     * query rendering. Consider using `consume()` instead, which will
+     * also handle nested expressions properly.
+     *
+     * @param string|int|float $value
+     *
+     * @return string Name of parameter
+     */
+    protected function escapeParam($value): string
+    {
+        $name = ':' . $this->_paramBase;
+        ++$this->_paramBase;
+        $this->params[$name] = $value;
+
+        return $name;
+    }
+
+    /**
      * Escapes argument by adding backticks around it.
      * This will allow you to use reserved SQL words as table or field
      * names such as "table" as well as other characters that SQL
      * permits in the identifiers (e.g. spaces or equation signs).
      */
-    protected function _escape(string $value): string
+    protected function escapeIdentifier(string $value): string
     {
         // in all other cases we should escape
         $c = $this->escape_char;
@@ -354,21 +344,39 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Converts value into parameter and returns reference. Use only during
-     * query rendering. Consider using `_consume()` instead, which will
-     * also handle nested expressions properly.
+     * Soft-escaping SQL identifier. This method will attempt to put
+     * escaping char around the identifier, however will not do so if you
+     * are using special characters like ".", "(" or escaping char.
      *
-     * @param string|int|float $value
-     *
-     * @return string Name of parameter
+     * It will smartly escape table.field type of strings resulting
+     * in "table"."field".
      */
-    protected function _param($value): string
+    protected function escapeIdentifierSoft(string $value): string
     {
-        $name = ':' . $this->_paramBase;
-        ++$this->_paramBase;
-        $this->params[$name] = $value;
+        // in some cases we should not escape
+        if ($this->isUnescapablePattern($value)) {
+            return $value;
+        }
 
-        return $name;
+        if (strpos($value, '.') !== false) {
+            return implode('.', array_map(__METHOD__, explode('.', $value)));
+        }
+
+        return $this->escape_char . trim($value) . $this->escape_char;
+    }
+
+    /**
+     * Given the string parameter, it will detect some "deal-breaker" for our
+     * soft escaping, such as "*" or "(".
+     * Those will typically indicate that expression is passed and shouldn't
+     * be escaped.
+     */
+    protected function isUnescapablePattern($value)
+    {
+        return is_object($value)
+        || $value === '*'
+                || strpos($value, '(') !== false
+                || strpos($value, $this->escape_char) !== false;
     }
 
     /**
@@ -412,13 +420,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 $identifier = substr($matches[0], 1, -1);
 
                 if (substr($matches[0], 0, 1) === '[') {
-                    $escaping = 'param';
+                    $escaping = self::ESCAPE_PARAM;
                 } elseif (substr($matches[0], 0, 1) === '{') {
                     if (substr($matches[0], 1, 1) === '{') {
-                        $escaping = 'soft-escape';
+                        $escaping = self::ESCAPE_IDENTIFIER_SOFT;
                         $identifier = substr($identifier, 1, -1);
                     } else {
-                        $escaping = 'escape';
+                        $escaping = self::ESCAPE_IDENTIFIER;
                     }
                 }
 
@@ -433,7 +441,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 // [foo] will attempt to call $this->_render_foo()
 
                 if (array_key_exists($identifier, $this->args['custom'])) {
-                    $value = $this->_consume($this->args['custom'][$identifier], $escaping);
+                    $value = $this->consume($this->args['custom'][$identifier], $escaping);
                 } elseif (method_exists($this, $fx)) {
                     $value = $this->{$fx}();
                 } else {

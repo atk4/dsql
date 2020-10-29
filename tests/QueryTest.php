@@ -34,7 +34,7 @@ class QueryTest extends AtkPhpunit\TestCase
         // passing properties in constructor
         $this->assertSame(
             '"q"',
-            $this->callProtected($this->q(), '_escape', 'q')
+            $this->callProtected($this->q(), 'escapeIdentifier', 'q')
         );
     }
 
@@ -551,7 +551,7 @@ class QueryTest extends AtkPhpunit\TestCase
 
     /**
      * @covers ::render
-     * @covers \atk4\dsql\Expression::_consume
+     * @covers \atk4\dsql\Expression::consume
      * @covers \atk4\dsql\Expression::render
      */
     public function testBasicRenderSubquery()

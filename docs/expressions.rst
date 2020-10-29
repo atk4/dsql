@@ -298,19 +298,19 @@ Escaping Methods
 The following methods are useful if you're building your own code for rendering
 parts of the query. You must not call them in normal circumstances.
 
-.. php:method:: _consume($sql_code)
+.. php:method::consume($expression, string $escapeMode = self::ESCAPE_PARAM)
 
   Makes `$sql_code` part of `$this` expression. Argument may be either a string
   (which will be escaped) or another :php:class:`Expression` or :php:class:`Query`.
   If specified :php:class:`Query` is in "select" mode, then it's automatically
   placed inside brackets::
 
-      $query->_consume('first_name');  // `first_name`
-      $query->_consume($other_query);  // will merge parameters and return string
+      $query->consume('first_name');  // `first_name`
+      $query->consume($other_query);  // will merge parameters and return string
 
-.. php:method:: escape($sql_code)
+.. php:method:: escape($value)
 
-  Creates new expression where $sql_code appears escaped. Use this method as a
+  Creates new expression where $value appears escaped. Use this method as a
   conventional means of specifying arguments when you think they might have
   a nasty back-ticks or commas in the field names. I generally **discourage**
   you from using this method. Example use would be::
@@ -323,13 +323,13 @@ parts of the query. You must not call them in normal circumstances.
       $query->field($query->escape('foo desc')); // adds field `foo desc` to the query
       $query->field(['foo desc']); // adds `foo` desc anyway
 
-.. php:method:: _escape($sql_code)
+.. php:method:: escapeIdentifier($sql_code)
 
   Always surrounds `$sql code` with back-ticks.
   
   This escaping method is automatically used for `{...}` expression template tags .
 
-.. php:method:: _escapeSoft($sql_code)
+.. php:method:: escapeIdentifierSoft($sql_code)
 
   Surrounds `$sql code` with back-ticks.
 
@@ -339,15 +339,15 @@ parts of the query. You must not call them in normal circumstances.
 
   Will do nothing if it finds "*", "`" or "(" character in `$sql_code`::
 
-      $query->_escapeSoft('first_name');  // `first_name`
-      $query->_escapeSoft('first.name');  // `first`.`name`
-      $query->_escapeSoft('(2+2)');       // (2+2)
-      $query->_escapeSoft('*');           // *
+      $query->escapeIdentifierSoft('first_name');  // `first_name`
+      $query->escapeIdentifierSoft('first.name');  // `first`.`name`
+      $query->escapeIdentifierSoft('(2+2)');       // (2+2)
+      $query->escapeIdentifierSoft('*');           // *
 
-.. php:method:: _param($value)
+.. php:method:: escapeParam($value)
 
     Converts value into parameter and returns reference. Used only during query
-    rendering. Consider using :php:meth:`_consume()` instead, which will also
+    rendering. Consider using :php:meth:`consume()` instead, which will also
     handle nested expressions properly.
 
     This escaping method is automatically used for `[...]` expression template tags .

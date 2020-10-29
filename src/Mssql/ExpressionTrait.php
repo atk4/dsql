@@ -6,19 +6,19 @@ namespace atk4\dsql\Mssql;
 
 trait ExpressionTrait
 {
-    private function fixOpenEscapeChar(string $v)
+    protected function escapeIdentifier(string $value): string
+    {
+        return $this->fixOpenEscapeChar(parent::escapeIdentifier($value));
+    }
+
+    protected function escapeIdentifierSoft(string $value): string
+    {
+        return $this->fixOpenEscapeChar(parent::escapeIdentifierSoft($value));
+    }
+
+    private function fixOpenEscapeChar(string $v): string
     {
         return preg_replace('~(?:\'(?:\'\'|\\\\\'|[^\'])*\')?+\K\]([^\[\]\'"(){}]*?)\]~s', '[$1]', $v);
-    }
-
-    protected function _escapeSoft(string $value): string
-    {
-        return $this->fixOpenEscapeChar(parent::_escapeSoft($value));
-    }
-
-    protected function _escape(string $value): string
-    {
-        return $this->fixOpenEscapeChar(parent::_escape($value));
     }
 
     // {{{ MSSQL does not support named parameters, so convert them to numerical inside execute
