@@ -13,8 +13,11 @@ use Doctrine\DBAL\DBALException;
  */
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
+    /** @const string "[]" in template, escape as parameter */
     protected const ESCAPE_PARAM = 'param';
+    /** @const string "{}" in template, escape as identifier */
     protected const ESCAPE_IDENTIFIER = 'identifier';
+    /** @const string "{{}}" in template, escape as identifier, but keep input with special characters like "." or "(" unescaped */
     protected const ESCAPE_IDENTIFIER_SOFT = 'identifier-soft';
     protected const ESCAPE_NONE = 'none';
 
