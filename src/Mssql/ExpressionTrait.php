@@ -16,7 +16,7 @@ trait ExpressionTrait
         return $this->fixOpenEscapeChar(parent::escapeIdentifierSoft($value));
     }
 
-    private function fixOpenEscapeChar(string $v)
+    private function fixOpenEscapeChar(string $v): string
     {
         return preg_replace('~(?:\'(?:\'\'|\\\\\'|[^\'])*\')?+\K\]([^\[\]\'"(){}]*?)\]~s', '[$1]', $v);
     }
