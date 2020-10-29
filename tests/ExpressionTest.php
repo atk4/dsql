@@ -388,15 +388,15 @@ class ExpressionTest extends AtkPhpunit\TestCase
         // few brief tests on _consume
         $this->assertSame(
             '"123"',
-            $this->callProtected($this->e(), '_consume', '123', 'escape')
+            $this->callProtected($this->e(), '_consume', '123', Expression::ESCAPE_COMPLETE)
         );
         $this->assertSame(
             ':x',
-            $this->callProtected($this->e(['_paramBase' => 'x']), '_consume', 123, 'param')
+            $this->callProtected($this->e(['_paramBase' => 'x']), '_consume', 123, Expression::ESCAPE_PARAM)
         );
         $this->assertSame(
             123,
-            $this->callProtected($this->e(), '_consume', 123, 'none')
+            $this->callProtected($this->e(), '_consume', 123, Expression::ESCAPE_NONE)
         );
         $this->assertSame(
             '(select *)',

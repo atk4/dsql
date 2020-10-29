@@ -13,6 +13,11 @@ use Doctrine\DBAL\DBALException;
  */
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
+    public const ESCAPE_PARAM = 'param';
+    public const ESCAPE_COMPLETE = 'escape';
+    public const ESCAPE_SOFT = 'soft-escape';
+    public const ESCAPE_NONE = 'none';
+
     /**
      * Template string.
      *
@@ -240,17 +245,17 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @return string|array Quoted expression or array of param names
      */
-    protected function _consume($sql_code, $escape_mode = 'param')
+    protected function _consume($sql_code, $escape_mode = self::ESCAPE_PARAM)
     {
         if (!is_object($sql_code)) {
             switch ($escape_mode) {
-                case 'param':
+                case self::ESCAPE_PARAM:
                     return $this->_param($sql_code);
-                case 'escape':
+                case self::ESCAPE_COMPLETE:
                     return $this->_escape($sql_code);
-                case 'soft-escape':
+                case self::ESCAPE_SOFT:
                     return $this->_escapeSoft($sql_code);
-                case 'none':
+                case self::ESCAPE_NONE:
                     return $sql_code;
             }
 
@@ -412,13 +417,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 $identifier = substr($matches[0], 1, -1);
 
                 if (substr($matches[0], 0, 1) === '[') {
-                    $escaping = 'param';
+                    $escaping = self::ESCAPE_PARAM;
                 } elseif (substr($matches[0], 0, 1) === '{') {
                     if (substr($matches[0], 1, 1) === '{') {
-                        $escaping = 'soft-escape';
+                        $escaping = self::ESCAPE_SOFT;
                         $identifier = substr($identifier, 1, -1);
                     } else {
-                        $escaping = 'escape';
+                        $escaping = self::ESCAPE_COMPLETE;
                     }
                 }
 

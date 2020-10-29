@@ -182,7 +182,7 @@ class Query extends Expression
             }
 
             // Will parameterize the value and escape if necessary
-            $field = $this->_consume($field, 'soft-escape');
+            $field = $this->_consume($field, self::ESCAPE_SOFT);
 
             if ($alias) {
                 // field alias cannot be expression, so simply escape it
@@ -300,7 +300,7 @@ class Query extends Expression
             }
 
             // consume or escape table
-            $table = $this->_consume($table, 'soft-escape');
+            $table = $this->_consume($table, self::ESCAPE_SOFT);
 
             // add alias if needed
             if ($alias) {
@@ -402,7 +402,7 @@ class Query extends Expression
             }
 
             // will parameterize the value and escape if necessary
-            $s .= 'as ' . $this->_consume($cursor, 'soft-escape');
+            $s .= 'as ' . $this->_consume($cursor, self::ESCAPE_SOFT);
 
             // is at least one recursive ?
             $isRecursive = $isRecursive || $recursive;
@@ -757,7 +757,7 @@ class Query extends Expression
             [$field] = $row;
         }
 
-        $field = $this->_consume($field, 'soft-escape');
+        $field = $this->_consume($field, self::ESCAPE_SOFT);
 
         if (count($row) === 1) {
             // Only a single parameter was passed, so we simply include all
@@ -821,7 +821,7 @@ class Query extends Expression
 
         // if value is object, then it should be Expression or Query itself
         // otherwise just escape value
-        $value = $this->_consume($value, 'param');
+        $value = $this->_consume($value, self::ESCAPE_PARAM);
 
         return $field . ' ' . $cond . ' ' . $value;
     }
@@ -926,7 +926,7 @@ class Query extends Expression
         }
 
         $g = array_map(function ($a) {
-            return $this->_consume($a, 'soft-escape');
+            return $this->_consume($a, self::ESCAPE_SOFT);
         }, $this->args['group']);
 
         return ' group by ' . implode(', ', $g);
@@ -988,8 +988,8 @@ class Query extends Expression
 
         if (isset($this->args['set']) && $this->args['set']) {
             foreach ($this->args['set'] as [$field, $value]) {
-                $field = $this->_consume($field, 'escape');
-                $value = $this->_consume($value, 'param');
+                $field = $this->_consume($field, self::ESCAPE_COMPLETE);
+                $value = $this->_consume($value, self::ESCAPE_PARAM);
 
                 $ret[] = $field . '=' . $value;
             }
@@ -1010,7 +1010,7 @@ class Query extends Expression
 
         if ($this->args['set']) {
             foreach ($this->args['set'] as [$field/*, $value*/]) {
-                $field = $this->_consume($field, 'escape');
+                $field = $this->_consume($field, self::ESCAPE_COMPLETE);
 
                 $ret[] = $field;
             }
@@ -1031,7 +1031,7 @@ class Query extends Expression
 
         if ($this->args['set']) {
             foreach ($this->args['set'] as [/*$field*/, $value]) {
-                $value = $this->_consume($value, 'param');
+                $value = $this->_consume($value, self::ESCAPE_PARAM);
 
                 $ret[] = $value;
             }
@@ -1262,7 +1262,7 @@ class Query extends Expression
         $x = [];
         foreach ($this->args['order'] as $tmp) {
             [$arg, $desc] = $tmp;
-            $x[] = $this->_consume($arg, 'soft-escape') . ($desc ? (' ' . $desc) : '');
+            $x[] = $this->_consume($arg, self::ESCAPE_SOFT) . ($desc ? (' ' . $desc) : '');
         }
 
         return ' order by ' . implode(', ', array_reverse($x));
@@ -1495,7 +1495,7 @@ class Query extends Expression
 
         // operand
         if ($short_form = isset($this->args['case_operand'])) {
-            $ret .= ' ' . $this->_consume($this->args['case_operand'], 'soft-escape');
+            $ret .= ' ' . $this->_consume($this->args['case_operand'], self::ESCAPE_SOFT);
         }
 
         // when, then
@@ -1512,18 +1512,18 @@ class Query extends Expression
                     throw (new Exception('When using short form CASE statement, then you should not set array as when() method 1st parameter'))
                         ->addMoreInfo('when', $row[0]);
                 }
-                $ret .= $this->_consume($row[0], 'param');
+                $ret .= $this->_consume($row[0], self::ESCAPE_PARAM);
             } else {
                 $ret .= $this->_sub_render_condition($row[0]);
             }
 
             // then
-            $ret .= ' then ' . $this->_consume($row[1], 'param');
+            $ret .= ' then ' . $this->_consume($row[1], self::ESCAPE_PARAM);
         }
 
         // else
         if (array_key_exists('case_else', $this->args)) {
-            $ret .= ' else ' . $this->_consume($this->args['case_else'], 'param');
+            $ret .= ' else ' . $this->_consume($this->args['case_else'], self::ESCAPE_PARAM);
         }
 
         return ' case' . $ret . ' end';
