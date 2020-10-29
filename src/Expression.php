@@ -243,53 +243,53 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Recursively renders sub-query or expression, combining parameters.
      *
-     * @param mixed  $sql_code    Expression
-     * @param string $escape_mode Fall-back escaping mode - param|escape|none
+     * @param mixed  $expression Expression
+     * @param string $escapeMode Fall-back escaping mode - using one of the Expression::ESCAPE_* constants
      *
      * @return string|array Quoted expression or array of param names
      */
-    protected function _consume($sql_code, $escape_mode = self::ESCAPE_PARAM)
+    protected function consume($expression, string $escapeMode = self::ESCAPE_PARAM)
     {
-        if (!is_object($sql_code)) {
-            switch ($escape_mode) {
+        if (!is_object($expression)) {
+            switch ($escapeMode) {
                 case self::ESCAPE_PARAM:
-                    return $this->escapeParam($sql_code);
+                    return $this->escapeParam($expression);
                 case self::ESCAPE_IDENTIFIER:
-                    return $this->escapeIdentifier($sql_code);
+                    return $this->escapeIdentifier($expression);
                 case self::ESCAPE_IDENTIFIER_SOFT:
-                    return $this->escapeIdentifierSoft($sql_code);
+                    return $this->escapeIdentifierSoft($expression);
                 case self::ESCAPE_NONE:
-                    return $sql_code;
+                    return $expression;
             }
 
             throw (new Exception('$escape_mode value is incorrect'))
-                ->addMoreInfo('escape_mode', $escape_mode);
+                ->addMoreInfo('escape_mode', $escapeMode);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
-        if ($sql_code instanceof Expressionable) {
-            $sql_code = $sql_code->getDsqlExpression($this);
+        if ($expression instanceof Expressionable) {
+            $expression = $expression->getDsqlExpression($this);
         }
 
-        if (!$sql_code instanceof self) {
+        if (!$expression instanceof self) {
             throw (new Exception('Only Expressions or Expressionable objects may be used in Expression'))
-                ->addMoreInfo('object', $sql_code);
+                ->addMoreInfo('object', $expression);
         }
 
         // at this point $sql_code is instance of Expression
-        $sql_code->params = $this->params;
-        $sql_code->_paramBase = $this->_paramBase;
+        $expression->params = $this->params;
+        $expression->_paramBase = $this->_paramBase;
         try {
-            $ret = $sql_code->render();
-            $this->params = $sql_code->params;
-            $this->_paramBase = $sql_code->_paramBase;
+            $ret = $expression->render();
+            $this->params = $expression->params;
+            $this->_paramBase = $expression->_paramBase;
         } finally {
-            $sql_code->params = [];
-            $sql_code->_paramBase = null;
+            $expression->params = [];
+            $expression->_paramBase = null;
         }
 
         // Queries should be wrapped in parentheses in most cases
-        if ($sql_code instanceof Query && $sql_code->allowToWrapInParenthesis === true) {
+        if ($expression instanceof Query && $expression->allowToWrapInParenthesis === true) {
             $ret = '(' . $ret . ')';
         }
 
@@ -297,7 +297,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Creates new expression where $sql_code appears escaped. Use this
+     * Creates new expression where $value appears escaped. Use this
      * method as a conventional means of specifying arguments when you
      * think they might have a nasty back-ticks or commas in the field
      * names.
@@ -313,7 +313,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Converts value into parameter and returns reference. Use only during
-     * query rendering. Consider using `_consume()` instead, which will
+     * query rendering. Consider using `consume()` instead, which will
      * also handle nested expressions properly.
      *
      * @param string|int|float $value
@@ -441,7 +441,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 // [foo] will attempt to call $this->_render_foo()
 
                 if (array_key_exists($identifier, $this->args['custom'])) {
-                    $value = $this->_consume($this->args['custom'][$identifier], $escaping);
+                    $value = $this->consume($this->args['custom'][$identifier], $escaping);
                 } elseif (method_exists($this, $fx)) {
                     $value = $this->{$fx}();
                 } else {

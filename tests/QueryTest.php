@@ -551,7 +551,7 @@ class QueryTest extends AtkPhpunit\TestCase
 
     /**
      * @covers ::render
-     * @covers \atk4\dsql\Expression::_consume
+     * @covers \atk4\dsql\Expression::consume
      * @covers \atk4\dsql\Expression::render
      */
     public function testBasicRenderSubquery()

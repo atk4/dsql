@@ -381,28 +381,28 @@ class ExpressionTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * @covers ::_consume
+     * @covers ::consume
      */
     public function testConsume()
     {
         $constants = (new \ReflectionClass(Expression::class))->getConstants();
 
-        // few brief tests on _consume
+        // few brief tests on consume
         $this->assertSame(
             '"123"',
-            $this->callProtected($this->e(), '_consume', '123', $constants['ESCAPE_IDENTIFIER'])
+            $this->callProtected($this->e(), 'consume', '123', $constants['ESCAPE_IDENTIFIER'])
         );
         $this->assertSame(
             ':x',
-            $this->callProtected($this->e(['_paramBase' => 'x']), '_consume', 123, $constants['ESCAPE_PARAM'])
+            $this->callProtected($this->e(['_paramBase' => 'x']), 'consume', 123, $constants['ESCAPE_PARAM'])
         );
         $this->assertSame(
             123,
-            $this->callProtected($this->e(), '_consume', 123, $constants['ESCAPE_NONE'])
+            $this->callProtected($this->e(), 'consume', 123, $constants['ESCAPE_NONE'])
         );
         $this->assertSame(
             '(select *)',
-            $this->callProtected($this->e(), '_consume', new Query())
+            $this->callProtected($this->e(), 'consume', new Query())
         );
 
         $this->assertSame(
@@ -414,23 +414,23 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * $escape_mode value is incorrect.
      *
-     * @covers ::_consume
+     * @covers ::consume
      */
     public function testConsumeException1()
     {
         $this->expectException(Exception::class);
-        $this->callProtected($this->e(), '_consume', 123, 'blahblah');
+        $this->callProtected($this->e(), 'consume', 123, 'blahblah');
     }
 
     /**
      * Only Expressions or Expressionable objects may be used in Expression.
      *
-     * @covers ::_consume
+     * @covers ::consume
      */
     public function testConsumeException2()
     {
         $this->expectException(Exception::class);
-        $this->callProtected($this->e(), '_consume', new \StdClass());
+        $this->callProtected($this->e(), 'consume', new \StdClass());
     }
 
     /**

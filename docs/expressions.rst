@@ -298,19 +298,19 @@ Escaping Methods
 The following methods are useful if you're building your own code for rendering
 parts of the query. You must not call them in normal circumstances.
 
-.. php:method:: _consume($sql_code)
+.. php:method::consume($expression, string $escapeMode = self::ESCAPE_PARAM)
 
   Makes `$sql_code` part of `$this` expression. Argument may be either a string
   (which will be escaped) or another :php:class:`Expression` or :php:class:`Query`.
   If specified :php:class:`Query` is in "select" mode, then it's automatically
   placed inside brackets::
 
-      $query->_consume('first_name');  // `first_name`
-      $query->_consume($other_query);  // will merge parameters and return string
+      $query->consume('first_name');  // `first_name`
+      $query->consume($other_query);  // will merge parameters and return string
 
-.. php:method:: escape($sql_code)
+.. php:method:: escape($value)
 
-  Creates new expression where $sql_code appears escaped. Use this method as a
+  Creates new expression where $value appears escaped. Use this method as a
   conventional means of specifying arguments when you think they might have
   a nasty back-ticks or commas in the field names. I generally **discourage**
   you from using this method. Example use would be::
@@ -347,7 +347,7 @@ parts of the query. You must not call them in normal circumstances.
 .. php:method:: escapeParam($value)
 
     Converts value into parameter and returns reference. Used only during query
-    rendering. Consider using :php:meth:`_consume()` instead, which will also
+    rendering. Consider using :php:meth:`consume()` instead, which will also
     handle nested expressions properly.
 
     This escaping method is automatically used for `[...]` expression template tags .
