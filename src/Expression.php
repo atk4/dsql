@@ -39,7 +39,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     public $args = ['custom' => []];
 
     /**
-     * As per PDO, _param() will convert value into :a, :b, :c .. :aa .. etc.
+     * As per PDO, escapeParam() will convert value into :a, :b, :c .. :aa .. etc.
      *
      * @var string
      */
@@ -250,11 +250,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         if (!is_object($sql_code)) {
             switch ($escape_mode) {
                 case self::ESCAPE_PARAM:
-                    return $this->_param($sql_code);
+                    return $this->escapeParam($sql_code);
                 case self::ESCAPE_IDENTIFIER:
-                    return $this->_escape($sql_code);
+                    return $this->escapeIdentifier($sql_code);
                 case self::ESCAPE_IDENTIFIER_SOFT:
-                    return $this->_escapeSoft($sql_code);
+                    return $this->escapeIdentifierSoft($sql_code);
                 case self::ESCAPE_NONE:
                     return $sql_code;
             }
@@ -294,42 +294,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Given the string parameter, it will detect some "deal-breaker" for our
-     * soft escaping, such as "*" or "(".
-     * Those will typically indicate that expression is passed and shouldn't
-     * be escaped.
-     */
-    protected function isUnescapablePattern($value)
-    {
-        return is_object($value)
-            || $value === '*'
-            || strpos($value, '(') !== false
-            || strpos($value, $this->escape_char) !== false;
-    }
-
-    /**
-     * Soft-escaping SQL identifier. This method will attempt to put
-     * escaping char around the identifier, however will not do so if you
-     * are using special characters like ".", "(" or escaping char.
-     *
-     * It will smartly escape table.field type of strings resulting
-     * in "table"."field".
-     */
-    protected function _escapeSoft(string $value): string
-    {
-        // in some cases we should not escape
-        if ($this->isUnescapablePattern($value)) {
-            return $value;
-        }
-
-        if (strpos($value, '.') !== false) {
-            return implode('.', array_map(__METHOD__, explode('.', $value)));
-        }
-
-        return $this->escape_char . trim($value) . $this->escape_char;
-    }
-
-    /**
      * Creates new expression where $sql_code appears escaped. Use this
      * method as a conventional means of specifying arguments when you
      * think they might have a nasty back-ticks or commas in the field
@@ -345,20 +309,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Escapes argument by adding backticks around it.
-     * This will allow you to use reserved SQL words as table or field
-     * names such as "table" as well as other characters that SQL
-     * permits in the identifiers (e.g. spaces or equation signs).
-     */
-    protected function _escape(string $value): string
-    {
-        // in all other cases we should escape
-        $c = $this->escape_char;
-
-        return $c . str_replace($c, $c . $c, $value) . $c;
-    }
-
-    /**
      * Converts value into parameter and returns reference. Use only during
      * query rendering. Consider using `_consume()` instead, which will
      * also handle nested expressions properly.
@@ -367,13 +317,63 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @return string Name of parameter
      */
-    protected function _param($value): string
+    protected function escapeParam($value): string
     {
         $name = ':' . $this->_paramBase;
         ++$this->_paramBase;
         $this->params[$name] = $value;
 
         return $name;
+    }
+
+    /**
+     * Escapes argument by adding backticks around it.
+     * This will allow you to use reserved SQL words as table or field
+     * names such as "table" as well as other characters that SQL
+     * permits in the identifiers (e.g. spaces or equation signs).
+     */
+    protected function escapeIdentifier(string $value): string
+    {
+        // in all other cases we should escape
+        $c = $this->escape_char;
+
+        return $c . str_replace($c, $c . $c, $value) . $c;
+    }
+
+    /**
+     * Soft-escaping SQL identifier. This method will attempt to put
+     * escaping char around the identifier, however will not do so if you
+     * are using special characters like ".", "(" or escaping char.
+     *
+     * It will smartly escape table.field type of strings resulting
+     * in "table"."field".
+     */
+    protected function escapeIdentifierSoft(string $value): string
+    {
+        // in some cases we should not escape
+        if ($this->isUnescapablePattern($value)) {
+            return $value;
+        }
+
+        if (strpos($value, '.') !== false) {
+            return implode('.', array_map(__METHOD__, explode('.', $value)));
+        }
+
+        return $this->escape_char . trim($value) . $this->escape_char;
+    }
+
+    /**
+     * Given the string parameter, it will detect some "deal-breaker" for our
+     * soft escaping, such as "*" or "(".
+     * Those will typically indicate that expression is passed and shouldn't
+     * be escaped.
+     */
+    protected function isUnescapablePattern($value)
+    {
+        return is_object($value)
+        || $value === '*'
+                || strpos($value, '(') !== false
+                || strpos($value, $this->escape_char) !== false;
     }
 
     /**

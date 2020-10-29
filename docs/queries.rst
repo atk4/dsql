@@ -48,10 +48,10 @@ you can bypass the escaping.
 
 There are 2 types of escaping:
 
- * :php:meth:`Expression::_escape()`. Used for field and table names. Surrounds name with *`*.
- * :php:meth:`Expression::_param()`. Will convert value into parameter and replace with *:a*
+ * :php:meth:`Expression::escapeIdentifier()`. Used for field and table names. Surrounds name with *`*.
+ * :php:meth:`Expression::escapeParam()`. Will convert value into parameter and replace with *:a*
 
-In the next example $a is escaped but $b is parametrized::
+In the next example $a is escaped but $b is parameterized::
 
     $query -> where('a', 'b');
 
@@ -331,7 +331,7 @@ used as aliases (if they are specified)::
 Method can be executed several times on the same Query object.
 
 Setting where and having clauses
----------------------
+--------------------------------
 
 .. php:method:: where($field, $operation, $value)
 
@@ -600,7 +600,7 @@ For a more complex join conditions, you can pass second argument as expression::
 
 
 Use WITH cursors
----------------------------
+----------------
 
 .. php:method:: with(Query $cursor, string $alias, ?array $fields = null, bool $recursive = false)
 
@@ -691,7 +691,7 @@ Use this to order your :php:class:`Query` result-set::
 Method can be executed several times on the same Query object.
 
 Insert and Replace query
-============
+========================
 
 Set value to a field
 --------------------
@@ -794,7 +794,7 @@ Example::
 
 
 Other Methods
-==============
+=============
 
 
 .. php:method:: dsql($properties)

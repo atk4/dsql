@@ -88,7 +88,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Testing different ways how to pass template to constructor.
      *
      * @covers ::__construct
-     * @covers ::_escape
+     * @covers ::escapeIdentifier
      */
     public function testConstructor2()
     {
@@ -232,7 +232,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * Test nested parameters.
      *
      * @covers ::__construct
-     * @covers ::_param
+     * @covers ::escapeParam
      * @covers ::getDebugQuery
      */
     public function testNestedParams()
@@ -300,10 +300,10 @@ class ExpressionTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * Fully covers _escape method.
+     * Fully covers escapeIdentifier method.
      *
-     * @covers ::_escape
-     * @covers ::_escapeSoft
+     * @covers ::escapeIdentifier
+     * @covers ::escapeIdentifierSoft
      * @covers ::escape
      */
     public function testEscape()
@@ -311,41 +311,41 @@ class ExpressionTest extends AtkPhpunit\TestCase
         // escaping expressions
         $this->assertSame(
             '"first_name"',
-            $this->callProtected($this->e(), '_escape', 'first_name')
+            $this->callProtected($this->e(), 'escapeIdentifier', 'first_name')
         );
         $this->assertSame(
             '"123"',
-            $this->callProtected($this->e(), '_escape', '123')
+            $this->callProtected($this->e(), 'escapeIdentifier', '123')
         );
         $this->assertSame(
             '"he""llo"',
-            $this->callProtected($this->e(), '_escape', 'he"llo')
+            $this->callProtected($this->e(), 'escapeIdentifier', 'he"llo')
         );
 
         // should not escape expressions
         $this->assertSame(
             '*',
-            $this->callProtected($this->e(), '_escapeSoft', '*')
+            $this->callProtected($this->e(), 'escapeIdentifierSoft', '*')
         );
         $this->assertSame(
             '"*"',
-            $this->callProtected($this->e(), '_escape', '*')
+            $this->callProtected($this->e(), 'escapeIdentifier', '*')
         );
         $this->assertSame(
             '(2+2) age',
-            $this->callProtected($this->e(), '_escapeSoft', '(2+2) age')
+            $this->callProtected($this->e(), 'escapeIdentifierSoft', '(2+2) age')
         );
         $this->assertSame(
             '"(2+2) age"',
-            $this->callProtected($this->e(), '_escape', '(2+2) age')
+            $this->callProtected($this->e(), 'escapeIdentifier', '(2+2) age')
         );
         $this->assertSame(
             '"users"."first_name"',
-            $this->callProtected($this->e(), '_escapeSoft', 'users.first_name')
+            $this->callProtected($this->e(), 'escapeIdentifierSoft', 'users.first_name')
         );
         $this->assertSame(
             '"users".*',
-            $this->callProtected($this->e(), '_escapeSoft', 'users.*')
+            $this->callProtected($this->e(), 'escapeIdentifierSoft', 'users.*')
         );
 
         $this->assertSame(
@@ -363,9 +363,9 @@ class ExpressionTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * Fully covers _param method.
+     * Fully covers escapeParam method.
      *
-     * @covers ::_param
+     * @covers ::escapeParam
      */
     public function testParam()
     {
@@ -548,7 +548,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
 // @codingStandardsIgnoreStart
 class JsonExpression extends Expression
 {
-    public function _param($value): string
+    public function escapeParam($value): string
     {
         return json_encode($value);
     }

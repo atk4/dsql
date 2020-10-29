@@ -186,7 +186,7 @@ class Query extends Expression
 
             if ($alias) {
                 // field alias cannot be expression, so simply escape it
-                $field .= ' ' . $this->_escape($alias);
+                $field .= ' ' . $this->escapeIdentifier($alias);
             }
 
             $ret[] = $field;
@@ -304,7 +304,7 @@ class Query extends Expression
 
             // add alias if needed
             if ($alias) {
-                $table .= ' ' . $this->_escape($alias);
+                $table .= ' ' . $this->escapeIdentifier($alias);
             }
 
             $ret[] = $table;
@@ -394,11 +394,11 @@ class Query extends Expression
         $isRecursive = false;
         foreach ($this->args['with'] as $alias => ['cursor' => $cursor, 'fields' => $fields, 'recursive' => $recursive]) {
             // cursor alias cannot be expression, so simply escape it
-            $s = $this->_escape($alias) . ' ';
+            $s = $this->escapeIdentifier($alias) . ' ';
 
             // set cursor fields
             if ($fields !== null) {
-                $s .= '(' . implode(',', array_map([$this, '_escape'], $fields)) . ') ';
+                $s .= '(' . implode(',', array_map([$this, 'escapeIdentifier'], $fields)) . ') ';
             }
 
             // will parameterize the value and escape if necessary
@@ -540,10 +540,10 @@ class Query extends Expression
 
             $jj .= $j['t'] . ' join ';
 
-            $jj .= $this->_escapeSoft($j['f1']);
+            $jj .= $this->escapeIdentifierSoft($j['f1']);
 
             if ($j['fa'] !== null) {
-                $jj .= ' ' . $this->_escape($j['fa']);
+                $jj .= ' ' . $this->escapeIdentifier($j['fa']);
             }
 
             $jj .= ' on ';
@@ -552,10 +552,10 @@ class Query extends Expression
                 $jj .= $this->_consume($j['expr']);
             } else {
                 $jj .=
-                    $this->_escape($j['fa'] ?: $j['f1']) . '.' .
-                    $this->_escape($j['f2']) . ' = ' .
-                    ($j['m1'] === null ? '' : $this->_escape($j['m1']) . '.') .
-                    $this->_escape($j['m2']);
+                    $this->escapeIdentifier($j['fa'] ?: $j['f1']) . '.' .
+                    $this->escapeIdentifier($j['f2']) . ' = ' .
+                    ($j['m1'] === null ? '' : $this->escapeIdentifier($j['m1']) . '.') .
+                    $this->escapeIdentifier($j['m2']);
             }
             $joins[] = $jj;
         }
@@ -814,7 +814,7 @@ class Query extends Expression
                 return '1 = 1'; // always true
             }
 
-            $value = '(' . implode(',', array_map([$this, '_param'], $value)) . ')';
+            $value = '(' . implode(',', array_map([$this, 'escapeParam'], $value)) . ')';
 
             return $field . ' ' . $cond . ' ' . $value;
         }

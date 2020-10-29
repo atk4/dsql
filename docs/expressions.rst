@@ -323,13 +323,13 @@ parts of the query. You must not call them in normal circumstances.
       $query->field($query->escape('foo desc')); // adds field `foo desc` to the query
       $query->field(['foo desc']); // adds `foo` desc anyway
 
-.. php:method:: _escape($sql_code)
+.. php:method:: escapeIdentifier($sql_code)
 
   Always surrounds `$sql code` with back-ticks.
   
   This escaping method is automatically used for `{...}` expression template tags .
 
-.. php:method:: _escapeSoft($sql_code)
+.. php:method:: escapeIdentifierSoft($sql_code)
 
   Surrounds `$sql code` with back-ticks.
 
@@ -339,12 +339,12 @@ parts of the query. You must not call them in normal circumstances.
 
   Will do nothing if it finds "*", "`" or "(" character in `$sql_code`::
 
-      $query->_escapeSoft('first_name');  // `first_name`
-      $query->_escapeSoft('first.name');  // `first`.`name`
-      $query->_escapeSoft('(2+2)');       // (2+2)
-      $query->_escapeSoft('*');           // *
+      $query->escapeIdentifierSoft('first_name');  // `first_name`
+      $query->escapeIdentifierSoft('first.name');  // `first`.`name`
+      $query->escapeIdentifierSoft('(2+2)');       // (2+2)
+      $query->escapeIdentifierSoft('*');           // *
 
-.. php:method:: _param($value)
+.. php:method:: escapeParam($value)
 
     Converts value into parameter and returns reference. Used only during query
     rendering. Consider using :php:meth:`_consume()` instead, which will also
