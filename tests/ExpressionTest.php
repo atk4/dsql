@@ -385,18 +385,20 @@ class ExpressionTest extends AtkPhpunit\TestCase
      */
     public function testConsume()
     {
+        $constants = (new \ReflectionClass(Expression::class))->getConstants();
+
         // few brief tests on _consume
         $this->assertSame(
             '"123"',
-            $this->callProtected($this->e(), '_consume', '123', Expression::ESCAPE_COMPLETE)
+            $this->callProtected($this->e(), '_consume', '123', $constants['ESCAPE_COMPLETE'])
         );
         $this->assertSame(
             ':x',
-            $this->callProtected($this->e(['_paramBase' => 'x']), '_consume', 123, Expression::ESCAPE_PARAM)
+            $this->callProtected($this->e(['_paramBase' => 'x']), '_consume', 123, $constants['ESCAPE_PARAM'])
         );
         $this->assertSame(
             123,
-            $this->callProtected($this->e(), '_consume', 123, Expression::ESCAPE_NONE)
+            $this->callProtected($this->e(), '_consume', 123, $constants['ESCAPE_NONE'])
         );
         $this->assertSame(
             '(select *)',

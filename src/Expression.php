@@ -13,10 +13,10 @@ use Doctrine\DBAL\DBALException;
  */
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
-    public const ESCAPE_PARAM = 'param';
-    public const ESCAPE_COMPLETE = 'escape';
-    public const ESCAPE_SOFT = 'soft-escape';
-    public const ESCAPE_NONE = 'none';
+    protected const ESCAPE_PARAM = 'param';
+    protected const ESCAPE_COMPLETE = 'escape';
+    protected const ESCAPE_SOFT = 'soft-escape';
+    protected const ESCAPE_NONE = 'none';
 
     /**
      * Template string.
