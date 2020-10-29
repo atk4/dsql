@@ -28,8 +28,10 @@ class Query extends Expression
     /** @var string Expression classname */
     protected $expression_class = Expression::class;
 
-    /** @var bool Do we allow to wrap query in parenthesis when rendering? */
-    public $allowToWrapInParenthesis = true;
+    public $consumeWrappedInParenthesis = true;
+
+    /** @deprecated use $consumeWrappedInParenthesis instead */
+    public $allowToWrapInParenthesis;
 
     /**
      * SELECT template.
@@ -638,12 +640,6 @@ class Query extends Expression
             $field = $or;
         }
 
-        if ($num_args === 1 && is_string($field)) {
-            $this->args[$kind][] = [$this->expr($field)];
-
-            return $this;
-        }
-
         // first argument is string containing more than just a field name and no more than 2
         // arguments means that we either have a string expression or embedded condition.
         if ($num_args === 2 && is_string($field) && !preg_match('/^[.a-zA-Z0-9_]*$/', $field)) {
@@ -674,6 +670,12 @@ class Query extends Expression
 
         switch ($num_args) {
             case 1:
+                if (is_string($field)) {
+                    $field = $this->expr($field);
+                }
+
+                $field->consumeWrappedInParenthesis = true;
+
                 $this->args[$kind][] = [$field];
 
                 break;

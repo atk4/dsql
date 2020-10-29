@@ -77,6 +77,9 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public $connection;
 
+    /** @var bool Do we wrap the expression in parenthesis when rendering? */
+    public $consumeWrappedInParenthesis = false;
+
     /**
      * Specifying options to constructors will override default
      * attribute values of this class.
@@ -262,8 +265,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     return $expression;
             }
 
-            throw (new Exception('$escape_mode value is incorrect'))
-                ->addMoreInfo('escape_mode', $escapeMode);
+            throw (new Exception('$escapeMode value is incorrect'))
+                ->addMoreInfo('escapeMode', $escapeMode);
         }
 
         // User may add Expressionable trait to any class, then pass it's objects
@@ -288,8 +291,14 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $expression->_paramBase = null;
         }
 
-        // Queries should be wrapped in parentheses in most cases
-        if ($expression instanceof Query && $expression->allowToWrapInParenthesis === true) {
+        if (isset($expression->allowToWrapInParenthesis)) {
+            'trigger_error'('Usage of Query::$allowToWrapInParenthesis is deprecated, will be removed in version 2.5', E_USER_DEPRECATED);
+
+            $expression->consumeWrappedInParenthesis = $expression->allowToWrapInParenthesis;
+        }
+
+        // Wrap in parentheses if expression requires so
+        if ($expression->consumeWrappedInParenthesis === true) {
             $ret = '(' . $ret . ')';
         }
 

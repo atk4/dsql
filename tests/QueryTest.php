@@ -684,8 +684,8 @@ class QueryTest extends AtkPhpunit\TestCase
         // SQLite do not support (($q1) union ($q2)) syntax. Correct syntax is ($q1 union $q2) without additional braces
         // Other SQL engines are more relaxed, but still these additional braces are not needed for union
         // Let's test how to do that properly
-        $q1->allowToWrapInParenthesis = false;
-        $q2->allowToWrapInParenthesis = false;
+        $q1->consumeWrappedInParenthesis = false;
+        $q2->consumeWrappedInParenthesis = false;
         $u = new Expression('([] union [])', [$q1, $q2]);
         $this->assertSame(
             '(select "date","amount" "debit",0 "credit" from "sales" union select "date",0 "debit","amount" "credit" from "purchases")',
@@ -735,11 +735,11 @@ class QueryTest extends AtkPhpunit\TestCase
     {
         // one parameter as a string - treat as expression
         $this->assertSame(
-            'where now()',
+            'where (now())',
             $this->q('[where]')->where('now()')->render()
         );
         $this->assertSame(
-            'where foo >=    bar',
+            'where (foo >=    bar)',
             $this->q('[where]')->where('foo >=    bar')->render()
         );
 
@@ -821,6 +821,14 @@ class QueryTest extends AtkPhpunit\TestCase
         $this->assertSame(
             'where "a" = :a and "b" is null',
             $this->q('[where]')->where('a', 1)->where('b', null)->render()
+        );
+    }
+
+    public function testWhereExpression()
+    {
+        $this->assertSame(
+            'where (a = 5 and b = 6)',
+            $this->q('[where]')->where('a = 5 and b = 6')->render()
         );
     }
 
@@ -1349,7 +1357,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
 
         $this->assertSame(
-            'select "name" from "employee" where ("a" = :a or a=b)',
+            'select "name" from "employee" where ("a" = :a or (a=b))',
             $this->q()
                 ->field('name')->table('employee')->where([['a', 1], 'a=b'])
                 ->render()
@@ -1522,7 +1530,7 @@ class QueryTest extends AtkPhpunit\TestCase
                 )
         );
         $this->assertSame(
-            'select "name" from "employee" where ("a" = :a or "b" = :b or (true and false))',
+            'select "name" from "employee" where ("a" = :a or "b" = :b or ((true) and (false)))',
             $q->render()
         );
     }
