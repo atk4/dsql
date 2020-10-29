@@ -64,7 +64,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     private $_paramBase;
 
     /**
-     * Will be populated with actual values by _param().
+     * Will be populated with actual values by escapeParam().
      *
      * @var array
      */
