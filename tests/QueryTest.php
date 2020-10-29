@@ -648,8 +648,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->table('sales')
             ->field('date')
             ->field('amount', 'debit')
-            ->field($this->q()->expr('0'), 'credit') // simply 0
-;
+            ->field($this->q()->expr('0'), 'credit'); // simply 0
         $this->assertSame(
             'select "date","amount" "debit",0 "credit" from "sales"',
             $q1->render()
@@ -1577,8 +1576,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->field('name')
             ->set('name', 1)
             ->option('calc_found_rows', 'select') // for default select mode
-            ->option('ignore', 'insert') // for insert mode
-;
+            ->option('ignore', 'insert'); // for insert mode
 
         $this->assertSame(
             'select calc_found_rows "name" from "test"',
