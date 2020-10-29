@@ -302,9 +302,9 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * Fully covers escapeIdentifier method.
      *
+     * @covers ::escape
      * @covers ::escapeIdentifier
      * @covers ::escapeIdentifierSoft
-     * @covers ::escape
      */
     public function testEscape()
     {
