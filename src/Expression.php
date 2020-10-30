@@ -626,6 +626,16 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * @deprecated use "getRows" method instead - will be removed in v2.5
+     */
+    public function get(): array
+    {
+        'trigger_error'('Method is deprecated. Use getRows instead', E_USER_DEPRECATED);
+
+        return $this->getRows();
+    }
+
+    /**
      * Executes expression and return whole result-set in form of array of hashes.
      *
      * @return string[][]|null[][]
