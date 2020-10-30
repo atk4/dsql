@@ -672,9 +672,11 @@ class Query extends Expression
             case 1:
                 if (is_string($field)) {
                     $field = $this->expr($field);
+                    $field->wrapInParentheses = true;
+                } elseif (!$field->wrapInParentheses) {
+                    $field = $this->expr('[]', [$field]);
+                    $field->wrapInParentheses = true;
                 }
-
-                $field->wrapInParentheses = true;
 
                 $this->args[$kind][] = [$field];
 
