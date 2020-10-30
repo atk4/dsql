@@ -210,14 +210,14 @@ Finally, you can pass connection class into :php:meth:`execute` directly.
     The main principle here is that the new object must be capable of working
     with database connection.
 
-.. php:method:: get()
+.. php:method:: getRows()
 
     Executes expression and return whole result-set in form of array of hashes::
 
         $data = new Expression([
                 'connection' => $pdo_dbh,
                 'template'   => 'show databases'
-            ])->get();
+            ])->getRows();
         echo json_encode($data);
 
     The output would be

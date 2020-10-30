@@ -174,7 +174,7 @@ treatment where it will be surrounded in brackets. Here are few examples::
         ->field('name')
         ->table($q);
 
-    $q->get();
+    $q->getRows();
 
 This query will perform `select name from (select * from employee)`::
 
@@ -195,7 +195,7 @@ This query will perform `select name from (select * from employee)`::
         ->table($u, 'derrivedTable')
         ;
 
-    $q->get();
+    $q->getRows();
 
 This query will perform union between 2 table selects resulting in the following
 query:
@@ -724,7 +724,7 @@ It is possible to add arbitrary options for the query. For example this will fet
     $q->table('user');
     $q->option('distinct');
     $q->field('birthday');
-    $birthdays = $q->get();
+    $birthdays = $q->getRows();
 
 Other posibility is to set options for delete or insert::
 

@@ -56,13 +56,13 @@ class Query extends AbstractQuery
         }
     }
 
-    public function get(): array
+    public function getRows(): array
     {
         return array_map(function ($row) {
             unset($row['__dsql_rownum']);
 
             return $row;
-        }, parent::get());
+        }, parent::getRows());
     }
 
     public function getRow(): ?array
