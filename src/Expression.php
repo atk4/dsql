@@ -127,6 +127,16 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * @deprecated will be removed in v2.5
+     */
+    public function __toString()
+    {
+        'trigger_error'('Method is deprecated. Use $this->getOne() instead', E_USER_DEPRECATED);
+
+        return $this->getOne();
+    }
+
+    /**
      * Whether or not an offset exists.
      *
      * @param string An offset to check for
