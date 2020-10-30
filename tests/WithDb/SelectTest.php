@@ -298,6 +298,14 @@ class SelectTest extends AtkPhpunit\TestCase
         $this->q('employee')->field('name')->getOne();
     }
 
+    public function testWhereExpression()
+    {
+        $this->assertSame(
+            [['id' => '2', 'name' => 'Jack', 'surname' => 'Williams', 'retired' => '1']],
+            $this->q('employee')->where('retired', 1)->where($this->q()->expr('{}=[] or {}=[]', ['surname', 'Williams', 'surname', 'Smith']))->get()
+        );
+    }
+
     public function testExecuteException()
     {
         $this->expectException(\atk4\dsql\ExecuteException::class);
