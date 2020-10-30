@@ -102,7 +102,7 @@ class SelectTest extends AtkPhpunit\TestCase
 
     public function testBasicQueries()
     {
-        $this->assertSame(4, count($this->q('employee')->get()));
+        $this->assertSame(4, count($this->q('employee')->getRows()));
 
         $this->assertSame(
             ['name' => 'Oliver', 'surname' => 'Smith'],
@@ -136,7 +136,7 @@ class SelectTest extends AtkPhpunit\TestCase
 
         $this->assertSame(
             [['now' => '4']],
-            $this->q()->field(new Expression('2+2'), 'now')->get()
+            $this->q()->field(new Expression('2+2'), 'now')->getRows()
         );
 
         /*
@@ -147,12 +147,12 @@ class SelectTest extends AtkPhpunit\TestCase
         if ($this->c->getDatabasePlatform() instanceof PostgreSQLPlatform) {
             $this->assertSame(
                 [['now' => '6']],
-                $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->get()
+                $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->getRows()
             );
         } else {
             $this->assertSame(
                 [['now' => '6']],
-                $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->get()
+                $this->q()->field(new Expression('[]+[]', [3, 3]), 'now')->getRows()
             );
         }
 
@@ -239,7 +239,7 @@ class SelectTest extends AtkPhpunit\TestCase
             ->insert();
         $this->assertSame(
             [['id' => '1', 'name' => 'John'], ['id' => '2', 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->order('id')->get()
+            $this->q('employee')->field('id,name')->order('id')->getRows()
         );
 
         // update
@@ -249,7 +249,7 @@ class SelectTest extends AtkPhpunit\TestCase
             ->update();
         $this->assertSame(
             [['id' => '1', 'name' => 'Johnny'], ['id' => '2', 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->order('id')->get()
+            $this->q('employee')->field('id,name')->order('id')->getRows()
         );
 
         // replace
@@ -271,7 +271,7 @@ class SelectTest extends AtkPhpunit\TestCase
         // not [Peter, Jane] as in MySQL, which in theory does the same thing,
         // but returns [Peter, Jane] - in original order.
         // That's why we add usort here.
-        $data = $this->q('employee')->field('id,name')->get();
+        $data = $this->q('employee')->field('id,name')->getRows();
         usort($data, function ($a, $b) {
             return $a['id'] - $b['id'];
         });
@@ -286,7 +286,7 @@ class SelectTest extends AtkPhpunit\TestCase
             ->delete();
         $this->assertSame(
             [['id' => '2', 'name' => 'Jane']],
-            $this->q('employee')->field('id,name')->get()
+            $this->q('employee')->field('id,name')->getRows()
         );
     }
 
@@ -302,7 +302,7 @@ class SelectTest extends AtkPhpunit\TestCase
     {
         $this->assertSame(
             [['id' => '2', 'name' => 'Jack', 'surname' => 'Williams', 'retired' => '1']],
-            $this->q('employee')->where('retired', 1)->where($this->q()->expr('{}=[] or {}=[]', ['surname', 'Williams', 'surname', 'Smith']))->get()
+            $this->q('employee')->where('retired', 1)->where($this->q()->expr('{}=[] or {}=[]', ['surname', 'Williams', 'surname', 'Smith']))->getRows()
         );
     }
 

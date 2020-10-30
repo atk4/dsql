@@ -158,7 +158,7 @@ The format of the ``$dsn`` is the same as with
 If you need to execute query that is not supported by DSQL, you should always
 use expressions::
 
-    $tables = $c -> expr('show tables like []', [$like_str])->get();
+    $tables = $c -> expr('show tables like []', [$like_str])->getRows();
 
 DSQL classes are mindful about your SQL vendor and it's quirks, so when you're
 building sub-queries with :php:meth:`Query::dsql`, you can avoid some nasty
@@ -192,7 +192,7 @@ simply call :php:meth:`Query::update`, for delete - :php:meth:`Query::delete`
 You can actually perform multiple operations::
 
     $q = $c->dsql()->table('employee')->where('emp_no', 1234);
-    $backup_data = $q->get();
+    $backup_data = $q->getRows();
     $q->delete();
 
 A good practice is to re-use the same query object before you branch out and

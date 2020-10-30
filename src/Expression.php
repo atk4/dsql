@@ -630,7 +630,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      *
      * @return string[][]|null[][]
      */
-    public function get(): array
+    public function getRows(): array
     {
         $stmt = $this->execute();
 
