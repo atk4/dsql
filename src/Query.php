@@ -28,7 +28,7 @@ class Query extends Expression
     /** @var string Expression classname */
     protected $expression_class = Expression::class;
 
-    public $consumeWrappedInParenthesis = true;
+    public $wrapInParentheses = true;
 
     /** @deprecated use $consumeWrappedInParenthesis instead - will be removed in version 2.5 */
     public $allowToWrapInParenthesis;
@@ -674,7 +674,7 @@ class Query extends Expression
                     $field = $this->expr($field);
                 }
 
-                $field->consumeWrappedInParenthesis = true;
+                $field->wrapInParentheses = true;
 
                 $this->args[$kind][] = [$field];
 

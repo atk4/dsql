@@ -78,11 +78,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     public $connection;
 
     /**
-     * Wrap the expression in parenthesis when consumed by another expression or not.
+     * Wrap the expression in parentheses when consumed by another expression or not.
      *
      * @var bool
      * */
-    public $consumeWrappedInParenthesis = false;
+    public $wrapInParentheses = false;
 
     /**
      * Specifying options to constructors will override default
@@ -296,13 +296,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
         }
 
         if (isset($expression->allowToWrapInParenthesis)) {
-            'trigger_error'('Usage of Query::$allowToWrapInParenthesis is deprecated, will be removed in version 2.5', E_USER_DEPRECATED);
+            'trigger_error'('Usage of Query::$allowToWrapInParenthesis is deprecated, use $wrapInParentheses instead - will be removed in version 2.5', E_USER_DEPRECATED);
 
-            $expression->consumeWrappedInParenthesis = $expression->allowToWrapInParenthesis;
+            $expression->wrapInParentheses = $expression->allowToWrapInParenthesis;
         }
 
         // Wrap in parentheses if expression requires so
-        if ($expression->consumeWrappedInParenthesis === true) {
+        if ($expression->wrapInParentheses === true) {
             $ret = '(' . $ret . ')';
         }
 
