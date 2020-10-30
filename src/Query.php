@@ -627,7 +627,7 @@ class Query extends Expression
         }
 
         // Array as first argument means we have to replace it with orExpr()
-        if (is_array($field)) {
+        if ($num_args === 1 && is_array($field)) {
             // or conditions
             $or = $this->orExpr();
             foreach ($field as $row) {
