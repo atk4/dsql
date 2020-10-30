@@ -827,8 +827,8 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testWhereExpression()
     {
         $this->assertSame(
-            'where (a = 5 and b = 6)',
-            $this->q('[where]')->where('a = 5 and b = 6')->render()
+            'where (a = 5 or b = 6) and (c = 3 or d = 1)',
+            $this->q('[where]')->where('a = 5 or b = 6')->where('c = 3 or d = 1')->render()
         );
     }
 
