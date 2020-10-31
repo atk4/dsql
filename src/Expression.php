@@ -561,7 +561,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     } elseif (is_string($val) || is_float($val)) {
                         $type = \PDO::PARAM_STR;
                     } elseif (is_resource($val)) {
-                        $type = \PDO::PARAM_LOB;
+                        throw new Exception('Resource type is not supported, set value as string instead');
                     } else {
                         throw (new Exception('Incorrect param type'))
                             ->addMoreInfo('key', $key)
