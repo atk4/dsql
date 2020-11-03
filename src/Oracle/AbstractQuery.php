@@ -6,9 +6,6 @@ namespace atk4\dsql\Oracle;
 
 use atk4\dsql\Query as BaseQuery;
 
-/**
- * Perform query operation on Oracle server.
- */
 abstract class AbstractQuery extends BaseQuery
 {
     protected $escape_char = '"';

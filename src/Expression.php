@@ -7,10 +7,6 @@ namespace atk4\dsql;
 use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\DBALException;
 
-/**
- * Creates new expression. Optionally specify a string - a piece
- * of SQL code that will become expression template and arguments.
- */
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
     /** @const string "[]" in template, escape as parameter */

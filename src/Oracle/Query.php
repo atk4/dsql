@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace atk4\dsql\Oracle;
 
-/**
- * Perform query operation on Oracle server.
- */
 class Query extends AbstractQuery
 {
     // {{{ for Oracle 11 and lower to support LIMIT with OFFSET

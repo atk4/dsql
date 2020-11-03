@@ -6,9 +6,6 @@ namespace atk4\dsql\Mssql;
 
 use atk4\dsql\Query as BaseQuery;
 
-/**
- * Perform query operation on MSSQL server.
- */
 class Query extends BaseQuery
 {
     use ExpressionTrait;

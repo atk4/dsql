@@ -6,16 +6,11 @@ namespace atk4\dsql\Postgresql;
 
 use atk4\dsql\Query as BaseQuery;
 
-/**
- * Perform query operation on PostgreSQL server.
- */
 class Query extends BaseQuery
 {
-    /** @var string */
     protected $escape_char = '"';
 
     protected $template_update = 'update [table][join] set [set] [where]';
-
     protected $template_replace;
 
     public function _render_limit()
