@@ -188,39 +188,6 @@ class SelectTest extends AtkPhpunit\TestCase
         }
     }
 
-    /**
-     * covers atk4\dsql\Expression::__toString, but on PHP 5.5 this hint doesn't work.
-     */
-    public function testCastingToString()
-    {
-        // simple value
-        $this->assertSame(
-            'Williams',
-            (string) $this->q('employee')->field('surname')->where('name', 'Jack')
-        );
-        // table as sub-query
-        $this->assertSame(
-            'Williams',
-            (string) $this->q($this->q('employee'), 'e2')->field('surname')->where('name', 'Jack')
-        );
-        // field as expression
-        $this->assertSame(
-            'Williams',
-            (string) $this->q('employee')->field($this->e('{}', ['surname']))->where('name', 'Jack')
-        );
-        // cast to string multiple times
-        $q = $this->q('employee')->field('surname')->where('name', 'Jack');
-        $this->assertSame(
-            ['Williams', 'Williams'],
-            [(string) $q, (string) $q]
-        );
-        // cast custom Expression to string
-        $this->assertSame(
-            '7',
-            (string) $this->e('select 3+4' . ($this->c->getDatabasePlatform() instanceof OraclePlatform ? ' FROM DUAL' : ''))
-        );
-    }
-
     public function testOtherQueries()
     {
         // truncate table

@@ -127,13 +127,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Casting to string will execute expression and return getOne() value.
-     *
-     * @return string
+     * @deprecated will be removed in v2.5
      */
     public function __toString()
     {
-        return (string) $this->getOne();
+        'trigger_error'('Method is deprecated. Use $this->getOne() instead', E_USER_DEPRECATED);
+
+        return $this->getOne();
     }
 
     /**
