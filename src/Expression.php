@@ -19,6 +19,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     protected const ESCAPE_IDENTIFIER = 'identifier';
     /** @const string "{{}}" in template, escape as identifier, but keep input with special characters like "." or "(" unescaped */
     protected const ESCAPE_IDENTIFIER_SOFT = 'identifier-soft';
+    /** @const string keep input as is */
     protected const ESCAPE_NONE = 'none';
 
     /**
