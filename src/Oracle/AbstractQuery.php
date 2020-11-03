@@ -8,8 +8,6 @@ use atk4\dsql\Query as BaseQuery;
 
 abstract class AbstractQuery extends BaseQuery
 {
-    protected $escape_char = '"';
-
     /** @var string */
     protected $template_seq_currval = 'select [sequence].CURRVAL from dual';
     /** @var string */

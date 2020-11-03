@@ -8,8 +8,6 @@ use atk4\dsql\Query as BaseQuery;
 
 class Query extends BaseQuery
 {
-    protected $escape_char = '"';
-
     protected $template_update = 'update [table][join] set [set] [where]';
     protected $template_replace;
 
