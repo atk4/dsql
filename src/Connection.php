@@ -7,6 +7,7 @@ namespace atk4\dsql;
 use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
 
 /**
  * Class for establishing and maintaining connection with your database.
@@ -196,7 +197,45 @@ abstract class Connection
 
         $connectionParams = ['pdo' => $pdo];
 
-        return DriverManager::getConnection($connectionParams);
+        $connection = DriverManager::getConnection($connectionParams);
+
+        // Oracle CLOB/BLOB has limited SQL support, see:
+        // https://stackoverflow.com/questions/12980038/ora-00932-inconsistent-datatypes-expected-got-clob#12980560
+        // fix this Oracle inconsistency by using VARCHAR/VARBINARY instead (but limited to 4000 bytes)
+        if ($connection->getDatabasePlatform() instanceof OraclePlatform) {
+            \Closure::bind(function () use ($connection) {
+                $connection->platform = new class() extends OraclePlatform {
+                    private function forwardTypeDeclarationSQL(string $targetMethodName, array $column): string
+                    {
+                        $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS);
+                        foreach ($backtrace as $frame) {
+                            if ($this === ($frame['object'] ?? null)
+                                && $targetMethodName === ($frame['function'] ?? null)) {
+                                throw new Exception('Long CLOB/TEXT (4000+ bytes) is not supported for Oracle');
+                            }
+                        }
+
+                        return $this->{$targetMethodName}($column);
+                    }
+
+                    public function getClobTypeDeclarationSQL(array $column)
+                    {
+                        $column['length'] = $this->getVarcharMaxLength();
+
+                        return $this->forwardTypeDeclarationSQL('getVarcharTypeDeclarationSQL', $column);
+                    }
+
+                    public function getBlobTypeDeclarationSQL(array $column)
+                    {
+                        $column['length'] = $this->getBinaryMaxLength();
+
+                        return $this->forwardTypeDeclarationSQL('getBinaryTypeDeclarationSQL', $column);
+                    }
+                };
+            }, null, DbalConnection::class)();
+        }
+
+        return $connection;
     }
 
     /**
