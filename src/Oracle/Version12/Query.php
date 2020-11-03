@@ -6,9 +6,6 @@ namespace atk4\dsql\Oracle\Version12;
 
 use atk4\dsql\Oracle\AbstractQuery;
 
-/**
- * Perform query operation on Oracle server.
- */
 class Query extends AbstractQuery
 {
     public function _render_limit()

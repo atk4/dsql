@@ -6,19 +6,10 @@ namespace atk4\dsql\Oracle;
 
 use atk4\dsql\Connection as BaseConnection;
 
-/**
- * Custom Connection class specifically for Oracle database.
- */
 class Connection extends BaseConnection
 {
-    /** @var string Query classname */
     protected $query_class = Query::class;
 
-    /**
-     * Add some configuration for current connection session.
-     *
-     * @param array $properties
-     */
     public function __construct($properties = [])
     {
         parent::__construct($properties);
