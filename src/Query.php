@@ -33,46 +33,22 @@ class Query extends Expression
     /** @deprecated use $consumeWrappedInParenthesis instead - will be removed in version 2.5 */
     public $allowToWrapInParenthesis;
 
-    /**
-     * SELECT template.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $template_select = '[with]select[option] [field] [from] [table][join][where][group][having][order][limit]';
 
-    /**
-     * INSERT template.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $template_insert = 'insert[option] into [table_noalias] ([set_fields]) values ([set_values])';
 
-    /**
-     * REPLACE template.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $template_replace = 'replace[option] into [table_noalias] ([set_fields]) values ([set_values])';
 
-    /**
-     * DELETE template.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $template_delete = '[with]delete [from] [table_noalias][where][having]';
 
-    /**
-     * UPDATE template.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $template_update = '[with]update [table_noalias] set [set] [where]';
 
-    /**
-     * TRUNCATE template.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $template_truncate = 'truncate table [table_noalias]';
 
     /**

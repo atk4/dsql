@@ -22,16 +22,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /** @const string keep input as is */
     protected const ESCAPE_NONE = 'none';
 
-    /**
-     * Template string.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $template;
 
     /**
-     * Hash containing configuration accumulated by calling methods
-     * such as Query::field(), Query::table(), etc.
+     * Configuration accumulated by calling methods such as Query::field(), Query::table(), etc.
      *
      * $args['custom'] is used to store hash of custom template replacements.
      *
@@ -50,39 +45,23 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     protected $paramBase = 'a';
 
     /**
-     * Field, table and alias name escaping symbol.
-     * By SQL Standard it's double quote, but MySQL uses backtick.
+     * Identifier (table, column, ...) escaping symbol. By SQL Standard it's double
+     * quote, but MySQL uses backtick.
      *
      * @var string
      */
     protected $escape_char = '"';
 
-    /**
-     * Used for Linking.
-     *
-     * @var string
-     */
+    /** @var string used for linking */
     private $_paramBase;
 
-    /**
-     * Will be populated with actual values by escapeParam().
-     *
-     * @var array
-     */
+    /** @var array Populated with actual values by escapeParam() */
     public $params = [];
 
-    /**
-     * When you are willing to execute the query, connection needs to be specified.
-     *
-     * @var Connection
-     */
+    /** @var Connection */
     public $connection;
 
-    /**
-     * Wrap the expression in parentheses when consumed by another expression or not.
-     *
-     * @var bool
-     * */
+    /** @var bool Wrap the expression in parentheses when consumed by another expression or not. */
     public $wrapInParentheses = false;
 
     /**
