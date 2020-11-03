@@ -22,21 +22,11 @@ class Query extends AbstractQuery
         return parent::limit($cnt, $shift);
     }
 
-    /**
-     * Renders [limit_start].
-     *
-     * @return string rendered SQL chunk
-     */
     public function _render_limit_start()
     {
         return (int) $this->args['limit']['shift'];
     }
 
-    /**
-     * Renders [and_limit_end].
-     *
-     * @return string rendered SQL chunk
-     */
     public function _render_and_limit_end()
     {
         if (!$this->args['limit']['cnt']) {

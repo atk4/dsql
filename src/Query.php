@@ -173,12 +173,6 @@ class Query extends Expression
         return implode(',', $ret);
     }
 
-    /**
-     * Renders part of the template: [field_noalias]
-     * Do not call directly.
-     *
-     * @return string Parsed template chunk
-     */
     protected function _render_field_noalias()
     {
         return $this->_render_field(false);
@@ -242,12 +236,7 @@ class Query extends Expression
     }
 
     /**
-     * Renders part of the template: [table]
-     * Do not call directly.
-     *
      * @param bool $add_alias Should we add aliases, see _render_table_noalias()
-     *
-     * @return string Parsed template chunk
      */
     protected function _render_table($add_alias = true)
     {
@@ -291,23 +280,11 @@ class Query extends Expression
         return implode(',', $ret);
     }
 
-    /**
-     * Renders part of the template: [table_noalias]
-     * Do not call directly.
-     *
-     * @return string Parsed template chunk
-     */
     protected function _render_table_noalias()
     {
         return $this->_render_table(false);
     }
 
-    /**
-     * Renders part of the template: [from]
-     * Do not call directly.
-     *
-     * @return string Parsed template chunk
-     */
     protected function _render_from()
     {
         return empty($this->args['table']) ? '' : 'from';
@@ -353,12 +330,6 @@ class Query extends Expression
         return $this->with($cursor, $alias, $fields, true);
     }
 
-    /**
-     * Renders part of the template: [with]
-     * Do not call directly.
-     *
-     * @return string Parsed template chunk
-     */
     protected function _render_with()
     {
         // will be joined for output
@@ -502,11 +473,6 @@ class Query extends Expression
         return $this;
     }
 
-    /**
-     * Renders [join].
-     *
-     * @return string rendered SQL chunk
-     */
     public function _render_join()
     {
         if (!isset($this->args['join'])) {
@@ -704,9 +670,9 @@ class Query extends Expression
      *
      * @param string $kind 'where' or 'having'
      *
-     * @return array Parsed chunks of query
+     * @return string[]
      */
-    protected function _sub_render_where($kind)
+    protected function _sub_render_where($kind): array
     {
         // will be joined for output
         $ret = [];
@@ -720,13 +686,6 @@ class Query extends Expression
         return $ret;
     }
 
-    /**
-     * Renders one condition.
-     *
-     * @param array $row Condition
-     *
-     * @return string
-     */
     protected function _sub_render_condition($row)
     {
         if (count($row) === 3) {
@@ -806,11 +765,6 @@ class Query extends Expression
         return $field . ' ' . $cond . ' ' . $value;
     }
 
-    /**
-     * Renders [where].
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_where()
     {
         if (!isset($this->args['where'])) {
@@ -820,11 +774,6 @@ class Query extends Expression
         return ' where ' . implode(' and ', $this->_sub_render_where('where'));
     }
 
-    /**
-     * Renders [orwhere].
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_orwhere()
     {
         if (!isset($this->args['where'])) {
@@ -834,11 +783,6 @@ class Query extends Expression
         return implode(' or ', $this->_sub_render_where('where'));
     }
 
-    /**
-     * Renders [andwhere].
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_andwhere()
     {
         if (!isset($this->args['where'])) {
@@ -848,11 +792,6 @@ class Query extends Expression
         return implode(' and ', $this->_sub_render_where('where'));
     }
 
-    /**
-     * Renders [having].
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_having()
     {
         if (!isset($this->args['having'])) {
@@ -894,11 +833,6 @@ class Query extends Expression
         return $this;
     }
 
-    /**
-     * Renders [group].
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_group()
     {
         if (!isset($this->args['group'])) {
@@ -956,11 +890,6 @@ class Query extends Expression
         return $this;
     }
 
-    /**
-     * Renders [set] for UPDATE query.
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_set()
     {
         // will be joined for output
@@ -978,11 +907,6 @@ class Query extends Expression
         return implode(', ', $ret);
     }
 
-    /**
-     * Renders [set_fields] for INSERT.
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_set_fields()
     {
         // will be joined for output
@@ -999,11 +923,6 @@ class Query extends Expression
         return implode(',', $ret);
     }
 
-    /**
-     * Renders [set_values] for INSERT.
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_set_values()
     {
         // will be joined for output
@@ -1052,11 +971,6 @@ class Query extends Expression
         return $this;
     }
 
-    /**
-     * Renders [option].
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_option()
     {
         if (!isset($this->args['option'][$this->mode])) {
@@ -1152,11 +1066,6 @@ class Query extends Expression
         return $this;
     }
 
-    /**
-     * Renders [limit].
-     *
-     * @return string rendered SQL chunk
-     */
     public function _render_limit()
     {
         if (isset($this->args['limit'])) {
@@ -1228,11 +1137,6 @@ class Query extends Expression
         return $this;
     }
 
-    /**
-     * Renders [order].
-     *
-     * @return string rendered SQL chunk
-     */
     public function _render_order()
     {
         if (!isset($this->args['order'])) {
@@ -1289,8 +1193,6 @@ class Query extends Expression
 
     /**
      * Renders query template. If the template is not explicitly set will use "select" mode.
-     *
-     * @return string
      */
     public function render()
     {
@@ -1460,11 +1362,6 @@ class Query extends Expression
         return $this;
     }
 
-    /**
-     * Renders [case].
-     *
-     * @return string rendered SQL chunk
-     */
     protected function _render_case()
     {
         if (!isset($this->args['case_when'])) {
