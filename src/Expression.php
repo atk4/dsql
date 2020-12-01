@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace atk4\dsql;
 
 use Doctrine\DBAL\Connection as DbalConnection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DbalException;
 
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
@@ -556,7 +556,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                 $statement->setFetchMode(\PDO::FETCH_ASSOC);
                 $statement->execute();
-            } catch (DBALException $e) {
+            } catch (DbalException | \Doctrine\DBAL\DBALException $e) { // @phpstan-ignore-line
                 $errorInfo = $e->getPrevious() !== null && $e->getPrevious() instanceof \PDOException
                     ? $e->getPrevious()->errorInfo
                     : null;

@@ -10,8 +10,8 @@ use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Platforms\SQLServerPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
+use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 
 class TransactionTest extends AtkPhpunit\TestCase
 {
@@ -46,7 +46,7 @@ class TransactionTest extends AtkPhpunit\TestCase
             return preg_replace_callback('~(?:\'(?:\'\'|\\\\\'|[^\'])*\')?+\K"([^\'"()\[\]{}]*?)"~s', function ($matches) {
                 if ($this->c->getDatabasePlatform() instanceof MySQLPlatform) {
                     return '`' . $matches[1] . '`';
-                } elseif ($this->c->getDatabasePlatform() instanceof SQLServerPlatform) {
+                } elseif ($this->c->getDatabasePlatform() instanceof SQLServer2012Platform) {
                     return '[' . $matches[1] . ']';
                 }
 
@@ -64,7 +64,7 @@ class TransactionTest extends AtkPhpunit\TestCase
                 return '"' . $v . '"';
             }, array_keys($row))) . ') VALUES(' . implode(', ', array_map(function ($v) {
                 if (is_bool($v)) {
-                    if ($this->c->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+                    if ($this->c->getDatabasePlatform() instanceof PostgreSQL94Platform) {
                         return $v ? 'true' : 'false';
                     }
 

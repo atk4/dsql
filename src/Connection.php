@@ -8,6 +8,8 @@ use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
+use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 
 /**
  * Class for establishing and maintaining connection with your database.
@@ -217,6 +219,20 @@ abstract class Connection
             \Closure::bind(function () use ($dbalConnection, $pdoConnection): void {
                 $dbalConnection->_conn = $pdoConnection;
             }, null, \Doctrine\DBAL\Connection::class)();
+        }
+
+        // DBAL 3.x removed some old platforms, to support instanceof reliably,
+        // make sure that DBAL 2.x platform is always supported in DBAL 3.x, see:
+        // https://github.com/doctrine/dbal/pull/3912
+        // TODO drop once DBAL 2.x support is dropped
+        $platformInterfaces = class_implements($dbalConnection->getDatabasePlatform());
+        if (
+            (in_array('Doctrine\DBAL\Platforms\SQLServerPlatform', $platformInterfaces, true)
+            && !($dbalConnection->getDatabasePlatform() instanceof SQLServer2012Platform))
+            || (in_array('Doctrine\DBAL\Platforms\PostgreSQLPlatform', $platformInterfaces, true)
+            && !($dbalConnection->getDatabasePlatform() instanceof PostgreSQL94Platform))
+        ) {
+            throw new Exception('Database server version is not supported.');
         }
 
         // Oracle CLOB/BLOB has limited SQL support, see:
