@@ -508,7 +508,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Execute expression.
      *
-     * @param \PDO|Connection $connection
+     * @param DbalConnection|Connection $connection
      *
      * @return \PDOStatement
      */
@@ -518,7 +518,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
             $connection = $this->connection;
         }
 
-        // If it's a PDO connection, we're cool
+        // If it's a DBAL connection, we're cool
         if ($connection instanceof DbalConnection) {
             $query = $this->render();
 
@@ -554,7 +554,6 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     }
                 }
 
-                $statement->setFetchMode(\PDO::FETCH_ASSOC);
                 $statement->execute();
             } catch (DbalException | \Doctrine\DBAL\DBALException $e) { // @phpstan-ignore-line
                 $errorInfo = $e->getPrevious() !== null && $e->getPrevious() instanceof \PDOException
