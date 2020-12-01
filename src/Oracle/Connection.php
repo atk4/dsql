@@ -67,7 +67,11 @@ class Connection extends BaseConnection
                 $dbalConnection = parent::connectDbalConnection($dsn);
             }
 
-            self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection();
+            if (BaseConnection::isComposerDbal2x()) {
+                self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection();
+            } else {
+                self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection()->getWrappedConnection();
+            }
             self::$ciLastConnectDsn = $dsn;
 
             return $dbalConnection;

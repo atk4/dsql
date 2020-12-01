@@ -220,9 +220,6 @@ involved, but once the query is executed, you can start streaming your data::
         echo $employee['first_name']."\n";
     }
 
-In most cases, when iterating you'll have PDOStatement, however this may not
-always be the case, so be cautious. Remember that DQSL can support vendors
-that PDO does not support as well or can use :ref:`proxy`.
-In that case you may end up with other Generator/Iterator but regardless,
+When iterating you'll have `Doctrine\DBAL\Result`. Remember that DQSL can support vendors,
 `$employee` will always contain associative array representing one row of data.
 (See also `Manual Query Execution`_).

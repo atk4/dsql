@@ -77,7 +77,7 @@ if you connect to vendor that does not use PDO.
     Creates new Expression class and sets :php:attr:`Expression::connection`.
 
     :param Expression  $expr: Expression (or query) to execute
-    :returns: PDOStatement, Iterable object or Generator.
+    :returns: `Doctrine\DBAL\Result`
     
 .. php:method:: registerConnectionClass($connectionClass = null, $connectionType = null)
 

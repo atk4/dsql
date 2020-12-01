@@ -23,8 +23,8 @@ or query::
 
 When it's time to execute you can specify your PDO manually::
 
-    $stmt = $expr->execute($pdo);
-    foreach($stmt as $row){
+    $rows = $expr->getRows($pdo);
+    foreach($rows as $row) {
         echo json_encode($row)."\n";
     }
 
@@ -33,7 +33,7 @@ With queries you might need to select mode first::
     $stmt = $query->selectMode('delete')->execute($pdo);
 
 The :php:meth:`Expresssion::execute` is a convenient way to prepare query,
-bind all parameters and get PDOStatement, but if you wish to do it manually,
+bind all parameters and get `Doctrine\DBAL\Result`, but if you wish to do it manually,
 see `Manual Query Execution`_.
 
 
@@ -169,9 +169,9 @@ So to implement our task, you might need a class like this::
             $this['file'] = $file;
         }
 
-        public function loadData()
+        public function loadData(): array
         {
-            return $this->mode('load_data')->execute();
+            return $this->mode('load_data')->getRows();
         }
     }
 

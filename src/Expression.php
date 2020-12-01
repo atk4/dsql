@@ -6,6 +6,7 @@ namespace atk4\dsql;
 
 use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\Exception as DbalException;
+use Doctrine\DBAL\Result as DbalResult;
 
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
@@ -506,13 +507,11 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Execute expression.
-     *
      * @param DbalConnection|Connection $connection
      *
-     * @return \PDOStatement
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
      */
-    public function execute(object $connection = null)
+    public function execute(object $connection = null): object
     {
         if ($connection === null) {
             $connection = $this->connection;
@@ -554,7 +553,12 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     }
                 }
 
-                $statement->execute();
+                $result = $statement->execute();
+                if (Connection::isComposerDbal2x()) {
+                    return $statement;
+                }
+
+                return $result;
             } catch (DbalException | \Doctrine\DBAL\DBALException $e) { // @phpstan-ignore-line
                 $errorInfo = $e->getPrevious() !== null && $e->getPrevious() instanceof \PDOException
                     ? $e->getPrevious()->errorInfo
@@ -566,16 +570,21 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                 throw $new;
             }
-
-            return $statement;
         }
 
         return $connection->execute($this);
     }
 
+    /**
+     * TODO drop support for \IteratorAggregate.
+     */
     public function getIterator(): iterable
     {
-        return $this->execute();
+        if (Connection::isComposerDbal2x()) {
+            return $this->execute();
+        }
+
+        return new \IteratorIterator($this->execute()->iterateAssociative());
     }
 
     // {{{ Result Querying
@@ -617,19 +626,17 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function getRows(): array
     {
-        $stmt = $this->execute();
-
-        if ($stmt instanceof \Generator) {
-            $res = iterator_to_array($stmt);
+        if (Connection::isComposerDbal2x()) {
+            $rows = $this->execute()->fetchAll();
         } else {
-            $res = $stmt->fetchAll();
+            $rows = $this->execute()->fetchAllAssociative();
         }
 
         return array_map(function ($row) {
             return array_map(function ($v) {
                 return $this->getCastValue($v);
             }, $row);
-        }, $res);
+        }, $rows);
     }
 
     /**
@@ -639,24 +646,19 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function getRow(): ?array
     {
-        $stmt = $this->execute();
-
-        if ($stmt instanceof \Generator) {
-            $res = $stmt->current();
+        if (Connection::isComposerDbal2x()) {
+            $row = $this->execute()->fetch();
         } else {
-            $res = $stmt->fetch();
-            if ($res === false) {
-                $res = null;
-            }
+            $row = $this->execute()->fetchAssociative();
         }
 
-        if ($res === null) {
+        if ($row === false) {
             return null;
         }
 
         return array_map(function ($v) {
             return $this->getCastValue($v);
-        }, $res);
+        }, $row);
     }
 
     /**

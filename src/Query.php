@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql;
 
+use Doctrine\DBAL\Result as DbalResult;
+
 /**
  * Perform query operation on SQL server (such as select, insert, delete, etc).
  */
@@ -987,9 +989,9 @@ class Query extends Expression
     /**
      * Execute select statement.
      *
-     * @return \PDOStatement
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
      */
-    public function select()
+    public function select(): object
     {
         return $this->mode('select')->execute();
     }
@@ -997,9 +999,9 @@ class Query extends Expression
     /**
      * Execute insert statement.
      *
-     * @return \PDOStatement
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
      */
-    public function insert()
+    public function insert(): object
     {
         return $this->mode('insert')->execute();
     }
@@ -1007,9 +1009,9 @@ class Query extends Expression
     /**
      * Execute update statement.
      *
-     * @return \PDOStatement
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
      */
-    public function update()
+    public function update(): object
     {
         return $this->mode('update')->execute();
     }
@@ -1017,9 +1019,9 @@ class Query extends Expression
     /**
      * Execute replace statement.
      *
-     * @return \PDOStatement
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
      */
-    public function replace()
+    public function replace(): object
     {
         return $this->mode('replace')->execute();
     }
@@ -1027,9 +1029,9 @@ class Query extends Expression
     /**
      * Execute delete statement.
      *
-     * @return \PDOStatement
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
      */
-    public function delete()
+    public function delete(): object
     {
         return $this->mode('delete')->execute();
     }
@@ -1037,9 +1039,9 @@ class Query extends Expression
     /**
      * Execute truncate statement.
      *
-     * @return \PDOStatement
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
      */
-    public function truncate()
+    public function truncate(): object
     {
         return $this->mode('truncate')->execute();
     }

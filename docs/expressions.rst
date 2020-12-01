@@ -191,9 +191,7 @@ Finally, you can pass connection class into :php:meth:`execute` directly.
 
         $stmt = $expr -> execute($pdo_dbh);
 
-    returns `PDOStamement <http://php.net/manual/en/class.pdostatement.php>`_ if
-    you have used `PDO <http://php.net/manual/en/class.pdo.php>`_ class or
-    ResultSet if you have used Connection.
+    returns `Doctrine\DBAL\Result`.
 
 .. todo::
 

@@ -10,6 +10,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\DBAL\Platforms\SQLServer2012Platform;
+use Doctrine\DBAL\Result as DbalResult;
 
 /**
  * Class for establishing and maintaining connection with your database.
@@ -184,6 +185,11 @@ abstract class Connection
         return self::$connectionClassRegistry[$driverSchema];
     }
 
+    final public static function isComposerDbal2x(): bool
+    {
+        return !class_exists(DbalResult::class);
+    }
+
     /**
      * Establishes connection based on a $dsn.
      *
@@ -202,13 +208,13 @@ abstract class Connection
         // https://github.com/doctrine/dbal/blob/v2.10.1/lib/Doctrine/DBAL/DriverManager.php#L179
         // https://github.com/doctrine/dbal/blob/3.0.0/src/DriverManager.php#L142
         // TODO probably drop support later
-        $pdoConnectionClassRefl = new \ReflectionClass(\Doctrine\DBAL\Driver\PDO\Connection::class);
-        if ($pdoConnectionClassRefl->getParentClass() !== false) { // DBAL 2.x
+        if (self::isComposerDbal2x()) {
             $dbalConnection = DriverManager::getConnection([
                 'pdo' => $pdo,
             ]);
-        } else { // DBAL 3.x
-            $pdoConnection = $pdoConnectionClassRefl->newInstanceWithoutConstructor();
+        } else {
+            $pdoConnection = (new \ReflectionClass(\Doctrine\DBAL\Driver\PDO\Connection::class))
+                ->newInstanceWithoutConstructor();
             $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             \Closure::bind(function () use ($pdoConnection, $pdo): void {
                 $pdoConnection->connection = $pdo;
@@ -314,9 +320,9 @@ abstract class Connection
     /**
      * Execute Expression by using this connection.
      *
-     * @return \PDOStatement
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
      */
-    public function execute(Expression $expr)
+    public function execute(Expression $expr): object
     {
         if ($this->connection === null) {
             throw new Exception('Queries cannot be executed through this connection');
