@@ -231,14 +231,20 @@ abstract class Connection
         // make sure that DBAL 2.x platform is always supported in DBAL 3.x, see:
         // https://github.com/doctrine/dbal/pull/3912
         // TODO drop once DBAL 2.x support is dropped
-        $platformInterfaces = class_implements($dbalConnection->getDatabasePlatform());
         if (
-            (in_array('Doctrine\DBAL\Platforms\SQLServerPlatform', $platformInterfaces, true)
-            && !($dbalConnection->getDatabasePlatform() instanceof SQLServer2012Platform))
-            || (in_array('Doctrine\DBAL\Platforms\PostgreSQLPlatform', $platformInterfaces, true)
-            && !($dbalConnection->getDatabasePlatform() instanceof PostgreSQL94Platform))
+            (in_array(get_class($dbalConnection->getDatabasePlatform()), [
+                'Doctrine\DBAL\Platforms\SQLServerPlatform',
+                'Doctrine\DBAL\Platforms\SQLServer2005Platform',
+                'Doctrine\DBAL\Platforms\SQLServer2008Platform',
+            ], true) && !($dbalConnection->getDatabasePlatform() instanceof SQLServer2012Platform))
+            || (in_array(get_class($dbalConnection->getDatabasePlatform()), [
+                'Doctrine\DBAL\Platforms\PostgreSqlPlatform',
+                'Doctrine\DBAL\Platforms\PostgreSQL91Platform',
+                'Doctrine\DBAL\Platforms\PostgreSQL92Platform',
+            ], true) && !($dbalConnection->getDatabasePlatform() instanceof PostgreSQL94Platform))
         ) {
-            throw new Exception('Database server version is not supported.');
+            throw (new Exception('Database server version is not supported'))
+                ->addMoreInfo('platform_class', get_class($dbalConnection->getDatabasePlatform()));
         }
 
         // Oracle CLOB/BLOB has limited SQL support, see:
