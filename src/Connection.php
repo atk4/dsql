@@ -195,16 +195,36 @@ abstract class Connection
             $pdo = new \PDO($dsn['dsn'], $dsn['user'], $dsn['pass']);
         }
 
-        $connectionParams = ['pdo' => $pdo];
-
-        $connection = DriverManager::getConnection($connectionParams);
+        // Doctrine DBAL 3.x does not support to create DBAL Connection with already
+        // instanced PDO, so create it without PDO first, see:
+        // https://github.com/doctrine/dbal/blob/v2.10.1/lib/Doctrine/DBAL/DriverManager.php#L179
+        // https://github.com/doctrine/dbal/blob/3.0.0/src/DriverManager.php#L142
+        // TODO probably drop support later
+        $pdoConnectionClassRefl = new \ReflectionClass(\Doctrine\DBAL\Driver\PDO\Connection::class);
+        if ($pdoConnectionClassRefl->getParentClass() !== false) { // DBAL 2.x
+            $dbalConnection = DriverManager::getConnection([
+                'pdo' => $pdo,
+            ]);
+        } else { // DBAL 3.x
+            $pdoConnection = $pdoConnectionClassRefl->newInstanceWithoutConstructor();
+            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            \Closure::bind(function () use ($pdoConnection, $pdo): void {
+                $pdoConnection->connection = $pdo;
+            }, null, \Doctrine\DBAL\Driver\PDO\Connection::class)();
+            $dbalConnection = DriverManager::getConnection([
+                'driver' => 'pdo_' . $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME),
+            ]);
+            \Closure::bind(function () use ($dbalConnection, $pdoConnection): void {
+                $dbalConnection->_conn = $pdoConnection;
+            }, null, \Doctrine\DBAL\Connection::class)();
+        }
 
         // Oracle CLOB/BLOB has limited SQL support, see:
         // https://stackoverflow.com/questions/12980038/ora-00932-inconsistent-datatypes-expected-got-clob#12980560
         // fix this Oracle inconsistency by using VARCHAR/VARBINARY instead (but limited to 4000 bytes)
-        if ($connection->getDatabasePlatform() instanceof OraclePlatform) {
-            \Closure::bind(function () use ($connection) {
-                $connection->platform = new class() extends OraclePlatform {
+        if ($dbalConnection->getDatabasePlatform() instanceof OraclePlatform) {
+            \Closure::bind(function () use ($dbalConnection) {
+                $dbalConnection->platform = new class() extends OraclePlatform {
                     private function forwardTypeDeclarationSQL(string $targetMethodName, array $column): string
                     {
                         $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -235,7 +255,7 @@ abstract class Connection
             }, null, DbalConnection::class)();
         }
 
-        return $connection;
+        return $dbalConnection;
     }
 
     /**
