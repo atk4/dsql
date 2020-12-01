@@ -559,7 +559,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                 }
 
                 return $result;
-            } catch (DbalException | \Doctrine\DBAL\DBALException $e) { // @phpstan-ignore-line
+            } catch (DbalException | \Doctrine\DBAL\DBALException $e) { // @phpstan-ignore-line for DBAL 2.x
                 $firstException = $e;
                 while ($firstException->getPrevious() !== null) {
                     $firstException = $firstException->getPrevious();
