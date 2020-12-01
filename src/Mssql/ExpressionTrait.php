@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace atk4\dsql\Mssql;
 
+use Doctrine\DBAL\Result as DbalResult;
+
 trait ExpressionTrait
 {
     protected function escapeIdentifier(string $value): string
@@ -26,7 +28,10 @@ trait ExpressionTrait
     private $numQueryParamsBackup;
     private $numQueryRender;
 
-    public function execute(object $connection = null)
+    /**
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
+     */
+    public function execute(object $connection = null): object
     {
         if ($this->numQueryParamsBackup !== null) {
             return parent::execute($connection);

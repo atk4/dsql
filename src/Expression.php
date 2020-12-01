@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace atk4\dsql;
 
 use Doctrine\DBAL\Connection as DbalConnection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DbalException;
+use Doctrine\DBAL\Result as DbalResult;
 
 class Expression implements \ArrayAccess, \IteratorAggregate
 {
@@ -506,19 +507,17 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Execute expression.
+     * @param DbalConnection|Connection $connection
      *
-     * @param \PDO|Connection $connection
-     *
-     * @return \PDOStatement
+     * @return DbalResult|\PDOStatement PDOStatement iff for DBAL 2.x
      */
-    public function execute(object $connection = null)
+    public function execute(object $connection = null): object
     {
         if ($connection === null) {
             $connection = $this->connection;
         }
 
-        // If it's a PDO connection, we're cool
+        // If it's a DBAL connection, we're cool
         if ($connection instanceof DbalConnection) {
             $query = $this->render();
 
@@ -554,29 +553,40 @@ class Expression implements \ArrayAccess, \IteratorAggregate
                     }
                 }
 
-                $statement->setFetchMode(\PDO::FETCH_ASSOC);
-                $statement->execute();
-            } catch (DBALException $e) {
-                $errorInfo = $e->getPrevious() !== null && $e->getPrevious() instanceof \PDOException
-                    ? $e->getPrevious()->errorInfo
-                    : null;
+                $result = $statement->execute();
+                if (Connection::isComposerDbal2x()) {
+                    return $statement;
+                }
 
-                $new = (new ExecuteException('DSQL got Exception when executing this query', $errorInfo[1] ?? 0))
+                return $result;
+            } catch (DbalException | \Doctrine\DBAL\DBALException $e) { // @phpstan-ignore-line
+                $firstException = $e;
+                while ($firstException->getPrevious() !== null) {
+                    $firstException = $firstException->getPrevious();
+                }
+                $errorInfo = $firstException instanceof \PDOException ? $firstException->errorInfo : null;
+
+                $new = (new ExecuteException('Dsql execute error', $errorInfo[1] ?? 0, $e))
                     ->addMoreInfo('error', $errorInfo[2] ?? 'n/a (' . $errorInfo[0] . ')')
                     ->addMoreInfo('query', $this->getDebugQuery());
 
                 throw $new;
             }
-
-            return $statement;
         }
 
         return $connection->execute($this);
     }
 
-    public function getIterator(): iterable
+    /**
+     * TODO drop support for \IteratorAggregate.
+     */
+    public function getIterator(): \Traversable
     {
-        return $this->execute();
+        if (Connection::isComposerDbal2x()) {
+            return $this->execute();
+        }
+
+        return $this->execute()->iterateAssociative();
     }
 
     // {{{ Result Querying
@@ -618,19 +628,17 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function getRows(): array
     {
-        $stmt = $this->execute();
-
-        if ($stmt instanceof \Generator) {
-            $res = iterator_to_array($stmt);
+        if (Connection::isComposerDbal2x()) {
+            $rows = $this->execute()->fetchAll();
         } else {
-            $res = $stmt->fetchAll();
+            $rows = $this->execute()->fetchAllAssociative();
         }
 
         return array_map(function ($row) {
             return array_map(function ($v) {
                 return $this->getCastValue($v);
             }, $row);
-        }, $res);
+        }, $rows);
     }
 
     /**
@@ -640,24 +648,19 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function getRow(): ?array
     {
-        $stmt = $this->execute();
-
-        if ($stmt instanceof \Generator) {
-            $res = $stmt->current();
+        if (Connection::isComposerDbal2x()) {
+            $row = $this->execute()->fetch();
         } else {
-            $res = $stmt->fetch();
-            if ($res === false) {
-                $res = null;
-            }
+            $row = $this->execute()->fetchAssociative();
         }
 
-        if ($res === null) {
+        if ($row === false) {
             return null;
         }
 
         return array_map(function ($v) {
             return $this->getCastValue($v);
-        }, $res);
+        }, $row);
     }
 
     /**

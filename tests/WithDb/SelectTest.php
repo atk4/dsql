@@ -10,8 +10,8 @@ use atk4\dsql\Exception;
 use atk4\dsql\Expression;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Platforms\SQLServerPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
+use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 
 class SelectTest extends AtkPhpunit\TestCase
 {
@@ -46,7 +46,7 @@ class SelectTest extends AtkPhpunit\TestCase
             return preg_replace_callback('~(?:\'(?:\'\'|\\\\\'|[^\'])*\')?+\K"([^\'"()\[\]{}]*?)"~s', function ($matches) {
                 if ($this->c->getDatabasePlatform() instanceof MySQLPlatform) {
                     return '`' . $matches[1] . '`';
-                } elseif ($this->c->getDatabasePlatform() instanceof SQLServerPlatform) {
+                } elseif ($this->c->getDatabasePlatform() instanceof SQLServer2012Platform) {
                     return '[' . $matches[1] . ']';
                 }
 
@@ -64,7 +64,7 @@ class SelectTest extends AtkPhpunit\TestCase
                 return '"' . $v . '"';
             }, array_keys($row))) . ') VALUES(' . implode(', ', array_map(function ($v) {
                 if (is_bool($v)) {
-                    if ($this->c->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+                    if ($this->c->getDatabasePlatform() instanceof PostgreSQL94Platform) {
                         return $v ? 'true' : 'false';
                     }
 
@@ -144,7 +144,7 @@ class SelectTest extends AtkPhpunit\TestCase
          * But CAST(.. AS int) does not work in mysql. So we use two different tests..
          * (CAST(.. AS int) will work on mariaDB, whereas mysql needs it to be CAST(.. AS signed))
          */
-        if ($this->c->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+        if ($this->c->getDatabasePlatform() instanceof PostgreSQL94Platform) {
             $this->assertSame(
                 [['now' => '6']],
                 $this->q()->field(new Expression('CAST([] AS int)+CAST([] AS int)', [3, 3]), 'now')->getRows()
@@ -170,7 +170,7 @@ class SelectTest extends AtkPhpunit\TestCase
          * But using CAST(.. AS CHAR) will return one single character on postgresql, but the
          * entire string on mysql.
          */
-        if ($this->c->getDatabasePlatform() instanceof PostgreSQLPlatform || $this->c->getDatabasePlatform() instanceof SQLServerPlatform) {
+        if ($this->c->getDatabasePlatform() instanceof PostgreSQL94Platform || $this->c->getDatabasePlatform() instanceof SQLServer2012Platform) {
             $this->assertSame(
                 'foo',
                 $this->e('select CAST([] AS VARCHAR)', ['foo'])->getOne()
@@ -220,7 +220,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
 
         // replace
-        if ($this->c->getDatabasePlatform() instanceof PostgreSQLPlatform || $this->c->getDatabasePlatform() instanceof SQLServerPlatform || $this->c->getDatabasePlatform() instanceof OraclePlatform) {
+        if ($this->c->getDatabasePlatform() instanceof PostgreSQL94Platform || $this->c->getDatabasePlatform() instanceof SQLServer2012Platform || $this->c->getDatabasePlatform() instanceof OraclePlatform) {
             $this->q('employee')
                 ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
                 ->where('id', 1)
