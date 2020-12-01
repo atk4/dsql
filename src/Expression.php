@@ -560,11 +560,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                 return $result;
             } catch (DbalException | \Doctrine\DBAL\DBALException $e) { // @phpstan-ignore-line
-                $errorInfo = $e->getPrevious() !== null && $e->getPrevious() instanceof \PDOException
-                    ? $e->getPrevious()->errorInfo
-                    : null;
+                $firstException = $e;
+                while ($firstException->getPrevious() !== null) {
+                    $firstException = $firstException->getPrevious();
+                }
+                $errorInfo = $firstException instanceof \PDOException ? $firstException->errorInfo : null;
 
-                $new = (new ExecuteException('DSQL got Exception when executing this query', $errorInfo[1] ?? 0))
+                $new = (new ExecuteException('Dsql execute error', $errorInfo[1] ?? 0, $e))
                     ->addMoreInfo('error', $errorInfo[2] ?? 'n/a (' . $errorInfo[0] . ')')
                     ->addMoreInfo('query', $this->getDebugQuery());
 
