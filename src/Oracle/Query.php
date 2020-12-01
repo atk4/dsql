@@ -34,7 +34,7 @@ class Query extends AbstractQuery
             max((int) ($this->args['limit']['cnt'] + $this->args['limit']['shift']), (int) $this->args['limit']['cnt']);
     }
 
-    public function getIterator(): iterable
+    public function getIterator(): \Traversable
     {
         foreach (parent::getIterator() as $row) {
             unset($row['__dsql_rownum']);

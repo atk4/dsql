@@ -578,13 +578,13 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * TODO drop support for \IteratorAggregate.
      */
-    public function getIterator(): iterable
+    public function getIterator(): \Traversable
     {
         if (Connection::isComposerDbal2x()) {
             return $this->execute();
         }
 
-        return new \IteratorIterator($this->execute()->iterateAssociative());
+        return $this->execute()->iterateAssociative();
     }
 
     // {{{ Result Querying
