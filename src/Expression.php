@@ -116,7 +116,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Whether or not an offset exists.
      *
-     * @param string An offset to check for
+     * @param string $offset
      */
     public function offsetExists($offset): bool
     {
@@ -126,7 +126,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Returns the value at specified offset.
      *
-     * @param string The offset to retrieve
+     * @param string $offset
      *
      * @return mixed
      */
@@ -138,8 +138,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Assigns a value to the specified offset.
      *
-     * @param string The offset to assign the value to
-     * @param mixed  The value to set
+     * @param string $offset
+     * @param mixed  $value  The value to set
      */
     public function offsetSet($offset, $value): void
     {
@@ -153,7 +153,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Unsets an offset.
      *
-     * @param string The offset to unset
+     * @param string $offset
      */
     public function offsetUnset($offset): void
     {
@@ -409,6 +409,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                 $identifier = substr($matches[0], 1, -1);
 
+                $escaping = null;
                 if (substr($matches[0], 0, 1) === '[') {
                     $escaping = self::ESCAPE_PARAM;
                 } elseif (substr($matches[0], 0, 1) === '{') {

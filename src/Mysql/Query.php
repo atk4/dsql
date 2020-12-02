@@ -14,8 +14,8 @@ class Query extends BaseQuery
 
     protected $template_update = 'update [table][join] set [set] [where]';
 
-    public function groupConcat($field, $delimeter = ',')
+    public function groupConcat($field, string $delimiter = ',')
     {
-        return $this->expr('group_concat({} separator [])', [$field, $delimeter]);
+        return $this->expr('group_concat({} separator [])', [$field, $delimiter]);
     }
 }
