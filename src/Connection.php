@@ -128,7 +128,9 @@ abstract class Connection
             ], $args));
         } elseif ($dsn instanceof DbalConnection) {
             $connectionClass = self::resolveConnectionClass(
-                $dsn->getWrappedConnection()->getAttribute(\PDO::ATTR_DRIVER_NAME)
+                Connection::isComposerDbal2x()
+                    ? $dsn->getWrappedConnection()->getAttribute(\PDO::ATTR_DRIVER_NAME)
+                    : $dsn->getWrappedConnection()->getWrappedConnection()->getAttribute(\PDO::ATTR_DRIVER_NAME)
             );
 
             return new $connectionClass(array_merge([
