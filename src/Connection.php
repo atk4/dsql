@@ -127,9 +127,11 @@ abstract class Connection
                 'connection' => $connectionClass::connectDbalConnection(['pdo' => $dsn]),
             ], $args));
         } elseif ($dsn instanceof DbalConnection) {
-            $connectionClass = self::resolveConnectionClass(
-                $dsn->getWrappedConnection()->getAttribute(\PDO::ATTR_DRIVER_NAME)
-            );
+            /** @var \PDO */
+            $pdo = self::isComposerDbal2x()
+                ? $dsn->getWrappedConnection()
+                : $dsn->getWrappedConnection()->getWrappedConnection(); // @phpstan-ignore-line
+            $connectionClass = self::resolveConnectionClass($pdo->getAttribute(\PDO::ATTR_DRIVER_NAME));
 
             return new $connectionClass(array_merge([
                 'connection' => $dsn,

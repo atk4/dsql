@@ -41,8 +41,8 @@ abstract class AbstractQuery extends BaseQuery
         return $this->args['sequence'];
     }
 
-    public function groupConcat($field, $delimeter = ',')
+    public function groupConcat($field, string $delimiter = ',')
     {
-        return $this->expr('listagg({field}, []) within group (order by {field})', ['field' => $field, $delimeter]);
+        return $this->expr('listagg({field}, []) within group (order by {field})', ['field' => $field, $delimiter]);
     }
 }

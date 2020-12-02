@@ -24,7 +24,7 @@ class Connection extends BaseConnection
 
     // {{{ fix for too many connections for CI testing
 
-    /** @var array */
+    /** @var int */
     private static $ciDifferentDsnCounter = 0;
     /** @var array */
     private static $ciLastConnectDsn;
@@ -70,7 +70,7 @@ class Connection extends BaseConnection
             if (BaseConnection::isComposerDbal2x()) {
                 self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection();
             } else {
-                self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection()->getWrappedConnection();
+                self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection()->getWrappedConnection(); // @phpstan-ignore-line
             }
             self::$ciLastConnectDsn = $dsn;
 
@@ -90,7 +90,10 @@ class Connection extends BaseConnection
     public function lastInsertId(string $sequence = null): string
     {
         if ($sequence) {
-            return $this->dsql()->mode('seq_currval')->sequence($sequence)->getOne();
+            /** @var AbstractQuery */
+            $query = $this->dsql()->mode('seq_currval');
+
+            return $query->sequence($sequence)->getOne();
         }
 
         // fallback

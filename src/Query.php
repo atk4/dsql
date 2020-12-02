@@ -321,9 +321,9 @@ class Query extends Expression
     /**
      * Recursive WITH query.
      *
-     * @param Query|array $cursor Specifies cursor query or array [alias=>query] for adding multiple
-     * @param string      $alias  Specify alias for this cursor
-     * @param array       $fields Optional array of field names used in cursor
+     * @param Query  $cursor Specifies cursor query or array [alias=>query] for adding multiple
+     * @param string $alias  Specify alias for this cursor
+     * @param array  $fields Optional array of field names used in cursor
      *
      * @return $this
      */
@@ -696,6 +696,8 @@ class Query extends Expression
             [$field, $cond] = $row;
         } elseif (count($row) === 1) {
             [$field] = $row;
+        } else {
+            throw new \InvalidArgumentException();
         }
 
         $field = $this->consume($field, self::ESCAPE_IDENTIFIER_SOFT);
@@ -709,7 +711,7 @@ class Query extends Expression
 
         // if no condition defined - set default condition
         if (count($row) === 2) {
-            $value = $cond;
+            $value = $cond; // @phpstan-ignore-line see https://github.com/phpstan/phpstan/issues/4173
 
             if ($value instanceof Expressionable) {
                 $value = $value->getDsqlExpression($this);
@@ -723,13 +725,13 @@ class Query extends Expression
                 $cond = '=';
             }
         } else {
-            $cond = trim(strtolower($cond));
+            $cond = trim(strtolower($cond)); // @phpstan-ignore-line see https://github.com/phpstan/phpstan/issues/4173
         }
 
         // below we can be sure that all 3 arguments has been passed
 
         // special conditions (IS | IS NOT) if value is null
-        if ($value === null) {
+        if ($value === null) { // @phpstan-ignore-line see https://github.com/phpstan/phpstan/issues/4173
             if (in_array($cond, ['=', 'is'], true)) {
                 return $field . ' is null';
             } elseif (in_array($cond, ['!=', '<>', 'not', 'is not'], true)) {
@@ -1324,12 +1326,11 @@ class Query extends Expression
      * PostgreSQL - string_agg
      * Oracle - listagg
      *
-     * @param mixed  $field
-     * @param string $delimiter
+     * @param mixed $field
      *
      * @return Expression
      */
-    public function groupConcat($field, $delimeter = ',')
+    public function groupConcat($field, string $delimiter = ',')
     {
         throw new Exception('groupConcat() is SQL-dependent, so use a correct class');
     }

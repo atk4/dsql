@@ -21,8 +21,8 @@ class Query extends BaseQuery
         }
     }
 
-    public function groupConcat($field, $delimeter = ',')
+    public function groupConcat($field, string $delimiter = ',')
     {
-        return $this->expr('string_agg({}, [])', [$field, $delimeter]);
+        return $this->expr('string_agg({}, [])', [$field, $delimiter]);
     }
 }

@@ -34,9 +34,9 @@ class Query extends BaseQuery
         }
     }
 
-    public function groupConcat($field, $delimeter = ',')
+    public function groupConcat($field, string $delimiter = ',')
     {
-        return $this->expr('string_agg({}, \'' . $delimeter . '\')', [$field]);
+        return $this->expr('string_agg({}, \'' . $delimiter . '\')', [$field]);
     }
 
     public function exists()
