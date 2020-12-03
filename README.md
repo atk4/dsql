@@ -136,7 +136,7 @@ Agile UI, Agile Data and DSQL you can do it in **less than 10 lines**:
 ``` php
 require 'vendor/autoload.php';
 
-$db = new \atk4\data\Persistence_SQL('mysql:dbname=atkui;host=localhost','root','root');
+$db = new \Atk4\Data\Persistence_SQL('mysql:dbname=atkui;host=localhost','root','root');
 
 $app = new \atk4\ui\App('My First App');
 $app->initLayout('Centered');
