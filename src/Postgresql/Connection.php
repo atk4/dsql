@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Postgresql;
+namespace Atk4\Dsql\Postgresql;
 
-use atk4\dsql\Connection as BaseConnection;
+use Atk4\Dsql\Connection as BaseConnection;
 
 class Connection extends BaseConnection
 {

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\tests\WithDb;
+namespace Atk4\Dsql\Tests\WithDb;
 
-use atk4\core\AtkPhpunit;
-use atk4\dsql\Connection;
+use Atk4\Core\AtkPhpunit;
+use Atk4\Dsql\Connection;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 
 /**
- * @coversDefaultClass \atk4\dsql\Query
+ * @coversDefaultClass \Atk4\Dsql\Query
  */
 class ConnectionTest extends AtkPhpunit\TestCase
 {

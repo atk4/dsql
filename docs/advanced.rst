@@ -70,7 +70,7 @@ results too.
 If you are creating :php:class:`Connection` through constructor, you may have
 to explicitly specify property :php:attr:`Connection::query_class`::
 
-    $c = new Connection(['connection'=>$pdo, 'query_class'=>atk4\dsql\Sqlite\Query::class]);
+    $c = new Connection(['connection'=>$pdo, 'query_class'=>Atk4\Dsql\Sqlite\Query::class]);
 
 This is also useful, if you have created your own Query class in a different
 namespace and wish to use it.
@@ -84,7 +84,7 @@ You can add support for new database vendors by creating your own
 :php:class:`Query` class.
 Let's say you want to add support for new SQL vendor::
 
-    class Query_MyVendor extends atk4\dsql\Query
+    class Query_MyVendor extends Atk4\Dsql\Query
     {
         // truncate is done differently by this vendor
         protected $template_truncate = 'delete [from] [table]';
@@ -96,14 +96,14 @@ Let's say you want to add support for new SQL vendor::
             $join_kind = null,
             $_foreign_alias = null
         ) {
-            throw new atk4\dsql\Exception("Join is not supported by the database");
+            throw new Atk4\Dsql\Exception("Join is not supported by the database");
         }
     }
 
 Now that our custom query class is complete, we would like to use it by default
 on the connection::
 
-    $c = \atk4\dsql\Connection::connect($dsn, $user, $pass, ['query_class'=>'Query_MyVendor']);
+    $c = \Atk4\Dsql\Connection::connect($dsn, $user, $pass, ['query_class'=>'Query_MyVendor']);
 
 .. _new_vendor:
 
@@ -156,8 +156,8 @@ query "LOAD DATA INFILE":
 
 So to implement our task, you might need a class like this::
 
-    use \atk4\dsql\Exception;
-    class QueryMysqlCustom extends \atk4\dsql\Mysql\Query
+    use \Atk4\Dsql\Exception;
+    class QueryMysqlCustom extends \Atk4\Dsql\Mysql\Query
     {
         protected $template_load_data = 'load data local infile [file] into table [table]';
 
@@ -212,9 +212,9 @@ be possible. You also risk injection or expose some sensitive data to the user.
 
 Usage::
 
-    throw new atk4\dsql\Exception('Hello');
+    throw new Atk4\Dsql\Exception('Hello');
 
-    throw (new atk4\dsql\Exception('File is not readable'))
+    throw (new Atk4\Dsql\Exception('File is not readable'))
         ->addMoreInfo('file', $file);
 
 When displayed to the user the exception will hide parameter for $file, but you
@@ -226,7 +226,7 @@ still can get it if you really need it:
 
     :returns: array
 
-Any DSQL-related code must always throw atk4\dsql\Exception. Query-related
+Any DSQL-related code must always throw Atk4\Dsql\Exception. Query-related
 errors will generate PDO exceptions. If you use a custom connection and doing
 some vendor-specific operations, you may also throw other vendor-specific
 exceptions.

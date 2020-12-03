@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\tests\WithDb;
+namespace Atk4\Dsql\Tests\WithDb;
 
-use atk4\core\AtkPhpunit;
-use atk4\dsql\Connection;
-use atk4\dsql\Exception;
-use atk4\dsql\Expression;
+use Atk4\Core\AtkPhpunit;
+use Atk4\Dsql\Connection;
+use Atk4\Dsql\Exception;
+use Atk4\Dsql\Expression;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;

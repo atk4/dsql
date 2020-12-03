@@ -55,12 +55,12 @@
   },
   "autoload": {
     "psr-4": {
-      "atk4\\dsql\\": "src/"
+      "Atk4\\Dsql\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "atk4\\dsql\\tests\\": "tests/"
+      "Atk4\\Dsql\\Tests\\": "tests/"
     }
   }
 }

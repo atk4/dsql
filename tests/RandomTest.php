@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\tests;
+namespace Atk4\Dsql\Tests;
 
-use atk4\core\AtkPhpunit;
-use atk4\dsql\Mysql;
-use atk4\dsql\Oracle;
-use atk4\dsql\Postgresql;
-use atk4\dsql\Query;
-use atk4\dsql\Sqlite;
+use Atk4\Core\AtkPhpunit;
+use Atk4\Dsql\Mysql;
+use Atk4\Dsql\Oracle;
+use Atk4\Dsql\Postgresql;
+use Atk4\Dsql\Query;
+use Atk4\Dsql\Sqlite;
 
 /**
- * @coversDefaultClass \atk4\dsql\Query
+ * @coversDefaultClass \Atk4\Dsql\Query
  */
 class RandomTest extends AtkPhpunit\TestCase
 {

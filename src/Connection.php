@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql;
+namespace Atk4\Dsql;
 
 use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\DriverManager;
@@ -17,7 +17,7 @@ use Doctrine\DBAL\Result as DbalResult;
  */
 abstract class Connection
 {
-    use \atk4\core\DiContainerTrait;
+    use \Atk4\Core\DiContainerTrait;
 
     /** @var string Query classname */
     protected $query_class = Query::class;

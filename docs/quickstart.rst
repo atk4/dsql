@@ -35,7 +35,7 @@ Getting Started
 We will start by looking at the :php:class:`Query` building, because you do
 not need a database to create a query::
 
-    use atk4\dsql\Query;
+    use Atk4\Dsql\Query;
 
     $query = new Query(['connection' => $pdo]);
 
@@ -133,7 +133,7 @@ create new instance of :ref:`Expression <expr>` or :ref:`Query <query>` you can
 perform operation and finally call :php:meth:`Expression::render()` to get the
 final query string::
 
-    use atk4\dsql\Query;
+    use Atk4\Dsql\Query;
 
     $q = (new Query())->table('user')->where('id', 1)->field('name');
     $query = $q->render();
@@ -143,7 +143,7 @@ When used in application you would typically generate queries with the
 purpose of executing them, which makes it very useful to create a
 :php:class:`Connection` object. The usage changes slightly::
 
-    $c = atk4\dsql\Connection::connect($dsn, $user, $password);
+    $c = Atk4\Dsql\Connection::connect($dsn, $user, $password);
     $q = $c->dsql()->table('user')->where('id', 1)->field('name');
 
     $name = $q->getOne();

@@ -28,7 +28,7 @@ DSQL has been in production since 2006, initially included in [AModules2](https:
 ## DSQL Is Simple and Powerful
 
 ``` php
-$query = new atk4\dsql\Query();
+$query = new Atk4\Dsql\Query();
 $query  ->table('employees')
         ->where('birth_date','1961-05-02')
         ->field('count(*)')
@@ -40,7 +40,7 @@ If the basic query is not fun, how about more complex one?
 
 ``` php
 // Establish a query looking for a maximum salary
-$salary = new atk4\dsql\Query(['connection'=>$pdo]);
+$salary = new Atk4\Dsql\Query(['connection'=>$pdo]);
 
 // Create few expression objects
 $e_ms = $salary->expr('max(salary)');
@@ -136,7 +136,7 @@ Agile UI, Agile Data and DSQL you can do it in **less than 10 lines**:
 ``` php
 require 'vendor/autoload.php';
 
-$db = new \atk4\data\Persistence_SQL('mysql:dbname=atkui;host=localhost','root','root');
+$db = new \Atk4\Data\Persistence_SQL('mysql:dbname=atkui;host=localhost','root','root');
 
 $app = new \atk4\ui\App('My First App');
 $app->initLayout('Centered');

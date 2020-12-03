@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\tests;
+namespace Atk4\Dsql\Tests;
 
-use atk4\core\AtkPhpunit;
-use atk4\dsql\Expression;
+use Atk4\Core\AtkPhpunit;
+use Atk4\Dsql\Expression;
 
 /**
- * @coversDefaultClass \atk4\dsql\Exception
+ * @coversDefaultClass \Atk4\Dsql\Exception
  */
 class ExceptionTest extends AtkPhpunit\TestCase
 {
@@ -19,14 +19,14 @@ class ExceptionTest extends AtkPhpunit\TestCase
      */
     public function testException1()
     {
-        $this->expectException(\atk4\dsql\Exception::class);
+        $this->expectException(\Atk4\Dsql\Exception::class);
 
-        throw new \atk4\dsql\Exception();
+        throw new \Atk4\Dsql\Exception();
     }
 
     public function testException2()
     {
-        $this->expectException(\atk4\dsql\Exception::class);
+        $this->expectException(\Atk4\Dsql\Exception::class);
         $e = new Expression('hello, [world]');
         $e->render();
     }
@@ -36,7 +36,7 @@ class ExceptionTest extends AtkPhpunit\TestCase
         try {
             $e = new Expression('hello, [world]');
             $e->render();
-        } catch (\atk4\dsql\Exception $e) {
+        } catch (\Atk4\Dsql\Exception $e) {
             $this->assertSame(
                 'Expression could not render tag',
                 $e->getMessage()

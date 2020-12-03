@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\tests;
+namespace Atk4\Dsql\Tests;
 
-use atk4\core\AtkPhpunit;
-use atk4\dsql\Exception;
-use atk4\dsql\Expression;
-use atk4\dsql\Mssql;
-use atk4\dsql\Mysql;
-use atk4\dsql\Oracle;
-use atk4\dsql\Postgresql;
-use atk4\dsql\Query;
-use atk4\dsql\Sqlite;
+use Atk4\Core\AtkPhpunit;
+use Atk4\Dsql\Exception;
+use Atk4\Dsql\Expression;
+use Atk4\Dsql\Mssql;
+use Atk4\Dsql\Mysql;
+use Atk4\Dsql\Oracle;
+use Atk4\Dsql\Postgresql;
+use Atk4\Dsql\Query;
+use Atk4\Dsql\Sqlite;
 
 /**
- * @coversDefaultClass \atk4\dsql\Query
+ * @coversDefaultClass \Atk4\Dsql\Query
  */
 class QueryTest extends AtkPhpunit\TestCase
 {
@@ -551,8 +551,8 @@ class QueryTest extends AtkPhpunit\TestCase
 
     /**
      * @covers ::render
-     * @covers \atk4\dsql\Expression::consume
-     * @covers \atk4\dsql\Expression::render
+     * @covers \Atk4\Dsql\Expression::consume
+     * @covers \Atk4\Dsql\Expression::render
      */
     public function testBasicRenderSubquery()
     {
@@ -569,7 +569,7 @@ class QueryTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * @covers \atk4\dsql\Expression::getDebugQuery
+     * @covers \Atk4\Dsql\Expression::getDebugQuery
      */
     public function testTestgetDebugQuery()
     {
@@ -1223,7 +1223,7 @@ class QueryTest extends AtkPhpunit\TestCase
         $this->assertSame(Expression::class, get_class($this->q()->expr('foo')));
 
         $q = new Mysql\Query();
-        $this->assertSame(\atk4\dsql\Mysql\Expression::class, get_class($q->expr('foo')));
+        $this->assertSame(\Atk4\Dsql\Mysql\Expression::class, get_class($q->expr('foo')));
     }
 
     /**
@@ -1538,7 +1538,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test reset().
      *
-     * @covers \atk4\dsql\Expression::reset
+     * @covers \Atk4\Dsql\Expression::reset
      */
     public function testReset()
     {

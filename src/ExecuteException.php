@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql;
+namespace Atk4\Dsql;
 
 class ExecuteException extends Exception
 {
