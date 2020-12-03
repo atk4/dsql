@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace atk4\dsql\Tests\WithDb;
 
-use atk4\core\AtkPhpunit;
+use Atk4\Core\AtkPhpunit;
 use atk4\dsql\Connection;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 

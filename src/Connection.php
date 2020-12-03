@@ -17,7 +17,7 @@ use Doctrine\DBAL\Result as DbalResult;
  */
 abstract class Connection
 {
-    use \atk4\core\DiContainerTrait;
+    use \Atk4\Core\DiContainerTrait;
 
     /** @var string Query classname */
     protected $query_class = Query::class;
