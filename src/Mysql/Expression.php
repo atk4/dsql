@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Mysql;
+namespace Atk4\Dsql\Mysql;
 
-use atk4\dsql\Expression as BaseExpression;
+use Atk4\Dsql\Expression as BaseExpression;
 
 class Expression extends BaseExpression
 {

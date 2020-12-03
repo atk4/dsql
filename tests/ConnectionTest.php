@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Tests;
+namespace Atk4\Dsql\Tests;
 
 use Atk4\Core\AtkPhpunit;
-use atk4\dsql\Connection;
+use Atk4\Dsql\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 
@@ -62,7 +62,7 @@ class DummyConnection4 extends Connection
 }
 
 /**
- * @coversDefaultClass \atk4\dsql\Connection
+ * @coversDefaultClass \Atk4\Dsql\Connection
  */
 class ConnectionTest extends AtkPhpunit\TestCase
 {
@@ -145,25 +145,25 @@ class ConnectionTest extends AtkPhpunit\TestCase
 
     public function testException1()
     {
-        $this->expectException(\atk4\dsql\Exception::class);
-        $c = \atk4\dsql\Sqlite\Connection::connect(':');
+        $this->expectException(\Atk4\Dsql\Exception::class);
+        $c = \Atk4\Dsql\Sqlite\Connection::connect(':');
     }
 
     public function testException2()
     {
-        $this->expectException(\atk4\dsql\Exception::class);
+        $this->expectException(\Atk4\Dsql\Exception::class);
         $c = Connection::connect('');
     }
 
     public function testException3()
     {
-        $this->expectException(\atk4\dsql\Exception::class);
-        $c = new \atk4\dsql\Sqlite\Connection('sqlite::memory');
+        $this->expectException(\Atk4\Dsql\Exception::class);
+        $c = new \Atk4\Dsql\Sqlite\Connection('sqlite::memory');
     }
 
     public function testException4()
     {
-        $c = new \atk4\dsql\Sqlite\Connection();
+        $c = new \Atk4\Dsql\Sqlite\Connection();
         $q = $c->expr('select (2+2)');
 
         $this->assertSame(
@@ -171,7 +171,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
             $q->render()
         );
 
-        $this->expectException(\atk4\dsql\Exception::class);
+        $this->expectException(\Atk4\Dsql\Exception::class);
         $q->execute();
     }
 }

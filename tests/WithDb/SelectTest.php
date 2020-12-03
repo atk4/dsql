@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Tests\WithDb;
+namespace Atk4\Dsql\Tests\WithDb;
 
 use Atk4\Core\AtkPhpunit;
-use atk4\dsql\Connection;
-use atk4\dsql\Exception;
-use atk4\dsql\Expression;
+use Atk4\Dsql\Connection;
+use Atk4\Dsql\Exception;
+use Atk4\Dsql\Expression;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
@@ -275,11 +275,11 @@ class SelectTest extends AtkPhpunit\TestCase
 
     public function testExecuteException()
     {
-        $this->expectException(\atk4\dsql\ExecuteException::class);
+        $this->expectException(\Atk4\Dsql\ExecuteException::class);
 
         try {
             $this->q('non_existing_table')->field('non_existing_field')->getOne();
-        } catch (\atk4\dsql\ExecuteException $e) {
+        } catch (\Atk4\Dsql\ExecuteException $e) {
             // test error code
             $unknownFieldErrorCode = [
                 'sqlite' => 1,        // SQLSTATE[HY000]: General error: 1 no such table: non_existing_table

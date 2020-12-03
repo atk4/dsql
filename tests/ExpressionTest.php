@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Tests;
+namespace Atk4\Dsql\Tests;
 
 use Atk4\Core\AtkPhpunit;
-use atk4\dsql\Exception;
-use atk4\dsql\Expression;
-use atk4\dsql\Expressionable;
-use atk4\dsql\Query;
+use Atk4\Dsql\Exception;
+use Atk4\Dsql\Expression;
+use Atk4\Dsql\Expressionable;
+use Atk4\Dsql\Query;
 
 /**
- * @coversDefaultClass \atk4\dsql\Expression
+ * @coversDefaultClass \Atk4\Dsql\Expression
  */
 class ExpressionTest extends AtkPhpunit\TestCase
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Mssql;
+namespace Atk4\Dsql\Mssql;
 
 use Doctrine\DBAL\Result as DbalResult;
 

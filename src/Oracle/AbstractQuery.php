@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Oracle;
+namespace Atk4\Dsql\Oracle;
 
-use atk4\dsql\Query as BaseQuery;
+use Atk4\Dsql\Query as BaseQuery;
 
 abstract class AbstractQuery extends BaseQuery
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Sqlite;
+namespace Atk4\Dsql\Sqlite;
 
-use atk4\dsql\Connection as BaseConnection;
+use Atk4\Dsql\Connection as BaseConnection;
 
 class Connection extends BaseConnection
 {

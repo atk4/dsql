@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Oracle;
+namespace Atk4\Dsql\Oracle;
 
 class Query extends AbstractQuery
 {

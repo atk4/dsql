@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\Oracle\Version12;
+namespace Atk4\Dsql\Oracle\Version12;
 
-use atk4\dsql\Oracle\Connection as BaseConnection;
+use Atk4\Dsql\Oracle\Connection as BaseConnection;
 
 class Connection extends BaseConnection
 {

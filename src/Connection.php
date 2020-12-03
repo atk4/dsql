@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql;
+namespace Atk4\Dsql;
 
 use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\DriverManager;
