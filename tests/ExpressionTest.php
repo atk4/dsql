@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\tests;
+namespace atk4\dsql\Tests;
 
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Exception;

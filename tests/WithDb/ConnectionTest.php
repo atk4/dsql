@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace atk4\dsql\tests\WithDb;
+namespace atk4\dsql\Tests\WithDb;
 
 use atk4\core\AtkPhpunit;
 use atk4\dsql\Connection;

@@ -60,7 +60,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "atk4\\dsql\\tests\\": "tests/"
+      "atk4\\dsql\\Tests\\": "tests/"
     }
   }
 }
