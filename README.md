@@ -138,10 +138,10 @@ require 'vendor/autoload.php';
 
 $db = new \Atk4\Data\Persistence_SQL('mysql:dbname=atkui;host=localhost','root','root');
 
-$app = new \atk4\ui\App('My First App');
+$app = new \Atk4\Ui\App('My First App');
 $app->initLayout('Centered');
 
-$g = $layout->add(new \atk4\ui\Grid());
+$g = $layout->add(new \Atk4\Ui\Grid());
 $g->setModel(new Employee($db), false);
 ```
 
