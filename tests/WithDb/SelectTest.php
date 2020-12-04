@@ -81,6 +81,8 @@ class SelectTest extends AtkPhpunit\TestCase
     protected function tearDown(): void
     {
         $this->dropDbIfExists();
+
+        $this->c = null;
     }
 
     private function q($table = null, $alias = null)
