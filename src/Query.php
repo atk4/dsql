@@ -780,20 +780,20 @@ class Query extends Expression
 
     protected function _render_orwhere()
     {
-        if (!isset($this->args['where'])) {
-            return;
+        foreach (['where', 'having'] as $kind) {
+            if (isset($this->args[$kind])) {
+                return implode(' or ', $this->_sub_render_where($kind));
+            }
         }
-
-        return implode(' or ', $this->_sub_render_where('where'));
     }
 
     protected function _render_andwhere()
     {
-        if (!isset($this->args['where'])) {
-            return;
+        foreach (['where', 'having'] as $kind) {
+            if (isset($this->args[$kind])) {
+                return implode(' and ', $this->_sub_render_where($kind));
+            }
         }
-
-        return implode(' and ', $this->_sub_render_where('where'));
     }
 
     protected function _render_having()
