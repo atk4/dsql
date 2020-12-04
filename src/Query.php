@@ -780,20 +780,28 @@ class Query extends Expression
 
     protected function _render_orwhere()
     {
-        if (!isset($this->args['where'])) {
-            return;
+        if (isset($this->args['where']) && isset($this->args['having'])) {
+            throw new Exception('Mixing of WHERE and HAVING conditions not allowed in query expression');
         }
 
-        return implode(' or ', $this->_sub_render_where('where'));
+        foreach (['where', 'having'] as $kind) {
+            if (isset($this->args[$kind])) {
+                return implode(' or ', $this->_sub_render_where($kind));
+            }
+        }
     }
 
     protected function _render_andwhere()
     {
-        if (!isset($this->args['where'])) {
-            return;
+        if (isset($this->args['where']) && isset($this->args['having'])) {
+            throw new Exception('Mixing of WHERE and HAVING conditions not allowed in query expression');
         }
 
-        return implode(' and ', $this->_sub_render_where('where'));
+        foreach (['where', 'having'] as $kind) {
+            if (isset($this->args[$kind])) {
+                return implode(' and ', $this->_sub_render_where($kind));
+            }
+        }
     }
 
     protected function _render_having()

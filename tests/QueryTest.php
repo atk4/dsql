@@ -1535,6 +1535,37 @@ class QueryTest extends AtkPhpunit\TestCase
         );
     }
 
+    public function testNestedOrAndHaving()
+    {
+        $q = $this->q();
+        $q->table('employee')->field(new Expression('sum([])', ['amount']), 'salary')->group('type');
+        $q->having(
+            $q
+                ->orExpr()
+                ->having('a', 1)
+                ->having('b', 1)
+        );
+        $this->assertSame(
+            'select sum(:a) "salary" from "employee" group by "type" having ("a" = :b or "b" = :c)',
+            $q->render()
+        );
+    }
+
+    public function testNestedOrAndHavingWithWhereException()
+    {
+        $q = $this->q();
+        $q->table('employee')->field(new Expression('sum([])', ['amount']), 'salary')->group('type');
+        $q->having(
+            $q
+                ->orExpr()
+                ->where('a', 1)
+                ->having('b', 1) // mixing triggers Exception on render
+        );
+
+        $this->expectException(Exception::class);
+        $q->render();
+    }
+
     /**
      * Test reset().
      *
