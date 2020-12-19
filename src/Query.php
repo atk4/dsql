@@ -1152,7 +1152,7 @@ class Query extends Expression
     public function _render_order()
     {
         if (!isset($this->args['order'])) {
-            return'';
+            return '';
         }
 
         $x = [];
