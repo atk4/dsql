@@ -481,7 +481,6 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testIteratorAggregate()
     {
         // todo - can not test this without actual DB connection and executing expression
-        null;
     }
 
     /**
