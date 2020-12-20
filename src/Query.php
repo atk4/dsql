@@ -1420,9 +1420,9 @@ class Query extends Expression
     /**
      * Sets value in args array. Doesn't allow duplicate aliases.
      *
-     * @param string $what  Where to set it - table|field
-     * @param string $alias Alias name
-     * @param mixed  $value Value to set in args array
+     * @param string      $what  Where to set it - table|field
+     * @param string|null $alias Alias name
+     * @param mixed       $value Value to set in args array
      */
     protected function _set_args($what, $alias, $value)
     {

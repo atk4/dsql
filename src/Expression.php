@@ -138,8 +138,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Assigns a value to the specified offset.
      *
-     * @param string $offset
-     * @param mixed  $value  The value to set
+     * @param string|null $offset
+     * @param mixed       $value  The value to set
      */
     public function offsetSet($offset, $value): void
     {
@@ -181,6 +181,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         // Otherwise, connection is probably PDO and we don't know which Expression
         // class to use, so we make a smart guess :)
+        // @phpstan-ignore-next-line
         if ($this instanceof Query) {
             $e = new self($properties, $arguments);
         } else {

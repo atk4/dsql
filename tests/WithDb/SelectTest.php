@@ -69,7 +69,7 @@ class SelectTest extends AtkPhpunit\TestCase
                     }
 
                     return $v ? 1 : 0;
-                } elseif (is_int($v) || is_float($v)) {
+                } elseif (is_int($v)) {
                     return $v;
                 }
 
