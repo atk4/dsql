@@ -49,7 +49,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     protected $escape_char = '"';
 
-    /** @var string used for linking */
+    /** @var string|null used for linking */
     private $_paramBase;
 
     /** @var array Populated with actual values by escapeParam() */
@@ -376,7 +376,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function render()
     {
-        $hadUnderscoreParamBase = isset($this->_paramBase);
+        $hadUnderscoreParamBase = $this->_paramBase !== null;
         if (!$hadUnderscoreParamBase) {
             $hadUnderscoreParamBase = false;
             $this->_paramBase = $this->paramBase;
@@ -556,7 +556,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                 $result = $statement->execute();
                 if (Connection::isComposerDbal2x()) {
-                    return $statement;
+                    return $statement; // @phpstan-ignore-line
                 }
 
                 return $result;
