@@ -8,7 +8,7 @@ use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\Exception as DbalException;
 use Doctrine\DBAL\Result as DbalResult;
 
-class Expression implements \ArrayAccess, \IteratorAggregate
+class Expression implements \ArrayAccess
 {
     /** @const string "[]" in template, escape as parameter */
     protected const ESCAPE_PARAM = 'param';
@@ -579,7 +579,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * TODO drop support for \IteratorAggregate.
+     * TODO drop method once we support DBAL 3.x only.
      */
     public function getIterator(): \Traversable
     {
