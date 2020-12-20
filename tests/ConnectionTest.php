@@ -158,7 +158,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
     public function testException3()
     {
         $this->expectException(\Atk4\Dsql\Exception::class);
-        $c = new \Atk4\Dsql\Sqlite\Connection('sqlite::memory');
+        $c = new \Atk4\Dsql\Sqlite\Connection('sqlite::memory'); // @phpstan-ignore-line
     }
 
     public function testException4()

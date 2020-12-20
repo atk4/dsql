@@ -164,7 +164,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * Use this instead of "new Expression()" if you want to automatically bind
      * new expression to the same connection as the parent.
      *
-     * @param array|string $properties
+     * @param string|array $properties
      * @param array        $arguments
      *
      * @return Expression

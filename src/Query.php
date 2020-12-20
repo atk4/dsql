@@ -558,7 +558,7 @@ class Query extends Expression
      * @param mixed  $cond     Condition such as '=', '>' or 'is not'
      * @param mixed  $value    Value. Will be quoted unless you pass expression
      * @param string $kind     Do not use directly. Use having()
-     * @param string $num_args when $kind is passed, we can't determine number of
+     * @param int    $num_args when $kind is passed, we can't determine number of
      *                         actual arguments, so this argument must be specified
      *
      * @return $this
@@ -662,9 +662,7 @@ class Query extends Expression
      */
     public function having($field, $cond = null, $value = null)
     {
-        $num_args = func_num_args();
-
-        return $this->where($field, $cond, $value, 'having', $num_args);
+        return $this->where($field, $cond, $value, 'having', func_num_args());
     }
 
     /**
@@ -1263,8 +1261,8 @@ class Query extends Expression
      * Connection is not mandatory, but if set, will be preserved. This
      * method should be used for building parts of the query internally.
      *
-     * @param array $properties
-     * @param array $arguments
+     * @param string|array $properties
+     * @param array        $arguments
      *
      * @return Expression
      */
