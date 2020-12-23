@@ -69,7 +69,7 @@ class SelectTest extends AtkPhpunit\TestCase
                     }
 
                     return $v ? 1 : 0;
-                } elseif (is_int($v) || is_float($v)) {
+                } elseif (is_int($v)) {
                     return $v;
                 }
 
@@ -82,7 +82,7 @@ class SelectTest extends AtkPhpunit\TestCase
     {
         $this->dropDbIfExists();
 
-        $this->c = null;
+        $this->c = null; // @phpstan-ignore-line
     }
 
     private function q($table = null, $alias = null)

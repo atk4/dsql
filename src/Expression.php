@@ -49,7 +49,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     protected $escape_char = '"';
 
-    /** @var string used for linking */
+    /** @var string|null used for linking */
     private $_paramBase;
 
     /** @var array Populated with actual values by escapeParam() */
@@ -138,8 +138,8 @@ class Expression implements \ArrayAccess, \IteratorAggregate
     /**
      * Assigns a value to the specified offset.
      *
-     * @param string $offset
-     * @param mixed  $value  The value to set
+     * @param string|null $offset
+     * @param mixed       $value  The value to set
      */
     public function offsetSet($offset, $value): void
     {
@@ -164,7 +164,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      * Use this instead of "new Expression()" if you want to automatically bind
      * new expression to the same connection as the parent.
      *
-     * @param array|string $properties
+     * @param string|array $properties
      * @param array        $arguments
      *
      * @return Expression
@@ -181,6 +181,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
         // Otherwise, connection is probably PDO and we don't know which Expression
         // class to use, so we make a smart guess :)
+        // @phpstan-ignore-next-line
         if ($this instanceof Query) {
             $e = new self($properties, $arguments);
         } else {
@@ -376,7 +377,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
      */
     public function render()
     {
-        $hadUnderscoreParamBase = isset($this->_paramBase);
+        $hadUnderscoreParamBase = $this->_paramBase !== null;
         if (!$hadUnderscoreParamBase) {
             $hadUnderscoreParamBase = false;
             $this->_paramBase = $this->paramBase;
@@ -556,7 +557,7 @@ class Expression implements \ArrayAccess, \IteratorAggregate
 
                 $result = $statement->execute();
                 if (Connection::isComposerDbal2x()) {
-                    return $statement;
+                    return $statement; // @phpstan-ignore-line
                 }
 
                 return $result;

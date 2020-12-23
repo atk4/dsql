@@ -234,7 +234,7 @@ abstract class Connection
         // https://github.com/doctrine/dbal/pull/3912
         // TODO drop once DBAL 2.x support is dropped
         if (
-            in_array(get_class($dbalConnection->getDatabasePlatform()), [
+            in_array(get_class($dbalConnection->getDatabasePlatform()), [ // @phpstan-ignore-line
                 'Doctrine\DBAL\Platforms\SQLServerPlatform',
                 'Doctrine\DBAL\Platforms\SQLServer2005Platform',
                 'Doctrine\DBAL\Platforms\SQLServer2008Platform',
@@ -244,7 +244,7 @@ abstract class Connection
                 $dbalConnection->platform = new SQLServer2012Platform();
             }, null, DbalConnection::class)();
         } elseif (
-            in_array(get_class($dbalConnection->getDatabasePlatform()), [
+            in_array(get_class($dbalConnection->getDatabasePlatform()), [ // @phpstan-ignore-line
                 'Doctrine\DBAL\Platforms\PostgreSqlPlatform',
                 'Doctrine\DBAL\Platforms\PostgreSQL91Platform',
                 'Doctrine\DBAL\Platforms\PostgreSQL92Platform',

@@ -28,7 +28,7 @@ class Connection extends BaseConnection
     private static $ciDifferentDsnCounter = 0;
     /** @var array */
     private static $ciLastConnectDsn;
-    /** @var \PDO */
+    /** @var \PDO|null */
     private static $ciLastConnectPdo;
 
     protected static function connectDbalConnection(array $dsn)
@@ -68,7 +68,7 @@ class Connection extends BaseConnection
             }
 
             if (BaseConnection::isComposerDbal2x()) {
-                self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection();
+                self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection(); // @phpstan-ignore-line
             } else {
                 self::$ciLastConnectPdo = $dbalConnection->getWrappedConnection()->getWrappedConnection(); // @phpstan-ignore-line
             }
