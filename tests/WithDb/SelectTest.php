@@ -127,7 +127,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
 
         $names = [];
-        foreach ($this->q('employee')->where('retired', false) as $row) {
+        foreach ($this->q('employee')->where('retired', false)->getIterator() as $row) {
             $names[] = $row['name'];
         }
 
