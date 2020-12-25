@@ -1099,8 +1099,8 @@ class Query extends Expression
      * $q->order('name desc, id asc')
      * $q->order('name',true);
      *
-     * @param string|array $order Order by
-     * @param string|bool  $desc  true to sort descending
+     * @param string|Expression|Expressionable|array $order Order by
+     * @param string|bool                            $desc  true to sort descending
      *
      * @return $this
      */
