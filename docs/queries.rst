@@ -677,7 +677,7 @@ Ordering result-set
     Orders query result-set in ascending or descending order by single or
     multiple fields.
 
-    :param int $order: one or more field names, expression etc.
+    :param string $order: one or more field names, expression etc.
     :param int $desc: pass true to sort descending
     :returns: $this
 
