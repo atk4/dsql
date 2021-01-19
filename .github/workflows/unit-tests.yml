@@ -158,11 +158,11 @@ jobs:
         run: "vendor/bin/phpunit --configuration phpunit-pgsql.xml.dist \"$(if [ -n \"$LOG_COVERAGE\" ]; then echo '--coverage-text'; else echo '--no-coverage'; fi)\" -v"
 
       - name: "Run tests: MSSQL (only for Phpunit)"
-        if: startsWith(matrix.type, 'Phpunit')'
+        if: startsWith(matrix.type, 'Phpunit')
         run: "vendor/bin/phpunit --configuration phpunit-mssql.xml.dist \"$(if [ -n \"$LOG_COVERAGE\" ]; then echo '--coverage-text'; else echo '--no-coverage'; fi)\" -v"
 
       - name: "Run tests: Oracle (only for Phpunit)"
-        if: startsWith(matrix.type, 'Phpunit')'
+        if: startsWith(matrix.type, 'Phpunit')
         run: "vendor/bin/phpunit --configuration phpunit-oracle.xml.dist \"$(if [ -n \"$LOG_COVERAGE\" ]; then echo '--coverage-text'; else echo '--no-coverage'; fi)\" -v"
 
       - name: Upload coverage logs 1/2 (only for "latest" Phpunit)
