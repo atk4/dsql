@@ -57,6 +57,14 @@ abstract class Connection
         $this->setDefaults($properties);
     }
 
+    public function __destruct()
+    {
+        // needed for DBAL connection to be released immeditelly
+        if ($this->connection !== null) {
+            $this->connection->close();
+        }
+    }
+
     /**
      * Normalize DSN connection string.
      *
