@@ -469,14 +469,16 @@ class Expression implements \ArrayAccess
                 continue;
             }
 
-            if (is_numeric($val)) {
+            if ($val === null) {
+                $replacement = 'NULL\1';
+            } elseif (is_bool($val)) {
+                $replacement = ($val ? '1' : '0') . '\1';
+            } elseif (is_numeric($val)) {
                 $replacement = $val . '\1';
             } elseif (is_string($val)) {
-                $replacement = "'" . addslashes($val) . "'\\1";
-            } elseif ($val === null) {
-                $replacement = 'NULL\1';
+                $replacement = '\'' . addslashes($val) . '\'\1';
             } else {
-                $replacement = $val . '\\1';
+                $replacement = $val . '\1';
             }
 
             $result = preg_replace('~' . $key . '([^_]|$)~', $replacement, $result);
