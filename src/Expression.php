@@ -469,7 +469,7 @@ class Expression implements \ArrayAccess
                 $replacement = 'NULL';
             } elseif (is_bool($val)) {
                 $replacement = $val ? '1' : '0';
-            } elseif (is_numeric($val)) {
+            } elseif (is_int($val) || is_float($val)) {
                 $replacement = (string) $val;
             } elseif (is_string($val)) {
                 $replacement = '\'' . addslashes($val) . '\'';
