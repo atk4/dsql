@@ -474,7 +474,7 @@ class Expression implements \ArrayAccess
             } elseif (is_bool($val)) {
                 $replacement = $val ? '1' : '0';
             } elseif (is_numeric($val)) {
-                $replacement = $val;
+                $replacement = (string) $val;
             } elseif (is_string($val)) {
                 $replacement = '\'' . addslashes($val) . '\'';
             } else {
