@@ -481,7 +481,7 @@ class Expression implements \ArrayAccess
                 continue;
             }
 
-            $result = preg_replace('~' . $key . '(?=[^_]|$)~', $replacement, $result);
+            $result = preg_replace('~' . $key . '(?!\w)~', $replacement, $result);
         }
 
         if (class_exists('SqlFormatter')) { // requires optional "jdorn/sql-formatter" package
