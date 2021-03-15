@@ -458,10 +458,6 @@ class Expression implements \ArrayAccess
      */
     public function getDebugQuery(): string
     {
-        if (func_num_args() > 0) { // remove in 2020-dec
-            throw new Exception('Use of $html argument and html rendering has been deprecated');
-        }
-
         $result = $this->render();
 
         foreach (array_reverse($this->params) as $key => $val) {
