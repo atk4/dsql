@@ -470,18 +470,18 @@ class Expression implements \ArrayAccess
             }
 
             if ($val === null) {
-                $replacement = 'NULL\1';
+                $replacement = 'NULL';
             } elseif (is_bool($val)) {
-                $replacement = ($val ? '1' : '0') . '\1';
+                $replacement = $val ? '1' : '0';
             } elseif (is_numeric($val)) {
-                $replacement = $val . '\1';
+                $replacement = $val;
             } elseif (is_string($val)) {
-                $replacement = '\'' . addslashes($val) . '\'\1';
+                $replacement = '\'' . addslashes($val) . '\'';
             } else {
-                $replacement = $val . '\1';
+                continue;
             }
 
-            $result = preg_replace('~' . $key . '([^_]|$)~', $replacement, $result);
+            $result = preg_replace('~' . $key . '(?=[^_]|$)~', $replacement, $result);
         }
 
         if (class_exists('SqlFormatter')) { // requires optional "jdorn/sql-formatter" package
