@@ -458,28 +458,26 @@ class Expression implements \ArrayAccess
      */
     public function getDebugQuery(): string
     {
-        if (func_num_args() > 0) { // remove in 2020-dec
-            throw new Exception('Use of $html argument and html rendering has been deprecated');
-        }
-
         $result = $this->render();
 
         foreach (array_reverse($this->params) as $key => $val) {
-            if (is_numeric($key)) {
+            if (is_int($key)) {
                 continue;
             }
 
-            if (is_numeric($val)) {
-                $replacement = $val . '\1';
+            if ($val === null) {
+                $replacement = 'NULL';
+            } elseif (is_bool($val)) {
+                $replacement = $val ? '1' : '0';
+            } elseif (is_int($val) || is_float($val)) {
+                $replacement = (string) $val;
             } elseif (is_string($val)) {
-                $replacement = "'" . addslashes($val) . "'\\1";
-            } elseif ($val === null) {
-                $replacement = 'NULL\1';
+                $replacement = '\'' . addslashes($val) . '\'';
             } else {
-                $replacement = $val . '\\1';
+                continue;
             }
 
-            $result = preg_replace('~' . $key . '([^_]|$)~', $replacement, $result);
+            $result = preg_replace('~' . $key . '(?!\w)~', $replacement, $result);
         }
 
         if (class_exists('SqlFormatter')) { // requires optional "jdorn/sql-formatter" package
