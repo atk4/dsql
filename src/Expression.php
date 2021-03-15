@@ -461,7 +461,7 @@ class Expression implements \ArrayAccess
         $result = $this->render();
 
         foreach (array_reverse($this->params) as $key => $val) {
-            if (is_numeric($key)) {
+            if (is_int($key)) {
                 continue;
             }
 
