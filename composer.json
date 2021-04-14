@@ -35,7 +35,7 @@
     "require-release": {
         "php": ">=7.3.0",
         "ext-pdo": "*",
-        "atk4/core": "~2.3.0",
+        "atk4/core": "~2.4.0",
         "doctrine/dbal": "^2.10 || ^3.0"
     },
     "require-dev": {
