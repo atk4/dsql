@@ -1,66 +1,67 @@
 {
-  "name": "atk4/dsql",
-  "type": "library",
-  "description": "Dynamic SQL Builder in PHP",
-  "keywords": [
-    "framework",
-    "sql",
-    "builder",
-    "orm"
-  ],
-  "homepage": "http://agiletoolkit.org/",
-  "license": "MIT",
-  "authors": [
-    {
-        "name": "Romans Malinovskis",
-        "email": "romans@agiletoolkit.org",
-        "homepage": "https://nearly.guru/"
+    "name": "atk4/dsql",
+    "type": "library",
+    "description": "Dynamic SQL Builder in PHP",
+    "keywords": [
+        "framework",
+        "sql",
+        "builder",
+        "orm"
+    ],
+    "homepage": "http://agiletoolkit.org/",
+    "version": "dev-develop",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Romans Malinovskis",
+            "email": "romans@agiletoolkit.org",
+            "homepage": "https://nearly.guru/"
+        },
+        {
+            "name": "Imants Horsts",
+            "homepage": "https://darkside.lv/"
+        },
+        {
+            "name": "Michael Voříšek",
+            "homepage": "https://mvorisek.cz/"
+        }
+    ],
+    "require": {
+        "php": ">=7.3.0",
+        "ext-pdo": "*",
+        "atk4/core": "dev-develop",
+        "doctrine/dbal": "^2.10 || ^3.0"
     },
-    {
-        "name": "Imants Horsts",
-        "homepage": "https://darkside.lv/"
+    "require-release": {
+        "php": ">=7.3.0",
+        "ext-pdo": "*",
+        "atk4/core": "~2.4.0",
+        "doctrine/dbal": "^2.10 || ^3.0"
     },
-    {
-        "name": "Michael Voříšek",
-        "homepage": "https://mvorisek.cz/"
-    }
-  ],
-  "version": "dev-develop",
-  "minimum-stability": "dev",
-  "prefer-stable": true,
-  "config": {
-    "sort-packages": true
-  },
-  "require": {
-    "php": ">=7.3.0",
-    "ext-pdo": "*",
-    "atk4/core": "dev-develop",
-    "doctrine/dbal": "^2.10 || ^3.0"
-  },
-  "require-release": {
-    "php": ">=7.3.0",
-    "ext-pdo": "*",
-    "atk4/core": "~2.3.0",
-    "doctrine/dbal": "^2.10 || ^3.0"
-  },
-  "require-dev": {
-    "friendsofphp/php-cs-fixer": "^2.17",
-    "johnkary/phpunit-speedtrap": "^3.2",
-    "phpstan/phpstan": "^0.12.58",
-    "phpunit/phpcov": "*",
-    "phpunit/phpunit": ">=9.1"
-  },
-  "suggest": {
-    "jdorn/sql-formatter": "*"
-  },
-  "autoload": {
-    "psr-4": {
-      "Atk4\\Dsql\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Atk4\\Dsql\\Tests\\": "tests/"
-    }
-  }
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.13",
+        "friendsofphp/php-cs-fixer": "^2.17",
+        "johnkary/phpunit-speedtrap": "^3.2",
+        "phpstan/phpstan": "^0.12.58",
+        "phpunit/phpcov": "*",
+        "phpunit/phpunit": ">=9.1"
+    },
+    "suggest": {
+        "jdorn/sql-formatter": "*"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Atk4\\Dsql\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Atk4\\Dsql\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
