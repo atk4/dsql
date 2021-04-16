@@ -9,7 +9,6 @@
         "orm"
     ],
     "homepage": "http://agiletoolkit.org/",
-    "version": "dev-develop",
     "license": "MIT",
     "authors": [
         {
@@ -27,12 +26,6 @@
         }
     ],
     "require": {
-        "php": ">=7.3.0",
-        "ext-pdo": "*",
-        "atk4/core": "dev-develop",
-        "doctrine/dbal": "^2.10 || ^3.0"
-    },
-    "require-release": {
         "php": ">=7.3.0",
         "ext-pdo": "*",
         "atk4/core": "~2.4.0",
