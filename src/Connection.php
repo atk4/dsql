@@ -127,30 +127,23 @@ abstract class Connection
     {
         // If it's already PDO or DbalConnection object, then we simply use it
         if ($dsn instanceof \PDO) {
-            $connectionClass = self::resolveConnectionClass(
-                $dsn->getAttribute(\PDO::ATTR_DRIVER_NAME)
-            );
-
-            return new $connectionClass(array_merge([
-                'connection' => $connectionClass::connectDbalConnection(['pdo' => $dsn]),
-            ], $args));
+            $connectionClass = self::resolveConnectionClass($dsn->getAttribute(\PDO::ATTR_DRIVER_NAME));
+            $connectionArg = $connectionClass::connectDbalConnection(['pdo' => $dsn]);
         } elseif ($dsn instanceof DbalConnection) {
             /** @var \PDO */
             $pdo = self::isComposerDbal2x()
                 ? $dsn->getWrappedConnection()
                 : $dsn->getWrappedConnection()->getWrappedConnection(); // @phpstan-ignore-line
             $connectionClass = self::resolveConnectionClass($pdo->getAttribute(\PDO::ATTR_DRIVER_NAME));
-
-            return new $connectionClass(array_merge([
-                'connection' => $dsn,
-            ], $args));
+            $connectionArg = $dsn;
+        } else {
+            $dsn = static::normalizeDsn($dsn, $user, $password);
+            $connectionClass = self::resolveConnectionClass($dsn['driverSchema']);
+            $connectionArg = $connectionClass::connectDbalConnection($dsn);
         }
 
-        $dsn = static::normalizeDsn($dsn, $user, $password);
-        $connectionClass = self::resolveConnectionClass($dsn['driverSchema']);
-
         return new $connectionClass(array_merge([
-            'connection' => $connectionClass::connectDbalConnection($dsn),
+            'connection' => $connectionArg,
         ], $args));
     }
 
