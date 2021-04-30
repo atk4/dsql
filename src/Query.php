@@ -870,12 +870,6 @@ class Query extends Expression
      */
     public function set($field, $value = null)
     {
-        if ($value === false) {
-            throw (new Exception('Value "false" is not supported by SQL'))
-                ->addMoreInfo('field', $field)
-                ->addMoreInfo('value', $value);
-        }
-
         if (is_array($value)) {
             throw (new Exception('Array values are not supported by SQL'))
                 ->addMoreInfo('field', $field)

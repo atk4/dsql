@@ -113,7 +113,7 @@ class SelectTest extends AtkPhpunit\TestCase
 
         $this->assertSame(
             ['surname' => 'Williams'],
-            $this->q('employee')->field('surname')->where('retired', '1')->getRow()
+            $this->q('employee')->field('surname')->where('retired', true)->getRow()
         );
 
         $this->assertSame(
@@ -201,10 +201,10 @@ class SelectTest extends AtkPhpunit\TestCase
 
         // insert
         $this->q('employee')
-            ->set(['id' => 1, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+            ->set(['id' => 1, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
             ->insert();
         $this->q('employee')
-            ->set(['id' => 2, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+            ->set(['id' => 2, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => false])
             ->insert();
         $this->assertSame(
             [['id' => '1', 'name' => 'John'], ['id' => '2', 'name' => 'Jane']],
@@ -224,12 +224,12 @@ class SelectTest extends AtkPhpunit\TestCase
         // replace
         if ($this->c->getDatabasePlatform() instanceof PostgreSQL94Platform || $this->c->getDatabasePlatform() instanceof SQLServer2012Platform || $this->c->getDatabasePlatform() instanceof OraclePlatform) {
             $this->q('employee')
-                ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
+                ->set(['name' => 'Peter', 'surname' => 'Doe', 'retired' => true])
                 ->where('id', 1)
                 ->update();
         } else {
             $this->q('employee')
-                ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => 1])
+                ->set(['id' => 1, 'name' => 'Peter', 'surname' => 'Doe', 'retired' => true])
                 ->replace();
         }
 
@@ -251,7 +251,7 @@ class SelectTest extends AtkPhpunit\TestCase
 
         // delete
         $this->q('employee')
-            ->where('retired', 1)
+            ->where('retired', true)
             ->delete();
         $this->assertSame(
             [['id' => '2', 'name' => 'Jane']],
@@ -271,7 +271,7 @@ class SelectTest extends AtkPhpunit\TestCase
     {
         $this->assertSame(
             [['id' => '2', 'name' => 'Jack', 'surname' => 'Williams', 'retired' => '1']],
-            $this->q('employee')->where('retired', 1)->where($this->q()->expr('{}=[] or {}=[]', ['surname', 'Williams', 'surname', 'Smith']))->getRows()
+            $this->q('employee')->where('retired', true)->where($this->q()->expr('{}=[] or {}=[]', ['surname', 'Williams', 'surname', 'Smith']))->getRows()
         );
     }
 

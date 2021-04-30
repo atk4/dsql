@@ -1468,14 +1468,14 @@ class QueryTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * Value [false] is not supported by SQL.
+     * Value of type array is not supported by SQL.
      *
      * @covers ::set
      */
     public function testSetException1()
     {
         $this->expectException(Exception::class);
-        $this->q()->set('name', false);
+        $this->q()->set('name', []);
     }
 
     /**

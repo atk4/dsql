@@ -6,6 +6,7 @@ namespace Atk4\Dsql;
 
 use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\Exception as DbalException;
+use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\DBAL\Result as DbalResult;
 
 class Expression implements \ArrayAccess
@@ -528,9 +529,13 @@ class Expression implements \ArrayAccess
                     if (is_int($val)) {
                         $type = \PDO::PARAM_INT;
                     } elseif (is_bool($val)) {
-                        // SQL does not like booleans at all, so convert them INT
-                        $type = \PDO::PARAM_INT;
-                        $val = (int) $val;
+                        if ($this->connection->getDatabasePlatform() instanceof PostgreSQL94Platform) {
+                            $type = \PDO::PARAM_STR;
+                            $val = $val ? '1' : '0';
+                        } else {
+                            $type = \PDO::PARAM_INT;
+                            $val = $val ? 1 : 0;
+                        }
                     } elseif ($val === null) {
                         $type = \PDO::PARAM_NULL;
                     } elseif (is_string($val) || is_float($val)) {
