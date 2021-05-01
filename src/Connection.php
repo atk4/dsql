@@ -256,6 +256,21 @@ abstract class Connection
             }, null, DbalConnection::class)();
         }
 
+        // PostgreSQL DBAL platform converts boolean to integer, but PHP 8.0.5 requires string, see:
+        // https://github.com/php/php-src/pull/6801
+        if ($dbalConnection->getDatabasePlatform() instanceof PostgreSQL94Platform) {
+            \Closure::bind(function () use ($dbalConnection) {
+                $dbalConnection->platform = new class() extends PostgreSQL94Platform {
+                    public function convertBooleansToDatabaseValue($item)
+                    {
+                        $v = $this->convertFromBoolean(parent::convertBooleansToDatabaseValue($item));
+
+                        return $v === null ? null : ($v ? '1' : '0');
+                    }
+                };
+            }, null, DbalConnection::class)();
+        }
+
         // SQL Server DBAL platform has buggy identifier escaping, fix until fixed officially, see:
         // https://github.com/doctrine/dbal/pull/4360
         if ($dbalConnection->getDatabasePlatform() instanceof SQLServer2012Platform) {
