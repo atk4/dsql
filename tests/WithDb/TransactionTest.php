@@ -149,10 +149,10 @@ class TransactionTest extends AtkPhpunit\TestCase
         // without transaction, ignoring exceptions
         try {
             $this->q('employee')
-                ->set(['id' => 1, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                ->set(['id' => 1, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
                 ->insert();
             $this->q('employee')
-                ->set(['id' => 2, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                ->set(['id' => 2, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => false])
                 ->insert();
         } catch (\Exception $e) {
             // ignore
@@ -166,7 +166,7 @@ class TransactionTest extends AtkPhpunit\TestCase
         // 1-level transaction: begin, insert, 2, rollback, 1
         $this->c->beginTransaction();
         $this->q('employee')
-            ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+            ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
             ->insert();
         $this->assertSame(
             '2',
@@ -183,10 +183,10 @@ class TransactionTest extends AtkPhpunit\TestCase
         try {
             $this->c->atomic(function () {
                 $this->q('employee')
-                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
                     ->insert();
                 $this->q('employee')
-                    ->set(['id' => 4, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 4, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => false])
                     ->insert();
             });
         } catch (\Exception $e) {
@@ -202,21 +202,21 @@ class TransactionTest extends AtkPhpunit\TestCase
         try {
             $this->c->atomic(function () {
                 $this->q('employee')
-                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
                     ->insert();
 
                 // success, in, fail, out, fail
                 $this->c->atomic(function () {
                     $this->q('employee')
-                        ->set(['id' => 4, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                        ->set(['id' => 4, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
                         ->insert();
                     $this->q('employee')
-                        ->set(['id' => 5, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                        ->set(['id' => 5, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => false])
                         ->insert();
                 });
 
                 $this->q('employee')
-                    ->set(['id' => 6, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 6, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => false])
                     ->insert();
             });
         } catch (\Exception $e) {
@@ -232,18 +232,18 @@ class TransactionTest extends AtkPhpunit\TestCase
         try {
             $this->c->atomic(function () {
                 $this->q('employee')
-                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
                     ->insert();
 
                 // success, in, success, out, fail
                 $this->c->atomic(function () {
                     $this->q('employee')
-                        ->set(['id' => 4, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                        ->set(['id' => 4, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
                         ->insert();
                 });
 
                 $this->q('employee')
-                    ->set(['id' => 5, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 5, 'FOO' => 'bar', 'name' => 'Jane', 'surname' => 'Doe', 'retired' => false])
                     ->insert();
             });
         } catch (\Exception $e) {
@@ -259,18 +259,18 @@ class TransactionTest extends AtkPhpunit\TestCase
         try {
             $this->c->atomic(function () {
                 $this->q('employee')
-                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
                     ->insert();
 
                 // success, in, fail, out, catch exception
                 $this->c->atomic(function () {
                     $this->q('employee')
-                        ->set(['id' => 4, 'FOO' => 'bar', 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                        ->set(['id' => 4, 'FOO' => 'bar', 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
                         ->insert();
                 });
 
                 $this->q('employee')
-                    ->set(['id' => 5, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => 0])
+                    ->set(['id' => 5, 'name' => 'Jane', 'surname' => 'Doe', 'retired' => false])
                     ->insert();
             });
         } catch (\Exception $e) {
@@ -286,7 +286,7 @@ class TransactionTest extends AtkPhpunit\TestCase
         try {
             $this->c->atomic(function () {
                 $this->q('employee')
-                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => 1])
+                    ->set(['id' => 3, 'name' => 'John', 'surname' => 'Doe', 'retired' => true])
                     ->insert();
             });
         } catch (\Exception $e) {
