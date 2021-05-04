@@ -1340,31 +1340,6 @@ class QueryTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * Test where() when $field is passed as array. Should create OR conditions.
-     *
-     * @covers ::_render_orwhere
-     * @covers ::_render_where
-     * @covers ::orExpr
-     * @covers ::where
-     */
-    public function testOrWhere()
-    {
-        $this->assertSame(
-            'select "name" from "employee" where ("a" = :a or "b" = :b)',
-            $this->q()
-                ->field('name')->table('employee')->where([['a', 1], ['b', 1]])
-                ->render()
-        );
-
-        $this->assertSame(
-            'select "name" from "employee" where ("a" = :a or (a=b))',
-            $this->q()
-                ->field('name')->table('employee')->where([['a', 1], 'a=b'])
-                ->render()
-        );
-    }
-
-    /**
      * Test OrWhere and AndWhere without where condition. Should ignore them.
      *
      * @covers ::_render_andwhere

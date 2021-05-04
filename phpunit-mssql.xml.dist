@@ -13,7 +13,7 @@
     <listeners>
         <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener" />
     </listeners>
-    <coverage processUncoveredFiles="true">
+    <coverage>
         <include>
             <directory suffix=".php">src</directory>
         </include>
