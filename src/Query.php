@@ -534,6 +534,9 @@ class Query extends Expression
      * surrounded by brackets:
      *  $q->where('user_id',$q->dsql()->table('users')->field('id'));
      *
+     * To specify OR conditions:
+     *  $q->where($q->orExpr()->where('a',1)->where('b',1));
+     *
      * @param mixed  $field    Field or Expression
      * @param mixed  $cond     Condition such as '=', '>' or 'is not'
      * @param mixed  $value    Value. Will be quoted unless you pass expression
