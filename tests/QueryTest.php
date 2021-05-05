@@ -25,8 +25,6 @@ class QueryTest extends AtkPhpunit\TestCase
     }
 
     /**
-     * Test constructor.
-     *
      * @covers ::__construct
      */
     public function testConstruct(): void

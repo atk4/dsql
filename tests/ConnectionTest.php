@@ -66,9 +66,6 @@ class DummyConnection4 extends Connection
  */
 class ConnectionTest extends AtkPhpunit\TestCase
 {
-    /**
-     * Test constructor.
-     */
     public function testInit(): void
     {
         $c = Connection::connect('sqlite::memory:');

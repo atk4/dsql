@@ -13,8 +13,6 @@ use Atk4\Dsql\Expression;
 class ExceptionTest extends AtkPhpunit\TestCase
 {
     /**
-     * Test constructor.
-     *
      * @covers ::__construct
      */
     public function testException1(): void
