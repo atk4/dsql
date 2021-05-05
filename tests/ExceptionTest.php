@@ -17,21 +17,21 @@ class ExceptionTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testException1()
+    public function testException1(): void
     {
         $this->expectException(\Atk4\Dsql\Exception::class);
 
         throw new \Atk4\Dsql\Exception();
     }
 
-    public function testException2()
+    public function testException2(): void
     {
         $this->expectException(\Atk4\Dsql\Exception::class);
         $e = new Expression('hello, [world]');
         $e->render();
     }
 
-    public function testException3()
+    public function testException3(): void
     {
         try {
             $e = new Expression('hello, [world]');

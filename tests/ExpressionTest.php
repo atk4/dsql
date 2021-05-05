@@ -25,7 +25,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testConstructorException1st1()
+    public function testConstructorException1st1(): void
     {
         $this->expectException(Exception::class);
         $this->e(null);
@@ -36,7 +36,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testConstructorException1st2()
+    public function testConstructorException1st2(): void
     {
         $this->expectException(Exception::class);
         $this->e(false);
@@ -45,7 +45,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * Test constructor exception - wrong 2nd parameter.
      */
-    public function testConstructorException2nd1()
+    public function testConstructorException2nd1(): void
     {
         $this->expectException(Exception::class);
         $this->e('hello, []', false);
@@ -54,7 +54,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * Test constructor exception - wrong 2nd parameter.
      */
-    public function testConstructorException2nd2()
+    public function testConstructorException2nd2(): void
     {
         $this->expectException(Exception::class);
         $this->e('hello, []', 'hello');
@@ -63,7 +63,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * Test constructor exception - no arguments.
      */
-    public function testConstructorException0arg()
+    public function testConstructorException0arg(): void
     {
         // Template is not defined for Expression
         $this->expectException(Exception::class);
@@ -75,7 +75,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testConstructor1()
+    public function testConstructor1(): void
     {
         $this->assertSame(
             '',
@@ -90,7 +90,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * @covers ::__construct
      * @covers ::escapeIdentifier
      */
-    public function testConstructor2()
+    public function testConstructor2(): void
     {
         // pass as string
         $this->assertSame(
@@ -124,7 +124,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testConstructor3()
+    public function testConstructor3(): void
     {
         $e = $this->e('hello, [who]', ['who' => 'world']);
         $this->assertSame('hello, :a', $e->render());
@@ -140,7 +140,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testConstructor4()
+    public function testConstructor4(): void
     {
         // argument = Expression
         $this->assertSame(
@@ -190,7 +190,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * @dataProvider provideNoTemplatingInSqlStringData
      */
-    public function testNoTemplatingInSqlString(string $expectedStr, string $exprStr, array $exprArgs)
+    public function testNoTemplatingInSqlString(string $expectedStr, string $exprStr, array $exprArgs): void
     {
         $this->assertSame($expectedStr, $this->e($exprStr, $exprArgs)->render());
     }
@@ -235,7 +235,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * @covers ::escapeParam
      * @covers ::getDebugQuery
      */
-    public function testNestedParams()
+    public function testNestedParams(): void
     {
         // ++1 and --2
         $e1 = $this->e('[] and []', [
@@ -258,7 +258,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * @covers ::__construct
      * @covers ::render
      */
-    public function testNestedExpressions()
+    public function testNestedExpressions(): void
     {
         $e1 = $this->e('Hello [who]', ['who' => 'world']);
 
@@ -280,7 +280,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * @covers ::__toString
      */
     /*
-    public function testToStringException1()
+    public function testToStringException1(): void
     {
         $e = new MyBadExpression('Hello');
         $this->expectException(Exception::class);
@@ -293,7 +293,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::expr
      */
-    public function testExpr()
+    public function testExpr(): void
     {
         $e = $this->e(['connection' => new \stdClass()]);
         $this->assertTrue($e->expr()->connection instanceof \stdClass);
@@ -306,7 +306,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * @covers ::escapeIdentifier
      * @covers ::escapeIdentifierSoft
      */
-    public function testEscape()
+    public function testEscape(): void
     {
         // escaping expressions
         $this->assertSame(
@@ -367,7 +367,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::escapeParam
      */
-    public function testParam()
+    public function testParam(): void
     {
         $e = new Expression('hello, [who]', ['who' => 'world']);
         $this->assertSame(
@@ -383,7 +383,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * @covers ::consume
      */
-    public function testConsume()
+    public function testConsume(): void
     {
         $constants = (new \ReflectionClass(Expression::class))->getConstants();
 
@@ -416,7 +416,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::consume
      */
-    public function testConsumeException1()
+    public function testConsumeException1(): void
     {
         $this->expectException(Exception::class);
         $this->callProtected($this->e(), 'consume', 123, 'blahblah');
@@ -427,7 +427,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::consume
      */
-    public function testConsumeException2()
+    public function testConsumeException2(): void
     {
         $this->expectException(Exception::class);
         $this->callProtected($this->e(), 'consume', new \StdClass());
@@ -439,7 +439,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      * @covers ::offsetSet
      * @covers ::offsetUnset
      */
-    public function testArrayAccess()
+    public function testArrayAccess(): void
     {
         $e = $this->e('', ['parrot' => 'red', 'blue']);
 
@@ -478,7 +478,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @doesNotPerformAssertions
      */
-    public function testIteratorAggregate()
+    public function testIteratorAggregate(): void
     {
         // todo - can not test this without actual DB connection and executing expression
     }
@@ -488,7 +488,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @coversNothing
      */
-    public function testJsonExpression()
+    public function testJsonExpression(): void
     {
         $e = new JsonExpression('hello, [who]', ['who' => 'world']);
 
@@ -505,7 +505,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     /**
      * Test reset exception if tag is not a string.
      */
-    public function testResetException()
+    public function testResetException(): void
     {
         $this->expectException(Exception::class);
         $this->e('test')->reset($this->e());
@@ -518,7 +518,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @doesNotPerformAssertions
      */
-    public function testVarDump()
+    public function testVarDump(): void
     {
         $this->e('test')->__debugInfo();
 
@@ -530,7 +530,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      *
      * @covers ::reset
      */
-    public function testReset()
+    public function testReset(): void
     {
         // reset everything
         $e = $this->e('hello, [name] [surname]', ['name' => 'John', 'surname' => 'Doe']);

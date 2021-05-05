@@ -16,10 +16,10 @@ class ConnectionTest extends AtkPhpunit\TestCase
     /**
      * @doesNotPerformAssertions
      */
-    public function testServerConnection()
+    public function testServerConnection(): void
     {
         $c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
 
-        return (string) $c->expr('SELECT 1' . ($c->getDatabasePlatform() instanceof OraclePlatform ? ' FROM DUAL' : ''))->getOne();
+        $this->assertSame('1', $c->expr('SELECT 1' . ($c->getDatabasePlatform() instanceof OraclePlatform ? ' FROM DUAL' : ''))->getOne());
     }
 }

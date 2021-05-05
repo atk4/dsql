@@ -69,7 +69,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
     /**
      * Test constructor.
      */
-    public function testInit()
+    public function testInit(): void
     {
         $c = Connection::connect('sqlite::memory:');
         $this->assertSame(
@@ -81,7 +81,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
     /**
      * Test DSN normalize.
      */
-    public function testDsnNormalize()
+    public function testDsnNormalize(): void
     {
         // standard
         $dsn = Connection::normalizeDsn('mysql://root:pass@localhost/db');
@@ -119,7 +119,7 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $this->assertSame(['dsn' => 'mysql:host=localhost:1234;dbname=db', 'user' => null, 'pass' => null, 'driverSchema' => 'mysql', 'rest' => 'host=localhost:1234;dbname=db'], $dsn);
     }
 
-    public function testConnectionRegistry()
+    public function testConnectionRegistry(): void
     {
         DummyConnection::registerConnectionClass();
 
@@ -137,31 +137,31 @@ class ConnectionTest extends AtkPhpunit\TestCase
         $this->assertSame(DummyConnection4::class, Connection::resolveConnectionClass('dummy4'));
     }
 
-    public function testMysqlFail()
+    public function testMysqlFail(): void
     {
         $this->expectException(\Exception::class);
         $c = Connection::connect('mysql:host=256.256.256.256'); // invalid host
     }
 
-    public function testException1()
+    public function testException1(): void
     {
         $this->expectException(\Atk4\Dsql\Exception::class);
         $c = \Atk4\Dsql\Sqlite\Connection::connect(':');
     }
 
-    public function testException2()
+    public function testException2(): void
     {
         $this->expectException(\Atk4\Dsql\Exception::class);
         $c = Connection::connect('');
     }
 
-    public function testException3()
+    public function testException3(): void
     {
         $this->expectException(\Atk4\Dsql\Exception::class);
         $c = new \Atk4\Dsql\Sqlite\Connection('sqlite::memory'); // @phpstan-ignore-line
     }
 
-    public function testException4()
+    public function testException4(): void
     {
         $c = new \Atk4\Dsql\Sqlite\Connection();
         $q = $c->expr('select (2+2)');

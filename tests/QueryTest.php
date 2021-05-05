@@ -29,7 +29,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::__construct
      */
-    public function testConstruct()
+    public function testConstruct(): void
     {
         // passing properties in constructor
         $this->assertSame(
@@ -43,7 +43,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::dsql
      */
-    public function testDsql()
+    public function testDsql(): void
     {
         $q = $this->q(['connection' => new \stdClass()]);
         $this->assertTrue($q->dsql()->connection instanceof \stdClass);
@@ -54,7 +54,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::field
      */
-    public function testFieldReturnValue()
+    public function testFieldReturnValue(): void
     {
         $q = $this->q();
         $this->assertSame($q, $q->field('first_name'));
@@ -66,7 +66,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_field
      * @covers ::field
      */
-    public function testFieldBasic()
+    public function testFieldBasic(): void
     {
         $this->assertSame(
             '"first_name"',
@@ -128,7 +128,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_field
      * @covers ::field
      */
-    public function testFieldDefaultField()
+    public function testFieldDefaultField(): void
     {
         // default defaultField
         $this->assertSame(
@@ -158,7 +158,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_field
      * @covers ::field
      */
-    public function testFieldExpression()
+    public function testFieldExpression(): void
     {
         $this->assertSame(
             '"name"',
@@ -201,7 +201,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_set_args
      * @covers ::field
      */
-    public function testFieldException1()
+    public function testFieldException1(): void
     {
         $this->expectException(Exception::class);
         $this->q()->field('name', 'a')->field('surname', 'a');
@@ -212,7 +212,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::field
      */
-    public function testFieldException2()
+    public function testFieldException2(): void
     {
         $this->expectException(Exception::class);
         $this->q()->field(['name', 'surname'], 'a');
@@ -223,7 +223,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::table
      */
-    public function testTableException1()
+    public function testTableException1(): void
     {
         $this->expectException(Exception::class);
         $this->q()->table('employee,jobs', 'u');
@@ -234,7 +234,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::table
      */
-    public function testTableException2()
+    public function testTableException2(): void
     {
         $this->expectException(Exception::class);
         $this->q()->table(['employee', 'jobs'], 'u');
@@ -247,7 +247,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @doesNotPerformAssertions
      */
-    public function testTableException3()
+    public function testTableException3(): void
     {
         //$this->expectException(Exception::class); // no more
         $this->q()->table($this->q()->expr('test'));
@@ -258,7 +258,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::table
      */
-    public function testTableException4()
+    public function testTableException4(): void
     {
         $this->expectException(Exception::class);
         $this->q()->table($this->q()->table('test'));
@@ -270,7 +270,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_set_args
      * @covers ::table
      */
-    public function testTableException5()
+    public function testTableException5(): void
     {
         $this->expectException(Exception::class);
         $this->q()
@@ -284,7 +284,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_set_args
      * @covers ::table
      */
-    public function testTableException6()
+    public function testTableException6(): void
     {
         $this->expectException(Exception::class);
         $this->q()
@@ -298,7 +298,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_set_args
      * @covers ::table
      */
-    public function testTableException7()
+    public function testTableException7(): void
     {
         $this->expectException(Exception::class);
         $this->q()
@@ -312,7 +312,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_set_args
      * @covers ::table
      */
-    public function testTableException8()
+    public function testTableException8(): void
     {
         $this->expectException(Exception::class);
         $this->q()
@@ -326,7 +326,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_set_args
      * @covers ::table
      */
-    public function testTableException9()
+    public function testTableException9(): void
     {
         $this->expectException(Exception::class);
         $this->q()
@@ -339,7 +339,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::table
      */
-    public function testTableException10()
+    public function testTableException10(): void
     {
         $this->expectException(Exception::class);
         $this->q()
@@ -354,7 +354,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::table
      */
-    public function testTableException11()
+    public function testTableException11(): void
     {
         $this->expectException(Exception::class);
         $this->q()
@@ -369,7 +369,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::mode
      */
-    public function testModeException1()
+    public function testModeException1(): void
     {
         $this->expectException(Exception::class);
         $this->q()->mode('non_existant_mode');
@@ -380,7 +380,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::table
      */
-    public function testTableReturnValue()
+    public function testTableReturnValue(): void
     {
         $q = $this->q();
         $this->assertSame($q, $q->table('employee'));
@@ -391,7 +391,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_table_noalias
      * @covers ::table
      */
-    public function testTableRender1()
+    public function testTableRender1(): void
     {
         // no table defined
         $this->assertSame(
@@ -513,7 +513,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_table
      * @covers ::table
      */
-    public function testTableRender2()
+    public function testTableRender2(): void
     {
         // pass table as expression or query
         $q = $this->q()->table('employee');
@@ -554,7 +554,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers \Atk4\Dsql\Expression::consume
      * @covers \Atk4\Dsql\Expression::render
      */
-    public function testBasicRenderSubquery()
+    public function testBasicRenderSubquery(): void
     {
         $age = new Expression('coalesce([age], [default_age])');
         $age['age'] = new Expression('year(now()) - year(birth_date)');
@@ -571,7 +571,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * @covers \Atk4\Dsql\Expression::getDebugQuery
      */
-    public function testTestgetDebugQuery()
+    public function testTestgetDebugQuery(): void
     {
         $age = new Expression('coalesce([age], [default_age], [foo], [bar])');
         $age['age'] = new Expression('year(now()) - year(birth_date)');
@@ -590,7 +590,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * @covers ::__debugInfo
      */
-    public function testVarDump()
+    public function testVarDump(): void
     {
         $this->assertMatchesRegularExpression(
             '/select\s+\*\s+from\s*"user".*/',
@@ -601,7 +601,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * @covers ::__debugInfo
      */
-    public function testVarDump2()
+    public function testVarDump2(): void
     {
         $this->assertMatchesRegularExpression(
             '/.*Expression could not render tag.*/',
@@ -612,7 +612,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * @covers ::__debugInfo
      */
-    public function testVarDump3()
+    public function testVarDump3(): void
     {
         $this->assertMatchesRegularExpression(
             '/.*Hello \'php\'.*/',
@@ -623,7 +623,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * @covers ::__debugInfo
      */
-    public function testVarDump4()
+    public function testVarDump4(): void
     {
         // should throw exception "Table cannot be Query in UPDATE, INSERT etc. query modes"
         $this->assertMatchesRegularExpression(
@@ -641,7 +641,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::render
      * @covers ::table
      */
-    public function testUnionQuery()
+    public function testUnionQuery(): void
     {
         // 1st query
         $q1 = $this->q()
@@ -707,7 +707,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::where
      */
-    public function testWhereReturnValue()
+    public function testWhereReturnValue(): void
     {
         $q = $this->q();
         $this->assertSame($q, $q->where('id', 1));
@@ -718,7 +718,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::field
      */
-    public function testHavingReturnValue()
+    public function testHavingReturnValue(): void
     {
         $q = $this->q();
         $this->assertSame($q, $q->having('id', 1));
@@ -731,7 +731,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_sub_render_where
      * @covers ::where
      */
-    public function testWhereBasic()
+    public function testWhereBasic(): void
     {
         // one parameter as a string - treat as expression
         $this->assertSame(
@@ -824,7 +824,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function testWhereExpression()
+    public function testWhereExpression(): void
     {
         $this->assertSame(
             'where (a = 5 or b = 6) and (c = 3 or d = 1)',
@@ -837,7 +837,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::order
      */
-    public function testWhereIncompatibleObject1()
+    public function testWhereIncompatibleObject1(): void
     {
         $this->expectException(Exception::class);
         $this->q('[where]')->where('a', new \DateTime())->render();
@@ -848,7 +848,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::order
      */
-    public function testWhereIncompatibleObject2()
+    public function testWhereIncompatibleObject2(): void
     {
         $this->expectException(Exception::class);
         $this->q('[where]')->where('a', new \DateTime());
@@ -859,7 +859,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::order
      */
-    public function testWhereIncompatibleObject3()
+    public function testWhereIncompatibleObject3(): void
     {
         $this->expectException(Exception::class);
         $this->q('[where]')->where('a', '<>', new \DateTime());
@@ -872,7 +872,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_sub_render_where
      * @covers ::where
      */
-    public function testWhereSpecialValues()
+    public function testWhereSpecialValues(): void
     {
         // in | not in
         $this->assertSame(
@@ -994,7 +994,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_having
      * @covers ::having
      */
-    public function testBasicHaving()
+    public function testBasicHaving(): void
     {
         $this->assertSame(
             'having "id" = :a',
@@ -1016,7 +1016,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_limit
      * @covers ::limit
      */
-    public function testLimit()
+    public function testLimit(): void
     {
         $this->assertSame(
             'limit 0, 100',
@@ -1034,7 +1034,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_order
      * @covers ::order
      */
-    public function testOrder()
+    public function testOrder(): void
     {
         $this->assertSame(
             'order by "name"',
@@ -1118,7 +1118,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::order
      */
-    public function testOrderException1()
+    public function testOrderException1(): void
     {
         $this->expectException(Exception::class);
         $this->q('[order]')->order(['name', 'surname'], 'desc');
@@ -1130,7 +1130,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_group
      * @covers ::group
      */
-    public function testGroup()
+    public function testGroup(): void
     {
         $this->assertSame(
             'group by "gender"',
@@ -1183,7 +1183,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test groupConcat.
      */
-    public function testGroupConcatException()
+    public function testGroupConcatException(): void
     {
         // doesn't support groupConcat by default
         $this->expectException(Exception::class);
@@ -1195,7 +1195,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::groupConcat
      */
-    public function testGroupConcat()
+    public function testGroupConcat(): void
     {
         $q = new Mysql\Query();
         $this->assertSame('group_concat(`foo` separator :a)', $q->groupConcat('foo', '-')->render());
@@ -1218,7 +1218,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::expr
      */
-    public function testExpr()
+    public function testExpr(): void
     {
         $this->assertSame(Expression::class, get_class($this->q()->expr('foo')));
 
@@ -1232,7 +1232,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_join
      * @covers ::join
      */
-    public function testJoin()
+    public function testJoin(): void
     {
         $this->assertSame(
             'left join "address" on "address"."id" = "address_id"',
@@ -1293,7 +1293,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::mode
      * @covers ::where
      */
-    public function testCombinedWhere()
+    public function testCombinedWhere(): void
     {
         $this->assertSame(
             'select "name" from "employee" where "a" = :a',
@@ -1349,7 +1349,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::orExpr
      * @covers ::where
      */
-    public function testEmptyOrAndWhere()
+    public function testEmptyOrAndWhere(): void
     {
         $this->assertSame(
             '',
@@ -1372,7 +1372,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::set
      * @covers ::where
      */
-    public function testInsertDeleteUpdate()
+    public function testInsertDeleteUpdate(): void
     {
         // delete template
         $this->assertSame(
@@ -1436,7 +1436,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::set
      */
-    public function testSetReturnValue()
+    public function testSetReturnValue(): void
     {
         $q = $this->q();
         $this->assertSame($q, $q->set('id', 1));
@@ -1447,7 +1447,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::set
      */
-    public function testSetException1()
+    public function testSetException1(): void
     {
         $this->expectException(Exception::class);
         $this->q()->set('name', []);
@@ -1460,7 +1460,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @doesNotPerformAssertions
      */
-    public function testSetException2()
+    public function testSetException2(): void
     {
         $this->q()->set((new Expression('foo')), 1);
     }
@@ -1474,7 +1474,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::orExpr
      * @covers ::where
      */
-    public function testNestedOrAnd()
+    public function testNestedOrAnd(): void
     {
         // test 1
         $q = $this->q();
@@ -1510,7 +1510,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function testNestedOrAndHaving()
+    public function testNestedOrAndHaving(): void
     {
         $q = $this->q();
         $q->table('employee')->field(new Expression('sum([])', ['amount']), 'salary')->group('type');
@@ -1526,7 +1526,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function testNestedOrAndHavingWithWhereException()
+    public function testNestedOrAndHavingWithWhereException(): void
     {
         $q = $this->q();
         $q->table('employee')->field(new Expression('sum([])', ['amount']), 'salary')->group('type');
@@ -1546,7 +1546,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers \Atk4\Dsql\Expression::reset
      */
-    public function testReset()
+    public function testReset(): void
     {
         // reset everything
         $q = $this->q()->table('user')->where('name', 'John');
@@ -1568,7 +1568,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::_render_option
      * @covers ::option
      */
-    public function testOption()
+    public function testOption(): void
     {
         // single option
         $this->assertSame(
@@ -1614,7 +1614,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::otherwise
      * @covers ::when
      */
-    public function testCaseExprNormal()
+    public function testCaseExprNormal(): void
     {
         // Test normal form
         $s = $this->q()->caseExpr()
@@ -1643,7 +1643,7 @@ class QueryTest extends AtkPhpunit\TestCase
      * @covers ::otherwise
      * @covers ::when
      */
-    public function testCaseExprShortForm()
+    public function testCaseExprShortForm(): void
     {
         $s = $this->q()->caseExpr('status')
             ->when('New', 't2.expose_new')
@@ -1668,7 +1668,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @doesNotPerformAssertions
      */
-    public function testCaseExprException1()
+    public function testCaseExprException1(): void
     {
         //$this->expectException(Exception::class);
         $this->q()->caseExpr()
@@ -1679,7 +1679,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * When using short form CASE statement, then you should not set array as when() method 1st parameter.
      */
-    public function testCaseExprException2()
+    public function testCaseExprException2(): void
     {
         $this->expectException(Exception::class);
         $this->q()->caseExpr('status')
@@ -1692,7 +1692,7 @@ class QueryTest extends AtkPhpunit\TestCase
      *
      * @covers ::exprNow
      */
-    public function testExprNow()
+    public function testExprNow(): void
     {
         $this->assertSame(
             'update "employee" set "hired"=current_timestamp()',
@@ -1714,7 +1714,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test table name with dots in it - Select.
      */
-    public function testTableNameDot1()
+    public function testTableNameDot1(): void
     {
         // render table
         $this->assertSame(
@@ -1746,7 +1746,7 @@ class QueryTest extends AtkPhpunit\TestCase
     /**
      * Test WITH.
      */
-    public function testWith()
+    public function testWith(): void
     {
         $q1 = $this->q()->table('salaries')->field('salary');
 
@@ -1797,7 +1797,7 @@ class QueryTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $this->assertSame(
             'select exists (select * from "contacts" where "first_name" = :a)',

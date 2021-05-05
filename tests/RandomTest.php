@@ -21,7 +21,7 @@ class RandomTest extends AtkPhpunit\TestCase
         return new Query(...$args);
     }
 
-    public function testMiscInsert()
+    public function testMiscInsert(): void
     {
         $data = [
             'id' => null,
@@ -79,7 +79,7 @@ class RandomTest extends AtkPhpunit\TestCase
         $this->assertSame($query, $q->render());
     }
 
-    public function testGroupConcat()
+    public function testGroupConcat(): void
     {
         $this->_groupConcatTest(
             new Mysql\Query(),

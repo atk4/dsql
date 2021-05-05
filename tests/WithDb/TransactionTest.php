@@ -102,14 +102,14 @@ class TransactionTest extends AtkPhpunit\TestCase
         return $this->c->expr($template, $args);
     }
 
-    public function testCommitException1()
+    public function testCommitException1(): void
     {
         // try to commit when not in transaction
         $this->expectException(Exception::class);
         $this->c->commit();
     }
 
-    public function testCommitException2()
+    public function testCommitException2(): void
     {
         // try to commit when not in transaction anymore
         $this->c->beginTransaction();
@@ -118,14 +118,14 @@ class TransactionTest extends AtkPhpunit\TestCase
         $this->c->commit();
     }
 
-    public function testRollbackException1()
+    public function testRollbackException1(): void
     {
         // try to rollback when not in transaction
         $this->expectException(Exception::class);
         $this->c->rollBack();
     }
 
-    public function testRollbackException2()
+    public function testRollbackException2(): void
     {
         // try to rollback when not in transaction anymore
         $this->c->beginTransaction();
@@ -137,7 +137,7 @@ class TransactionTest extends AtkPhpunit\TestCase
     /**
      * Tests simple and nested transactions.
      */
-    public function testTransactions()
+    public function testTransactions(): void
     {
         // truncate table, prepare
         $this->q('employee')->truncate();
@@ -302,7 +302,7 @@ class TransactionTest extends AtkPhpunit\TestCase
     /**
      * Tests inTransaction().
      */
-    public function testInTransaction()
+    public function testInTransaction(): void
     {
         // inTransaction tests
         $this->assertFalse(
