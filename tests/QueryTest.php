@@ -19,7 +19,10 @@ use Atk4\Dsql\Sqlite;
  */
 class QueryTest extends AtkPhpunit\TestCase
 {
-    public function q(...$args)
+    /**
+     * @param string|array ...$args
+     */
+    public function q(...$args): Query
     {
         return new Query(...$args);
     }
@@ -44,7 +47,7 @@ class QueryTest extends AtkPhpunit\TestCase
     public function testDsql(): void
     {
         $q = $this->q(['connection' => new \stdClass()]);
-        $this->assertTrue($q->dsql()->connection instanceof \stdClass);
+        $this->assertInstanceOf(\stdClass::class, $q->dsql()->connection);
     }
 
     /**
@@ -535,7 +538,7 @@ class QueryTest extends AtkPhpunit\TestCase
         $q2 = $this->q()->table('customer');
 
         $this->assertSame(
-            // TODO this way it would be more correct:
+            // this way it would be more correct:
             // 'select "e"."name", "c"."name" from (select * from "employee") "e", (select * from "customer") "c" where "e"."last_name" = "c"."last_name"',
             'select "e"."name", "c"."name" from (select * from "employee") "e", (select * from "customer") "c" where "e"."last_name" = c.last_name',
             $this->q()
@@ -1461,7 +1464,7 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testSetException2(): void
     {
-        $this->q()->set((new Expression('foo')), 1);
+        $this->q()->set(new Expression('foo'), 1);
     }
 
     /**

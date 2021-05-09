@@ -16,7 +16,10 @@ use Atk4\Dsql\Sqlite;
  */
 class RandomTest extends AtkPhpunit\TestCase
 {
-    public function q(...$args)
+    /**
+     * @param string|array ...$args
+     */
+    public function q(...$args): Query
     {
         return new Query(...$args);
     }
@@ -69,7 +72,7 @@ class RandomTest extends AtkPhpunit\TestCase
     /**
      * Confirms that group concat works for all the SQL vendors we support.
      */
-    public function _groupConcatTest($expected, $q)
+    public function _groupConcatTest(string $expected, Query $q): void
     {
         $q->table('people');
         $q->group('age');

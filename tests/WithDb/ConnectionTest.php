@@ -13,9 +13,6 @@ use Doctrine\DBAL\Platforms\OraclePlatform;
  */
 class ConnectionTest extends AtkPhpunit\TestCase
 {
-    /**
-     * @doesNotPerformAssertions
-     */
     public function testServerConnection(): void
     {
         $c = Connection::connect($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);

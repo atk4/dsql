@@ -9,6 +9,9 @@ use Doctrine\DBAL\Exception as DbalException;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\DBAL\Result as DbalResult;
 
+/**
+ * @phpstan-implements \ArrayAccess<int|string, mixed>
+ */
 class Expression implements Expressionable, \ArrayAccess
 {
     /** @const string "[]" in template, escape as parameter */
@@ -31,7 +34,7 @@ class Expression implements Expressionable, \ArrayAccess
      * This property is made public to ease customization and make it accessible
      * from Connection class for example.
      *
-     * @var array
+     * @var array<int|string, mixed>
      */
     public $args = ['custom' => []];
 
@@ -125,7 +128,7 @@ class Expression implements Expressionable, \ArrayAccess
     /**
      * Whether or not an offset exists.
      *
-     * @param string $offset
+     * @param int|string $offset
      */
     public function offsetExists($offset): bool
     {
@@ -135,7 +138,7 @@ class Expression implements Expressionable, \ArrayAccess
     /**
      * Returns the value at specified offset.
      *
-     * @param string $offset
+     * @param int|string $offset
      *
      * @return mixed
      */
@@ -147,8 +150,8 @@ class Expression implements Expressionable, \ArrayAccess
     /**
      * Assigns a value to the specified offset.
      *
-     * @param string|null $offset
-     * @param mixed       $value  The value to set
+     * @param int|string|null $offset
+     * @param mixed           $value  The value to set
      */
     public function offsetSet($offset, $value): void
     {
@@ -162,7 +165,7 @@ class Expression implements Expressionable, \ArrayAccess
     /**
      * Unsets an offset.
      *
-     * @param string $offset
+     * @param int|string $offset
      */
     public function offsetUnset($offset): void
     {
@@ -206,22 +209,15 @@ class Expression implements Expressionable, \ArrayAccess
     /**
      * Resets arguments.
      *
-     * @param string $tag
-     *
      * @return $this
      */
-    public function reset($tag = null)
+    public function reset(string $tag = null)
     {
         // unset all arguments
         if ($tag === null) {
             $this->args = ['custom' => []];
 
             return $this;
-        }
-
-        if (!is_string($tag)) {
-            throw (new Exception('Tag should be string'))
-                ->addMoreInfo('tag', $tag);
         }
 
         // unset custom/argument or argument if such exists
@@ -240,7 +236,7 @@ class Expression implements Expressionable, \ArrayAccess
      * @param mixed  $expression Expression
      * @param string $escapeMode Fall-back escaping mode - using one of the Expression::ESCAPE_* constants
      *
-     * @return string|array Quoted expression or array of param names
+     * @return string Quoted expression
      */
     protected function consume($expression, string $escapeMode = self::ESCAPE_PARAM)
     {
@@ -279,12 +275,6 @@ class Expression implements Expressionable, \ArrayAccess
         } finally {
             $expression->params = [];
             $expression->_paramBase = null;
-        }
-
-        if (isset($expression->allowToWrapInParenthesis)) {
-            'trigger_error'('Usage of Query::$allowToWrapInParenthesis is deprecated, use $wrapInParentheses instead - will be removed in version 2.5', E_USER_DEPRECATED);
-
-            $expression->wrapInParentheses = $expression->allowToWrapInParenthesis;
         }
 
         // Wrap in parentheses if expression requires so
@@ -369,8 +359,10 @@ class Expression implements Expressionable, \ArrayAccess
      * soft escaping, such as "*" or "(".
      * Those will typically indicate that expression is passed and shouldn't
      * be escaped.
+     *
+     * @param self|string $value
      */
-    protected function isUnescapablePattern($value)
+    protected function isUnescapablePattern($value): bool
     {
         return is_object($value)
         || $value === '*'
@@ -380,10 +372,8 @@ class Expression implements Expressionable, \ArrayAccess
 
     /**
      * Render expression and return it as string.
-     *
-     * @return string Rendered query
      */
-    public function render()
+    public function render(): string
     {
         $hadUnderscoreParamBase = $this->_paramBase !== null;
         if (!$hadUnderscoreParamBase) {
@@ -438,8 +428,6 @@ class Expression implements Expressionable, \ArrayAccess
                 }
                 $fx = '_render_' . $identifier;
 
-                // [foo] will attempt to call $this->_render_foo()
-
                 if (array_key_exists($identifier, $this->args['custom'])) {
                     $value = $this->consume($this->args['custom'][$identifier], $escaping);
                 } elseif (method_exists($this, $fx)) {
@@ -449,7 +437,7 @@ class Expression implements Expressionable, \ArrayAccess
                         ->addMoreInfo('tag', $identifier);
                 }
 
-                return is_array($value) ? '(' . implode(',', $value) . ')' : $value;
+                return $value;
             },
             $this->template
         );
@@ -495,7 +483,7 @@ class Expression implements Expressionable, \ArrayAccess
         return $result;
     }
 
-    public function __debugInfo()
+    public function __debugInfo(): array
     {
         $arr = [
             'R' => false,
@@ -591,6 +579,8 @@ class Expression implements Expressionable, \ArrayAccess
 
     /**
      * TODO drop method once we support DBAL 3.x only.
+     *
+     * @return \Traversable<array<mixed>>
      */
     public function getIterator(): \Traversable
     {

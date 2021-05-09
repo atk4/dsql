@@ -8,6 +8,7 @@ use Atk4\Core\AtkPhpunit;
 use Atk4\Dsql\Connection;
 use Atk4\Dsql\Exception;
 use Atk4\Dsql\Expression;
+use Atk4\Dsql\Query;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
@@ -85,7 +86,11 @@ class SelectTest extends AtkPhpunit\TestCase
         $this->c = null; // @phpstan-ignore-line
     }
 
-    private function q($table = null, $alias = null)
+    /**
+     * @param mixed  $table
+     * @param string $alias
+     */
+    private function q($table = null, string $alias = null): Query
     {
         $q = $this->c->dsql();
 
@@ -97,7 +102,11 @@ class SelectTest extends AtkPhpunit\TestCase
         return $q;
     }
 
-    private function e($template = null, $args = null)
+    /**
+     * @param string|array $template
+     * @param array        $args
+     */
+    private function e($template = [], array $args = null): Expression
     {
         return $this->c->expr($template, $args);
     }

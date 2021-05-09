@@ -15,7 +15,10 @@ use Atk4\Dsql\Query;
  */
 class ExpressionTest extends AtkPhpunit\TestCase
 {
-    public function e(...$args)
+    /**
+     * @param mixed ...$args
+     */
+    public function e(...$args): Expression
     {
         return new Expression(...$args);
     }
@@ -195,7 +198,10 @@ class ExpressionTest extends AtkPhpunit\TestCase
         $this->assertSame($expectedStr, $this->e($exprStr, $exprArgs)->render());
     }
 
-    public function provideNoTemplatingInSqlStringData()
+    /**
+     * @return iterable<array>
+     */
+    public function provideNoTemplatingInSqlStringData(): iterable
     {
         $testStrs = [];
         foreach (['\'', '"', '`'] as $enclosureChar) {
@@ -296,7 +302,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
     public function testExpr(): void
     {
         $e = $this->e(['connection' => new \stdClass()]);
-        $this->assertTrue($e->expr()->connection instanceof \stdClass);
+        $this->assertInstanceOf(\stdClass::class, $e->expr()->connection);
     }
 
     /**
@@ -480,7 +486,7 @@ class ExpressionTest extends AtkPhpunit\TestCase
      */
     public function testIteratorAggregate(): void
     {
-        // todo - can not test this without actual DB connection and executing expression
+        // TODO can not test this without actual DB connection and executing expression
     }
 
     /**
@@ -500,15 +506,6 @@ class ExpressionTest extends AtkPhpunit\TestCase
             [],
             $e->params
         );
-    }
-
-    /**
-     * Test reset exception if tag is not a string.
-     */
-    public function testResetException(): void
-    {
-        $this->expectException(Exception::class);
-        $this->e('test')->reset($this->e());
     }
 
     /**

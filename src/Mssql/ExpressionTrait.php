@@ -25,7 +25,9 @@ trait ExpressionTrait
 
     // {{{ MSSQL does not support named parameters, so convert them to numerical inside execute
 
+    /** @var array|null */
     private $numQueryParamsBackup;
+    /** @var string|null */
     private $numQueryRender;
 
     /**
@@ -61,7 +63,7 @@ trait ExpressionTrait
         }
     }
 
-    public function render()
+    public function render(): string
     {
         if ($this->numQueryParamsBackup !== null) {
             return $this->numQueryRender;

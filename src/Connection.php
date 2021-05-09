@@ -160,7 +160,7 @@ abstract class Connection
      * @param string $connectionClass
      * @param string $driverSchema
      */
-    public static function registerConnectionClass($connectionClass = null, $driverSchema = null)
+    public static function registerConnectionClass($connectionClass = null, $driverSchema = null): void
     {
         if ($connectionClass === null) {
             $connectionClass = static::class;
@@ -508,6 +508,10 @@ abstract class Connection
      * Atomic executes operations within one begin/end transaction, so if
      * the code inside callback will fail, then all of the transaction
      * will be also rolled back.
+     *
+     * @param mixed ...$args
+     *
+     * @return mixed
      */
     public function atomic(\Closure $fx, ...$args)
     {
