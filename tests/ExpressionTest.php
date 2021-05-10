@@ -8,6 +8,7 @@ use Atk4\Core\AtkPhpunit;
 use Atk4\Dsql\Exception;
 use Atk4\Dsql\Expression;
 use Atk4\Dsql\Expressionable;
+use Atk4\Dsql\Mysql;
 use Atk4\Dsql\Query;
 
 /**
@@ -301,8 +302,8 @@ class ExpressionTest extends AtkPhpunit\TestCase
      */
     public function testExpr(): void
     {
-        $e = $this->e(['connection' => new \stdClass()]);
-        $this->assertInstanceOf(\stdClass::class, $e->expr()->connection);
+        $e = $this->e(['connection' => new Mysql\Connection()]);
+        $this->assertInstanceOf(Mysql\Connection::class, $e->expr()->connection);
     }
 
     /**

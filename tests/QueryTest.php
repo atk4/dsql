@@ -46,8 +46,8 @@ class QueryTest extends AtkPhpunit\TestCase
      */
     public function testDsql(): void
     {
-        $q = $this->q(['connection' => new \stdClass()]);
-        $this->assertInstanceOf(\stdClass::class, $q->dsql()->connection);
+        $q = $this->q(['connection' => new Mysql\Connection()]);
+        $this->assertInstanceOf(Mysql\Connection::class, $q->dsql()->connection);
     }
 
     /**

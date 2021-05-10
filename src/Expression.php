@@ -59,7 +59,7 @@ class Expression implements Expressionable, \ArrayAccess
     /** @var array Populated with actual values by escapeParam() */
     public $params = [];
 
-    /** @var Connection */
+    /** @var Connection|null */
     public $connection;
 
     /** @var bool Wrap the expression in parentheses when consumed by another expression or not. */
@@ -183,17 +183,13 @@ class Expression implements Expressionable, \ArrayAccess
      */
     public function expr($properties = [], $arguments = null)
     {
-        // If we use DSQL Connection, then we should call expr() from there.
-        // Connection->expr() will return correct, connection specific Expression class.
-        if ($this->connection instanceof Connection) {
+        if ($this->connection !== null) {
             // TODO - condition above always satisfied when connection is set - adjust tests,
             // so connection is always set and remove the code below
             return $this->connection->expr($properties, $arguments);
         }
 
-        // Otherwise, connection is probably PDO and we don't know which Expression
-        // class to use, so we make a smart guess :)
-        // @phpstan-ignore-next-line
+        // make a smart guess :) when connection is not set
         if ($this instanceof Query) {
             $e = new self($properties, $arguments);
         } else {
@@ -201,7 +197,6 @@ class Expression implements Expressionable, \ArrayAccess
         }
 
         $e->escape_char = $this->escape_char;
-        $e->connection = $this->connection;
 
         return $e;
     }
