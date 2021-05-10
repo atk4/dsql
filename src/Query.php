@@ -172,7 +172,7 @@ class Query extends Expression
             $ret[] = $field;
         }
 
-        return implode(',', $ret);
+        return implode(', ', $ret);
     }
 
     protected function _render_field_noalias()
@@ -279,7 +279,7 @@ class Query extends Expression
             $ret[] = $table;
         }
 
-        return implode(',', $ret);
+        return implode(', ', $ret);
     }
 
     protected function _render_table_noalias()
@@ -349,7 +349,7 @@ class Query extends Expression
 
             // set cursor fields
             if ($fields !== null) {
-                $s .= '(' . implode(',', array_map([$this, 'escapeIdentifier'], $fields)) . ') ';
+                $s .= '(' . implode(', ', array_map([$this, 'escapeIdentifier'], $fields)) . ') ';
             }
 
             // will parameterize the value and escape if necessary
@@ -361,7 +361,7 @@ class Query extends Expression
             $ret[] = $s;
         }
 
-        return 'with ' . ($isRecursive ? 'recursive ' : '') . implode(',', $ret) . ' ';
+        return 'with ' . ($isRecursive ? 'recursive ' : '') . implode(', ', $ret) . ' ';
     }
 
     /// }}}
@@ -730,7 +730,7 @@ class Query extends Expression
                 return '1 = 1'; // always true
             }
 
-            $value = '(' . implode(',', array_map(function ($v) { return $this->escapeParam($v); }, $value)) . ')';
+            $value = '(' . implode(', ', array_map(function ($v) { return $this->escapeParam($v); }, $value)) . ')';
 
             return $field . ' ' . $cond . ' ' . $value;
         }
@@ -899,7 +899,7 @@ class Query extends Expression
             }
         }
 
-        return implode(',', $ret);
+        return implode(', ', $ret);
     }
 
     protected function _render_set_values()
@@ -915,7 +915,7 @@ class Query extends Expression
             }
         }
 
-        return implode(',', $ret);
+        return implode(', ', $ret);
     }
 
     // }}}

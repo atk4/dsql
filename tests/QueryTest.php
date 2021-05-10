@@ -71,11 +71,11 @@ class QueryTest extends AtkPhpunit\TestCase
             $this->callProtected($this->q()->field('first_name'), '_render_field')
         );
         $this->assertSame(
-            '"first_name","last_name"',
+            '"first_name", "last_name"',
             $this->callProtected($this->q()->field('first_name,last_name'), '_render_field')
         );
         $this->assertSame(
-            '"first_name","last_name"',
+            '"first_name", "last_name"',
             $this->callProtected($this->q()->field('first_name')->field('last_name'), '_render_field')
         );
         $this->assertSame(
@@ -447,31 +447,31 @@ class QueryTest extends AtkPhpunit\TestCase
 
         // multiple tables
         $this->assertSame(
-            'select "employee"."name" from "employee","jobs"',
+            'select "employee"."name" from "employee", "jobs"',
             $this->q()
                 ->field('employee.name')->table('employee')->table('jobs')
                 ->render()
         );
         $this->assertSame(
-            'select "name" from "employee","jobs"',
+            'select "name" from "employee", "jobs"',
             $this->q()
                 ->field('name')->table('employee,jobs')
                 ->render()
         );
         $this->assertSame(
-            'select "name" from "employee","jobs"',
+            'select "name" from "employee", "jobs"',
             $this->q()
                 ->field('name')->table('  employee ,   jobs  ')
                 ->render()
         );
         $this->assertSame(
-            'select "name" from "employee","jobs"',
+            'select "name" from "employee", "jobs"',
             $this->q()
                 ->field('name')->table(['employee', 'jobs'])
                 ->render()
         );
         $this->assertSame(
-            'select "name" from "employee","jobs"',
+            'select "name" from "employee", "jobs"',
             $this->q()
                 ->field('name')->table(['employee  ', '  jobs'])
                 ->render()
@@ -479,13 +479,13 @@ class QueryTest extends AtkPhpunit\TestCase
 
         // multiple tables with aliases
         $this->assertSame(
-            'select "name" from "employee","jobs" "j"',
+            'select "name" from "employee", "jobs" "j"',
             $this->q()
                 ->field('name')->table(['employee', 'j' => 'jobs'])
                 ->render()
         );
         $this->assertSame(
-            'select "name" from "employee" "e","jobs" "j"',
+            'select "name" from "employee" "e", "jobs" "j"',
             $this->q()
                 ->field('name')->table(['e' => 'employee', 'j' => 'jobs'])
                 ->render()
@@ -535,8 +535,9 @@ class QueryTest extends AtkPhpunit\TestCase
         $q2 = $this->q()->table('customer');
 
         $this->assertSame(
-            //this way it would be more correct: 'select "e"."name","c"."name" from (select * from "employee") "e",(select * from "customer") "c" where "e"."last_name" = "c"."last_name"',
-            'select "e"."name","c"."name" from (select * from "employee") "e",(select * from "customer") "c" where "e"."last_name" = c.last_name',
+            // TODO this way it would be more correct:
+            // 'select "e"."name", "c"."name" from (select * from "employee") "e", (select * from "customer") "c" where "e"."last_name" = "c"."last_name"',
+            'select "e"."name", "c"."name" from (select * from "employee") "e", (select * from "customer") "c" where "e"."last_name" = c.last_name',
             $this->q()
                 ->field('e.name')
                 ->field('c.name')
@@ -648,7 +649,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->field('amount', 'debit')
             ->field($this->q()->expr('0'), 'credit'); // simply 0
         $this->assertSame(
-            'select "date","amount" "debit",0 "credit" from "sales"',
+            'select "date", "amount" "debit", 0 "credit" from "sales"',
             $q1->render()
         );
 
@@ -659,23 +660,23 @@ class QueryTest extends AtkPhpunit\TestCase
             ->field($this->q()->expr('0'), 'debit') // simply 0
             ->field('amount', 'credit');
         $this->assertSame(
-            'select "date",0 "debit","amount" "credit" from "purchases"',
+            'select "date", 0 "debit", "amount" "credit" from "purchases"',
             $q2->render()
         );
 
         // $q1 union $q2
         $u = new Expression('([] union [])', [$q1, $q2]);
         $this->assertSame(
-            '((select "date","amount" "debit",0 "credit" from "sales") union (select "date",0 "debit","amount" "credit" from "purchases"))',
+            '((select "date", "amount" "debit", 0 "credit" from "sales") union (select "date", 0 "debit", "amount" "credit" from "purchases"))',
             $u->render()
         );
 
-        // SELECT date,debit,credit FROM ($q1 union $q2)
+        // SELECT date, debit, credit FROM ($q1 union $q2)
         $q = $this->q()
             ->field('date,debit,credit')
             ->table($u, 'derrivedTable');
         $this->assertSame(
-            'select "date","debit","credit" from ((select "date","amount" "debit",0 "credit" from "sales") union (select "date",0 "debit","amount" "credit" from "purchases")) "derrivedTable"',
+            'select "date", "debit", "credit" from ((select "date", "amount" "debit", 0 "credit" from "sales") union (select "date", 0 "debit", "amount" "credit" from "purchases")) "derrivedTable"',
             $q->render()
         );
 
@@ -686,16 +687,16 @@ class QueryTest extends AtkPhpunit\TestCase
         $q2->wrapInParentheses = false;
         $u = new Expression('([] union [])', [$q1, $q2]);
         $this->assertSame(
-            '(select "date","amount" "debit",0 "credit" from "sales" union select "date",0 "debit","amount" "credit" from "purchases")',
+            '(select "date", "amount" "debit", 0 "credit" from "sales" union select "date", 0 "debit", "amount" "credit" from "purchases")',
             $u->render()
         );
 
-        // SELECT date,debit,credit FROM ($q1 union $q2)
+        // SELECT date, debit, credit FROM ($q1 union $q2)
         $q = $this->q()
             ->field('date,debit,credit')
             ->table($u, 'derrivedTable');
         $this->assertSame(
-            'select "date","debit","credit" from (select "date","amount" "debit",0 "credit" from "sales" union select "date",0 "debit","amount" "credit" from "purchases") "derrivedTable"',
+            'select "date", "debit", "credit" from (select "date", "amount" "debit", 0 "credit" from "sales" union select "date", 0 "debit", "amount" "credit" from "purchases") "derrivedTable"',
             $q->render()
         );
     }
@@ -777,11 +778,11 @@ class QueryTest extends AtkPhpunit\TestCase
             $this->q('[where]')->where('id', '=', 1)->render()
         );
         $this->assertSame(
-            'where "id" in (:a,:b)',
+            'where "id" in (:a, :b)',
             $this->q('[where]')->where('id', '=', [1, 2])->render()
         );
         $this->assertSame(
-            'where "id" in (:a,:b)',
+            'where "id" in (:a, :b)',
             $this->q('[where]')->where('id', [1, 2])->render()
         );
         $this->assertSame(
@@ -874,27 +875,27 @@ class QueryTest extends AtkPhpunit\TestCase
     {
         // in | not in
         $this->assertSame(
-            'where "id" in (:a,:b)',
+            'where "id" in (:a, :b)',
             $this->q('[where]')->where('id', 'in', [1, 2])->render()
         );
         $this->assertSame(
-            'where "id" not in (:a,:b)',
+            'where "id" not in (:a, :b)',
             $this->q('[where]')->where('id', 'not in', [1, 2])->render()
         );
         $this->assertSame(
-            'where "id" not in (:a,:b)',
+            'where "id" not in (:a, :b)',
             $this->q('[where]')->where('id', 'not', [1, 2])->render()
         );
         $this->assertSame(
-            'where "id" in (:a,:b)',
+            'where "id" in (:a, :b)',
             $this->q('[where]')->where('id', '=', [1, 2])->render()
         );
         $this->assertSame(
-            'where "id" not in (:a,:b)',
+            'where "id" not in (:a, :b)',
             $this->q('[where]')->where('id', '<>', [1, 2])->render()
         );
         $this->assertSame(
-            'where "id" not in (:a,:b)',
+            'where "id" not in (:a, :b)',
             $this->q('[where]')->where('id', '!=', [1, 2])->render()
         );
         // speacial treatment for empty array values
@@ -908,15 +909,15 @@ class QueryTest extends AtkPhpunit\TestCase
         );
         // pass array as CSV
         $this->assertSame(
-            'where "id" in (:a,:b)',
+            'where "id" in (:a, :b)',
             $this->q('[where]')->where('id', 'in', '1,2')->render()
         );
         $this->assertSame(
-            'where "id" not in (:a,:b)',
+            'where "id" not in (:a, :b)',
             $this->q('[where]')->where('id', 'not in', '1,    2')->render()
         );
         $this->assertSame(
-            'where "id" not in (:a,:b)',
+            'where "id" not in (:a, :b)',
             $this->q('[where]')->where('id', 'not', '1,2')->render()
         );
 
@@ -973,15 +974,15 @@ class QueryTest extends AtkPhpunit\TestCase
 
         // in | not in
         $this->assertSame(
-            'where "id" in (:a,:b)',
+            'where "id" in (:a, :b)',
             $this->q('[where]')->where('id=', [1, 2])->render()
         );
         $this->assertSame(
-            'where "id" not in (:a,:b)',
+            'where "id" not in (:a, :b)',
             $this->q('[where]')->where('id!=', [1, 2])->render()
         );
         $this->assertSame(
-            'where "id" not in (:a,:b)',
+            'where "id" not in (:a, :b)',
             $this->q('[where]')->where('id<>', [1, 2])->render()
         );
     }
@@ -1409,7 +1410,7 @@ class QueryTest extends AtkPhpunit\TestCase
 
         // set multiple fields
         $this->assertSame(
-            'insert into "employee" ("time","name") values (now(),:a)',
+            'insert into "employee" ("time", "name") values (now(), :a)',
             $this->q()
                 ->field('time')->field('name')->table('employee')
                 ->set('time', new Expression('now()'))
@@ -1420,7 +1421,7 @@ class QueryTest extends AtkPhpunit\TestCase
 
         // set as array
         $this->assertSame(
-            'insert into "employee" ("time","name") values (now(),:a)',
+            'insert into "employee" ("time", "name") values (now(), :a)',
             $this->q()
                 ->field('time')->field('name')->table('employee')
                 ->set(['time' => new Expression('now()'), 'name' => 'unknown'])
@@ -1763,7 +1764,7 @@ class QueryTest extends AtkPhpunit\TestCase
             ->with($q1, 'q12', ['bar', 'baz'], true) // this one is recursive
             ->table('q11')
             ->table('q12');
-        $this->assertSame('with recursive "q11" ("foo","qwe""ry") as (select "salary" from "salaries"),"q12" ("bar","baz") as (select "salary" from "salaries") select * from "q11","q12"', $q2->render());
+        $this->assertSame('with recursive "q11" ("foo", "qwe""ry") as (select "salary" from "salaries"), "q12" ("bar", "baz") as (select "salary" from "salaries") select * from "q11", "q12"', $q2->render());
 
         // now test some more useful reql life query
         $quotes = $this->q()
@@ -1785,9 +1786,9 @@ class QueryTest extends AtkPhpunit\TestCase
             ->field(['name', 'salary', 'q.quoted', 'i.invoiced']);
         $this->assertSame(
             'with ' .
-                '"q" ("emp","quoted") as (select "emp_id",sum(:a) from "quotes" group by "emp_id"),' .
-                '"i" ("emp","invoiced") as (select "emp_id",sum(:b) from "invoices" group by "emp_id") ' .
-            'select "name","salary","q"."quoted","i"."invoiced" ' .
+                '"q" ("emp", "quoted") as (select "emp_id", sum(:a) from "quotes" group by "emp_id"), ' .
+                '"i" ("emp", "invoiced") as (select "emp_id", sum(:b) from "invoices" group by "emp_id") ' .
+            'select "name", "salary", "q"."quoted", "i"."invoiced" ' .
             'from "employees" ' .
                 'left join "q" on "q"."emp" = "employees"."id" ' .
                 'left join "i" on "i"."emp" = "employees"."id"',
