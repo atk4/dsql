@@ -72,13 +72,13 @@ class.
 Connection class is also responsible for executing queries. This is only used
 if you connect to vendor that does not use PDO.
 
-.. php:method:: execute(Expression $expr)
+.. php:method:: execute(Expression $expr): \Doctrine\DBAL\Result
 
     Creates new Expression class and sets :php:attr:`Expression::connection`.
 
     :param Expression  $expr: Expression (or query) to execute
     :returns: `Doctrine\DBAL\Result`
-    
+
 .. php:method:: registerConnectionClass($connectionClass = null, $connectionType = null)
 
     Adds connection class to the registry for resolving in Connection::resolveConnectionClass method.
@@ -93,6 +93,6 @@ Developers can register custom classes to handle driver types using the `Conneci
 
 .. php:method:: connectDbalConnection(array $dsn)
 
-   The method should establish connection with DB and return the underlying connection object used by 
-   the `Connection` class. By default PDO is used but the method can be overriden to return custom object to be 
+   The method should establish connection with DB and return the underlying connection object used by
+   the `Connection` class. By default PDO is used but the method can be overriden to return custom object to be
    used for connection to DB.
