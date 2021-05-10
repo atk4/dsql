@@ -9,7 +9,7 @@ use Doctrine\DBAL\Exception as DbalException;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\DBAL\Result as DbalResult;
 
-class Expression implements \ArrayAccess
+class Expression implements Expressionable, \ArrayAccess
 {
     /** @const string "[]" in template, escape as parameter */
     protected const ESCAPE_PARAM = 'param';
@@ -112,6 +112,14 @@ class Expression implements \ArrayAccess
         'trigger_error'('Method is deprecated. Use $this->getOne() instead', E_USER_DEPRECATED);
 
         return $this->getOne();
+    }
+
+    /**
+     * @return $this
+     */
+    public function getDsqlExpression(self $expression): self
+    {
+        return $this;
     }
 
     /**
@@ -252,13 +260,12 @@ class Expression implements \ArrayAccess
                 ->addMoreInfo('escapeMode', $escapeMode);
         }
 
-        // User may add Expressionable trait to any class, then pass it's objects
         if ($expression instanceof Expressionable) {
             $expression = $expression->getDsqlExpression($this);
         }
 
         if (!$expression instanceof self) {
-            throw (new Exception('Only Expressions or Expressionable objects may be used in Expression'))
+            throw (new Exception('Only Expressionable object type may be used in Expression'))
                 ->addMoreInfo('object', $expression);
         }
 
