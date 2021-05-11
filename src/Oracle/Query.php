@@ -22,7 +22,7 @@ class Query extends AbstractQuery
 
     public function _render_limit_start(): string
     {
-        return $this->args['limit']['shift'] ?? '0';
+        return (string) ($this->args['limit']['shift'] ?? 0);
     }
 
     public function _render_and_limit_end(): ?string
