@@ -9,6 +9,7 @@ class Query extends AbstractQuery
     // {{{ for Oracle 11 and lower to support LIMIT with OFFSET
 
     protected $template_select = '[with]select[option] [field] [from] [table][join][where][group][having][order]';
+    /** @var string */
     protected $template_select_limit = 'select * from (select "__t".*, rownum "__dsql_rownum" [from] ([with]select[option] [field] [from] [table][join][where][group][having][order]) "__t") where "__dsql_rownum" > [limit_start][and_limit_end]';
 
     public function limit($cnt, $shift = null)
@@ -19,12 +20,12 @@ class Query extends AbstractQuery
         return parent::limit($cnt, $shift);
     }
 
-    public function _render_limit_start()
+    public function _render_limit_start(): string
     {
-        return (int) $this->args['limit']['shift'];
+        return $this->args['limit']['shift'] ?? '0';
     }
 
-    public function _render_and_limit_end()
+    public function _render_and_limit_end(): ?string
     {
         if (!$this->args['limit']['cnt']) {
             return '';

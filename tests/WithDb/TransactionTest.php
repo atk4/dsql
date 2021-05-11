@@ -8,6 +8,7 @@ use Atk4\Core\AtkPhpunit;
 use Atk4\Dsql\Connection;
 use Atk4\Dsql\Exception;
 use Atk4\Dsql\Expression;
+use Atk4\Dsql\Query;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
@@ -85,7 +86,11 @@ class TransactionTest extends AtkPhpunit\TestCase
         $this->c = null; // @phpstan-ignore-line
     }
 
-    private function q($table = null, $alias = null)
+    /**
+     * @param mixed  $table
+     * @param string $alias
+     */
+    private function q($table = null, string $alias = null): Query
     {
         $q = $this->c->dsql();
 
@@ -97,19 +102,23 @@ class TransactionTest extends AtkPhpunit\TestCase
         return $q;
     }
 
-    private function e($template = null, $args = null)
+    /**
+     * @param string|array $template
+     * @param array        $args
+     */
+    private function e($template = [], array $args = null): Expression
     {
         return $this->c->expr($template, $args);
     }
 
-    public function testCommitException1()
+    public function testCommitException1(): void
     {
         // try to commit when not in transaction
         $this->expectException(Exception::class);
         $this->c->commit();
     }
 
-    public function testCommitException2()
+    public function testCommitException2(): void
     {
         // try to commit when not in transaction anymore
         $this->c->beginTransaction();
@@ -118,14 +127,14 @@ class TransactionTest extends AtkPhpunit\TestCase
         $this->c->commit();
     }
 
-    public function testRollbackException1()
+    public function testRollbackException1(): void
     {
         // try to rollback when not in transaction
         $this->expectException(Exception::class);
         $this->c->rollBack();
     }
 
-    public function testRollbackException2()
+    public function testRollbackException2(): void
     {
         // try to rollback when not in transaction anymore
         $this->c->beginTransaction();
@@ -137,7 +146,7 @@ class TransactionTest extends AtkPhpunit\TestCase
     /**
      * Tests simple and nested transactions.
      */
-    public function testTransactions()
+    public function testTransactions(): void
     {
         // truncate table, prepare
         $this->q('employee')->truncate();
@@ -302,7 +311,7 @@ class TransactionTest extends AtkPhpunit\TestCase
     /**
      * Tests inTransaction().
      */
-    public function testInTransaction()
+    public function testInTransaction(): void
     {
         // inTransaction tests
         $this->assertFalse(

@@ -22,16 +22,18 @@ class Query extends BaseQuery
         . "\n" . 'set IDENTITY_INSERT [table_noalias] off'
         . "\n" . 'end end catch';
 
-    public function _render_limit()
+    public function _render_limit(): ?string
     {
-        if (isset($this->args['limit'])) {
-            $cnt = (int) $this->args['limit']['cnt'];
-            $shift = (int) $this->args['limit']['shift'];
-
-            return (!isset($this->args['order']) ? ' order by (select null)' : '')
-                . ' offset ' . $shift . ' rows'
-                . ' fetch next ' . $cnt . ' rows only';
+        if (!isset($this->args['limit'])) {
+            return null;
         }
+
+        $cnt = (int) $this->args['limit']['cnt'];
+        $shift = (int) $this->args['limit']['shift'];
+
+        return (!isset($this->args['order']) ? ' order by (select null)' : '')
+            . ' offset ' . $shift . ' rows'
+            . ' fetch next ' . $cnt . ' rows only';
     }
 
     public function groupConcat($field, string $delimiter = ',')

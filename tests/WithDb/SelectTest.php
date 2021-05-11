@@ -8,6 +8,7 @@ use Atk4\Core\AtkPhpunit;
 use Atk4\Dsql\Connection;
 use Atk4\Dsql\Exception;
 use Atk4\Dsql\Expression;
+use Atk4\Dsql\Query;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
@@ -85,7 +86,11 @@ class SelectTest extends AtkPhpunit\TestCase
         $this->c = null; // @phpstan-ignore-line
     }
 
-    private function q($table = null, $alias = null)
+    /**
+     * @param mixed  $table
+     * @param string $alias
+     */
+    private function q($table = null, string $alias = null): Query
     {
         $q = $this->c->dsql();
 
@@ -97,12 +102,16 @@ class SelectTest extends AtkPhpunit\TestCase
         return $q;
     }
 
-    private function e($template = null, $args = null)
+    /**
+     * @param string|array $template
+     * @param array        $args
+     */
+    private function e($template = [], array $args = null): Expression
     {
         return $this->c->expr($template, $args);
     }
 
-    public function testBasicQueries()
+    public function testBasicQueries(): void
     {
         $this->assertSame(4, count($this->q('employee')->getRows()));
 
@@ -164,7 +173,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function testExpression()
+    public function testExpression(): void
     {
         /*
          * PostgreSQL, at least versions before 10, needs to have the string cast to the
@@ -190,7 +199,7 @@ class SelectTest extends AtkPhpunit\TestCase
         }
     }
 
-    public function testOtherQueries()
+    public function testOtherQueries(): void
     {
         // truncate table
         $this->q('employee')->truncate();
@@ -259,7 +268,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function testEmptyGetOne()
+    public function testEmptyGetOne(): void
     {
         // truncate table
         $this->q('employee')->truncate();
@@ -267,7 +276,7 @@ class SelectTest extends AtkPhpunit\TestCase
         $this->q('employee')->field('name')->getOne();
     }
 
-    public function testWhereExpression()
+    public function testWhereExpression(): void
     {
         $this->assertSame(
             [['id' => '2', 'name' => 'Jack', 'surname' => 'Williams', 'retired' => '1']],
@@ -275,7 +284,7 @@ class SelectTest extends AtkPhpunit\TestCase
         );
     }
 
-    public function testExecuteException()
+    public function testExecuteException(): void
     {
         $this->expectException(\Atk4\Dsql\ExecuteException::class);
 

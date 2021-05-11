@@ -13,7 +13,7 @@ abstract class AbstractQuery extends BaseQuery
     /** @var string */
     protected $template_seq_nextval = '[sequence].NEXTVAL';
 
-    public function render()
+    public function render(): string
     {
         if ($this->mode === 'select' && $this->main_table === null) {
             $this->table('DUAL');
@@ -36,7 +36,7 @@ abstract class AbstractQuery extends BaseQuery
         return $this;
     }
 
-    public function _render_sequence()
+    public function _render_sequence(): ?string
     {
         return $this->args['sequence'];
     }
