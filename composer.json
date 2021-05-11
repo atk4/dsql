@@ -27,13 +27,13 @@
         }
     ],
     "require": {
-        "php": ">=7.3.0",
+        "php": ">=7.4.0",
         "ext-pdo": "*",
         "atk4/core": "dev-develop",
         "doctrine/dbal": "^2.10 || ^3.0"
     },
     "require-release": {
-        "php": ">=7.3.0",
+        "php": ">=7.4.0",
         "ext-pdo": "*",
         "atk4/core": "~3.0.0",
         "doctrine/dbal": "^2.10 || ^3.0"
