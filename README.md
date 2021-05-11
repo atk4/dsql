@@ -1,4 +1,6 @@
 
+# ⚠️ repo was integrated into [atk4/data](https://github.com/atk4/data) ⚠️
+
 DSQL is a composable SQL query builder. You can write multi-vendor queries in PHP profiting from
 better security, clean syntax and avoid human errors.
 
