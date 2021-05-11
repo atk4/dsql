@@ -341,11 +341,12 @@ abstract class Connection
                             . ', ' . $this->quoteSingleIdentifierAsStringLiteral((string) $level0Name)
                             . ', N' . $this->quoteStringLiteral((string) $level1Type)
                             . ', ' . $this->quoteSingleIdentifierAsStringLiteral((string) $level1Name)
-                            . ($level2Type !== null || $level2Name !== null
+                            . (
+                                $level2Type !== null || $level2Name !== null
                                 ? ', N' . $this->quoteStringLiteral((string) $level2Type)
                                   . ', ' . $this->quoteSingleIdentifierAsStringLiteral((string) $level2Name)
                                 : ''
-                              );
+                            );
                     }
 
                     public function getDropExtendedPropertySQL(
@@ -363,11 +364,12 @@ abstract class Connection
                             . ', ' . $this->quoteSingleIdentifierAsStringLiteral((string) $level0Name)
                             . ', N' . $this->quoteStringLiteral((string) $level1Type)
                             . ', ' . $this->quoteSingleIdentifierAsStringLiteral((string) $level1Name)
-                            . ($level2Type !== null || $level2Name !== null
+                            . (
+                                $level2Type !== null || $level2Name !== null
                                 ? ', N' . $this->quoteStringLiteral((string) $level2Type)
                                   . ', ' . $this->quoteSingleIdentifierAsStringLiteral((string) $level2Name)
                                 : ''
-                              );
+                            );
                     }
 
                     public function getUpdateExtendedPropertySQL(
@@ -386,11 +388,12 @@ abstract class Connection
                             . ', ' . $this->quoteSingleIdentifierAsStringLiteral((string) $level0Name)
                             . ', N' . $this->quoteStringLiteral((string) $level1Type)
                             . ', ' . $this->quoteSingleIdentifierAsStringLiteral((string) $level1Name)
-                            . ($level2Type !== null || $level2Name !== null
+                            . (
+                                $level2Type !== null || $level2Name !== null
                                 ? ', N' . $this->quoteStringLiteral((string) $level2Type)
                                   . ', ' . $this->quoteSingleIdentifierAsStringLiteral((string) $level2Name)
                                 : ''
-                              );
+                            );
                     }
 
                     protected function getCommentOnTableSQL(string $tableName, ?string $comment): string
@@ -422,7 +425,7 @@ abstract class Connection
                 $dbalConnection->platform = new class() extends OraclePlatform {
                     private function forwardTypeDeclarationSQL(string $targetMethodName, array $column): string
                     {
-                        $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS);
+                        $backtrace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS);
                         foreach ($backtrace as $frame) {
                             if ($this === ($frame['object'] ?? null)
                                 && $targetMethodName === ($frame['function'] ?? null)) {
