@@ -112,7 +112,7 @@ class Expression implements Expressionable, \ArrayAccess
      */
     public function __toString()
     {
-        'trigger_error'('Method is deprecated. Use $this->getOne() instead', E_USER_DEPRECATED);
+        'trigger_error'('Method is deprecated. Use $this->getOne() instead', \E_USER_DEPRECATED);
 
         return $this->getOne();
     }
@@ -613,7 +613,7 @@ class Expression implements Expressionable, \ArrayAccess
      */
     public function get(): array
     {
-        'trigger_error'('Method is deprecated. Use getRows instead', E_USER_DEPRECATED);
+        'trigger_error'('Method is deprecated. Use getRows instead', \E_USER_DEPRECATED);
 
         return $this->getRows();
     }

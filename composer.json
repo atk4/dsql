@@ -27,24 +27,24 @@
         }
     ],
     "require": {
-        "php": ">=7.3.0",
+        "php": ">=7.4.0",
         "ext-pdo": "*",
         "atk4/core": "dev-develop",
         "doctrine/dbal": "^2.10 || ^3.0"
     },
     "require-release": {
-        "php": ">=7.3.0",
+        "php": ">=7.4.0",
         "ext-pdo": "*",
         "atk4/core": "~3.0.0",
         "doctrine/dbal": "^2.10 || ^3.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.13",
-        "friendsofphp/php-cs-fixer": "^2.17",
+        "friendsofphp/php-cs-fixer": "^3.0",
         "johnkary/phpunit-speedtrap": "^3.2",
         "phpstan/phpstan": "^0.12.58",
         "phpunit/phpcov": "*",
-        "phpunit/phpunit": ">=9.1"
+        "phpunit/phpunit": ">=9.3"
     },
     "suggest": {
         "jdorn/sql-formatter": "*"
